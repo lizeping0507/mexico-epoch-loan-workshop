@@ -1,0 +1,98 @@
+# 服务容器
+server:
+  # 服务端口
+  port: 12001
+  max-http-header-size: 10MB
+  # 容器配置
+  undertow:
+    io-threads: 16
+    worker-threads: 256
+    buffer-size: 1024
+    buffers-per-region: 1024
+    direct-buffers: true
+
+#项目基本配置
+spring:
+  boot:
+    admin:
+      client:
+        url: http://loan-1:10000
+  main:
+    allow-bean-definition-overriding: true
+  application:
+    name: epoch-loan-workshop-timing
+  cloud:
+    nacos:
+      discovery:
+        # 服务中心
+        server-addr: loan-1:8848
+        # 配置中心命名空间ID
+        namespace: pro_1300
+      config:
+        # 动态配置
+        enabled: true
+        #读取配置文件
+        shared-dataids: epoch-loan-workshop-mysql.yml,epoch-loan-workshop-redis.yml,epoch-loan-workshop-rocket.yml,epoch-loan-workshop-risk.yml
+        refreshable-dataids: epoch-loan-workshop-mysql.yml,epoch-loan-workshop-redis.yml,epoch-loan-workshop-rocket.yml,epoch-loan-workshop-risk.yml
+        # 服务中心
+        server-addr: loan-1:8848
+        # 配置中心命名空间ID
+        namespace: pro_1300
+        group: DEFAULT_GROUP
+        # 这里指定的文件格式需要和nacos上新建的配置文件后缀相同，否则读不到
+        file-extension: yml
+
+logging:
+  level:
+    com.alibaba.nacos.client.config.impl: WARN
+
+#安全检查
+management:
+  endpoint:
+    logfile:
+      external-file: ${log.path}/system.log
+    health:
+      show-details: ALWAYS
+  health:
+    elasticsearch:
+      enabled: false
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+
+# feign支持sentinel
+feign:
+  sentinel:
+    enabled: true
+
+# ribbon 策略
+ribbon:
+  ReadTimeout: 6000
+  ConnectTimeout: 6000
+
+#mybatis
+mybatis-plus:
+  # 配置文件扫描
+  mapper-locations: classpath*:/mapper/*Mapper.xml
+  # 实体类扫描
+  typeAliasesPackage: com.epoch.loan.workshop.common.entity
+  global-config:
+    # 数据库相关配置
+    db-config:
+      #主键类型  AUTO:"数据库ID自增", INPUT:"用户输入ID",ID_WORKER:"全局唯一ID (数字类型唯一ID)", UUID:"全局唯一ID UUID";
+      id-type: UUID
+      #字段策略 IGNORED:"忽略判断",NOT_NULL:"非 NULL 判断"),NOT_EMPTY:"非空判断"
+      field-strategy: not_empty
+      #驼峰下划线转换
+      column-underline: true
+      #数据库大写下划线转换
+      #capital-mode: true
+      #逻辑删除配置
+      logic-delete-value: 0
+      logic-not-delete-value: 1
+  # 原生配置
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+

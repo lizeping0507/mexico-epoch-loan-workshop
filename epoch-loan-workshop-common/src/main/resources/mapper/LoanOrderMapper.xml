@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.epoch.loan.workshop.common.dao.LoanOrderDao">
+    <update id="updateOrderStatus">
+        UPDATE loan_order SET status=#{status},update_time=#{updateTime} WHERE id=#{orderId}
+    </update>
+    <update id="updateOrderProductId">
+        UPDATE loan_order SET product_id=#{productId},update_time=#{updateTime} WHERE id=#{orderId}
+    </update>
+    <update id="updateOrderApprovalAmount">
+        UPDATE loan_order SET approval_amount=#{approvalAmount},update_time=#{updateTime} WHERE id=#{orderId}
+    </update>
+    <update id="updateOrderUserType">
+        UPDATE loan_order SET user_type=#{userType},update_time=#{updateTime} WHERE id=#{orderId}
+    </update>
+    <update id="updateOrderReloan">
+        UPDATE loan_order SET reloan=#{reloan},update_time=#{updateTime} WHERE id=#{orderId}
+    </update>
+    <update id="updateOrderExaminePassTime">
+        UPDATE loan_order SET examine_pass_time=#{examinePassTime},update_time=#{updateTime} WHERE id=#{orderId}
+    </update>
+    <update id="updateOrderActualAmount">
+        UPDATE loan_order SET actual_amount=#{actualAmount},update_time=#{updateTime} WHERE id=#{orderId}
+    </update>
+    <update id="updateOrderLoanTime">
+        UPDATE loan_order SET loan_time=#{loanTime},update_time=#{updateTime} WHERE id=#{orderId}
+    </update>
+    <update id="updateOrderArrivalTime">
+        UPDATE loan_order SET arrival_time=#{arrivalTime},update_time=#{updateTime} WHERE id=#{orderId}
+    </update>
+    <update id="updateOrderEstimatedRepaymentAmount">
+        UPDATE loan_order SET estimated_repayment_amount=#{estimatedRepaymentAmount},update_time=#{updateTime} WHERE
+        id=#{orderId}
+    </update>
+    <update id="updateOrderActualRepaymentAmount">
+        UPDATE loan_order SET actual_repayment_amount=#{actualRepaymentAmount},update_time=#{updateTime} WHERE id=#{orderId}
+    </update>
+    <update id="updateOrderIncidentalAmount">
+        UPDATE loan_order SET incidental_amount=#{incidentalAmount},update_time=#{updateTime} WHERE id=#{orderId}
+    </update>
+    <update id="updateLoanTime">
+        UPDATE loan_order SET loan_time=#{loanTime},update_time=#{updateTime} WHERE id=#{orderId}
+    </update>
+    <select id="findOrder" resultType="com.epoch.loan.workshop.common.entity.LoanOrderEntity">
+        SELECT * FROM loan_order WHERE id=#{orderId}
+    </select>
+    <select id="findOrderCountByAppNameAndUserIdAndStatus" resultType="java.lang.Integer">
+        SELECT COUNT(1) FROM loan_order WHERE user_id=#{userId} AND app_name=#{appName} AND status=#{status}
+    </select>
+    <select id="findRemittanceDistributionGroupById" resultType="java.lang.String">
+        SELECT remittance_distribution_group FROM loan_order WHERE id = #{orderId}
+    </select>
+</mapper>

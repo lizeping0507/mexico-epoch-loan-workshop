@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.epoch.loan.workshop.common.dao.LoanMaskDao">
+
+    <select id="findLoanMaskByAppNameAndLevel" resultType="com.epoch.loan.workshop.common.entity.LoanMaskEntity">
+        SELECT * FROM loan_mask WHERE app_name=#{appName} and level=#{level}
+    </select>
+</mapper>

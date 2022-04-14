@@ -1,0 +1,141 @@
+package com.epoch.loan.workshop.mq.order;
+
+import com.epoch.loan.workshop.common.constant.OrderBillStatus;
+import com.epoch.loan.workshop.common.constant.OrderExamineStatus;
+import com.epoch.loan.workshop.common.constant.OrderStatus;
+import com.epoch.loan.workshop.common.entity.LoanOrderBillEntity;
+import com.epoch.loan.workshop.common.entity.LoanOrderEntity;
+import com.epoch.loan.workshop.common.mq.order.params.OrderParams;
+import com.epoch.loan.workshop.common.util.DateUtil;
+import com.epoch.loan.workshop.common.util.LogUtil;
+import lombok.Data;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyContext;
+import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyStatus;
+import org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently;
+import org.apache.rocketmq.common.message.Message;
+import org.apache.rocketmq.common.message.MessageExt;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.stereotype.Component;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * @author : Duke
+ * @packageName : com.epoch.loan.workshop.mq.order
+ * @className : OrderWay
+ * @createTime : 2021/11/16 18:07
+ * @description : 订单在途
+ */
+@RefreshScope
+@Component
+@Data
+public class OrderWay extends BaseOrderMQListener implements MessageListenerConcurrently {
+
+    /**
+     * 标签
+     */
+    @Value("${rocket.order.orderWay.subExpression}")
+    private String subExpression;
+
+    /**
+     * 消息监听器
+     */
+    private MessageListenerConcurrently messageListener = this;
+
+    /**
+     * 消费任务
+     */
+    @Override
+    public ConsumeConcurrentlyStatus consumeMessage(List<MessageExt> msgs, ConsumeConcurrentlyContext context) {
+        // 循环处理消息
+        for (Message msg : msgs) {
+            // 消息对象
+            OrderParams orderParams = null;
+
+            try {
+                // 获取消息对象
+                orderParams = getMessage(msg);
+                if (ObjectUtils.isEmpty(orderParams)) {
+                    continue;
+                }
+
+                // 队列拦截
+                if (intercept(orderParams.getGroupName(), subExpression)) {
+                    // 等待重试
+                    retry(orderParams, subExpression);
+                    continue;
+                }
+
+                // 订单id
+                String orderId = orderParams.getOrderId();
+
+                // 查询订单ID
+                LoanOrderEntity loanOrderEntity = loanOrderDao.findOrder(orderId);
+                if (ObjectUtils.isEmpty(loanOrderEntity)) {
+                    continue;
+                }
+
+                /*计算还款金额及更新还款时间 TODO 还款金额应该移到审批通过节点计算*/
+                // 计算每期还款时间
+                Map<Integer, Date> repaymentTimeMap = new HashMap<>();
+                Date firstRepaymentTime;
+                for (int i = 1; i <= loanOrderEntity.getStages(); i++) {
+                    // 第一期起始时间
+                    if (i == 1) {
+                        firstRepaymentTime = DateUtil.addDay(new Date(), 6);
+                        repaymentTimeMap.put(i, firstRepaymentTime);
+                        continue;
+                    }
+
+                    // 还款时间
+                    Date repaymentTime = DateUtil.addDay(new Date(), 6 * i);
+                    repaymentTimeMap.put(i, repaymentTime);
+                }
+
+                // 应还金额
+                double repaymentAmount = loanOrderEntity.getEstimatedRepaymentAmount() / loanOrderEntity.getStages();
+
+                // 查询订单账单列表
+                List<LoanOrderBillEntity> loanOrderBillEntityList = loanOrderBillDao.findOrderBillByOrderId(orderId);
+
+                // 修改订单账单还款实际及还款金额
+                loanOrderBillEntityList.parallelStream().forEach(loanOrderBillEntity -> {
+                    // 修改应还金额
+                    loanOrderBillDao.updateOrderBillRepaymentAmount(loanOrderBillEntity.getId(), repaymentAmount, new Date());
+
+                    // 修改还款时间
+                    loanOrderBillDao.updateOrderBillRepaymentTime(loanOrderBillEntity.getId(), DateUtil.StringToDate(DateUtil.DateToString(repaymentTimeMap.get(loanOrderBillEntity.getStages()), "yyyy-MM-dd") + " 23:59:59", "yyyy-MM-dd HH:mm:ss"), new Date());
+                });
+
+                // 修改订单和订单账单状态为在途  FIXME 新老表
+                updateOrderStatus(orderId, OrderStatus.WAY);
+                updateOrderBillStatus(orderId, OrderBillStatus.WAY);
+                platformOrderDao.updateOrderStatus(orderId, 170, new Date());
+
+                // 修改审核状态
+                updateModeExamine(orderId, subExpression, OrderExamineStatus.PASS);
+
+                // 发送到下一模型
+                sendNextModel(orderParams, subExpression);
+            } catch (Exception e) {
+                try {
+                    // 更新对应模型审核状态
+                    updateModeExamine(orderParams.getOrderId(), subExpression, OrderExamineStatus.FAIL);
+
+                    // 异常,重试
+                    retry(orderParams, subExpression);
+                } catch (Exception exception) {
+                    LogUtil.sysError("[OrderWay]", exception);
+                }
+
+                LogUtil.sysError("[OrderWay]", e);
+            }
+        }
+        return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
+    }
+}

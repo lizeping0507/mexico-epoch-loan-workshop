@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.epoch.loan.workshop.common.dao.LoanRemittanceOrderRecordDao">
+    <insert id="insert">
+        INSERT INTO loan_remittance_order_record (id,
+                                                  order_id,
+                                                  payment_id,
+                                                  amount,
+                                                  phone,
+                                                  add_card,
+                                                  pan_card,
+                                                  email,
+                                                  name,
+                                                  bank_card,
+                                                  ifsc,
+                                                  status,
+                                                  process_remittance_payment_record_id,
+                                                  success_remittance_payment_record_id,
+                                                  update_time,
+                                                  create_time)
+        VALUES (#{loanRemittanceOrderRecordEntity.id},
+                #{loanRemittanceOrderRecordEntity.orderId},
+                #{loanRemittanceOrderRecordEntity.paymentId},
+                #{loanRemittanceOrderRecordEntity.amount},
+                #{loanRemittanceOrderRecordEntity.phone},
+                #{loanRemittanceOrderRecordEntity.addCard},
+                #{loanRemittanceOrderRecordEntity.panCard},
+                #{loanRemittanceOrderRecordEntity.email},
+                #{loanRemittanceOrderRecordEntity.name},
+                #{loanRemittanceOrderRecordEntity.bankCard},
+                #{loanRemittanceOrderRecordEntity.ifsc},
+                #{loanRemittanceOrderRecordEntity.status},
+                #{loanRemittanceOrderRecordEntity.processRemittancePaymentRecordId},
+                #{loanRemittanceOrderRecordEntity.successRemittancePaymentRecordId},
+                #{loanRemittanceOrderRecordEntity.updateTime},
+                #{loanRemittanceOrderRecordEntity.createTime})
+    </insert>
+    <update id="updateStatus">
+        update loan_remittance_order_record set status = #{status} , update_time = #{updateTime} where id = #{id}
+    </update>
+    <update id="updatePaymentId">
+        update loan_remittance_order_record set payment_id = #{paymentId} , update_time = #{updateTime} where id = #{id}
+    </update>
+    <update id="updateProcessRemittancePaymentRecordId">
+        update loan_remittance_order_record set process_remittance_payment_record_id = #{processRemittancePaymentRecordId} , update_time = #{updateTime} where id = #{id}
+    </update>
+    <update id="updateSuccessRemittancePaymentRecordId">
+        update loan_remittance_order_record set success_remittance_payment_record_id = #{successRemittancePaymentRecordId} , update_time = #{updateTime} where id = #{id}
+    </update>
+    <select id="findLoanRemittanceOrderRecordStatusByOrderId" resultType="java.lang.Integer">
+        SELECT status FROM loan_remittance_order_record WHERE order_id=#{orderId}
+    </select>
+    <select id="findLoanRemittanceOrderRecordStatusById" resultType="java.lang.Integer">
+        SELECT status FROM loan_remittance_order_record WHERE id=#{id}
+    </select>
+    <select id="getById" resultType="com.epoch.loan.workshop.common.entity.LoanRemittanceOrderRecordEntity">
+        SELECT * FROM loan_remittance_order_record WHERE id = #{id}
+    </select>
+    <select id="findByStatus"
+            resultType="com.epoch.loan.workshop.common.entity.LoanRemittanceOrderRecordEntity">
+        SELECT * FROM loan_remittance_order_record WHERE status = #{status}
+    </select>
+</mapper>

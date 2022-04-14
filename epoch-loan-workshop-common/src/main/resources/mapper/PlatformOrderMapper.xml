@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.epoch.loan.workshop.common.dao.PlatformOrderDao">
+
+    <update id="updateOrderStatus">
+        UPDATE platform_order SET order_status=#{status},update_time=#{updateTime} WHERE order_no=#{orderNo}
+    </update>
+    <update id="updateOrderProductId">
+        UPDATE platform_order SET product_id=#{productId},update_time=#{updateTime} WHERE order_no=#{orderNo}
+    </update>
+    <update id="updateOrderUserType">
+        UPDATE platform_order SET user_type=#{userType},update_time=#{updateTime} WHERE order_no=#{orderNo}
+    </update>
+    <update id="updateOrderApprovalAmount">
+        UPDATE platform_order SET approval_amount=#{approvalAmount},update_time=#{updateTime} WHERE order_no=#{orderNo}
+    </update>
+    <update id="updateOrderReloan">
+        UPDATE platform_order SET is_reloan=#{reloan},update_time=#{updateTime} WHERE order_no=#{orderNo}
+    </update>
+    <update id="updateOrderApprovalTime">
+        UPDATE platform_order SET approval_time=#{time},update_time=#{updateTime} WHERE order_no=#{orderNo}
+    </update>
+    <update id="updateOrderReceiveAmount">
+        UPDATE platform_order SET receive_amount=#{receiveAmount},update_time=#{updateTime} WHERE order_no=#{orderNo}
+    </update>
+    <update id="updateOrderLoanTime">
+        UPDATE platform_order SET loan_time=#{loanTime},update_time=#{updateTime} WHERE order_no=#{orderNo}
+    </update>
+    <update id="updateOrderMerchantId">
+        UPDATE platform_order SET merchant_id=#{merchantId},update_time=#{updateTime} WHERE order_no=#{orderNo}
+    </update>
+    <select id="findWayOrderCountByUserId" resultType="java.lang.Integer">
+        SELECT COUNT(1) FROM platform_order WHERE order_status IN (115,170,171,175,180) AND user_id=#{userId}
+    </select>
+    <select id="findUserFirstOrderDateByUserIdAndProductId" resultType="java.util.Date">
+        SELECT actual_repayment_time FROM platform_order WHERE user_id=#{userId} AND product_id=#{productId} ORDER BY order_time ASC LIMIT 0,1
+    </select>
+    <select id="findUserFirstOrderDateByUserId" resultType="java.util.Date">
+        SELECT actual_repayment_time FROM platform_order WHERE user_id=#{userId} ORDER BY order_time ASC LIMIT 0,1
+    </select>
+    <select id="findAppIdByOrderNo" resultType="java.lang.Long">
+        SELECT app_id FROM platform_order WHERE order_no = #{orderNo} LIMIT 0,1
+    </select>
+</mapper>

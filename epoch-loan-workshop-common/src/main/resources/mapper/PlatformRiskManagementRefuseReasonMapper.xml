@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.epoch.loan.workshop.common.dao.PlatformRiskManagementRefuseReasonDao">
+
+    <insert id="insert">
+        INSERT INTO `platform_riskmanagement_refuse_reason` (`order_no`, `user_id`, `user_type`,
+                                                                          `login_name`, `source`, `merchant_id`,
+                                                                          `product_id`, `pass`, `refuse_reason`,
+                                                                          `app_id`, `channel_id`, `create_time`,
+                                                                          `moudle_tag`)
+        VALUES (
+                #{platformRiskManagementRefuseReasonEntity.orderNo},
+                #{platformRiskManagementRefuseReasonEntity.userId},
+                #{platformRiskManagementRefuseReasonEntity.userType},
+                #{platformRiskManagementRefuseReasonEntity.loginName},
+                #{platformRiskManagementRefuseReasonEntity.source},
+                #{platformRiskManagementRefuseReasonEntity.merchantId},
+                #{platformRiskManagementRefuseReasonEntity.productId},
+                #{platformRiskManagementRefuseReasonEntity.pass},
+                #{platformRiskManagementRefuseReasonEntity.refuseReason},
+                #{platformRiskManagementRefuseReasonEntity.appId},
+                #{platformRiskManagementRefuseReasonEntity.channelId},
+                #{platformRiskManagementRefuseReasonEntity.createTime},
+                #{platformRiskManagementRefuseReasonEntity.moudleTag});
+    </insert>
+</mapper>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.epoch.loan.workshop.common.dao.LoanOrderBillDao">
+
+    <insert id="insertOrderBillByOrderId">
+        INSERT INTO
+        loan_order_bill
+        (`id`, `order_id`, `stages`,`repayment_amount`, `punishment_amount`, `interest_amount`, `incidental_amount`,
+        `repayment_time`, `actual_repayment_time`, `status`, `create_time`, `update_time`)
+        VALUES
+        (#{loanOrderBillEntity.id}, #{loanOrderBillEntity.orderId}, #{loanOrderBillEntity.stages},
+        #{loanOrderBillEntity.repaymentAmount},
+        #{loanOrderBillEntity.punishmentAmount}, #{loanOrderBillEntity.interestAmount},
+        #{loanOrderBillEntity.incidentalAmount}, #{loanOrderBillEntity.repaymentTime},
+        #{loanOrderBillEntity.actualRepaymentTime}, #{loanOrderBillEntity.status}, #{loanOrderBillEntity.createTime},
+        #{loanOrderBillEntity.updateTime});
+    </insert>
+    <update id="updateOrderBillStatusByOrderId">
+        UPDATE loan_order_bill SET status=#{status},update_time=#{updateTime} WHERE order_id=#{orderId}
+    </update>
+    <update id="updateOrderBillRepaymentAmount">
+        UPDATE loan_order_bill SET repayment_amount=#{repaymentAmount},update_time=#{updateTime} WHERE id=#{id}
+    </update>
+    <update id="updateOrderBillRepaymentTime">
+        UPDATE loan_order_bill SET repayment_time=#{repaymentTime},update_time=#{updateTime} WHERE id=#{id}
+    </update>
+    <update id="updateOrderBillActualRepaymentTime">
+        UPDATE loan_order_bill SET actual_repayment_time=#{actualRepaymentTime},update_time=#{updateTime} WHERE id=#{id}
+    </update>
+    <update id="updateOrderBillStatus">
+        UPDATE loan_order_bill SET status=#{status},update_time=#{updateTime} WHERE id=#{id}
+    </update>
+    <select id="findOrderBillByOrderId" resultType="com.epoch.loan.workshop.common.entity.LoanOrderBillEntity">
+        SELECT * FROM loan_order_bill WHERE order_id=#{orderId}
+    </select>
+    <select id="findOrderBill" resultType="com.epoch.loan.workshop.common.entity.LoanOrderBillEntity">
+        SELECT * FROM loan_order_bill WHERE id=#{id}
+    </select>
+    <select id="findOrderNotCompleteCount" resultType="java.lang.Integer">
+        SELECT COUNT(1) FROM loan_order_bill WHERE order_id=#{orderId} AND status NOT IN (50,51)
+    </select>
+    <select id="sumOrderCompleteRepaymentAmount" resultType="java.lang.Double">
+        SELECT SUM(repayment_amount) FROM loan_order_bill WHERE order_id=#{orderId} AND status IN (50,51)
+    </select>
+    <select id="findOrderDueCompleteCount" resultType="java.lang.Integer">
+        SELECT COUNT(1) FROM loan_order_bill WHERE order_id=#{orderId} AND status = 51
+    </select>
+    <select id="sumOrderRepaymentAmount" resultType="java.lang.Double">
+        SELECT SUM(repayment_amount) FROM loan_order_bill WHERE order_id=#{orderId}
+    </select>
+</mapper>
