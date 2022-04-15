@@ -1,6 +1,9 @@
 package com.epoch.loan.workshop.common.service;
 
-import com.epoch.loan.workshop.common.params.params.request.*;
+import com.epoch.loan.workshop.common.params.params.request.RepaymentParams;
+import com.epoch.loan.workshop.common.params.params.request.UtrParams;
+import com.epoch.loan.workshop.common.params.params.request.YeahPayRepamentCallbackParam;
+import com.epoch.loan.workshop.common.params.result.Result;
 
 /**
  * @author : Shangkunfeng
@@ -13,8 +16,26 @@ public interface RepaymentService {
 
     /**
      * 放款发起
+     *
      * @param params 放款参数
      * @return 支付地址
      */
     String repayment(RepaymentParams params);
+
+    /**
+     * 回调处理
+     *
+     * @param params 回调参数
+     * @return String
+     */
+    String yeahPayCallback(YeahPayRepamentCallbackParam params);
+
+    /**
+     * 调支付提供的UTR接口
+     *
+     * @param params utr参数
+     * @return 调用支付成功与否
+     * @throws Exception
+     */
+    Result<Object> repayUtr(UtrParams params) throws Exception;
 }

@@ -2,7 +2,6 @@ package com.epoch.loan.workshop.common.params.params.request;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.Serializable;
 

@@ -20,6 +20,7 @@ dubbo:
   registry:
     # 服务注册地址，也就是 Nacos 的服务器地址
     address: nacos://loan-1:8848
+    parameters[namespace]: ${namespace}
   provider:
     # 配置负载均衡策略（轮询） random：随机 #roundrobin：轮询 #leastactive：最少活跃数 #consistenthash：一致性 Hash
     loadbalance: roundrobin
@@ -30,44 +31,24 @@ spring:
     admin:
       client:
         url: http://loan-1:10000
-  zipkin:
-    base-url: http://loan-1:9411/
-    disscoveryClientEnabled: false
-  sleuth:
-    sampler:
-      probability: 1.0
   main:
     allow-bean-definition-overriding: true
   application:
-    name: epoch-pf-option-order
+    name: epoch-loan-workshop-order
   cloud:
     nacos:
-      discovery:
-        # 服务中心
-        server-addr: loan-1:8848
-        # 配置中心命名空间ID
-        namespace: pro_1300
       config:
         # 动态配置
         enabled: true
         #读取配置文件
-        shared-dataids: epoch-loan-workshop-mysql.yml,epoch-loan-workshop-redis.yml,epoch-loan-workshop-rocket.yml,epoch-loan-workshop-risk.yml
-        refreshable-dataids: epoch-loan-workshop-mysql.yml,epoch-loan-workshop-redis.yml,epoch-loan-workshop-rocket.yml,epoch-loan-workshop-risk.yml
-        # 服务中心
+        shared-dataids: epoch-loan-workshop-platform.yml,epoch-loan-workshop-mysql.yml,epoch-loan-workshop-redis.yml,epoch-loan-workshop-rocket.yml,epoch-loan-workshop-risk.yml,epoch-loan-workshop-elasticsearch.yml
+        refreshable-dataids: epoch-loan-workshop-platform.yml,epoch-loan-workshop-mysql.yml,epoch-loan-workshop-redis.yml,epoch-loan-workshop-rocket.yml,epoch-loan-workshop-risk.yml,epoch-loan-workshop-elasticsearch.yml        # 服务中心
         server-addr: loan-1:8848
         # 配置中心命名空间ID
-        namespace: pro_1300
+        namespace: ${namespace}
         group: DEFAULT_GROUP
         # 这里指定的文件格式需要和nacos上新建的配置文件后缀相同，否则读不到
         file-extension: yml
-    sentinel:
-      enabled: true
-      eager: true
-      transport:
-        # sentinel 控制台的端口
-        dashboard: loan-1:7747
-        #默认8719端口，假如被占用会自动从8719开始依次+1扫描，直至找到未被占用的端口
-        port: 6000
 
 #日志基本
 logging:

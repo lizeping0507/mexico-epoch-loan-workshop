@@ -2,10 +2,9 @@ package com.epoch.loan.workshop.api.web;
 
 import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.constant.Field;
-import com.epoch.loan.workshop.common.constant.ReturnCodeField;
-import com.epoch.loan.workshop.common.constant.ReturnMessage;
+import com.epoch.loan.workshop.common.constant.ResultEnum;
+import com.epoch.loan.workshop.common.mq.log.params.AccessLogParams;
 import com.epoch.loan.workshop.common.params.result.Result;
-import com.epoch.loan.workshop.common.params.system.AccessLogParams;
 import com.epoch.loan.workshop.common.util.IpUtil;
 import com.epoch.loan.workshop.common.util.LogUtil;
 import com.epoch.loan.workshop.common.util.ObjectIdUtil;
@@ -15,10 +14,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
 import java.io.IOException;
 
 /**
@@ -42,6 +39,11 @@ public class Interceptor implements HandlerInterceptor {
     @Value("${spring.application.name}")
     private String NAME;
 
+    /**
+     * 项目端口
+     */
+    @Value("${server.port}")
+    private String PORT;
 
     /**
      * 请求之前执行
@@ -66,6 +68,9 @@ public class Interceptor implements HandlerInterceptor {
         // 唯一流水号
         String serialNo = ObjectIdUtil.getObjectId();
 
+        // 映射地址
+        String mappingUrl = (String) request.getAttribute(Field.MAPPING_URL);
+
         // 访问日志
         AccessLogParams accessLogParams = new AccessLogParams();
 
@@ -78,20 +83,27 @@ public class Interceptor implements HandlerInterceptor {
         // 请求地址
         accessLogParams.setUrl(request.getRequestURI());
 
+        // 映射地址
+        accessLogParams.setMappingUrl(mappingUrl);
+
         // 获取客户端IP
         accessLogParams.setIp(ip);
 
         // 当前服务器IP
         accessLogParams.setServerIp(SERVER_IP);
 
+        // 当前服务端口
+        accessLogParams.setPort(PORT);
+
         // 项目名称
         accessLogParams.setApplicationName(NAME);
+
 
         // 判断请求类型 只接受GET或POST类型请求
         if (!request.getMethod().equals(HttpMethod.POST.name()) && !request.getMethod().equals(HttpMethod.GET.name())) {
             // 不是规定请求类型返回请求类型异常
             // 向前端返回异常信息
-            String result = viewWriter(response, serialNo, ReturnCodeField.METHOD_FAIL, ReturnMessage.METHOD_FAIL);
+            String result = viewWriter(response, serialNo, ResultEnum.METHOD_ERROR.code(), ResultEnum.METHOD_ERROR.message());
 
             // 将响应信息封装到日志中
             accessLogParams.setResponse(result);
@@ -159,6 +171,7 @@ public class Interceptor implements HandlerInterceptor {
      */
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+
         // 从request中获取日志对象
         Object object = request.getAttribute(Field.ACCESS_LOG);
 
@@ -174,7 +187,7 @@ public class Interceptor implements HandlerInterceptor {
         accessLogParams.setResponseTime(System.currentTimeMillis());
 
         // 计算请求耗时时间
-        String accessSpend = String.valueOf(Long.valueOf(accessLogParams.getResponseTime()) - Long.valueOf(accessLogParams.getRequestTime()));
+        Long accessSpend = Long.valueOf(accessLogParams.getResponseTime()) - Long.valueOf(accessLogParams.getRequestTime());
         accessLogParams.setAccessSpend(accessSpend);
 
         // 打印请求日志

@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.constant.Field;
 import com.epoch.loan.workshop.common.constant.OrderExamineStatus;
 import com.epoch.loan.workshop.common.constant.OrderStatus;
-import com.epoch.loan.workshop.common.entity.*;
+import com.epoch.loan.workshop.common.entity.mysql.*;
 import com.epoch.loan.workshop.common.mq.order.params.OrderParams;
 import com.epoch.loan.workshop.common.util.DateUtil;
 import com.epoch.loan.workshop.common.util.HttpUtils;
@@ -19,12 +19,9 @@ import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyStatus;
 import org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently;
 import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.common.message.MessageExt;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -42,18 +39,16 @@ import java.util.Map;
 @Data
 public class RiskModelV2 extends BaseOrderMQListener implements MessageListenerConcurrently {
     /**
-     * 标签
-     */
-    @Value("${rocket.order.riskModelV2.subExpression}")
-    private String subExpression = "";
-
-    /**
      * 消息监听器
      */
     private MessageListenerConcurrently messageListener = this;
 
     /**
      * 消费任务
+     *
+     * @param msgs    消息列表
+     * @param context 消息轨迹对象
+     * @return
      */
     @Override
     public ConsumeConcurrentlyStatus consumeMessage(List<MessageExt> msgs, ConsumeConcurrentlyContext context) {
@@ -70,9 +65,9 @@ public class RiskModelV2 extends BaseOrderMQListener implements MessageListenerC
                 }
 
                 // 队列拦截
-                if (intercept(orderParams.getGroupName(), subExpression)) {
+                if (intercept(orderParams.getGroupName(), subExpression())) {
                     // 等待重试
-                    retry(orderParams, subExpression);
+                    retry(orderParams, subExpression());
                     continue;
                 }
 
@@ -94,10 +89,10 @@ public class RiskModelV2 extends BaseOrderMQListener implements MessageListenerC
                 JSONObject result = sendRiskV2Request(loanOrderEntity);
                 if (ObjectUtils.isEmpty(result)) {
                     // 更新对应模型审核状态
-                    updateModeExamine(orderId, subExpression, OrderExamineStatus.FAIL);
+                    updateModeExamine(orderId, subExpression(), OrderExamineStatus.FAIL);
 
                     // 错误，重试
-                    retry(orderParams, subExpression);
+                    retry(orderParams, subExpression());
                     continue;
                 }
 
@@ -107,11 +102,13 @@ public class RiskModelV2 extends BaseOrderMQListener implements MessageListenerC
                 // 验证状态码
                 if (code == 4009) {
                     /* 查询失败-风控处理中*/
+                    // 更新对应模型审核状态
+                    updateModeExamine(orderId, subExpression(), OrderExamineStatus.WAIT);
                     // 如果超过创建时间3小时 不进队列 走拒绝逻辑
-                    LoanOrderExamineEntity loanOrderExamine = loanOrderExamineDao.findByModelNameAndOrderId(orderId, subExpression);
-                    if (DateUtil.getIntervalMinute(new Date(), loanOrderExamine.getCreateTime()) > 60 * 3){
+                    LoanOrderExamineEntity loanOrderExamine = loanOrderExamineDao.findByModelNameAndOrderId(orderId, subExpression());
+                    if (DateUtil.getIntervalMinute(new Date(), loanOrderExamine.getCreateTime()) > 60 * 3) {
                         // 更新对应模型审核状态 ：拒绝
-                        updateModeExamine(orderId, subExpression, OrderExamineStatus.REFUSE);
+                        updateModeExamine(orderId, subExpression(), OrderExamineStatus.REFUSE);
 
                         // 更改订单状态 FIXME 新老表
                         this.updateOrderStatus(orderId, OrderStatus.EXAMINE_FAIL);
@@ -120,10 +117,10 @@ public class RiskModelV2 extends BaseOrderMQListener implements MessageListenerC
                     }
 
                     // 更新对应模型审核状态 :等待处理
-                    updateModeExamine(orderId, subExpression, OrderExamineStatus.WAIT);
+                    updateModeExamine(orderId, subExpression(), OrderExamineStatus.WAIT);
 
                     // 等待,重试
-                    retry(orderParams, subExpression);
+                    retry(orderParams, subExpression());
                     continue;
                 } else if (code == 200) {
                     /* 查询成功*/
@@ -172,15 +169,15 @@ public class RiskModelV2 extends BaseOrderMQListener implements MessageListenerC
                         platformOrderDao.updateOrderApprovalAmount(orderId, quota, new Date());
 
                         // 更新对应模型审核状态
-                        updateModeExamine(orderId, subExpression, OrderExamineStatus.PASS);
+                        updateModeExamine(orderId, subExpression(), OrderExamineStatus.PASS);
 
                         // 发送下一模型
-                        sendNextModel(orderParams, subExpression);
+                        sendNextModel(orderParams, subExpression());
                         continue;
                     } else {
                         // 不通过
                         // 更新对应模型审核状态
-                        updateModeExamine(orderId, subExpression, OrderExamineStatus.REFUSE);
+                        updateModeExamine(orderId, subExpression(), OrderExamineStatus.REFUSE);
 
                         // 更改订单状态 FIXME 新老表
                         this.updateOrderStatus(orderId, OrderStatus.EXAMINE_FAIL);
@@ -190,19 +187,19 @@ public class RiskModelV2 extends BaseOrderMQListener implements MessageListenerC
                 } else {
                     /* 查询失败*/
                     // 更新对应模型审核状态
-                    updateModeExamine(orderId, subExpression, OrderExamineStatus.FAIL);
+                    updateModeExamine(orderId, subExpression(), OrderExamineStatus.FAIL);
 
                     // 异常,重试
-                    retry(orderParams, subExpression);
+                    retry(orderParams, subExpression());
                     continue;
                 }
             } catch (Exception e) {
                 try {
                     // 更新对应模型审核状态
-                    updateModeExamine(orderParams.getOrderId(), subExpression, OrderExamineStatus.FAIL);
+                    updateModeExamine(orderParams.getOrderId(), subExpression(), OrderExamineStatus.FAIL);
 
                     // 异常,重试
-                    retry(orderParams, subExpression);
+                    retry(orderParams, subExpression());
                 } catch (Exception exception) {
                     LogUtil.sysError("[RiskModelV2]", exception);
                 }
@@ -304,7 +301,7 @@ public class RiskModelV2 extends BaseOrderMQListener implements MessageListenerC
             String requestParams = JSONObject.toJSONString(params);
 
             // 更新节点请求数据
-            loanOrderExamineDao.updateOrderExamineRequest(loanOrderEntity.getId(), subExpression, requestParams, new Date());
+            loanOrderExamineDao.updateOrderExamineRequest(loanOrderEntity.getId(), subExpression(), requestParams, new Date());
 
             // 发送请求
             String result = HttpUtils.POST_FORM(riskConfig.getRiskUrl(), requestParams);
@@ -313,7 +310,7 @@ public class RiskModelV2 extends BaseOrderMQListener implements MessageListenerC
             }
 
             // 更新节点响应数据
-            loanOrderExamineDao.updateOrderExamineResponse(loanOrderEntity.getId(), subExpression, result, new Date());
+            loanOrderExamineDao.updateOrderExamineResponse(loanOrderEntity.getId(), subExpression(), result, new Date());
 
             // 返回响应参数
             return JSONObject.parseObject(result);

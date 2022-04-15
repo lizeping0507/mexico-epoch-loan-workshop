@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.constant.Field;
 import com.epoch.loan.workshop.common.constant.OrderExamineStatus;
 import com.epoch.loan.workshop.common.constant.OrderStatus;
-import com.epoch.loan.workshop.common.entity.*;
+import com.epoch.loan.workshop.common.entity.mysql.*;
 import com.epoch.loan.workshop.common.mq.order.params.OrderParams;
 import com.epoch.loan.workshop.common.util.HttpUtils;
 import com.epoch.loan.workshop.common.util.LogUtil;
@@ -17,7 +17,6 @@ import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyStatus;
 import org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently;
 import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.common.message.MessageExt;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 
@@ -36,13 +35,6 @@ import java.util.List;
 @Component
 @Data
 public class PublicCloudInfoPush extends BaseOrderMQListener implements MessageListenerConcurrently {
-
-    /**
-     * 标签
-     */
-    @Value("${rocket.order.publicCloudInfoPush.subExpression}")
-    private String subExpression = "";
-
     /**
      * 消息监听器
      */
@@ -50,6 +42,10 @@ public class PublicCloudInfoPush extends BaseOrderMQListener implements MessageL
 
     /**
      * 消费任务
+     *
+     * @param msgs    消息列表
+     * @param context 消息轨迹对象
+     * @return
      */
     @Override
     public ConsumeConcurrentlyStatus consumeMessage(List<MessageExt> msgs, ConsumeConcurrentlyContext context) {
@@ -66,9 +62,9 @@ public class PublicCloudInfoPush extends BaseOrderMQListener implements MessageL
                 }
 
                 // 队列拦截
-                if (intercept(orderParams.getGroupName(), subExpression)) {
+                if (intercept(orderParams.getGroupName(), subExpression())) {
                     // 等待重试
-                    retry(orderParams, subExpression);
+                    retry(orderParams, subExpression());
                     continue;
                 }
 
@@ -90,10 +86,10 @@ public class PublicCloudInfoPush extends BaseOrderMQListener implements MessageL
                 JSONObject result = sendPublicCloudInfoPush(loanOrderEntity);
                 if (ObjectUtils.isEmpty(result)) {
                     // 更新对应模型审核状态
-                    updateModeExamine(orderParams.getOrderId(), subExpression, OrderExamineStatus.FAIL);
+                    updateModeExamine(orderParams.getOrderId(), subExpression(), OrderExamineStatus.FAIL);
 
                     // 错误，重试
-                    retry(orderParams, subExpression);
+                    retry(orderParams, subExpression());
                     continue;
                 }
 
@@ -102,27 +98,27 @@ public class PublicCloudInfoPush extends BaseOrderMQListener implements MessageL
                 if (code == 200) {
                     /* 推送成功*/
                     // 更新对应模型审核状态
-                    updateModeExamine(orderId, subExpression, OrderExamineStatus.PASS);
+                    updateModeExamine(orderId, subExpression(), OrderExamineStatus.PASS);
 
                     // 发送下一模型
-                    sendNextModel(orderParams, subExpression);
+                    sendNextModel(orderParams, subExpression());
                     continue;
                 } else {
                     /* 推送失败*/
                     // 更新对应模型审核状态
-                    updateModeExamine(orderId, subExpression, OrderExamineStatus.FAIL);
+                    updateModeExamine(orderId, subExpression(), OrderExamineStatus.FAIL);
 
                     // 推送失败 等待,重试
-                    retry(orderParams, subExpression);
+                    retry(orderParams, subExpression());
                     continue;
                 }
             } catch (Exception e) {
                 try {
                     // 更新对应模型审核状态
-                    updateModeExamine(orderParams.getOrderId(), subExpression, OrderExamineStatus.FAIL);
+                    updateModeExamine(orderParams.getOrderId(), subExpression(), OrderExamineStatus.FAIL);
 
                     // 异常,重试
-                    retry(orderParams, subExpression);
+                    retry(orderParams, subExpression());
                 } catch (Exception exception) {
                     LogUtil.sysError("[PublicCloudInfoPush]", exception);
                 }
@@ -145,7 +141,7 @@ public class PublicCloudInfoPush extends BaseOrderMQListener implements MessageL
             String requestParams = formatJson(loanOrderEntity);
 
             // 更新节点请求数据
-            loanOrderExamineDao.updateOrderExamineRequest(loanOrderEntity.getId(), subExpression, requestParams, new Date());
+            loanOrderExamineDao.updateOrderExamineRequest(loanOrderEntity.getId(), subExpression(), requestParams, new Date());
 
             // 请求三方
             String result = HttpUtils.POST(riskConfig.getCloudPushUrl(), requestParams);
@@ -154,7 +150,7 @@ public class PublicCloudInfoPush extends BaseOrderMQListener implements MessageL
             }
 
             // 更新节点响应数据
-            loanOrderExamineDao.updateOrderExamineResponse(loanOrderEntity.getId(), subExpression, result, new Date());
+            loanOrderExamineDao.updateOrderExamineResponse(loanOrderEntity.getId(), subExpression(), result, new Date());
 
             // 返回响应参数
             return JSONObject.parseObject(result);

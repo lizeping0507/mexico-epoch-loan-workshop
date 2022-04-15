@@ -85,7 +85,7 @@ public class YeahPayCallBackParams implements Serializable {
     /**
      * 状态，0等待处理中，1处理成功，2失败
      */
-    private Integer status;
+    private int status;
     /**
      * 状态说明
      */

@@ -1,11 +1,11 @@
 package com.epoch.loan.workshop.mq.order;
 
 import com.epoch.loan.workshop.common.constant.OrderBillStatus;
-import com.epoch.loan.workshop.common.constant.OrderExamineStatus;
 import com.epoch.loan.workshop.common.constant.OrderStatus;
-import com.epoch.loan.workshop.common.entity.LoanOrderBillEntity;
-import com.epoch.loan.workshop.common.entity.LoanOrderEntity;
+import com.epoch.loan.workshop.common.constant.RedisKeyField;
+import com.epoch.loan.workshop.common.entity.mysql.*;
 import com.epoch.loan.workshop.common.mq.order.params.OrderParams;
+import com.epoch.loan.workshop.common.util.DateUtil;
 import com.epoch.loan.workshop.common.util.LogUtil;
 import lombok.Data;
 import org.apache.commons.lang3.ObjectUtils;
@@ -14,10 +14,10 @@ import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyStatus;
 import org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently;
 import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.common.message.MessageExt;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -32,11 +32,6 @@ import java.util.List;
 @Component
 @Data
 public class OrderDue extends BaseOrderMQListener implements MessageListenerConcurrently {
-    /**
-     * 标签
-     */
-    @Value("${rocket.order.orderDue.subExpression}")
-    private String subExpression;
 
     /**
      * 消息监听器
@@ -45,6 +40,10 @@ public class OrderDue extends BaseOrderMQListener implements MessageListenerConc
 
     /**
      * 消费任务
+     *
+     * @param msgs    消息列表
+     * @param context 消息轨迹对象
+     * @return
      */
     @Override
     public ConsumeConcurrentlyStatus consumeMessage(List<MessageExt> msgs, ConsumeConcurrentlyContext context) {
@@ -61,9 +60,9 @@ public class OrderDue extends BaseOrderMQListener implements MessageListenerConc
                 }
 
                 // 队列拦截
-                if (intercept("SYSTEM", subExpression)) {
+                if (intercept("SYSTEM", subExpression())) {
                     // 等待重试
-                    retry(orderParams, subExpression);
+                    retry(orderParams, subExpression());
                     continue;
                 }
 
@@ -80,13 +79,45 @@ public class OrderDue extends BaseOrderMQListener implements MessageListenerConc
                 }
 
                 // 根据订单账单id查询账单
-                LoanOrderBillEntity orderBillEntity = loanOrderBillDao.findOrderBill(orderBillId);
-                if (ObjectUtils.isEmpty(orderBillEntity)) {
+                LoanOrderBillEntity loanOrderBillEntity = loanOrderBillDao.findOrderBill(orderBillId);
+                if (ObjectUtils.isEmpty(loanOrderBillEntity)) {
                     continue;
                 }
 
+                // 判断是否逾期
+                if (loanOrderBillEntity.getRepaymentTime().getTime() > System.currentTimeMillis()) {
+                    continue;
+                }
+
+                // 计算逾期天数
+                int dueDay = DateUtil.getIntervalDays(DateUtil.getDefault(), DateUtil.DateToString(loanOrderBillEntity.getRepaymentTime(), "yyyy-MM-dd"), "yyyy-MM-dd");
+
+                // 本期应还还款本金
+                double principalAmount = loanOrderBillEntity.getPrincipalAmount();
+
+                // 利息金额
+                double interestAmount = loanOrderBillEntity.getInterestAmount();
+
+                // 罚息利率
+                double penaltyInterest = loanOrderEntity.getPenaltyInterest();
+
+                // 计算罚息金额
+                double punishmentAmount = principalAmount * ((penaltyInterest / 100) * dueDay);
+                if (punishmentAmount > principalAmount) {
+                    punishmentAmount = principalAmount;
+                }
+
+                // 应还款金额
+                double repaymentAmount = principalAmount + interestAmount + punishmentAmount;
+
+                // 更新减免金额
+                loanOrderBillDao.updateOrderBillReductionAmount(orderBillId, 0.00, new Date());
+
+                // 更新罚息金额
+                loanOrderBillDao.updateOrderBillPunishmentAmount(orderBillId, punishmentAmount, new Date());
+
                 // 更新还款金额
-                loanOrderBillDao.updateOrderBillRepaymentAmount(orderBillId, orderParams.getAmount(), new Date());
+                loanOrderBillDao.updateOrderBillRepaymentAmount(orderBillId, repaymentAmount, new Date());
 
                 // 计算预计还款金额更新预计还款金额
                 double amount = loanOrderBillDao.sumOrderRepaymentAmount(orderId);
@@ -95,15 +126,21 @@ public class OrderDue extends BaseOrderMQListener implements MessageListenerConc
                 // 更新订单账单状态为逾期
                 updateOrderBillStatus(orderBillId, OrderBillStatus.DUE);
 
-                // 更新订单状态为逾期
+                // 更新订单状态为逾期 TODO 新老表
                 updateOrderStatus(orderId, OrderStatus.DUE);
+                platformOrderDao.updateOrderStatus(orderId, 180, new Date());
+
+                // 新增还款计划 TODO 新老表 需要SKF写
+                addrepaymentPlan(loanOrderEntity, loanOrderBillEntity, punishmentAmount);
+
+                // 删除计算标识
+                redisUtil.del(RedisKeyField.ORDER_BILL_DUE_LOCK + orderId);
+
+                continue;
             } catch (Exception e) {
                 try {
-                    // 更新对应模型审核状态
-                    updateModeExamine(orderParams.getOrderId(), subExpression, OrderExamineStatus.FAIL);
-
                     // 异常,重试
-                    retry(orderParams, subExpression);
+                    retry(orderParams, subExpression());
                 } catch (Exception exception) {
                     LogUtil.sysError("[OrderDue]", exception);
                 }
@@ -113,4 +150,5 @@ public class OrderDue extends BaseOrderMQListener implements MessageListenerConc
         }
         return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
     }
+
 }

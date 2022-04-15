@@ -20,7 +20,7 @@ public class GlobPayPayOutQueryParam {
      */
     private String payOrderId;
     /**
-     * 	MD5签名
+     * MD5签名
      */
     private String sign;
 }

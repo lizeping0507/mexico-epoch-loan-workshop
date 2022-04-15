@@ -2,7 +2,7 @@ package com.epoch.loan.workshop.timing.task;
 
 import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.constant.LoanRemittancePaymentRecordStatus;
-import com.epoch.loan.workshop.common.entity.LoanPaymentEntity;
+import com.epoch.loan.workshop.common.entity.mysql.LoanPaymentEntity;
 import com.epoch.loan.workshop.common.util.DateUtil;
 import com.epoch.loan.workshop.common.util.SendDingDingUtils;
 import org.apache.commons.collections.CollectionUtils;

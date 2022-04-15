@@ -78,7 +78,7 @@ public class DingTalkSendUtils {
                 result += line;
             }
         } catch (Exception e) {
-            LogUtil.sysInfo("DingTalk发送 POST 请求出现异常！", e);
+            LogUtil.sysError("[DingTalk]", e);
             e.printStackTrace();
         }
         //使用finally块来关闭输出流、输入流

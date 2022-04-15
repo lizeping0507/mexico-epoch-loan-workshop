@@ -17,7 +17,7 @@ public class SunFlowerPayPayoutParam {
      */
     private String merchant_id;
     /**
-     *  商户订单号
+     * 商户订单号
      */
     private String merchant_trade_no;
     /**

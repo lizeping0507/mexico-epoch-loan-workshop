@@ -2,7 +2,7 @@ package com.epoch.loan.workshop.common.mq.remittance;
 
 import com.alibaba.fastjson.JSON;
 import com.epoch.loan.workshop.common.mq.BaseMQ;
-import com.epoch.loan.workshop.common.mq.remittance.params.DistributionParams;
+import com.epoch.loan.workshop.common.mq.remittance.params.DistributionRemittanceParams;
 import com.epoch.loan.workshop.common.mq.remittance.params.RemittanceParams;
 import lombok.Data;
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
@@ -31,24 +31,36 @@ public class RemittanceMQManager extends BaseMQ {
      * 生产者对象
      */
     private static DefaultMQProducer producer = null;
-
+    /**
+     * 最大线程数量
+     */
+    @Value("${rocket.remittance.consumeThreadMax}")
+    public int consumeThreadMax;
+    /**
+     * 最小线程数量
+     */
+    @Value("${rocket.remittance.consumeThreadMin}")
+    public int consumeThreadMin;
+    /**
+     * 次消费消息的数量
+     */
+    @Value("${rocket.remittance.consumeMessageBatchMaxSize}")
+    public int consumeMessageBatchMaxSize;
     /**
      * 生产者所属的组
      */
     @Value("${rocket.remittance.producerGroup}")
     private String producerGroup = "";
-
     /**
      * 主题
      */
     @Value("${rocket.remittance.topic}")
     private String topic = "";
-
     /**
      * YeahPay支付标签
      */
     @Value("${rocket.remittance.yeahPay.subExpression}")
-    private String yeahSubExpression;
+    private String yeahPaySubExpression;
 
     /**
      * InPay支付标签
@@ -111,28 +123,29 @@ public class RemittanceMQManager extends BaseMQ {
     private String globPaySubExpression;
 
     /**
+     * FastPay支付标签
+     */
+    @Value("${rocket.remittance.fastPay.subExpression}")
+    private String fastPaySubExpression;
+
+    /**
+     * YeahPa1支付标签
+     */
+    @Value("${rocket.remittance.yeahPay1.subExpression}")
+    private String yeahPay1SubExpression;
+
+    /**
+     * YeahPa1支付标签
+     */
+    @Value("${rocket.remittance.yeahPay1.subExpression}")
+    private String yeahPay2SubExpression;
+
+    /**
      * 分配队列标签
      */
     @Value("${rocket.remittance.distribution.subExpression}")
     private String distributionSubExpression;
 
-    /**
-     * 最大线程数量
-     */
-    @Value("${rocket.order.consumeThreadMax}")
-    public int consumeThreadMax;
-
-    /**
-     * 最小线程数量
-     */
-    @Value("${rocket.order.consumeThreadMin}")
-    public int consumeThreadMin;
-
-    /**
-     * 次消费消息的数量
-     */
-    @Value("${rocket.order.consumeMessageBatchMaxSize}")
-    public int consumeMessageBatchMaxSize;
 
     /**
      * 初始化
@@ -174,8 +187,8 @@ public class RemittanceMQManager extends BaseMQ {
     /**
      * 发送消息
      *
-     * @param params 队列参数
-     * @param tag 标签
+     * @param params         队列参数
+     * @param tag            标签
      * @param delayTimeLevel 延时级别
      * @throws Exception e
      */
@@ -203,11 +216,11 @@ public class RemittanceMQManager extends BaseMQ {
     /**
      * 发送消息
      *
-     * @param distributionParams
+     * @param distributionRemittanceParams
      * @param tag
      * @throws Exception
      */
-    public void sendMessage(DistributionParams distributionParams, String tag) throws Exception {
+    public void sendMessage(DistributionRemittanceParams distributionRemittanceParams, String tag) throws Exception {
         // 消息体
         Message msg = new Message();
 
@@ -218,7 +231,7 @@ public class RemittanceMQManager extends BaseMQ {
         msg.setTags(tag);
 
         //送消息体内容
-        msg.setBody(JSON.toJSONString(distributionParams).getBytes());
+        msg.setBody(JSON.toJSONString(distributionRemittanceParams).getBytes());
 
         // 发送消息
         producer.send(msg);
@@ -228,12 +241,12 @@ public class RemittanceMQManager extends BaseMQ {
     /**
      * 发送消息
      *
-     * @param params 队列参数
-     * @param tag 标签
+     * @param params         队列参数
+     * @param tag            标签
      * @param delayTimeLevel 延时级别
      * @throws Exception e
      */
-    public void sendMessage(DistributionParams params, String tag, int delayTimeLevel) throws Exception {
+    public void sendMessage(DistributionRemittanceParams params, String tag, int delayTimeLevel) throws Exception {
         // 消息体
         Message msg = new Message();
 

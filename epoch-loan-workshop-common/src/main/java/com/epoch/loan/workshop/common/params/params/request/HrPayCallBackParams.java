@@ -26,11 +26,11 @@ public class HrPayCallBackParams implements Serializable {
      */
     private String orderid;
     /**
-     * 	平台支付流水号
+     * 平台支付流水号
      */
     private String transaction_id;
     /**
-     *  实际代付金额
+     * 实际代付金额
      */
     private String amount;
     /**

@@ -80,7 +80,7 @@ public class SendDingDingUtils {
      * 获取链接
      *
      * @param webHook 发送地址
-     * @param secret 密钥
+     * @param secret  密钥
      * @return
      * @throws NoSuchAlgorithmException
      * @throws UnsupportedEncodingException

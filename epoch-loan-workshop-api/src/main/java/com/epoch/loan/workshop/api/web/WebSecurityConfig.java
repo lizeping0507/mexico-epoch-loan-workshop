@@ -10,7 +10,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
  * @packageName : com.epoch.pf.option.api.web
  * @className : WebSecurityConfig
  * @createTime : 2021/3/10 21:59
- * @description : 启动类
+ * @description : 权限校验
  */
 @Configuration
 @EnableWebSecurity

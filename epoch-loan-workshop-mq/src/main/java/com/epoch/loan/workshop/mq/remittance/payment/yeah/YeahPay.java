@@ -2,16 +2,16 @@ package com.epoch.loan.workshop.mq.remittance.payment.yeah;
 
 import cn.hutool.core.codec.Base64Encoder;
 import cn.hutool.http.HttpRequest;
-import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.constant.Field;
 import com.epoch.loan.workshop.common.constant.LoanRemittanceOrderRecordStatus;
 import com.epoch.loan.workshop.common.constant.LoanRemittancePaymentRecordStatus;
 import com.epoch.loan.workshop.common.constant.PaymentField;
-import com.epoch.loan.workshop.common.entity.LoanPaymentEntity;
-import com.epoch.loan.workshop.common.entity.LoanRemittanceOrderRecordEntity;
-import com.epoch.loan.workshop.common.entity.LoanRemittancePaymentRecordEntity;
+import com.epoch.loan.workshop.common.entity.mysql.LoanPaymentEntity;
+import com.epoch.loan.workshop.common.entity.mysql.LoanRemittanceOrderRecordEntity;
+import com.epoch.loan.workshop.common.entity.mysql.LoanRemittancePaymentRecordEntity;
 import com.epoch.loan.workshop.common.mq.remittance.params.RemittanceParams;
+import com.epoch.loan.workshop.common.util.HttpUtils;
 import com.epoch.loan.workshop.common.util.LogUtil;
 import com.epoch.loan.workshop.mq.remittance.payment.BaseRemittancePaymentMQListener;
 import lombok.Data;
@@ -22,15 +22,11 @@ import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyStatus;
 import org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently;
 import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.common.message.MessageExt;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author : Duke
@@ -43,14 +39,10 @@ import java.util.Set;
 @Component
 @Data
 public class YeahPay extends BaseRemittancePaymentMQListener implements MessageListenerConcurrently {
-
-    private YeahPayToken token;
-
     /**
-     * 放款队列标签标签
+     * YeahPay token
      */
-    @Value("${rocket.remittance.yeahPay.subExpression}")
-    protected String subExpression;
+    private YeahPayToken token;
 
     /**
      * 消息监听器
@@ -60,6 +52,10 @@ public class YeahPay extends BaseRemittancePaymentMQListener implements MessageL
 
     /**
      * 消费任务
+     *
+     * @param msgs
+     * @param context
+     * @return
      */
     @Override
     public ConsumeConcurrentlyStatus consumeMessage(List<MessageExt> msgs, ConsumeConcurrentlyContext context) {
@@ -109,6 +105,9 @@ public class YeahPay extends BaseRemittancePaymentMQListener implements MessageL
                     updateRemittancePaymentRecordConfigTag(paymentRecord.getId(), configTag);
                 }
 
+                // 订单支付记录ID
+                String orderRecordId = orderRecord.getId();
+
                 // 更新放款记录状态为 "进行中"
                 updateRemittanceOrderRecordStatus(paymentRecord.getRemittanceOrderRecordId(), LoanRemittanceOrderRecordStatus.PROCESS);
 
@@ -121,7 +120,7 @@ public class YeahPay extends BaseRemittancePaymentMQListener implements MessageL
                     if (payoutResult.equals(PaymentField.PAYOUT_REQUEST_SUCCESS)) {
                         // 发起成功 修改状态
                         updateLoanRemittancePaymentRecordStatus(id, LoanRemittancePaymentRecordStatus.PROCESS);
-                        retryRemittance(remittanceParams, subExpression);
+                        retryRemittance(remittanceParams, subExpression());
                         continue;
                     } else if (payoutResult.equals(PaymentField.PAYOUT_REQUEST_SPECIAL)) {
                         // 次数限制导致发起失败 标记过滤渠道并重回分配队列
@@ -150,7 +149,7 @@ public class YeahPay extends BaseRemittancePaymentMQListener implements MessageL
 
                             // 重入放款队列
                             remittanceParams.setId(paymentLogId);
-                            retryRemittance(remittanceParams, subExpression);
+                            retryRemittance(remittanceParams, subExpression());
                         }
                     }
                 } else if (paymentRecord.getStatus().equals(LoanRemittancePaymentRecordStatus.PROCESS)) {
@@ -162,11 +161,12 @@ public class YeahPay extends BaseRemittancePaymentMQListener implements MessageL
                         // 成功 修改支付记录状态及支付详情记录状态
                         updateRemittanceOrderRecordStatus(orderRecord.getId(), LoanRemittanceOrderRecordStatus.SUCCESS);
                         updateLoanRemittancePaymentRecordStatus(paymentRecord.getId(), LoanRemittancePaymentRecordStatus.SUCCESS);
-                        updateSuccessRemittancePaymentRecordId(orderRecord.getId(), paymentRecord.getId());
+                        updateProcessRemittancePaymentRecordId(orderRecordId, "");
+                        updateSuccessRemittancePaymentRecordId(orderRecordId, paymentRecord.getId());
                         continue;
                     } else if (res == PaymentField.PAYOUT_PROCESS || res == PaymentField.PAYOUT_QUERY_ERROR) {
                         //  进行中 重回放款队列
-                        retryRemittance(remittanceParams, subExpression);
+                        retryRemittance(remittanceParams, subExpression());
                         continue;
                     } else if (res == PaymentField.PAYOUT_FAILED) {
                         // 失败 标记过滤渠道 重回分配队列
@@ -178,7 +178,7 @@ public class YeahPay extends BaseRemittancePaymentMQListener implements MessageL
             } catch (Exception e) {
                 try {
                     // 异常,重试
-                    retryRemittance(remittanceParams, subExpression);
+                    retryRemittance(remittanceParams, subExpression());
                 } catch (Exception exception) {
                     LogUtil.sysError("[YeahPay]", exception);
                 }
@@ -190,6 +190,12 @@ public class YeahPay extends BaseRemittancePaymentMQListener implements MessageL
 
     /**
      * yeahpay 放款
+     *
+     * @param paymentEntity
+     * @param orderRecord
+     * @param paymentRecord
+     * @return
+     * @throws Exception
      */
     public Integer payout(LoanPaymentEntity paymentEntity, LoanRemittanceOrderRecordEntity orderRecord, LoanRemittancePaymentRecordEntity paymentRecord) throws Exception {
         // 格式化数字
@@ -275,7 +281,10 @@ public class YeahPay extends BaseRemittancePaymentMQListener implements MessageL
     /**
      * 订单查询
      *
-     * @return 查询结果
+     * @param orderRecord
+     * @param paymentRecord
+     * @param paymentEntity
+     * @return
      */
     private int queryOrder(LoanRemittanceOrderRecordEntity orderRecord, LoanRemittancePaymentRecordEntity paymentRecord, LoanPaymentEntity paymentEntity) {
 
@@ -350,31 +359,37 @@ public class YeahPay extends BaseRemittancePaymentMQListener implements MessageL
     /**
      * 获取 Yeahpay token
      *
-     * @param appId  appId
-     * @param appKey appKey
-     * @return token
+     * @param appId
+     * @param appKey
+     * @param url
+     * @return
      */
     public String getToken(String appId, String appKey, String url) {
         if (ObjectUtils.isEmpty(token) || System.currentTimeMillis() >= token.getExpirationTimestmp()) {
-            // Authorization
-            String authorization = PaymentField.YEAHPAY_BASIC + Base64Encoder.encode(appId + ":" + appKey);
+
 
             // 请求
             String response;
             try {
-                response = HttpRequest.post(url)
-                        .header(PaymentField.YEAHPAY_AUTHORIZATION, authorization)
-                        .header("Content-Type", "application/x-www-form-urlencoded")
-                        .body(PaymentField.YEAHPAY_TOKEN_PARAM)
-                        .execute()
-                        .body();
+                // 请求头
+                Map<String, String> headers = new HashMap<>();
+                String authorization = PaymentField.YEAHPAY_BASIC + Base64Encoder.encode(appId + ":" + appKey);
+                headers.put(PaymentField.YEAHPAY_AUTHORIZATION, authorization);
+                headers.put("Content-Type", "application/x-www-form-urlencoded");
+
+                // 请求参数 固定的
+                Map<String, String> params = new HashMap<>();
+                params.put("grant_type", "client_credentials");
+
+                response = HttpUtils.POST_WITH_HEADER(url, params, headers);
+
                 JSONObject jsonObject = JSONObject.parseObject(response);
                 String accessToken = jsonObject.getString("access_token");
                 Long expiresIn = jsonObject.getLong("expires_in");
 
                 token = new YeahPayToken();
                 token.setAccessToken(accessToken);
-                token.setExpirationTimestmp(System.currentTimeMillis() +  1000 * 60 * 60 * 24);
+                token.setExpirationTimestmp(System.currentTimeMillis() + expiresIn - 1000 * 60 * 60 * 24);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -382,8 +397,14 @@ public class YeahPay extends BaseRemittancePaymentMQListener implements MessageL
 
         return token.getAccessToken();
     }
+
     /**
      * 发起代付
+     *
+     * @param yeahPayParam
+     * @param url
+     * @param token
+     * @return
      */
     public String request(YeahPayParam yeahPayParam, String url, String token) {
         // 请求
@@ -405,8 +426,9 @@ public class YeahPay extends BaseRemittancePaymentMQListener implements MessageL
     /**
      * 根据权重挑选YeahPay账号
      *
-     * @param config     yeahPay渠道配置信息
-     * @param removeTags 不参与挑选的key
+     * @param config
+     * @param removeTags
+     * @return
      */
     private String chooseAccountByWeight(JSONObject config, List<String> removeTags) {
         // 配置解析
@@ -449,7 +471,8 @@ public class YeahPay extends BaseRemittancePaymentMQListener implements MessageL
     /**
      * 根据权重挑选YeahPay账号
      *
-     * @param config yeahPay渠道配置信息
+     * @param config
+     * @return
      */
     private String chooseAccountByWeight(JSONObject config) {
         return chooseAccountByWeight(config, new ArrayList<>());

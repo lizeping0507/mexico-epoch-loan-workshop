@@ -1,7 +1,6 @@
 package com.epoch.loan.workshop.api.controller;
 
-import com.epoch.loan.workshop.common.service.PaymentCallbackService;
-import com.epoch.loan.workshop.common.service.RepaymentService;
+import com.epoch.loan.workshop.common.service.*;
 import org.apache.dubbo.config.annotation.DubboReference;
 
 /**
@@ -16,10 +15,55 @@ public class BaseController {
      * 支付回调
      */
     @DubboReference(check = false)
-    protected PaymentCallbackService paymentCallbackService;
+    public DynamicRequestService dynamicRequestService;
+    /**
+     * 支付回调
+     */
+    @DubboReference(check = false)
+    public PaymentCallbackService paymentCallbackService;
     /**
      * 放款
      */
     @DubboReference(check = false)
-    protected RepaymentService repaymentService;
+    public RepaymentService repaymentService;
+    /**
+     * 用户
+     */
+    @DubboReference(check = false)
+    public UserService userService;
+    /**
+     * 产品
+     */
+    @DubboReference(check = false)
+    public ProductService productService;
+    /**
+     * 手机短信
+     */
+    @DubboReference(check = false)
+    public ShortMessageService shortMessageService;
+    /**
+     * 合同
+     */
+    @DubboReference(check = false)
+    public OrderService orderService;
+    /**
+     * OCR
+     */
+    @DubboReference(check = false)
+    public OcrService ocrService;
+    /**
+     * 银行卡
+     */
+    @DubboReference(check = false)
+    public BankCardService bankCardService;
+    /**
+     * SDK
+     */
+    @DubboReference(check = false)
+    public SdkService sdkService;
+    /**
+     * 静态资源
+     */
+    @DubboReference(check = false)
+    StaticResourcesService staticResourcesService;
 }

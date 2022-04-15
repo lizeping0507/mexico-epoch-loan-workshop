@@ -2,22 +2,19 @@ package com.epoch.loan.workshop.mq.remittance.payment.glob;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.NumberUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.http.HttpRequest;
 import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.constant.LoanRemittanceOrderRecordStatus;
 import com.epoch.loan.workshop.common.constant.LoanRemittancePaymentRecordStatus;
 import com.epoch.loan.workshop.common.constant.PaymentField;
-import com.epoch.loan.workshop.common.entity.LoanPaymentEntity;
-import com.epoch.loan.workshop.common.entity.LoanRemittanceOrderRecordEntity;
-import com.epoch.loan.workshop.common.entity.LoanRemittancePaymentRecordEntity;
+import com.epoch.loan.workshop.common.entity.mysql.LoanPaymentEntity;
+import com.epoch.loan.workshop.common.entity.mysql.LoanRemittanceOrderRecordEntity;
+import com.epoch.loan.workshop.common.entity.mysql.LoanRemittancePaymentRecordEntity;
 import com.epoch.loan.workshop.common.mq.remittance.params.RemittanceParams;
-import com.epoch.loan.workshop.common.util.HttpUtils;
 import com.epoch.loan.workshop.common.util.IpUtil;
 import com.epoch.loan.workshop.common.util.LogUtil;
 import com.epoch.loan.workshop.mq.remittance.payment.BaseRemittancePaymentMQListener;
-import com.epoch.loan.workshop.mq.remittance.payment.yeah.YeahPayParam;
 import lombok.Data;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -26,15 +23,15 @@ import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyStatus;
 import org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently;
 import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.common.message.MessageExt;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author : lyf
@@ -47,20 +44,76 @@ import java.util.*;
 @Component
 @Data
 public class GlobPay extends BaseRemittancePaymentMQListener implements MessageListenerConcurrently {
-    /**
-     * 放款队列标签标签
-     */
-    @Value("${rocket.remittance.globPay.subExpression}")
-    protected String subExpression;
 
     /**
      * 消息监听器
      */
     private MessageListenerConcurrently messageListener = this;
 
+    /**
+     * 1.将所有需要签名的字段按照 ASCII 码从小到大进行排序，并按照按照 k=v&k=v 的格式拼接字符串，并在字符串后面拼接商户私钥用 &key=x 进行拼接，生成待签名 queryString 字符串。
+     * 2.对生成的 queryString 字符串进行 MD5 签名，得到小写签名串。
+     * 3.除了sign和sign_type以外不为空的参数都需要参与签名(注意：回调以及同步响应的签名方法参数名称为signType)
+     *
+     * @param param
+     * @param key
+     * @return
+     */
+    public static String sign(Object param, String key) {
+        StringBuilder tempSign = new StringBuilder();
+
+        // Bean转Map
+        Map<String, Object> map = BeanUtil.beanToMap(param);
+
+        // 取所有字段名并排序
+        List<String> filedList = new ArrayList<>(map.keySet());
+        Collections.sort(filedList);
+
+        // 拼接kv
+        for (String filed : filedList) {
+            Object value = map.get(filed);
+            if (value != null) {
+                tempSign.append(filed).append("=").append(value).append("&");
+            }
+        }
+
+        // 拼接key
+        tempSign.append("key=").append(key);
+
+        // md5并转小写
+        return SecureUtil.md5(tempSign.toString()).toLowerCase();
+    }
+
+    /**
+     * 发起代付
+     *
+     * @param param
+     * @param url
+     * @return
+     */
+    public static String request(Map<String, Object> param, String url) {
+        // 请求
+        String response = null;
+        try {
+            response = HttpRequest.post(url)
+                    .header("Content-Type", MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+                    .form(param)
+                    .timeout(20000)
+                    .execute().body();
+
+        } catch (Exception e) {
+            LogUtil.sysError("[GlobPay]", e);
+        }
+
+        return response;
+    }
 
     /**
      * 消费任务
+     *
+     * @param msgs
+     * @param context
+     * @return
      */
     @Override
     public ConsumeConcurrentlyStatus consumeMessage(List<MessageExt> msgs, ConsumeConcurrentlyContext context) {
@@ -113,7 +166,7 @@ public class GlobPay extends BaseRemittancePaymentMQListener implements MessageL
                     if (payoutResult.equals(PaymentField.PAYOUT_SUCCESS)) {
                         // 发起成功 修改状态
                         updateLoanRemittancePaymentRecordStatus(id, LoanRemittancePaymentRecordStatus.PROCESS);
-                        retryRemittance(remittanceParams, subExpression);
+                        retryRemittance(remittanceParams, subExpression());
                         continue;
                     } else {
                         // 发起失败 标记渠道 重回分配队列
@@ -132,7 +185,7 @@ public class GlobPay extends BaseRemittancePaymentMQListener implements MessageL
                         continue;
                     } else if (res == PaymentField.PAYOUT_PROCESS || res == PaymentField.PAYOUT_QUERY_ERROR) {
                         //  进行中 重回放款队列
-                        retryRemittance(remittanceParams, subExpression);
+                        retryRemittance(remittanceParams, subExpression());
                         continue;
                     } else if (res == PaymentField.PAYOUT_FAILED) {
                         // 失败 标记过滤渠道 重回分配队列
@@ -144,7 +197,7 @@ public class GlobPay extends BaseRemittancePaymentMQListener implements MessageL
             } catch (Exception e) {
                 try {
                     // 异常,重试
-                    retryRemittance(remittanceParams, subExpression);
+                    retryRemittance(remittanceParams, subExpression());
                 } catch (Exception exception) {
                     LogUtil.sysError("[globPay]", exception);
                 }
@@ -156,9 +209,13 @@ public class GlobPay extends BaseRemittancePaymentMQListener implements MessageL
 
     /**
      * 放款
+     *
+     * @param paymentEntity
+     * @param orderRecord
+     * @param paymentRecord
+     * @return
      */
     public Integer payout(LoanPaymentEntity paymentEntity, LoanRemittanceOrderRecordEntity orderRecord, LoanRemittancePaymentRecordEntity paymentRecord) {
-
         // 获取渠道配置信息
         JSONObject paymentConfig = JSONObject.parseObject(paymentEntity.getConfig());
         String merchantId = paymentConfig.getString(PaymentField.GLOBPAY_MERCHANT_ID);
@@ -195,7 +252,7 @@ public class GlobPay extends BaseRemittancePaymentMQListener implements MessageL
         String returnResult;
         try {
             // 发送第三方代付请求
-            returnResult = request( BeanUtil.beanToMap(param), payoutUrl);
+            returnResult = request(BeanUtil.beanToMap(param), payoutUrl);
             // 存储请求信息 和响应信息
             updateLoanRemittancePaymentRecordLog(
                     paymentRecord.getId(),
@@ -229,6 +286,11 @@ public class GlobPay extends BaseRemittancePaymentMQListener implements MessageL
 
     /**
      * 订单查询
+     *
+     * @param orderRecord
+     * @param paymentRecord
+     * @param paymentEntity
+     * @return
      */
     private int queryOrder(LoanRemittanceOrderRecordEntity orderRecord, LoanRemittancePaymentRecordEntity paymentRecord, LoanPaymentEntity paymentEntity) {
         // 获取渠道配置信息
@@ -246,7 +308,7 @@ public class GlobPay extends BaseRemittancePaymentMQListener implements MessageL
         String returnResult;
         try {
             // 发送第三方提现请求
-            returnResult = request( BeanUtil.beanToMap(param), queryUrl);
+            returnResult = request(BeanUtil.beanToMap(param), queryUrl);
         } catch (Exception e) {
             // 请求异常
             LogUtil.sysError("GlobPay查询代付异常:", e);
@@ -287,57 +349,6 @@ public class GlobPay extends BaseRemittancePaymentMQListener implements MessageL
             // 其他状态 进行中
             return PaymentField.PAYOUT_PROCESS;
         }
-    }
-
-    /*
-     1.将所有需要签名的字段按照 ASCII 码从小到大进行排序，并按照按照 k=v&k=v 的格式拼接字符串，并在字符串后面拼接商户私钥用 &key=x 进行拼接，生成待签名 queryString 字符串。
-     2.对生成的 queryString 字符串进行 MD5 签名，得到小写签名串。
-     3.除了sign和sign_type以外不为空的参数都需要参与签名(注意：回调以及同步响应的签名方法参数名称为signType)
-    */
-
-    public static String sign(Object param, String key) {
-        StringBuilder tempSign = new StringBuilder();
-
-        // Bean转Map
-        Map<String, Object> map = BeanUtil.beanToMap(param);
-
-        // 取所有字段名并排序
-        List<String> filedList = new ArrayList<>(map.keySet());
-        Collections.sort(filedList);
-
-        // 拼接kv
-        for (String filed : filedList) {
-            Object value = map.get(filed);
-            if (value != null) {
-                tempSign.append(filed).append("=").append(value).append("&");
-            }
-        }
-
-        // 拼接key
-        tempSign.append("key=").append(key);
-
-        // md5并转小写
-        return SecureUtil.md5(tempSign.toString()).toLowerCase();
-    }
-
-    /**
-     * 发起代付
-     */
-    public static String request(Map<String, Object> param, String url) {
-        // 请求
-        String response = null;
-        try {
-            response = HttpRequest.post(url)
-                    .header("Content-Type", MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-                    .form(param)
-                    .timeout(20000)
-                    .execute().body();
-
-        } catch (Exception e) {
-            LogUtil.sysError("[GlobPay]", e);
-        }
-
-        return response;
     }
 
 }

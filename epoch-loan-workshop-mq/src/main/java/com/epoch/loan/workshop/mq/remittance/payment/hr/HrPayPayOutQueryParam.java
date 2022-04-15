@@ -20,7 +20,7 @@ public class HrPayPayOutQueryParam {
      */
     private String orderid;
     /**
-     * 	MD5签名
+     * MD5签名
      */
     private String sign;
 }

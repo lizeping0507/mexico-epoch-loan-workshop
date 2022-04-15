@@ -8,9 +8,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.constant.LoanRemittanceOrderRecordStatus;
 import com.epoch.loan.workshop.common.constant.LoanRemittancePaymentRecordStatus;
 import com.epoch.loan.workshop.common.constant.PaymentField;
-import com.epoch.loan.workshop.common.entity.LoanPaymentEntity;
-import com.epoch.loan.workshop.common.entity.LoanRemittanceOrderRecordEntity;
-import com.epoch.loan.workshop.common.entity.LoanRemittancePaymentRecordEntity;
+import com.epoch.loan.workshop.common.entity.mysql.LoanPaymentEntity;
+import com.epoch.loan.workshop.common.entity.mysql.LoanRemittanceOrderRecordEntity;
+import com.epoch.loan.workshop.common.entity.mysql.LoanRemittancePaymentRecordEntity;
 import com.epoch.loan.workshop.common.mq.remittance.params.RemittanceParams;
 import com.epoch.loan.workshop.common.util.HttpUtils;
 import com.epoch.loan.workshop.common.util.LogUtil;
@@ -24,7 +24,6 @@ import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyStatus;
 import org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently;
 import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.common.message.MessageExt;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 
@@ -43,25 +42,16 @@ import java.util.*;
 @Data
 public class FastPay extends BaseRemittancePaymentMQListener implements MessageListenerConcurrently {
     /**
-     * 分配队列标签
-     */
-    @Value("${rocket.remittance.distribution.subExpression}")
-    protected String distributionSubExpression;
-
-    /**
-     * 放款队列标签标签
-     */
-    @Value("${rocket.remittance.fastPay.subExpression}")
-    protected String subExpression;
-
-    /**
      * 消息监听器
      */
     private MessageListenerConcurrently messageListener = this;
 
-
     /**
      * 消费任务
+     *
+     * @param msgs
+     * @param context
+     * @return
      */
     @Override
     public ConsumeConcurrentlyStatus consumeMessage(List<MessageExt> msgs, ConsumeConcurrentlyContext context) {
@@ -104,6 +94,9 @@ public class FastPay extends BaseRemittancePaymentMQListener implements MessageL
                     continue;
                 }
 
+                // 订单支付记录ID
+                String orderRecordId = orderRecord.getId();
+
                 // 更新放款记录状态为 "进行中"
                 updateRemittanceOrderRecordStatus(paymentRecord.getRemittanceOrderRecordId(), LoanRemittanceOrderRecordStatus.PROCESS);
 
@@ -115,7 +108,7 @@ public class FastPay extends BaseRemittancePaymentMQListener implements MessageL
                     // 判断放款状态
                     if (payoutResult.equals(PaymentField.PAYOUT_REQUEST_SUCCESS)) {
                         updateLoanRemittancePaymentRecordStatus(id, LoanRemittancePaymentRecordStatus.PROCESS);
-                        retryRemittance(remittanceParams, subExpression);
+                        retryRemittance(remittanceParams, subExpression());
                         continue;
                     } else {
                         // 发起失败 标记渠道 重回分配队列
@@ -132,11 +125,12 @@ public class FastPay extends BaseRemittancePaymentMQListener implements MessageL
                         // 成功 修改支付记录状态及支付详情记录状态
                         updateRemittanceOrderRecordStatus(orderRecord.getId(), LoanRemittanceOrderRecordStatus.SUCCESS);
                         updateLoanRemittancePaymentRecordStatus(paymentRecord.getId(), LoanRemittancePaymentRecordStatus.SUCCESS);
-                        updateSuccessRemittancePaymentRecordId(orderRecord.getId(), paymentRecord.getId());
+                        updateProcessRemittancePaymentRecordId(orderRecordId, "");
+                        updateSuccessRemittancePaymentRecordId(orderRecordId, paymentRecord.getId());
                         continue;
                     } else if (res == PaymentField.PAYOUT_PROCESS || res == PaymentField.PAYOUT_QUERY_ERROR) {
                         //  进行中 重回放款队列
-                        retryRemittance(remittanceParams, subExpression);
+                        retryRemittance(remittanceParams, subExpression());
                         continue;
                     } else if (res == PaymentField.PAYOUT_FAILED) {
                         // 失败 标记过滤渠道 重回分配队列
@@ -148,7 +142,7 @@ public class FastPay extends BaseRemittancePaymentMQListener implements MessageL
             } catch (Exception e) {
                 try {
                     // 异常,重试
-                    retryRemittance(remittanceParams, subExpression);
+                    retryRemittance(remittanceParams, subExpression());
                 } catch (Exception exception) {
                     LogUtil.sysError("[FastPay]", exception);
                 }
@@ -160,6 +154,11 @@ public class FastPay extends BaseRemittancePaymentMQListener implements MessageL
 
     /**
      * 放款
+     *
+     * @param paymentEntity
+     * @param orderRecord
+     * @param paymentRecord
+     * @return
      */
     public Integer payout(LoanPaymentEntity paymentEntity, LoanRemittanceOrderRecordEntity orderRecord, LoanRemittancePaymentRecordEntity paymentRecord) {
         // 格式化数字
@@ -226,6 +225,11 @@ public class FastPay extends BaseRemittancePaymentMQListener implements MessageL
 
     /**
      * 订单查询
+     *
+     * @param orderRecord
+     * @param paymentRecord
+     * @param paymentEntity
+     * @return
      */
     private int queryOrder(LoanRemittanceOrderRecordEntity orderRecord, LoanRemittancePaymentRecordEntity paymentRecord, LoanPaymentEntity paymentEntity) {
         // 获取渠道配置信息
@@ -296,14 +300,15 @@ public class FastPay extends BaseRemittancePaymentMQListener implements MessageL
 
     /**
      * 参数签名
-     *
-     * @param param 请求参数
-     * @return 签名字符串
      * 待签名数据按照以下方式进行签名：
      * 将除了参数 key 值按照 ASCII 升序排序
      * 将除了参数值按照 key=value&key=value...的形式拼接成字符串 stringA（空key=value 中 value 为空的不参与拼接， 不进行签名）
      * 将上述字符串使用平台的 key 进行 MD5 加密, MD5(stringA&key=密钥)
      * 最后将 MD5 加密后的字符串转成大写
+     *
+     * @param param
+     * @param key
+     * @return
      */
     public String sign(FastPayPayoutParam param, String key) {
         Map<String, Object> map = BeanUtil.beanToMap(param);

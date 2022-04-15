@@ -3,9 +3,8 @@ package com.epoch.loan.workshop.timing;
 import com.epoch.loan.workshop.common.config.StartConfig;
 import com.epoch.loan.workshop.common.mq.order.OrderMQManager;
 import com.epoch.loan.workshop.common.mq.remittance.RemittanceMQManager;
+import com.epoch.loan.workshop.common.mq.repayment.RepaymentMQManager;
 import com.epoch.loan.workshop.timing.util.QuartzUtil;
-import org.apache.dubbo.config.spring.context.annotation.DubboComponentScan;
-import org.apache.dubbo.config.spring.context.annotation.EnableDubbo;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -13,7 +12,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
-import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 
 import javax.annotation.PostConstruct;
 
@@ -27,10 +26,8 @@ import javax.annotation.PostConstruct;
 @EnableDiscoveryClient
 @SpringBootApplication
 @ComponentScan(basePackages = {"com.epoch.loan.workshop"})
-@DubboComponentScan(basePackages = {"com.epoch.loan.workshop.task"})
-@MapperScan(basePackages = "com.epoch.loan.workshop.common.dao")
-@EnableDubbo(scanBasePackages = {"com.epoch.loan.workshop.task.service"})
-@EnableAsync
+@MapperScan(basePackages = "com.epoch.loan.workshop.common.dao.mysql")
+@EnableElasticsearchRepositories(basePackages = "com.epoch.loan.workshop.common.dao.elastic")
 @EnableAspectJAutoProxy(exposeProxy = true)
 public class Application {
     /**
@@ -43,6 +40,12 @@ public class Application {
      */
     @Autowired
     private RemittanceMQManager remittanceMqManagerProduct;
+
+    /**
+     * 还款队列
+     */
+    @Autowired
+    private RepaymentMQManager repaymentMQManager;
 
     /**
      * 定时任务
@@ -71,6 +74,7 @@ public class Application {
     public void startJob() throws Exception {
         orderMQManager.init();
         remittanceMqManagerProduct.init();
+        repaymentMQManager.init();
         quartzUtil.startJob();
     }
 }

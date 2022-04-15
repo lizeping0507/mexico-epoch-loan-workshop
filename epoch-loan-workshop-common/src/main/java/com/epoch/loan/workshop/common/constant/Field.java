@@ -54,39 +54,26 @@ public class Field {
     public final static String TOKEN = "token";
 
     /**
-     * user
-     */
-    public final static String USER = "user";
-
-    /**
-     * AFid
-     */
-    public final static String AF_ID = "afId";
-
-    /**
-     * gAid
-     */
-    public final static String G_AID = "gaId";
-
-    /**
-     * 设备ID
+     * app名称
      */
     public final static String APP_NAME = "appName";
 
     /**
-     * 设备ID
+     * 设备类型
      */
-    public final static String DEVICE_ID = "deviceId";
+    public final static String MOBILE_TYPE = "mobileType";
+
+    /**
+     * 渠道标识
+     */
+    public final static String CHANNEL_CODE = "channelCode";
+
 
     /**
      * APP版本
      */
     public final static String APP_VERSION = "appVersion";
 
-    /**
-     * Gps地址
-     */
-    public final static String GPS = "gps";
 
     /**
      * 邮编
@@ -143,10 +130,6 @@ public class Field {
      */
     public final static String TRANSACTION_ID = "transactionId";
 
-    /**
-     * 用于用于标识是否为非贷超的调用
-     */
-    public final static String NOT_LOAN_MARKET = "notLoanMarket";
 
     /**
      * 用于标识是否重跑决策
@@ -258,15 +241,6 @@ public class Field {
      */
     public final static String MD5 = "md5";
 
-    /**
-     * 用户姓名
-     */
-    public final static String USER_NAME = "user_name";
-
-    /**
-     * 产品id
-     */
-    public final static String PRODUCT_ID = "product_id";
 
     /**
      * 签名
@@ -277,11 +251,6 @@ public class Field {
      * 返回码
      */
     public final static String CODE = "code";
-
-    /**
-     * 是否复贷用户
-     */
-    public final static String IS_RELOAN = "is_reloan";
 
     /**
      * 状态
@@ -322,4 +291,19 @@ public class Field {
      * 拒绝原因
      */
     public final static String REASON = "reason";
+
+    /**
+     * 映射地址
+     */
+    public final static String MAPPING_URL = "mapping_url";
+
+    /**
+     * GPS经纬度
+     */
+    public static final String GPS = "GPS";
+
+    /**
+     * GPS地址
+     */
+    public static final String GPS_ADDRESS = "gpsAddress";
 }

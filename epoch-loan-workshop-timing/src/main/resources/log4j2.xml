@@ -25,7 +25,8 @@
         </RollingRandomAccessFile>
 
         <!-- 系统日志 -->
-        <RollingRandomAccessFile fileName="${LOG_HOME}/system.log" filePattern="${LOG_BACKUP}/system.%d{yyyyMMdd}.log" name="SystemLog">
+        <RollingRandomAccessFile fileName="${LOG_HOME}/system.log" filePattern="${LOG_BACKUP}/system.%d{yyyyMMdd}.log"
+                                 name="SystemLog">
             <PatternLayout pattern="%date{yyyy-MM-dd HH:mm:ss.SSS} %level - %msg%n"/>
             <Policies>
                 <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
@@ -33,7 +34,8 @@
         </RollingRandomAccessFile>
 
         <!-- 请求访问日志 -->
-        <RollingRandomAccessFile fileName="${LOG_HOME}/request.log" filePattern="${LOG_BACKUP}/request.%d{yyyyMMdd}.log" name="RequestLog">
+        <RollingRandomAccessFile fileName="${LOG_HOME}/request.log" filePattern="${LOG_BACKUP}/request.%d{yyyyMMdd}.log"
+                                 name="RequestLog">
             <PatternLayout pattern="%date{yyyy-MM-dd HH:mm:ss.SSS} - %msg%n"/>
             <Policies>
                 <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
@@ -47,11 +49,6 @@
             <appender-ref ref="DaemonLog"/>
         </AsyncLogger>
 
-        <!-- system logger (同步)-->
-        <logger additivity="true" level="info" name="EPOCH_SYS">
-            <appender-ref ref="SystemLog"/>
-        </logger>
-
         <!-- request logger (异步)-->
         <AsyncLogger additivity="false" includeLocation="true" level="info" name="EPOCH_REQ">
             <appender-ref ref="RequestLog"/>
@@ -59,7 +56,6 @@
 
         <!-- Root Logger -->
         <root level="info">
-            <appender-ref ref="Console"/>
             <appender-ref ref="SystemLog"/>
         </root>
     </loggers>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.epoch.loan.workshop.common.dao.LoanOrderDao">
+<mapper namespace="com.epoch.loan.workshop.common.dao.mysql.LoanOrderDao">
     <update id="updateOrderStatus">
         UPDATE loan_order SET status=#{status},update_time=#{updateTime} WHERE id=#{orderId}
     </update>
@@ -33,7 +33,8 @@
         id=#{orderId}
     </update>
     <update id="updateOrderActualRepaymentAmount">
-        UPDATE loan_order SET actual_repayment_amount=#{actualRepaymentAmount},update_time=#{updateTime} WHERE id=#{orderId}
+        UPDATE loan_order SET actual_repayment_amount=#{actualRepaymentAmount},update_time=#{updateTime} WHERE
+        id=#{orderId}
     </update>
     <update id="updateOrderIncidentalAmount">
         UPDATE loan_order SET incidental_amount=#{incidentalAmount},update_time=#{updateTime} WHERE id=#{orderId}
@@ -41,7 +42,11 @@
     <update id="updateLoanTime">
         UPDATE loan_order SET loan_time=#{loanTime},update_time=#{updateTime} WHERE id=#{orderId}
     </update>
-    <select id="findOrder" resultType="com.epoch.loan.workshop.common.entity.LoanOrderEntity">
+    <update id="updateOrderRepaymentDistributionGroup">
+        UPDATE loan_order SET repayment_distribution_group=#{repaymentDistributionGroup},update_time=#{updateTime} WHERE
+        id=#{orderId}
+    </update>
+    <select id="findOrder" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanOrderEntity">
         SELECT * FROM loan_order WHERE id=#{orderId}
     </select>
     <select id="findOrderCountByAppNameAndUserIdAndStatus" resultType="java.lang.Integer">
@@ -49,5 +54,8 @@
     </select>
     <select id="findRemittanceDistributionGroupById" resultType="java.lang.String">
         SELECT remittance_distribution_group FROM loan_order WHERE id = #{orderId}
+    </select>
+    <select id="findOrderByStatus" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanOrderEntity">
+        SELECT * FROM loan_order status=#{status}
     </select>
 </mapper>

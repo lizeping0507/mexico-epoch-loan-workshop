@@ -1,9 +1,9 @@
 package com.epoch.loan.workshop.mq.remittance;
 
 import com.alibaba.fastjson.JSONObject;
-import com.epoch.loan.workshop.common.dao.*;
+import com.epoch.loan.workshop.common.dao.mysql.*;
 import com.epoch.loan.workshop.common.mq.remittance.RemittanceMQManager;
-import com.epoch.loan.workshop.common.mq.remittance.params.DistributionParams;
+import com.epoch.loan.workshop.common.mq.remittance.params.DistributionRemittanceParams;
 import com.epoch.loan.workshop.common.mq.remittance.params.RemittanceParams;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently;
@@ -24,6 +24,7 @@ import java.util.Date;
 @RefreshScope
 @Component
 public abstract class BaseRemittanceMQListener {
+
     /**
      * 支付分配
      */
@@ -49,9 +50,16 @@ public abstract class BaseRemittanceMQListener {
     public LoanRemittancePaymentRecordDao loanRemittancePaymentRecordDao;
 
     /**
-     * 获取子类标签
+     * 支付渠道
      */
-    protected abstract String getSubExpression();
+    @Autowired
+    public LoanPaymentDao loanPaymentDao;
+
+    /**
+     * 放款队列生产
+     */
+    @Autowired
+    public RemittanceMQManager remittanceMQManager;
 
     /**
      * 获取子类消息监听
@@ -62,26 +70,27 @@ public abstract class BaseRemittanceMQListener {
      * 消费任务启动
      */
     public void start() throws Exception {
-        remittanceMQManagerProduct.consumer(getMessageListener(), getSubExpression());
+        // 获取子类
+        MessageListenerConcurrently messageListenerConcurrently = getMessageListener();
+
+        // 启动队列
+        remittanceMQManager.consumer(messageListenerConcurrently, subExpression());
     }
 
     /**
-     * 支付渠道
+     * 获取标签
+     *
+     * @return
      */
-    @Autowired
-    public LoanPaymentDao loanPaymentDao;
-
-    /**
-     * 放款队列生产
-     */
-    @Autowired
-    public RemittanceMQManager remittanceMQManagerProduct;
+    public String subExpression() {
+        return getMessageListener().getClass().getSimpleName();
+    }
 
     /**
      * 获取消息内容
      *
      * @param message 消息内容
-     * @param clazz 消息实体类型
+     * @param clazz   消息实体类型
      * @return clazz
      */
     public <T> T getMessage(Message message, Class<T> clazz) throws Exception {
@@ -106,19 +115,19 @@ public abstract class BaseRemittanceMQListener {
      *
      * @param params 队列参数
      */
-    public void retryDistribution(DistributionParams params, String tag) throws Exception {
-        remittanceMQManagerProduct.sendMessage(params, tag, 4);
+    public void retryDistribution(DistributionRemittanceParams params, String tag) throws Exception {
+        remittanceMQManager.sendMessage(params, tag, 4);
     }
 
     /**
      * 进入放款队列
      *
      * @param params 放款队列参数
-     * @param tag 标签
+     * @param tag    标签
      * @throws Exception E
      */
     public void sendToRemittance(RemittanceParams params, String tag) throws Exception {
-        remittanceMQManagerProduct.sendMessage(params, tag);
+        remittanceMQManager.sendMessage(params, tag);
     }
 
     /**

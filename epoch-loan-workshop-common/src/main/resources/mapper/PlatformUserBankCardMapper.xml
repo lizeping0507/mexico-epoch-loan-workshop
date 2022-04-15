@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.epoch.loan.workshop.common.dao.PlatformUserBankCardDao">
+<mapper namespace="com.epoch.loan.workshop.common.dao.mysql.PlatformUserBankCardDao">
 
     <select id="findUserBankCard"
-            resultType="com.epoch.loan.workshop.common.entity.PlatformUserBankCardEntity">
+            resultType="com.epoch.loan.workshop.common.entity.mysql.PlatformUserBankCardEntity">
         SELECT * FROM platform_user_bankcard WHERE user_id=#{userId} AND order_no = #{orderNo} LIMIT 0,1
     </select>
     <select id="findUserBankCardById"
-            resultType="com.epoch.loan.workshop.common.entity.PlatformUserBankCardEntity">
+            resultType="com.epoch.loan.workshop.common.entity.mysql.PlatformUserBankCardEntity">
         SELECT * FROM platform_user_bankcard WHERE id = #{id} LIMIT 0,1
     </select>
 </mapper>

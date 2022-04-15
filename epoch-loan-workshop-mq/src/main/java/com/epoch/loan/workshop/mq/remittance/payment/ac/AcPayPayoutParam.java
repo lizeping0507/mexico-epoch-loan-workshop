@@ -30,8 +30,8 @@ public class AcPayPayoutParam {
     private String name;
     /**
      * 银行卡号/ vpa
-     *  1、银行卡转账，填银行卡号码
-     *  2、UPI转账，填写UPI账号
+     * 1、银行卡转账，填银行卡号码
+     * 2、UPI转账，填写UPI账号
      */
     private String ka;
     /**

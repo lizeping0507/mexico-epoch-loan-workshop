@@ -21,7 +21,7 @@ public class TrustPayPayoutParam {
      */
     private String orderId;
     /**
-     * 	代付金额，单位卢比，允许两位小数
+     * 代付金额，单位卢比，允许两位小数
      */
     private String amount;
 

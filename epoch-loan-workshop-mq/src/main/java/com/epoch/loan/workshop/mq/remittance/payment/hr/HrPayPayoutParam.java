@@ -36,7 +36,7 @@ public class HrPayPayoutParam {
      */
     private String mobile;
     /**
-     * 	收款人邮箱
+     * 收款人邮箱
      */
     private String email;
     /**

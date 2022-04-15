@@ -19,7 +19,7 @@ public class SunFlowerPayCallBackParams implements Serializable {
     private static final long serialVersionUID = 116541653165465L;
 
     /**
-     *  支付平台订单号
+     * 支付平台订单号
      */
     private String platform_trade_no;
     /**

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.epoch.loan.workshop.common.dao.mysql.PlatfromOrderPushRepaymentPlanDao">
+
+    <insert id="insert">
+        INSERT INTO `platform_receive_order_push_repayment_plan` (`id`,
+                                                                   `repayment_id`,
+                                                                   `order_no`,
+                                                                   `due_time`,
+                                                                   `amount`,
+                                                                   `is_able_defer`,
+                                                                   `paid_amount`,
+                                                                   `period_no`,
+                                                                   `pay_type`,
+                                                                   `remark`,
+                                                                   `can_repay_time`,
+                                                                   `success_time`,
+                                                                   `bill_status`)
+        VALUES (#{orderPushRepaymentPlanEntity.id},
+                #{orderPushRepaymentPlanEntity.repaymentId},
+                #{orderPushRepaymentPlanEntity.orderNo},
+                #{orderPushRepaymentPlanEntity.dueTime},
+                #{orderPushRepaymentPlanEntity.amount},
+                #{orderPushRepaymentPlanEntity.isAbleDefer},
+                #{orderPushRepaymentPlanEntity.paidAmount},
+                #{orderPushRepaymentPlanEntity.periodNo},
+                #{orderPushRepaymentPlanEntity.payType},
+                #{orderPushRepaymentPlanEntity.remark},
+                #{orderPushRepaymentPlanEntity.canRepayTime},
+                #{orderPushRepaymentPlanEntity.successTime},
+                #{orderPushRepaymentPlanEntity.billStatus})
+
+    </insert>
+
+    <select id="getMaxId" resultType="java.lang.Long">
+        select max(id) from platform_receive_order_push_repayment_plan
+    </select>
+</mapper>

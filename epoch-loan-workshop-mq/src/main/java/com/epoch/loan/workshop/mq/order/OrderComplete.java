@@ -1,10 +1,10 @@
 package com.epoch.loan.workshop.mq.order;
 
 import com.epoch.loan.workshop.common.constant.OrderBillStatus;
-import com.epoch.loan.workshop.common.constant.OrderExamineStatus;
 import com.epoch.loan.workshop.common.constant.OrderStatus;
-import com.epoch.loan.workshop.common.entity.LoanOrderBillEntity;
-import com.epoch.loan.workshop.common.entity.LoanOrderEntity;
+import com.epoch.loan.workshop.common.constant.RedisKeyField;
+import com.epoch.loan.workshop.common.entity.mysql.LoanOrderBillEntity;
+import com.epoch.loan.workshop.common.entity.mysql.LoanOrderEntity;
 import com.epoch.loan.workshop.common.mq.order.params.OrderParams;
 import com.epoch.loan.workshop.common.util.LogUtil;
 import lombok.Data;
@@ -14,7 +14,6 @@ import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyStatus;
 import org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently;
 import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.common.message.MessageExt;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 
@@ -32,13 +31,6 @@ import java.util.List;
 @Component
 @Data
 public class OrderComplete extends BaseOrderMQListener implements MessageListenerConcurrently {
-
-    /**
-     * 标签
-     */
-    @Value("${rocket.order.orderComplete.subExpression}")
-    private String subExpression;
-
     /**
      * 消息监听器
      */
@@ -46,6 +38,10 @@ public class OrderComplete extends BaseOrderMQListener implements MessageListene
 
     /**
      * 消费任务
+     *
+     * @param msgs    消息列表
+     * @param context 消息轨迹对象
+     * @return
      */
     @Override
     public ConsumeConcurrentlyStatus consumeMessage(List<MessageExt> msgs, ConsumeConcurrentlyContext context) {
@@ -62,9 +58,9 @@ public class OrderComplete extends BaseOrderMQListener implements MessageListene
                 }
 
                 // 队列拦截
-                if (intercept("SYSTEM", subExpression)) {
+                if (intercept("SYSTEM", subExpression())) {
                     // 等待重试
-                    retry(orderParams, subExpression);
+                    retry(orderParams, subExpression());
                     continue;
                 }
 
@@ -73,6 +69,14 @@ public class OrderComplete extends BaseOrderMQListener implements MessageListene
 
                 // 订单账单id
                 String orderBillId = orderParams.getOrderBillId();
+
+                // 判断是否正在计算逾期
+                Object orderBillDueLock = redisUtil.get(RedisKeyField.ORDER_BILL_DUE_LOCK + orderId);
+                if (ObjectUtils.isNotEmpty(orderBillDueLock)) {
+                    // 等待重试
+                    retry(orderParams, subExpression());
+                    continue;
+                }
 
                 // 查询订单ID
                 LoanOrderEntity loanOrderEntity = loanOrderDao.findOrder(orderId);
@@ -91,14 +95,32 @@ public class OrderComplete extends BaseOrderMQListener implements MessageListene
                 }
 
                 // 根据订单账单id查询账单
-                LoanOrderBillEntity orderBillEntity = loanOrderBillDao.findOrderBill(orderBillId);
-                if (ObjectUtils.isEmpty(orderBillEntity)) {
+                LoanOrderBillEntity loanOrderBillEntity = loanOrderBillDao.findOrderBill(orderBillId);
+                if (ObjectUtils.isEmpty(loanOrderBillEntity)) {
+                    continue;
+                }
+
+                // 根据订单账单ID查询已经实际支付金额
+                double receivedAmount = loanRepaymentPaymentRecordDao.sumRepaymentRecordActualAmount(orderBillId);
+
+                // 更新已付金额
+                loanOrderBillDao.updateOrderBillReceivedAmount(orderBillId, receivedAmount, new Date());
+
+                // 还款金额
+                double repayment = loanOrderBillEntity.getRepaymentAmount();
+
+                // 计算未还金额
+                double nonArrivalAmount = repayment - receivedAmount;
+
+                // 如果未偿还金额大于0
+                if (nonArrivalAmount > 0) {
+                    addrepaymentPlan(loanOrderEntity, loanOrderBillEntity, 0);
                     continue;
                 }
 
                 // 查看本期账单是否有逾期
                 int orderBillStatus = OrderBillStatus.COMPLETE;
-                if (orderBillEntity.getStatus() == OrderBillStatus.DUE) {
+                if (loanOrderBillEntity.getStatus() == OrderBillStatus.DUE) {
                     orderBillStatus = OrderBillStatus.DUE_COMPLETE;
                 }
 
@@ -130,14 +152,12 @@ public class OrderComplete extends BaseOrderMQListener implements MessageListene
 
                     // 更新订单状态
                     updateOrderStatus(orderId, orderStatus);
+                    platformOrderDao.updateOrderStatus(orderId, 200, new Date());
                 }
             } catch (Exception e) {
                 try {
-                    // 更新对应模型审核状态
-                    updateModeExamine(orderParams.getOrderId(), subExpression, OrderExamineStatus.FAIL);
-
                     // 异常,重试
-                    retry(orderParams, subExpression);
+                    retry(orderParams, subExpression());
                 } catch (Exception exception) {
                     LogUtil.sysError("[OrderComplete]", exception);
                 }

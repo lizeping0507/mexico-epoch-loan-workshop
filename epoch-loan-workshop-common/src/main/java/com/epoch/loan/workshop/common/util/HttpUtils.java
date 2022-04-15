@@ -1,7 +1,6 @@
 package com.epoch.loan.workshop.common.util;
 
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.*;
@@ -31,15 +30,12 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 
 import javax.net.ssl.*;
 import java.io.*;
-import java.net.SocketTimeoutException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.security.KeyManagementException;
@@ -1476,7 +1472,7 @@ public class HttpUtils {
         if (null != params && params.length() > 0) {
             List<NameValuePair> formparams = new ArrayList<NameValuePair>();
             Map<String, String> paramsMap = JSONObject.parseObject(params, Map.class);
-            for (String key :paramsMap.keySet()) {
+            for (String key : paramsMap.keySet()) {
                 formparams.add(new BasicNameValuePair(key, paramsMap.get(key)));
             }
 

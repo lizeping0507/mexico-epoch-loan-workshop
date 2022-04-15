@@ -1,63 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.epoch.loan.workshop.common.dao.LoanRemittancePaymentRecordDao">
+<mapper namespace="com.epoch.loan.workshop.common.dao.mysql.LoanRemittancePaymentRecordDao">
 
     <insert id="insert">
         INSERT INTO `loan_remittance_payment_record` (`id`,
-                                                      `payment_id`,
-                                                      `business_id`,
-                                                      `config_tag`,
-                                                      `queue_param`,
-                                                      `status`,
-                                                      `remittance_order_record_id`,
-                                                      `request`,
-                                                      `response`,
-                                                      `search_request`,
-                                                      `search_response`,
-                                                      `create_time`,
-                                                      `update_time`)
+        `payment_id`,
+        `business_id`,
+        `config_tag`,
+        `queue_param`,
+        `status`,
+        `remittance_order_record_id`,
+        `request`,
+        `response`,
+        `search_request`,
+        `search_response`,
+        `create_time`,
+        `update_time`)
         VALUES (#{loanPaymentLogEntity.id},
-                #{loanPaymentLogEntity.paymentId},
-                #{loanPaymentLogEntity.businessId},
-                #{loanPaymentLogEntity.configTag},
-                #{loanPaymentLogEntity.queueParam},
-                #{loanPaymentLogEntity.status},
-                #{loanPaymentLogEntity.remittanceOrderRecordId},
-                #{loanPaymentLogEntity.request},
-                #{loanPaymentLogEntity.response},
-                #{loanPaymentLogEntity.searchRequest},
-                #{loanPaymentLogEntity.searchesponse},
-                #{loanPaymentLogEntity.createTime},
-                #{loanPaymentLogEntity.updateTime});
+        #{loanPaymentLogEntity.paymentId},
+        #{loanPaymentLogEntity.businessId},
+        #{loanPaymentLogEntity.configTag},
+        #{loanPaymentLogEntity.queueParam},
+        #{loanPaymentLogEntity.status},
+        #{loanPaymentLogEntity.remittanceOrderRecordId},
+        #{loanPaymentLogEntity.request},
+        #{loanPaymentLogEntity.response},
+        #{loanPaymentLogEntity.searchRequest},
+        #{loanPaymentLogEntity.searchesponse},
+        #{loanPaymentLogEntity.createTime},
+        #{loanPaymentLogEntity.updateTime});
     </insert>
     <update id="updateRequestAndResponse">
-        UPDATE `loan_remittance_payment_record` set request = #{request} ,response = #{response},update_time = #{updateTime} where id = #{id}
+        UPDATE `loan_remittance_payment_record` set request = #{request} ,response = #{response},update_time =
+        #{updateTime} where id = #{id}
     </update>
     <update id="updateStatus">
         UPDATE `loan_remittance_payment_record` set status = #{status} ,update_time = #{updateTime} where id = #{id}
     </update>
     <update id="updateSearchRequestAndSearchResponse">
-        UPDATE `loan_remittance_payment_record` set search_request = #{request} ,search_response = #{response}, update_time = #{updateTime} where id = #{id}
+        UPDATE `loan_remittance_payment_record` set search_request = #{request} ,search_response = #{response},
+        update_time = #{updateTime} where id = #{id}
     </update>
     <update id="updateRemittancePaymentRecordConfigTag">
-        UPDATE `loan_remittance_payment_record` set config_tag = #{configTag}, update_time = #{updateTime} where id = #{id}
+        UPDATE `loan_remittance_payment_record` set config_tag = #{configTag}, update_time = #{updateTime} where id =
+        #{id}
     </update>
     <update id="updateQueueParam">
-        UPDATE `loan_remittance_payment_record` set queue_param = #{queueParam}, update_time = #{updateTime} where id = #{id}
+        UPDATE `loan_remittance_payment_record` set queue_param = #{queueParam}, update_time = #{updateTime} where id =
+        #{id}
     </update>
-    <select id="getById" resultType="com.epoch.loan.workshop.common.entity.LoanRemittancePaymentRecordEntity">
+    <select id="getById" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanRemittancePaymentRecordEntity">
         SELECT * FROM loan_remittance_payment_record WHERE id = #{id}
     </select>
     <select id="findByRemittanceOrderRecordIdAndPaymentId" resultType="java.lang.String">
-        SELECT config_tag FROM loan_remittance_payment_record WHERE  remittance_order_record_id = #{remittanceOrderRecordId} AND payment_id = #{paymentId}
+        SELECT config_tag FROM loan_remittance_payment_record WHERE remittance_order_record_id =
+        #{remittanceOrderRecordId} AND payment_id = #{paymentId}
     </select>
-    <select id="getByOrderId" resultType="com.epoch.loan.workshop.common.entity.LoanRemittancePaymentRecordEntity">
+    <select id="getByOrderId"
+            resultType="com.epoch.loan.workshop.common.entity.mysql.LoanRemittancePaymentRecordEntity">
         SELECT t1.*
         FROM loan_remittance_payment_record t1
-            LEFT JOIN loan_remittance_order_record t2
-                ON t2.process_remittance_payment_record_id = t1.id
+        LEFT JOIN loan_remittance_order_record t2
+        ON t2.process_remittance_payment_record_id = t1.id
         WHERE
-            t2.order_id = #{orderId} LIMIT 0,1
+        t2.order_id = #{orderId} LIMIT 0,1
     </select>
 
     <select id="countByTime" resultType="java.lang.Integer">
@@ -77,7 +83,7 @@
             </if>
         </trim>
     </select>
-    <select id="findById" resultType="com.epoch.loan.workshop.common.entity.LoanRemittancePaymentRecordEntity">
+    <select id="findById" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanRemittancePaymentRecordEntity">
         SELECT * FROM loan_remittance_payment_record where id = #{id}
     </select>
 </mapper>

@@ -3,9 +3,9 @@ package com.epoch.loan.workshop.mq.order;
 import com.epoch.loan.workshop.common.constant.LoanRemittanceOrderRecordStatus;
 import com.epoch.loan.workshop.common.constant.OrderExamineStatus;
 import com.epoch.loan.workshop.common.constant.OrderStatus;
-import com.epoch.loan.workshop.common.entity.*;
+import com.epoch.loan.workshop.common.entity.mysql.*;
 import com.epoch.loan.workshop.common.mq.order.params.OrderParams;
-import com.epoch.loan.workshop.common.mq.remittance.params.DistributionParams;
+import com.epoch.loan.workshop.common.mq.remittance.params.DistributionRemittanceParams;
 import com.epoch.loan.workshop.common.util.LogUtil;
 import com.epoch.loan.workshop.common.util.ObjectIdUtil;
 import lombok.Data;
@@ -16,7 +16,6 @@ import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyStatus;
 import org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently;
 import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.common.message.MessageExt;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 
@@ -35,18 +34,16 @@ import java.util.List;
 @Data
 public class OrderRemittance extends BaseOrderMQListener implements MessageListenerConcurrently {
     /**
-     * 标签
-     */
-    @Value("${rocket.order.orderRemittance.subExpression}")
-    private String subExpression;
-
-    /**
      * 消息监听器
      */
     private MessageListenerConcurrently messageListener = this;
 
     /**
      * 消费任务
+     *
+     * @param msgs    消息列表
+     * @param context 消息轨迹对象
+     * @return
      */
     @Override
     public ConsumeConcurrentlyStatus consumeMessage(List<MessageExt> msgs, ConsumeConcurrentlyContext context) {
@@ -63,9 +60,9 @@ public class OrderRemittance extends BaseOrderMQListener implements MessageListe
                 }
 
                 // 队列拦截
-                if (intercept(orderParams.getGroupName(), subExpression)) {
+                if (intercept(orderParams.getGroupName(), subExpression())) {
                     // 等待重试
-                    retry(orderParams, subExpression);
+                    retry(orderParams, subExpression());
                     continue;
                 }
 
@@ -87,7 +84,7 @@ public class OrderRemittance extends BaseOrderMQListener implements MessageListe
                 String userId = loanOrderEntity.getUserId();
 
                 // 查询当前模型处理状态
-                int status = getModelStatus(orderId, subExpression);
+                int status = getModelStatus(orderId, subExpression());
 
                 // 判断模型状态
                 if (status == OrderExamineStatus.CREATE) {
@@ -129,39 +126,39 @@ public class OrderRemittance extends BaseOrderMQListener implements MessageListe
                     platformOrderDao.updateOrderStatus(orderId, 115, new Date());
 
                     // 发送放款请求
-                    DistributionParams distributionParams = new DistributionParams();
-                    distributionParams.setId(id);
-                    distributionParams.setGroupName(loanOrderEntity.getRemittanceDistributionGroup());
-                    sendDistribution(distributionParams);
+                    DistributionRemittanceParams distributionRemittanceParams = new DistributionRemittanceParams();
+                    distributionRemittanceParams.setId(id);
+                    distributionRemittanceParams.setGroupName(loanOrderEntity.getRemittanceDistributionGroup());
+                    sendDistribution(distributionRemittanceParams);
 
                     // 更改模型审核状态为等待
-                    updateModeExamine(orderId, subExpression, OrderExamineStatus.WAIT);
+                    updateModeExamine(orderId, subExpression(), OrderExamineStatus.WAIT);
 
                     // 放入队列等待放款成功
-                    retry(orderParams, subExpression);
+                    retry(orderParams, subExpression());
                 } else {
                     // 查询支付状态
                     Integer loanRemittanceOrderRecordStatus = loanRemittanceOrderRecordDao.findLoanRemittanceOrderRecordStatusByOrderId(orderId);
 
                     // 判断支付状态是否合法
                     if (loanRemittanceOrderRecordStatus == null) {
-                        // 更改模型审核状态为创建
-                        updateModeExamine(orderId, subExpression, OrderExamineStatus.CREATE);
+                        // 更改模型审核状态为等待
+                        updateModeExamine(orderId, subExpression(), OrderExamineStatus.CREATE);
 
-                        // 放入队列等待放款
-                        retry(orderParams, subExpression);
+                        // 放入队列等待放款成功
+                        retry(orderParams, subExpression());
                     } else if (loanRemittanceOrderRecordStatus == LoanRemittanceOrderRecordStatus.SUCCESS) {
                         // 更新对应模型审核状态
-                        updateModeExamine(orderId, subExpression, OrderExamineStatus.PASS);
+                        updateModeExamine(orderId, subExpression(), OrderExamineStatus.PASS);
 
                         // 更新放款时间
                         updateLoanTime(orderId);
 
                         // 发送下一模型
-                        sendNextModel(orderParams, subExpression);
+                        sendNextModel(orderParams, subExpression());
                     } else if (loanRemittanceOrderRecordStatus == LoanRemittanceOrderRecordStatus.THOROUGHLY_FAILED) {
                         // 异常状况 此订单放款彻底失败  流程结束
-                        updateModeExamine(orderId, subExpression, OrderExamineStatus.FAIL);
+                        updateModeExamine(orderId, subExpression(), OrderExamineStatus.FAIL);
 
                         // 更改新表订单状态 : 废弃
                         updateOrderStatus(orderId, OrderStatus.ABANDONED);
@@ -170,16 +167,16 @@ public class OrderRemittance extends BaseOrderMQListener implements MessageListe
                         platformOrderDao.updateOrderStatus(orderId, 169, new Date());
                     } else {
                         // 放入队列等待放款成功
-                        retry(orderParams, subExpression);
+                        retry(orderParams, subExpression());
                     }
                 }
             } catch (Exception e) {
                 try {
                     // 更新对应模型审核状态
-                    updateModeExamine(orderParams.getOrderId(), subExpression, OrderExamineStatus.FAIL);
+                    updateModeExamine(orderParams.getOrderId(), subExpression(), OrderExamineStatus.FAIL);
 
                     // 异常,重试
-                    retry(orderParams, subExpression);
+                    retry(orderParams, subExpression());
                 } catch (Exception exception) {
                     LogUtil.sysError("[OrderRemittance]", exception);
                 }
@@ -198,7 +195,7 @@ public class OrderRemittance extends BaseOrderMQListener implements MessageListe
      * @return 标准名字
      */
     private String standardiseName(String name) {
-        if (StringUtils.isEmpty(name)){
+        if (StringUtils.isEmpty(name)) {
             return "";
         }
 
@@ -210,12 +207,12 @@ public class OrderRemittance extends BaseOrderMQListener implements MessageListe
             // 合法字符拼接 非法字符转空格
             if ((aChar >= 65 && aChar <= 90) || (aChar >= 97 && aChar <= 122)) {
                 noSymbolStr.append(aChar);
-            }else {
+            } else {
                 aChar = 32;
             }
 
             // 单独空格拼接 连续空格去除
-            if (aChar == 32 && preChar!= 32){
+            if (aChar == 32 && preChar != 32) {
                 noSymbolStr.append(aChar);
             }
             preChar = aChar;

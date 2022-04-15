@@ -28,7 +28,7 @@ public class QePayPayoutParam {
      */
     private String mch_transferId;
     /**
-     * 	转账金额
+     * 转账金额
      */
     private String transfer_amount;
     /**

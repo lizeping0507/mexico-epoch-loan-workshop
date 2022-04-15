@@ -1,7 +1,7 @@
 package com.epoch.loan.workshop.timing.util;
 
-import com.epoch.loan.workshop.common.dao.LoanTimingDao;
-import com.epoch.loan.workshop.common.entity.LoanTimingEntity;
+import com.epoch.loan.workshop.common.dao.mysql.LoanTimingDao;
+import com.epoch.loan.workshop.common.entity.mysql.LoanTimingEntity;
 import com.epoch.loan.workshop.common.util.LogUtil;
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;

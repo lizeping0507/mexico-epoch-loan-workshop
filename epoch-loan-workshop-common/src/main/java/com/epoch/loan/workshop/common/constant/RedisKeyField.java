@@ -28,4 +28,9 @@ public class RedisKeyField {
      * 用户缓存记录
      */
     public final static String USER_CACHE = "userCache" + SPLIT;
+
+    /**
+     * 订单逾期计算锁
+     */
+    public final static String ORDER_BILL_DUE_LOCK = "orderBillDueLock" + SPLIT;
 }

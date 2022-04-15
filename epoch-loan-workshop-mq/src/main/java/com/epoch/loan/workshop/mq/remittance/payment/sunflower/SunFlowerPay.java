@@ -3,17 +3,14 @@ package com.epoch.loan.workshop.mq.remittance.payment.sunflower;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.NumberUtil;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.epoch.loan.workshop.common.constant.LoanRemittanceOrderRecordStatus;
 import com.epoch.loan.workshop.common.constant.LoanRemittancePaymentRecordStatus;
 import com.epoch.loan.workshop.common.constant.PaymentField;
-import com.epoch.loan.workshop.common.entity.LoanPaymentEntity;
-import com.epoch.loan.workshop.common.entity.LoanRemittanceOrderRecordEntity;
-import com.epoch.loan.workshop.common.entity.LoanRemittancePaymentRecordEntity;
+import com.epoch.loan.workshop.common.entity.mysql.LoanPaymentEntity;
+import com.epoch.loan.workshop.common.entity.mysql.LoanRemittanceOrderRecordEntity;
+import com.epoch.loan.workshop.common.entity.mysql.LoanRemittancePaymentRecordEntity;
 import com.epoch.loan.workshop.common.mq.remittance.params.RemittanceParams;
-import com.epoch.loan.workshop.common.params.system.AccessLogParams;
 import com.epoch.loan.workshop.common.util.HttpUtils;
 import com.epoch.loan.workshop.common.util.LogUtil;
 import com.epoch.loan.workshop.mq.remittance.payment.BaseRemittancePaymentMQListener;
@@ -25,9 +22,7 @@ import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyStatus;
 import org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently;
 import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.common.message.MessageExt;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
@@ -35,7 +30,10 @@ import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.Signature;
 import java.security.spec.PKCS8EncodedKeySpec;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author : lyf
@@ -49,19 +47,63 @@ import java.util.*;
 @Data
 public class SunFlowerPay extends BaseRemittancePaymentMQListener implements MessageListenerConcurrently {
     /**
-     * 放款队列标签标签
-     */
-    @Value("${rocket.remittance.sunFlowerPay.subExpression}")
-    protected String subExpression;
-
-    /**
      * 消息监听器
      */
     private MessageListenerConcurrently messageListener = this;
 
+    /**
+     * 参数签名
+     * 第⼀步： 假设所有发送或者接收到的数据为集合M，将集合M内⾮空参数值的参数按照参数名ASCII
+     * 码从⼩到⼤排序（字典序），使⽤URL键值对的格式（即key1=value1&key2=value2）拼接成字
+     * 符串stringA。
+     * 特别注意以下重要规则：
+     * ◆ 参数名ASCII码从⼩到⼤排序（字典序）；
+     * ◆ 如果参数的值为空不参与签名；
+     * ◆ 参数名区分⼤⼩写；
+     * ◆ 验证调⽤返回或⽀付平台主动通知签名时，传送的sign参数不参与签名，将⽣成的签名与该sign
+     * 值作校验。
+     * ◆ ⽀付平台接⼝可能增加字段，验证签名时必须⽀持增加的扩展字段
+     * <p>
+     * 第⼆步： 对stringA进⾏RSA运算，得到sign值signValue。
+     *
+     * @param param 请求参数
+     * @return 签名字符串
+     */
+    public static String sign(Object param, String key) {
+
+        StringBuilder data = new StringBuilder();
+        // Bean转Map
+        Map<String, Object> map = BeanUtil.beanToMap(param);
+        // 取所有字段名并排序
+        List<String> filedList = new ArrayList<>(map.keySet());
+        Collections.sort(filedList);
+        // 拼接kv
+        for (String filed : filedList) {
+            Object value = map.get(filed);
+            if (value != null && !"".equals(value)) {
+                data.append(filed).append("=").append(value).append("&");
+            }
+        }
+        try {
+            //通过PKCS#8编码的Key指令获得私钥对象
+            PKCS8EncodedKeySpec pkcs8KeySpec = new PKCS8EncodedKeySpec(java.util.Base64.getDecoder().decode(key));
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            PrivateKey privateKey = keyFactory.generatePrivate(pkcs8KeySpec);
+            Signature signature = Signature.getInstance("SHA1WithRSA");
+            signature.initSign(privateKey);
+            signature.update(data.toString().getBytes(StandardCharsets.UTF_8));
+            return java.util.Base64.getEncoder().encodeToString(signature.sign());
+        } catch (Exception e) {
+            throw new RuntimeException("签名字符串[" + data + "]时遇到异常", e);
+        }
+    }
 
     /**
      * 消费任务
+     *
+     * @param msgs
+     * @param context
+     * @return
      */
     @Override
     public ConsumeConcurrentlyStatus consumeMessage(List<MessageExt> msgs, ConsumeConcurrentlyContext context) {
@@ -103,6 +145,9 @@ public class SunFlowerPay extends BaseRemittancePaymentMQListener implements Mes
                     continue;
                 }
 
+                // 订单支付记录ID
+                String orderRecordId = orderRecord.getId();
+
                 // 更新放款记录状态为 "进行中"
                 updateRemittanceOrderRecordStatus(paymentRecord.getRemittanceOrderRecordId(), LoanRemittanceOrderRecordStatus.PROCESS);
 
@@ -114,7 +159,7 @@ public class SunFlowerPay extends BaseRemittancePaymentMQListener implements Mes
                     if (payoutResult.equals(PaymentField.PAYOUT_SUCCESS)) {
                         // 发起成功 修改状态
                         updateLoanRemittancePaymentRecordStatus(id, LoanRemittancePaymentRecordStatus.PROCESS);
-                        retryRemittance(remittanceParams, subExpression);
+                        retryRemittance(remittanceParams, subExpression());
                         continue;
                     } else {
                         // 发起失败 标记渠道 重回分配队列
@@ -129,11 +174,12 @@ public class SunFlowerPay extends BaseRemittancePaymentMQListener implements Mes
                         // 成功 修改支付记录状态及支付详情记录状态
                         updateRemittanceOrderRecordStatus(orderRecord.getId(), LoanRemittanceOrderRecordStatus.SUCCESS);
                         updateLoanRemittancePaymentRecordStatus(paymentRecord.getId(), LoanRemittancePaymentRecordStatus.SUCCESS);
-                        updateSuccessRemittancePaymentRecordId(orderRecord.getId(), paymentRecord.getId());
+                        updateProcessRemittancePaymentRecordId(orderRecordId, "");
+                        updateSuccessRemittancePaymentRecordId(orderRecordId, paymentRecord.getId());
                         continue;
                     } else if (res == PaymentField.PAYOUT_PROCESS || res == PaymentField.PAYOUT_QUERY_ERROR) {
                         //  进行中 重回放款队列
-                        retryRemittance(remittanceParams, subExpression);
+                        retryRemittance(remittanceParams, subExpression());
                         continue;
                     } else if (res == PaymentField.PAYOUT_FAILED) {
                         // 失败 标记过滤渠道 重回分配队列
@@ -145,7 +191,7 @@ public class SunFlowerPay extends BaseRemittancePaymentMQListener implements Mes
             } catch (Exception e) {
                 try {
                     // 异常,重试
-                    retryRemittance(remittanceParams, subExpression);
+                    retryRemittance(remittanceParams, subExpression());
                 } catch (Exception exception) {
                     LogUtil.sysError("[SunFlowerPay]", exception);
                 }
@@ -157,6 +203,12 @@ public class SunFlowerPay extends BaseRemittancePaymentMQListener implements Mes
 
     /**
      * 放款
+     *
+     * @param paymentEntity
+     * @param orderRecord
+     * @param paymentRecord
+     * @return
+     * @throws Exception
      */
     public Integer payout(LoanPaymentEntity paymentEntity, LoanRemittanceOrderRecordEntity orderRecord, LoanRemittancePaymentRecordEntity paymentRecord) throws Exception {
 
@@ -219,6 +271,12 @@ public class SunFlowerPay extends BaseRemittancePaymentMQListener implements Mes
 
     /**
      * 订单查询
+     *
+     * @param orderRecord
+     * @param paymentRecord
+     * @param paymentEntity
+     * @return
+     * @throws Exception
      */
     private int queryOrder(LoanRemittanceOrderRecordEntity orderRecord, LoanRemittancePaymentRecordEntity paymentRecord, LoanPaymentEntity paymentEntity) throws Exception {
         // 获取渠道配置信息
@@ -281,53 +339,6 @@ public class SunFlowerPay extends BaseRemittancePaymentMQListener implements Mes
         } else {
             // 其他状态 进行中
             return PaymentField.PAYOUT_PROCESS;
-        }
-    }
-
-    /**
-     * 参数签名
-     * 第⼀步： 假设所有发送或者接收到的数据为集合M，将集合M内⾮空参数值的参数按照参数名ASCII
-     * 码从⼩到⼤排序（字典序），使⽤URL键值对的格式（即key1=value1&key2=value2）拼接成字
-     * 符串stringA。
-     * 特别注意以下重要规则：
-     * ◆ 参数名ASCII码从⼩到⼤排序（字典序）；
-     * ◆ 如果参数的值为空不参与签名；
-     * ◆ 参数名区分⼤⼩写；
-     * ◆ 验证调⽤返回或⽀付平台主动通知签名时，传送的sign参数不参与签名，将⽣成的签名与该sign
-     * 值作校验。
-     * ◆ ⽀付平台接⼝可能增加字段，验证签名时必须⽀持增加的扩展字段
-     *
-     * 第⼆步： 对stringA进⾏RSA运算，得到sign值signValue。
-     *
-     * @param param 请求参数
-     * @return 签名字符串
-     */
-    public static String sign(Object param, String key) {
-
-        StringBuilder data = new StringBuilder();
-        // Bean转Map
-        Map<String, Object> map = BeanUtil.beanToMap(param);
-        // 取所有字段名并排序
-        List<String> filedList = new ArrayList<>(map.keySet());
-        Collections.sort(filedList);
-        // 拼接kv
-        for (String filed : filedList) {
-            Object value = map.get(filed);
-            if (value != null && !"".equals(value)) {
-                data.append(filed).append("=").append(value).append("&");
-            }
-        }
-        try {
-            //通过PKCS#8编码的Key指令获得私钥对象
-            PKCS8EncodedKeySpec pkcs8KeySpec = new PKCS8EncodedKeySpec(java.util.Base64.getDecoder().decode(key));
-            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-            PrivateKey privateKey = keyFactory.generatePrivate(pkcs8KeySpec);
-            Signature signature = Signature.getInstance("SHA1WithRSA");
-            signature.initSign(privateKey);
-            signature.update(data.toString().getBytes(StandardCharsets.UTF_8));
-            return java.util.Base64.getEncoder().encodeToString(signature.sign());
-        } catch (Exception e) {
-            throw new RuntimeException("签名字符串[" + data + "]时遇到异常", e);
         }
     }
 }

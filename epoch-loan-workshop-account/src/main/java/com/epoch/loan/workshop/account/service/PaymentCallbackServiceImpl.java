@@ -1,12 +1,13 @@
 package com.epoch.loan.workshop.account.service;
 
 import com.alibaba.fastjson.JSONObject;
-import com.epoch.loan.workshop.common.entity.LoanPaymentEntity;
-import com.epoch.loan.workshop.common.entity.LoanRemittancePaymentRecordEntity;
+import com.epoch.loan.workshop.common.entity.mysql.LoanPaymentEntity;
+import com.epoch.loan.workshop.common.entity.mysql.LoanRemittancePaymentRecordEntity;
 import com.epoch.loan.workshop.common.mq.remittance.params.RemittanceParams;
 import com.epoch.loan.workshop.common.params.params.request.*;
 import com.epoch.loan.workshop.common.service.PaymentCallbackService;
 import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 
 /**
@@ -35,8 +36,19 @@ public class PaymentCallbackServiceImpl extends BaseService implements PaymentCa
         String name = loanPayment.getName();
 
         // 发送到yeahPay队列
-        RemittanceParams remittanceParams = JSONObject.parseObject(paymentRecord.getQueueParam(), RemittanceParams.class);
+        String queueParam = paymentRecord.getQueueParam();
+        RemittanceParams remittanceParams;
+        if (StringUtils.isNotEmpty(queueParam)){
+            remittanceParams = JSONObject.parseObject(queueParam, RemittanceParams.class);
+        }
+        else {
+            remittanceParams = new RemittanceParams();
+            remittanceParams.setGroupName("Weight");
+            remittanceParams.setId(paymentRecord.getId());
+        }
         remittanceMQManagerProduct.sendMessage(remittanceParams, name);
+        remittanceParams.setGroupName("Weight");
+        remittanceParams.setId(paymentRecord.getId());
 
         return "success";
     }
@@ -55,8 +67,16 @@ public class PaymentCallbackServiceImpl extends BaseService implements PaymentCa
         // 发送到inPay队列
         LoanRemittancePaymentRecordEntity paymentRecord = paymentRecordDao.getById(id);
 
-        // 发送到yeahPay队列
-        RemittanceParams remittanceParams = JSONObject.parseObject(paymentRecord.getQueueParam(), RemittanceParams.class);
+        String queueParam = paymentRecord.getQueueParam();
+        RemittanceParams remittanceParams;
+        if (StringUtils.isNotEmpty(queueParam)){
+            remittanceParams = JSONObject.parseObject(queueParam, RemittanceParams.class);
+        }
+        else {
+            remittanceParams = new RemittanceParams();
+            remittanceParams.setGroupName("Weight");
+            remittanceParams.setId(paymentRecord.getId());
+        }
         remittanceMQManagerProduct.sendMessage(remittanceParams, remittanceMQManagerProduct.getInPaySubExpression());
 
         return "success";
@@ -77,7 +97,16 @@ public class PaymentCallbackServiceImpl extends BaseService implements PaymentCa
         LoanRemittancePaymentRecordEntity paymentRecord = paymentRecordDao.getById(id);
 
         // 发送到sunFlowerPay队列
-        RemittanceParams remittanceParams = JSONObject.parseObject(paymentRecord.getQueueParam(), RemittanceParams.class);
+        String queueParam = paymentRecord.getQueueParam();
+        RemittanceParams remittanceParams;
+        if (StringUtils.isNotEmpty(queueParam)){
+            remittanceParams = JSONObject.parseObject(queueParam, RemittanceParams.class);
+        }
+        else {
+            remittanceParams = new RemittanceParams();
+            remittanceParams.setGroupName("Weight");
+            remittanceParams.setId(paymentRecord.getId());
+        }
         remittanceMQManagerProduct.sendMessage(remittanceParams, remittanceMQManagerProduct.getSunFlowerPaySubExpression());
 
         return "SUCCESS";
@@ -98,7 +127,16 @@ public class PaymentCallbackServiceImpl extends BaseService implements PaymentCa
         LoanRemittancePaymentRecordEntity paymentRecord = paymentRecordDao.getById(id);
 
         // 发送到oceanPay队列
-        RemittanceParams remittanceParams = JSONObject.parseObject(paymentRecord.getQueueParam(), RemittanceParams.class);
+        String queueParam = paymentRecord.getQueueParam();
+        RemittanceParams remittanceParams;
+        if (StringUtils.isNotEmpty(queueParam)){
+            remittanceParams = JSONObject.parseObject(queueParam, RemittanceParams.class);
+        }
+        else {
+            remittanceParams = new RemittanceParams();
+            remittanceParams.setGroupName("Weight");
+            remittanceParams.setId(paymentRecord.getId());
+        }
         remittanceMQManagerProduct.sendMessage(remittanceParams, remittanceMQManagerProduct.getOceanPaySubExpression());
 
         return "OK";
@@ -120,7 +158,16 @@ public class PaymentCallbackServiceImpl extends BaseService implements PaymentCa
         LoanRemittancePaymentRecordEntity paymentRecord = paymentRecordDao.getById(id);
 
         // 发送到acPay队列
-        RemittanceParams remittanceParams = JSONObject.parseObject(paymentRecord.getQueueParam(), RemittanceParams.class);
+        String queueParam = paymentRecord.getQueueParam();
+        RemittanceParams remittanceParams;
+        if (StringUtils.isNotEmpty(queueParam)){
+            remittanceParams = JSONObject.parseObject(queueParam, RemittanceParams.class);
+        }
+        else {
+            remittanceParams = new RemittanceParams();
+            remittanceParams.setGroupName("Weight");
+            remittanceParams.setId(paymentRecord.getId());
+        }
         remittanceMQManagerProduct.sendMessage(remittanceParams, remittanceMQManagerProduct.getAcPaySubExpression());
 
         return "success";
@@ -139,7 +186,16 @@ public class PaymentCallbackServiceImpl extends BaseService implements PaymentCa
         LoanRemittancePaymentRecordEntity paymentRecord = paymentRecordDao.getById(id);
 
         // 发送到incashPay队列
-        RemittanceParams remittanceParams = JSONObject.parseObject(paymentRecord.getQueueParam(), RemittanceParams.class);
+        String queueParam = paymentRecord.getQueueParam();
+        RemittanceParams remittanceParams;
+        if (StringUtils.isNotEmpty(queueParam)){
+            remittanceParams = JSONObject.parseObject(queueParam, RemittanceParams.class);
+        }
+        else {
+            remittanceParams = new RemittanceParams();
+            remittanceParams.setGroupName("Weight");
+            remittanceParams.setId(paymentRecord.getId());
+        }
         remittanceMQManagerProduct.sendMessage(remittanceParams, remittanceMQManagerProduct.getIncashPaySubExpression());
         return "ok";
     }
@@ -157,7 +213,16 @@ public class PaymentCallbackServiceImpl extends BaseService implements PaymentCa
         LoanRemittancePaymentRecordEntity paymentRecord = paymentRecordDao.getById(id);
 
         // 发送到incashXjdPay队列
-        RemittanceParams remittanceParams = JSONObject.parseObject(paymentRecord.getQueueParam(), RemittanceParams.class);
+        String queueParam = paymentRecord.getQueueParam();
+        RemittanceParams remittanceParams;
+        if (StringUtils.isNotEmpty(queueParam)){
+            remittanceParams = JSONObject.parseObject(queueParam, RemittanceParams.class);
+        }
+        else {
+            remittanceParams = new RemittanceParams();
+            remittanceParams.setGroupName("Weight");
+            remittanceParams.setId(paymentRecord.getId());
+        }
         remittanceMQManagerProduct.sendMessage(remittanceParams, remittanceMQManagerProduct.getIncashXjdPaySubExpression());
         return "ok";
     }
@@ -175,13 +240,23 @@ public class PaymentCallbackServiceImpl extends BaseService implements PaymentCa
         LoanRemittancePaymentRecordEntity paymentRecord = paymentRecordDao.getById(id);
 
         // 发送到trustPay队列
-        RemittanceParams remittanceParams = JSONObject.parseObject(paymentRecord.getQueueParam(), RemittanceParams.class);
+        String queueParam = paymentRecord.getQueueParam();
+        RemittanceParams remittanceParams;
+        if (StringUtils.isNotEmpty(queueParam)){
+            remittanceParams = JSONObject.parseObject(queueParam, RemittanceParams.class);
+        }
+        else {
+            remittanceParams = new RemittanceParams();
+            remittanceParams.setGroupName("Weight");
+            remittanceParams.setId(paymentRecord.getId());
+        }
         remittanceMQManagerProduct.sendMessage(remittanceParams, remittanceMQManagerProduct.getTrustPaySubExpression());
         JSONObject object = new JSONObject();
         object.put("code", 200);
         object.put("message", "ok");
         return object;
     }
+
     /**
      * qePay支付回调处理
      *
@@ -195,10 +270,20 @@ public class PaymentCallbackServiceImpl extends BaseService implements PaymentCa
         LoanRemittancePaymentRecordEntity paymentRecord = paymentRecordDao.getById(id);
 
         // 发送到qePay队列
-        RemittanceParams remittanceParams = JSONObject.parseObject(paymentRecord.getQueueParam(), RemittanceParams.class);
+        String queueParam = paymentRecord.getQueueParam();
+        RemittanceParams remittanceParams;
+        if (StringUtils.isNotEmpty(queueParam)){
+            remittanceParams = JSONObject.parseObject(queueParam, RemittanceParams.class);
+        }
+        else {
+            remittanceParams = new RemittanceParams();
+            remittanceParams.setGroupName("Weight");
+            remittanceParams.setId(paymentRecord.getId());
+        }
         remittanceMQManagerProduct.sendMessage(remittanceParams, remittanceMQManagerProduct.getQePaySubExpression());
         return "success";
     }
+
     /**
      * hrPay支付回调处理
      *
@@ -212,10 +297,20 @@ public class PaymentCallbackServiceImpl extends BaseService implements PaymentCa
         LoanRemittancePaymentRecordEntity paymentRecord = paymentRecordDao.getById(id);
 
         // 发送到hrPay队列
-        RemittanceParams remittanceParams = JSONObject.parseObject(paymentRecord.getQueueParam(), RemittanceParams.class);
+        String queueParam = paymentRecord.getQueueParam();
+        RemittanceParams remittanceParams;
+        if (StringUtils.isNotEmpty(queueParam)){
+            remittanceParams = JSONObject.parseObject(queueParam, RemittanceParams.class);
+        }
+        else {
+            remittanceParams = new RemittanceParams();
+            remittanceParams.setGroupName("Weight");
+            remittanceParams.setId(paymentRecord.getId());
+        }
         remittanceMQManagerProduct.sendMessage(remittanceParams, remittanceMQManagerProduct.getQePaySubExpression());
         return "ok";
     }
+
     /**
      * globPay支付回调处理
      *
@@ -229,7 +324,16 @@ public class PaymentCallbackServiceImpl extends BaseService implements PaymentCa
         LoanRemittancePaymentRecordEntity paymentRecord = paymentRecordDao.getById(id);
 
         // 发送到hrPay队列
-        RemittanceParams remittanceParams = JSONObject.parseObject(paymentRecord.getQueueParam(), RemittanceParams.class);
+        String queueParam = paymentRecord.getQueueParam();
+        RemittanceParams remittanceParams;
+        if (StringUtils.isNotEmpty(queueParam)){
+            remittanceParams = JSONObject.parseObject(queueParam, RemittanceParams.class);
+        }
+        else {
+            remittanceParams = new RemittanceParams();
+            remittanceParams.setGroupName("Weight");
+            remittanceParams.setId(paymentRecord.getId());
+        }
         remittanceMQManagerProduct.sendMessage(remittanceParams, remittanceMQManagerProduct.getGlobPaySubExpression());
         return "success";
     }
@@ -243,7 +347,7 @@ public class PaymentCallbackServiceImpl extends BaseService implements PaymentCa
     @Override
     public boolean checkOrder(String poutId) {
         LoanRemittancePaymentRecordEntity paymentRecord = paymentRecordDao.findById(poutId);
-        if (null != paymentRecord ){
+        if (null != paymentRecord) {
             return true;
         }
         return false;

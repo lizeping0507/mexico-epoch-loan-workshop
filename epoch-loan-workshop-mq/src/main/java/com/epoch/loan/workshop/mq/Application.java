@@ -3,9 +3,11 @@ package com.epoch.loan.workshop.mq;
 import com.epoch.loan.workshop.common.config.StartConfig;
 import com.epoch.loan.workshop.common.mq.order.OrderMQManager;
 import com.epoch.loan.workshop.common.mq.remittance.RemittanceMQManager;
+import com.epoch.loan.workshop.common.mq.repayment.RepaymentMQManager;
+import com.epoch.loan.workshop.mq.log.AccessLogStorage;
 import com.epoch.loan.workshop.mq.order.*;
 import com.epoch.loan.workshop.mq.order.screen.*;
-import com.epoch.loan.workshop.mq.remittance.Distribution;
+import com.epoch.loan.workshop.mq.remittance.DistributionRemittance;
 import com.epoch.loan.workshop.mq.remittance.payment.ac.AcPay;
 import com.epoch.loan.workshop.mq.remittance.payment.fast.FastPay;
 import com.epoch.loan.workshop.mq.remittance.payment.glob.GlobPay;
@@ -20,13 +22,15 @@ import com.epoch.loan.workshop.mq.remittance.payment.trust.TrustPay;
 import com.epoch.loan.workshop.mq.remittance.payment.yeah.YeahPay;
 import com.epoch.loan.workshop.mq.remittance.payment.yeah.YeahPay1;
 import com.epoch.loan.workshop.mq.remittance.payment.yeah.YeahPay2;
+import com.epoch.loan.workshop.mq.repayment.DistributionRepayment;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 
 import javax.annotation.PostConstruct;
 
@@ -40,8 +44,9 @@ import javax.annotation.PostConstruct;
 @EnableDiscoveryClient
 @SpringBootApplication
 @ComponentScan(basePackages = {"com.epoch.loan.workshop"})
-@MapperScan(basePackages = "com.epoch.loan.workshop.common.dao")
-@EnableAsync
+@MapperScan(basePackages = "com.epoch.loan.workshop.common.dao.mysql")
+@EnableElasticsearchRepositories(basePackages = "com.epoch.loan.workshop.common.dao.elastic")
+@EnableAspectJAutoProxy(exposeProxy = true)
 public class Application {
     /**
      * 订单队列
@@ -113,47 +118,56 @@ public class Application {
      * 汇款分配队列
      */
     @Autowired
-    private Distribution distribution;
+    private DistributionRemittance distributionRemittance;
+
     /**
      * yeahPay放款队列
      */
     @Autowired
     private YeahPay yeahPay;
+
     /**
      * yeahPay2放款队列
      */
     @Autowired
     private YeahPay2 yeahPay2;
+
     /**
      * yeahPa1放款队列
      */
     @Autowired
     private YeahPay1 yeahPay1;
+
     /**
      * fastPay放款队列
      */
     @Autowired
     private FastPay fastPay;
+
     /**
      * inPay放款队列
      */
     @Autowired
     private InPay inPay;
+
     /**
      * subFlowerPay放款队列
      */
     @Autowired
     private SunFlowerPay sunFlowerPay;
+
     /**
      * oceanPay放款队列
      */
     @Autowired
     private OceanPay oceanPay;
+
     /**
      * acPay放款队列
      */
     @Autowired
     private AcPay acPay;
+
     /**
      * IncashPay放款队列
      */
@@ -184,11 +198,34 @@ public class Application {
      */
     @Autowired
     private GlobPay globPay;
+
+    /**
+     * yeahPay还款队列
+     */
+    @Autowired
+    private com.epoch.loan.workshop.mq.repayment.yeah.YeahPay1 repaymentYeahPay1;
+
     /**
      * 订单放款
      */
     @Autowired
     private OrderRemittance orderRemittance;
+
+    /**
+     * 响应日志
+     */
+    @Autowired
+    private AccessLogStorage accessLogStorage;
+    /**
+     * 还款队列生产
+     */
+    @Autowired
+    public RepaymentMQManager repaymentMQManager;
+    /**
+     * 还款队列生产
+     */
+    @Autowired
+    public DistributionRepayment distributionRepayment;
 
     /**
      * 启动类
@@ -200,6 +237,7 @@ public class Application {
         StartConfig.initConfig();
 
         SpringApplication.run(Application.class, args);
+
     }
 
     /**
@@ -210,6 +248,7 @@ public class Application {
     @PostConstruct
     public void startJob() throws Exception {
         orderMQManager.init();
+        repaymentMQManager.init();
         remittanceMQManagerProduct.init();
         orderComplete.start();
         orderDue.start();
@@ -221,7 +260,7 @@ public class Application {
         orderExaminePass.start();
         orderWay.start();
         riskModelV2.start();
-        distribution.start();
+        distributionRemittance.start();
         yeahPay.start();
         fastPay.start();
         inPay.start();
@@ -235,6 +274,9 @@ public class Application {
         trustPay.start();
         qePay.start();
         hrPay.start();
+        accessLogStorage.start();
         globPay.start();
+        repaymentYeahPay1.start();
+        distributionRepayment.start();
     }
 }

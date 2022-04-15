@@ -4,8 +4,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
-import java.util.Date;
 
 /**
  * @author : Shangkunfeng
@@ -25,7 +23,7 @@ public class InPayCallBackParams implements Serializable {
      */
     private String order_number;
     /**
-     * 	状态（交易中：payout_ing，交易成功：payout_success，交易失败：payout_fail）
+     * 状态（交易中：payout_ing，交易成功：payout_success，交易失败：payout_fail）
      */
     private String status;
     /**

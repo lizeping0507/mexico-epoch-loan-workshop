@@ -1,18 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.epoch.loan.workshop.common.dao.LoanOrderBillDao">
+<mapper namespace="com.epoch.loan.workshop.common.dao.mysql.LoanOrderBillDao">
 
-    <insert id="insertOrderBillByOrderId">
+    <insert id="insertOrderBill">
         INSERT INTO
-        loan_order_bill
-        (`id`, `order_id`, `stages`,`repayment_amount`, `punishment_amount`, `interest_amount`, `incidental_amount`,
-        `repayment_time`, `actual_repayment_time`, `status`, `create_time`, `update_time`)
-        VALUES
-        (#{loanOrderBillEntity.id}, #{loanOrderBillEntity.orderId}, #{loanOrderBillEntity.stages},
+        loan_order_bill(
+        `id`,
+        `order_id`,
+        `stages`,
+        `received_amount`,
+        `repayment_amount`,
+        `principal_amount`,
+        `punishment_amount`,
+        `interest_amount`,
+        `incidental_amount`,
+        `reduction_amount`,
+        `repayment_time`,
+        `actual_repayment_time`,
+        `type`,
+        `status`,
+        `create_time`,
+        `update_time`)
+        VALUES(
+        #{loanOrderBillEntity.id},
+        #{loanOrderBillEntity.orderId},
+        #{loanOrderBillEntity.stages},
+        #{loanOrderBillEntity.receivedAmount},
         #{loanOrderBillEntity.repaymentAmount},
-        #{loanOrderBillEntity.punishmentAmount}, #{loanOrderBillEntity.interestAmount},
-        #{loanOrderBillEntity.incidentalAmount}, #{loanOrderBillEntity.repaymentTime},
-        #{loanOrderBillEntity.actualRepaymentTime}, #{loanOrderBillEntity.status}, #{loanOrderBillEntity.createTime},
+        #{loanOrderBillEntity.principalAmount},
+        #{loanOrderBillEntity.punishmentAmount},
+        #{loanOrderBillEntity.interestAmount},
+        #{loanOrderBillEntity.incidentalAmount},
+        #{loanOrderBillEntity.reductionAmount},
+        #{loanOrderBillEntity.repaymentTime},
+        #{loanOrderBillEntity.actualRepaymentTime},
+        #{loanOrderBillEntity.type},
+        #{loanOrderBillEntity.status},
+        #{loanOrderBillEntity.createTime},
         #{loanOrderBillEntity.updateTime});
     </insert>
     <update id="updateOrderBillStatusByOrderId">
@@ -30,10 +54,10 @@
     <update id="updateOrderBillStatus">
         UPDATE loan_order_bill SET status=#{status},update_time=#{updateTime} WHERE id=#{id}
     </update>
-    <select id="findOrderBillByOrderId" resultType="com.epoch.loan.workshop.common.entity.LoanOrderBillEntity">
+    <select id="findOrderBillByOrderId" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanOrderBillEntity">
         SELECT * FROM loan_order_bill WHERE order_id=#{orderId}
     </select>
-    <select id="findOrderBill" resultType="com.epoch.loan.workshop.common.entity.LoanOrderBillEntity">
+    <select id="findOrderBill" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanOrderBillEntity">
         SELECT * FROM loan_order_bill WHERE id=#{id}
     </select>
     <select id="findOrderNotCompleteCount" resultType="java.lang.Integer">
@@ -48,4 +72,36 @@
     <select id="sumOrderRepaymentAmount" resultType="java.lang.Double">
         SELECT SUM(repayment_amount) FROM loan_order_bill WHERE order_id=#{orderId}
     </select>
+    <select id="findOrderBillByStatusAndRepaymentTime"
+            resultType="com.epoch.loan.workshop.common.entity.mysql.LoanOrderBillEntity">
+        SELECT * FROM loan_order_bill WHERE status=#{status} AND repayment_time <![CDATA[ <= ]]> #{repaymentTime}
+    </select>
+    <select id="findOrderBillByStatus"
+            resultType="com.epoch.loan.workshop.common.entity.mysql.LoanOrderBillEntity">
+        SELECT * FROM loan_order_bill WHERE status=#{status}
+    </select>
+    <select id="findByDay" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanOrderBillEntity">
+        SELECT * FROM loan_order_bill WHERE create_time like #{createTime}
+    </select>
+    <update id="updateOrderBillPunishmentAmount">
+        UPDATE loan_order_bill SET punishment_amount=#{punishmentAmount},update_time=#{updateTime} WHERE id=#{id}
+    </update>
+    <update id="updateOrderBillReductionAmount">
+        UPDATE loan_order_bill SET reduction_amount=#{reductionAmount},update_time=#{updateTime} WHERE id=#{id}
+    </update>
+    <update id="updateOrderBillReceivedAmount">
+        UPDATE loan_order_bill SET received_amount=#{receivedAmount},update_time=#{updateTime} WHERE id=#{id}
+    </update>
+    <update id="updateType">
+        UPDATE loan_order_bill SET type=#{type},update_time=#{updateTime} WHERE id=#{id}
+    </update>
+    <update id="updateOrderBillIncidentalAmount">
+        UPDATE loan_order_bill SET incidental_amount=#{incidentalAmount},update_time=#{updateTime} WHERE id=#{id}
+    </update>
+    <update id="updateInterestAmount">
+        UPDATE loan_order_bill SET interest_amount=#{interestAmount},update_time=#{updateTime} WHERE id=#{id}
+    </update>
+    <update id="updateOrderBillPrincipalAmount">
+        UPDATE loan_order_bill SET principal_amount=#{principalAmount},update_time=#{updateTime} WHERE id=#{id}
+    </update>
 </mapper>

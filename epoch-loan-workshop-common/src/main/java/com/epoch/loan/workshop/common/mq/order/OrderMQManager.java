@@ -3,6 +3,7 @@ package com.epoch.loan.workshop.common.mq.order;
 import com.alibaba.fastjson.JSON;
 import com.epoch.loan.workshop.common.mq.BaseMQ;
 import com.epoch.loan.workshop.common.mq.order.params.OrderParams;
+import lombok.Data;
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
 import org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently;
 import org.apache.rocketmq.client.exception.MQClientException;
@@ -22,12 +23,37 @@ import org.springframework.stereotype.Component;
  */
 @RefreshScope
 @Component
+@Data
 public class OrderMQManager extends BaseMQ {
 
     /**
      * 生产者对象
      */
     private static DefaultMQProducer producer = null;
+
+    /**
+     * 最大线程数量
+     */
+    @Value("${rocket.order.consumeThreadMax}")
+
+    public int consumeThreadMax;
+    /**
+     * 最小线程数量
+     */
+    @Value("${rocket.order.consumeThreadMin}")
+
+    public int consumeThreadMin;
+    /**
+     * 次消费消息的数量
+     */
+    @Value("${rocket.order.consumeMessageBatchMaxSize}")
+    public int consumeMessageBatchMaxSize;
+
+    /**
+     * 标签
+     */
+    @Value("${rocket.order.orderComplete.subExpression}")
+    private String orderCompleteSubExpression;
 
     /**
      * 生产者所属的组
@@ -42,22 +68,16 @@ public class OrderMQManager extends BaseMQ {
     private String topic = "";
 
     /**
-     * 最大线程数量
+     * 逾期TAG
      */
-    @Value("${rocket.order.consumeThreadMax}")
-    public int consumeThreadMax;
+    @Value("${rocket.order.orderDue.subExpression}")
+    private String orderDueSubExpression = "";
 
     /**
-     * 最小线程数量
+     * 风控V3TAG
      */
-    @Value("${rocket.order.consumeThreadMin}")
-    public int consumeThreadMin;
-
-    /**
-     * 次消费消息的数量
-     */
-    @Value("${rocket.order.consumeMessageBatchMaxSize}")
-    public int consumeMessageBatchMaxSize;
+    @Value("${rocket.order.riskModelV3.subExpression}")
+    private String riskModelV3orderDueSubExpression = "";
 
     /**
      * 初始化

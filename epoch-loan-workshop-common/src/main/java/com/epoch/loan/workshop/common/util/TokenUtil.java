@@ -2,8 +2,8 @@ package com.epoch.loan.workshop.common.util;
 
 import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.constant.RedisKeyField;
-import com.epoch.loan.workshop.common.params.system.UserCache;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserCache;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
@@ -23,38 +23,6 @@ public class TokenUtil {
      */
     @Autowired
     private RedisUtil redisUtil;
-
-    /**
-     * 获取用户安全密匙
-     *
-     * @param token
-     * @return
-     */
-    public String getUserSecretKey(String token) {
-        // Token有效性校验
-        if (!userOnline(token)) {
-            return null;
-        }
-
-        // 通过redis获取用户信息
-        Object userIdObject = redisUtil.get(RedisKeyField.TOKEN + token);
-        if (ObjectUtils.isEmpty(userIdObject)) {
-            return null;
-        }
-
-        // 用户ID
-        String userId = String.valueOf(userIdObject);
-
-        // 用户缓存
-        Object userCacheObject = redisUtil.get(RedisKeyField.USER_CACHE + userId);
-        if (ObjectUtils.isEmpty(userCacheObject)) {
-            return null;
-        }
-
-        // 用户缓存
-        UserCache userCache = JSONObject.parseObject(String.valueOf(userCacheObject), UserCache.class);
-        return userCache.getDeviceId();
-    }
 
     /**
      * 用户是否在线

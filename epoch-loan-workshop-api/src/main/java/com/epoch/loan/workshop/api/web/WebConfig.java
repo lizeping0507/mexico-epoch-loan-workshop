@@ -1,10 +1,15 @@
 package com.epoch.loan.workshop.api.web;
 
+import org.springframework.boot.SpringBootConfiguration;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
+
+import javax.servlet.Filter;
+import java.util.HashSet;
 
 /**
  * @author : Duke
@@ -13,9 +18,30 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupp
  * @createTime : 2021/3/10 21:59
  * @description : 拦截器规则
  */
-@Configuration
+@SpringBootConfiguration
+@ServletComponentScan
 public class WebConfig extends WebMvcConfigurationSupport {
 
+    /**
+     * 注册贷超转发过滤器
+     *
+     * @return FilterRegistrationBean
+     */
+    @Bean
+    public FilterRegistrationBean<Filter> forwardFilter() {
+        FilterRegistrationBean<Filter> registration = new FilterRegistrationBean<>();
+        registration.setFilter(new ForwardFilter());
+        registration.addUrlPatterns("/*");
+        registration.setName("forwardFilter");
+        registration.setOrder(1);
+        return registration;
+    }
+
+    /**
+     * 拦截器Bean
+     *
+     * @return Interceptor
+     */
     @Bean
     public Interceptor interceptor() {
         return new Interceptor();

@@ -16,7 +16,7 @@
         </Console>
 
         <!-- 守护线程日志 -->
-        <RollingRandomAccessFile fileName="${LOG_HOME}/daemon.log" filePattern="${LOG_BACKUP}/system.%d{yyyyMMdd}.log"
+        <RollingRandomAccessFile fileName="${LOG_HOME}/daemon.log" filePattern="${LOG_BACKUP}/daemon.%d{yyyyMMdd}.log"
                                  name="DaemonLog">
             <PatternLayout pattern="%date{yyyy-MM-dd HH:mm:ss.SSS} %level - %msg%n"/>
             <Policies>
@@ -41,56 +41,21 @@
                 <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
             </Policies>
         </RollingRandomAccessFile>
-
-
-        <!-- 长连接日志 -->
-        <RollingRandomAccessFile fileName="${LOG_HOME}/sc.log" filePattern="${LOG_BACKUP}/sc.%d{yyyyMMdd}.log"
-                                 name="ScLog">
-            <PatternLayout pattern="%date{yyyy-MM-dd HH:mm:ss.SSS} - %msg%n"/>
-            <Policies>
-                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
-            </Policies>
-        </RollingRandomAccessFile>
-
-        <!-- 实时耗时日志 -->
-        <RollingRandomAccessFile fileName="${LOG_HOME}/scTime.log" filePattern="${LOG_BACKUP}/scTime.%d{yyyyMMdd}.log"
-                                 name="ScTimeLog">
-            <PatternLayout pattern="%date{yyyy-MM-dd HH:mm:ss.SSS} - %msg%n"/>
-            <Policies>
-                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
-            </Policies>
-        </RollingRandomAccessFile>
     </appenders>
 
     <loggers>
-        <!-- system logger (同步)-->
-        <logger additivity="true" level="info" name="EPOCH_SYS">
-            <appender-ref ref="SystemLog"/>
-        </logger>
+        <!-- daemon logger (异步)-->
+        <AsyncLogger additivity="false" includeLocation="true" level="info" name="EPOCH_DAE">
+            <appender-ref ref="DaemonLog"/>
+        </AsyncLogger>
 
         <!-- request logger (异步)-->
         <AsyncLogger additivity="false" includeLocation="true" level="info" name="EPOCH_REQ">
             <appender-ref ref="RequestLog"/>
         </AsyncLogger>
 
-        <!-- sc logger (异步)-->
-        <AsyncLogger additivity="false" includeLocation="true" level="info" name="EPOCH_SC">
-            <appender-ref ref="ScLog"/>
-        </AsyncLogger>
-
-        <!-- scTime logger (异步)-->
-        <AsyncLogger additivity="false" includeLocation="true" level="info" name="EPOCH_SC_TIME">
-            <appender-ref ref="ScTimeLog"/>
-        </AsyncLogger>
-
-        <!-- daemon logger (异步)-->
-        <AsyncLogger additivity="false" includeLocation="true" level="info" name="EPOCH_DAE">
-            <appender-ref ref="DaemonLog"/>
-        </AsyncLogger>
-
         <!-- Root Logger -->
         <root level="info">
-            <appender-ref ref="Console"/>
             <appender-ref ref="SystemLog"/>
         </root>
     </loggers>

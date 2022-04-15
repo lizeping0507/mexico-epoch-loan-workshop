@@ -1,15 +1,14 @@
 package com.epoch.loan.workshop.api.controller;
 
-import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONUtil;
-import com.epoch.loan.workshop.api.controller.BaseController;
 import com.epoch.loan.workshop.common.config.URL;
-import com.epoch.loan.workshop.common.constant.ReturnCodeField;
-import com.epoch.loan.workshop.common.constant.ReturnMessage;
+import com.epoch.loan.workshop.common.constant.ResultEnum;
 import com.epoch.loan.workshop.common.params.params.request.*;
 import com.epoch.loan.workshop.common.params.result.Result;
 import com.epoch.loan.workshop.common.util.LogUtil;
-import org.springframework.web.bind.annotation.*;
+import com.epoch.loan.workshop.common.util.ThrowableUtils;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author : Shangkunfeng
@@ -39,9 +38,9 @@ public class PaymentCallBackController extends BaseController {
             LogUtil.sysError("[PaymentCallBackController yeahPay]", e);
 
             // 异常返回结果
-            result.setReturnCode(ReturnCodeField.SYSTEM_ERROR);
-            result.setMessage(ReturnMessage.SYSTEM_ERROR);
-            result.setEx(e.getMessage());
+            result.setEx(ThrowableUtils.throwableToString(e));
+            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
+            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
             return result;
         }
     }
@@ -63,9 +62,9 @@ public class PaymentCallBackController extends BaseController {
             LogUtil.sysError("[PaymentCallBackController inPay]", e);
 
             // 异常返回结果
-            result.setReturnCode(ReturnCodeField.SYSTEM_ERROR);
-            result.setMessage(ReturnMessage.SYSTEM_ERROR);
-            result.setEx(e.getMessage());
+            result.setEx(ThrowableUtils.throwableToString(e));
+            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
+            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
             return result;
         }
     }
@@ -86,9 +85,9 @@ public class PaymentCallBackController extends BaseController {
             LogUtil.sysError("[PaymentCallBackController sunFlowerPay]", e);
 
             // 异常返回结果
-            result.setReturnCode(ReturnCodeField.SYSTEM_ERROR);
-            result.setMessage(ReturnMessage.SYSTEM_ERROR);
-            result.setEx(e.getMessage());
+            result.setEx(ThrowableUtils.throwableToString(e));
+            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
+            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
             return result;
         }
     }
@@ -110,9 +109,9 @@ public class PaymentCallBackController extends BaseController {
             LogUtil.sysError("[PaymentCallBackController oceanPay]", e);
 
             // 异常返回结果
-            result.setReturnCode(ReturnCodeField.SYSTEM_ERROR);
-            result.setMessage(ReturnMessage.SYSTEM_ERROR);
-            result.setEx(e.getMessage());
+            result.setEx(ThrowableUtils.throwableToString(e));
+            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
+            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
             return result;
         }
     }
@@ -134,9 +133,9 @@ public class PaymentCallBackController extends BaseController {
             LogUtil.sysError("[PaymentCallBackController acPay]", e);
 
             // 异常返回结果
-            result.setReturnCode(ReturnCodeField.SYSTEM_ERROR);
-            result.setMessage(ReturnMessage.SYSTEM_ERROR);
-            result.setEx(e.getMessage());
+            result.setEx(ThrowableUtils.throwableToString(e));
+            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
+            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
             return result;
         }
     }
@@ -158,9 +157,9 @@ public class PaymentCallBackController extends BaseController {
             LogUtil.sysError("[PaymentCallBackController incashPay]", e);
 
             // 异常返回结果
-            result.setReturnCode(ReturnCodeField.SYSTEM_ERROR);
-            result.setMessage(ReturnMessage.SYSTEM_ERROR);
-            result.setEx(e.getMessage());
+            result.setEx(ThrowableUtils.throwableToString(e));
+            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
+            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
             return result;
         }
     }
@@ -182,9 +181,9 @@ public class PaymentCallBackController extends BaseController {
             LogUtil.sysError("[PaymentCallBackController incashXjdPay]", e);
 
             // 异常返回结果
-            result.setReturnCode(ReturnCodeField.SYSTEM_ERROR);
-            result.setMessage(ReturnMessage.SYSTEM_ERROR);
-            result.setEx(e.getMessage());
+            result.setEx(ThrowableUtils.throwableToString(e));
+            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
+            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
             return result;
         }
     }
@@ -207,9 +206,9 @@ public class PaymentCallBackController extends BaseController {
             LogUtil.sysError("[PaymentCallBackController trustPay]", e);
 
             // 异常返回结果
-            result.setReturnCode(ReturnCodeField.SYSTEM_ERROR);
-            result.setMessage(ReturnMessage.SYSTEM_ERROR);
-            result.setEx(e.getMessage());
+            result.setEx(ThrowableUtils.throwableToString(e));
+            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
+            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
             return result;
         }
     }
@@ -231,9 +230,9 @@ public class PaymentCallBackController extends BaseController {
             LogUtil.sysError("[PaymentCallBackController qePay]", e);
 
             // 异常返回结果
-            result.setReturnCode(ReturnCodeField.SYSTEM_ERROR);
-            result.setMessage(ReturnMessage.SYSTEM_ERROR);
-            result.setEx(e.getMessage());
+            result.setEx(ThrowableUtils.throwableToString(e));
+            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
+            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
             return result;
         }
     }
@@ -255,9 +254,9 @@ public class PaymentCallBackController extends BaseController {
             LogUtil.sysError("[PaymentCallBackController hrPay]", e);
 
             // 异常返回结果
-            result.setReturnCode(ReturnCodeField.SYSTEM_ERROR);
-            result.setMessage(ReturnMessage.SYSTEM_ERROR);
-            result.setEx(e.getMessage());
+            result.setEx(ThrowableUtils.throwableToString(e));
+            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
+            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
             return result;
         }
     }
@@ -279,9 +278,9 @@ public class PaymentCallBackController extends BaseController {
             LogUtil.sysError("[PaymentCallBackController globPay]", e);
 
             // 异常返回结果
-            result.setReturnCode(ReturnCodeField.SYSTEM_ERROR);
-            result.setMessage(ReturnMessage.SYSTEM_ERROR);
-            result.setEx(e.getMessage());
+            result.setEx(ThrowableUtils.throwableToString(e));
+            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
+            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
             return result;
         }
     }

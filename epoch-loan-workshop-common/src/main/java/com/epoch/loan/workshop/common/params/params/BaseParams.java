@@ -15,6 +15,7 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 public class BaseParams implements Serializable {
+    private static final long serialVersionUID = 116541653165465L;
 
     /**
      * 请求流水号
@@ -27,11 +28,6 @@ public class BaseParams implements Serializable {
     public String token;
 
     /**
-     * 设备唯一ID
-     */
-    public String deviceId;
-
-    /**
      * app 名称
      */
     public String appName;
@@ -42,17 +38,12 @@ public class BaseParams implements Serializable {
     public String appVersion;
 
     /**
-     * afId
+     * 渠道标识
      */
-    public String afId;
+    public String channelCode;
 
     /**
-     * gAid
+     * 设备类型
      */
-    public String gaId;
-
-    /**
-     * gps
-     */
-    public String gps;
+    public String mobileType;
 }

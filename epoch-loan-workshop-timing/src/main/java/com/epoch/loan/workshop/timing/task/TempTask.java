@@ -1,15 +1,19 @@
 package com.epoch.loan.workshop.timing.task;
 
-import com.epoch.loan.workshop.common.constant.OrderExamineStatus;
-import com.epoch.loan.workshop.common.entity.LoanOrderExamineEntity;
+import com.epoch.loan.workshop.common.entity.mysql.LoanOrderBillEntity;
+import com.epoch.loan.workshop.common.entity.mysql.LoanOrderEntity;
+import com.epoch.loan.workshop.common.entity.mysql.LoanOrderExamineEntity;
 import com.epoch.loan.workshop.common.mq.order.params.OrderParams;
 import com.epoch.loan.workshop.common.util.DateUtil;
 import com.epoch.loan.workshop.common.util.LogUtil;
+import lombok.SneakyThrows;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.springframework.stereotype.Component;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -27,47 +31,67 @@ public class TempTask extends BaseTask implements Job {
     /**
      * 方法主体
      */
+    @SneakyThrows
     @Override
     public void execute(JobExecutionContext jobExecutionContext) {
-        Date date = new Date();
-        List<LoanOrderExamineEntity> riskModelV3 = loanOrderExamineDao.findByModelNameAndStatusBeforTime("RiskModelV3",21, date);
-        List<LoanOrderExamineEntity> riskModelV2 = loanOrderExamineDao.findByModelNameAndStatusBeforTime("RiskModelV2",21, date);
-
-        LogUtil.sysInfo(riskModelV3.size() + "  ====== " + riskModelV2.size());
-
-
-        // 模型名称列表
-        List<String> modelNames = loanOrderModelDao.findNamesByGroup("MASK-INTERNAL-LOAN");
-
-        // 订单放入队列
-        riskModelV3.forEach(loanOrderExamineEntity -> {
-            try {
-                OrderParams orderParams = new OrderParams();
-                orderParams.setOrderId(loanOrderExamineEntity.getOrderId());
-                orderParams.setModelList(modelNames);
-                orderParams.setGroupName("MASK-INTERNAL-LOAN");
-                orderMQManager.sendMessage(orderParams, modelNames.get(0));
-                LogUtil.sysInfo("MASK-INTERNAL-LOAN   " + loanOrderExamineEntity.getOrderId());
-            } catch (Exception exception) {
-                LogUtil.sysError("[RiskModelV3ToQueueTask]", exception);
-            }
-        });
-
-        // 模型名称列表
-        List<String> modelNames1 = loanOrderModelDao.findNamesByGroup("SHOP-INTERNAL-LOAN");
-        // 订单放入队列
-        riskModelV2.forEach(loanOrderExamineEntity -> {
-            try {
-                OrderParams orderParams = new OrderParams();
-                orderParams.setOrderId(loanOrderExamineEntity.getOrderId());
-                orderParams.setModelList(modelNames1);
-                orderParams.setGroupName("SHOP-INTERNAL-LOAN");
-                orderMQManager.sendMessage(orderParams, modelNames1.get(0));
-                LogUtil.sysInfo("SHOP-INTERNAL-LOAN   "+ loanOrderExamineEntity.getOrderId());
-            } catch (Exception exception) {
-                LogUtil.sysError("[RiskModelV2ToQueueTask]", exception);
-            }
-        });
-
+        updateOrderBill();
     }
+
+    // 	UPDATE loan_order SET stages = 1 ,stages_day = 7 , interest = 0.70,processing_fee_proportion=40.00,penalty_interest=1.00
+    private void updateOrderBill() throws ParseException {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd%");
+        Date date = simpleDateFormat.parse("2022-01-10%");
+        Date now = new Date();
+
+
+        while(date.getTime() <=now.getTime()){
+            String format = simpleDateFormat.format(date);
+            List<LoanOrderBillEntity> loanOrderBills = loanOrderBillDao.findByDay(format);
+            LogUtil.sysInfo(" {}  数据量: {} 开始处理 ... ", format, loanOrderBills.size());
+
+            for (LoanOrderBillEntity loanOrderBill : loanOrderBills) {
+                try{
+                    if (loanOrderBill.getType() == null){
+                        loanOrderBillDao.updateType(loanOrderBill.getId(), 0, new Date());
+                    }
+                    if (loanOrderBill.getReceivedAmount() == null){
+                        loanOrderBillDao.updateOrderBillReceivedAmount(loanOrderBill.getId(), 0.00, new Date());
+                    }
+                    if (loanOrderBill.getPrincipalAmount() == null){
+
+                        LoanOrderEntity loanOrderEntity = loanOrderDao.findOrder(loanOrderBill.getOrderId());
+                        double approvalAmount = loanOrderEntity.getApprovalAmount();
+                        double stagesPrincipalAmount = approvalAmount / loanOrderEntity.getStages();
+                        // 更新已付金额
+                        loanOrderBillDao.updateOrderBillPrincipalAmount(loanOrderBill.getId(), stagesPrincipalAmount, new Date());
+                    }
+                    if (loanOrderBill.getPunishmentAmount() == null){
+                        loanOrderBillDao.updateOrderBillPunishmentAmount(loanOrderBill.getId(), 0.00, new Date());
+                    }
+
+                    LoanOrderEntity order = loanOrderDao.findOrder(loanOrderBill.getOrderId());
+                    Double approvalAmount = order.getApprovalAmount();
+                    Double interest = order.getInterest();
+                    Double interestAmount = approvalAmount * (interest / 100);
+                    Double stagesInterestAmount = interestAmount / order.getStages();
+                    loanOrderBillDao.updateInterestAmount(loanOrderBill.getId(), stagesInterestAmount, new Date());
+
+                    if (loanOrderBill.getIncidentalAmount() == null){
+                        loanOrderBillDao.updateOrderBillIncidentalAmount(loanOrderBill.getId(), 0.00, new Date());
+                    }
+                    if (loanOrderBill.getReductionAmount() == null){
+                        loanOrderBillDao.updateOrderBillReductionAmount(loanOrderBill.getId(), 0.00, new Date());
+                    }
+                    LogUtil.sysInfo(" {}  Id: {} 处理完成 ", format, loanOrderBill.getId());
+                }catch (Exception e){
+                    LogUtil.sysError(format + "  Id: " +  loanOrderBill.getId() + "处理失败", e);
+                }
+            }
+
+            LogUtil.sysInfo(" {}  数据量: {} 完成 ... ", format, loanOrderBills.size());
+            date = DateUtil.addDay(date, 1);
+        }
+    }
+
+
 }

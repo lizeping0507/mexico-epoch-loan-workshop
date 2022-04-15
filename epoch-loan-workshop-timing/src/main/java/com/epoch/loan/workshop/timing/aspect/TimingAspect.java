@@ -2,9 +2,8 @@ package com.epoch.loan.workshop.timing.aspect;
 
 
 import com.alibaba.fastjson.JSONObject;
-
 import com.epoch.loan.workshop.common.constant.Field;
-import com.epoch.loan.workshop.common.dao.LoanTimingDao;
+import com.epoch.loan.workshop.common.dao.mysql.LoanTimingDao;
 import com.epoch.loan.workshop.common.util.DateUtil;
 import com.epoch.loan.workshop.common.util.LogUtil;
 import org.aspectj.lang.ProceedingJoinPoint;

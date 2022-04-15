@@ -1,7 +1,7 @@
 package com.epoch.loan.workshop.timing.task;
 
 import com.epoch.loan.workshop.common.constant.OrderExamineStatus;
-import com.epoch.loan.workshop.common.entity.LoanOrderExamineEntity;
+import com.epoch.loan.workshop.common.entity.mysql.LoanOrderExamineEntity;
 import com.epoch.loan.workshop.common.mq.order.params.OrderParams;
 import com.epoch.loan.workshop.common.util.DateUtil;
 import com.epoch.loan.workshop.common.util.LogUtil;
@@ -31,7 +31,7 @@ public class RiskModelV3ToQueueTask extends BaseTask implements Job {
     public void execute(JobExecutionContext jobExecutionContext) {
         // 查询 模型为风控决策V3（RiskModelV3） 状态为等待（20） 更新时间为今天前
         Date zero = DateUtil.getStartForDay();
-        List<LoanOrderExamineEntity> loanOrderExamines = loanOrderExamineDao.findByModelNameAndStatusBeforTime("RiskModelV3", OrderExamineStatus.WAIT, zero);
+        List<LoanOrderExamineEntity> loanOrderExamines = loanOrderExamineDao.findByModelNameAndStatusBeforTime(orderMQManager.getRiskModelV3orderDueSubExpression(), OrderExamineStatus.WAIT, zero);
 
         // 模型名称列表
         List<String> modelNames = loanOrderModelDao.findNamesByGroup("MASK-INTERNAL-LOAN");

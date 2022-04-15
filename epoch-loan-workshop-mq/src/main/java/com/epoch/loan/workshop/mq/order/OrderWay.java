@@ -3,9 +3,9 @@ package com.epoch.loan.workshop.mq.order;
 import com.epoch.loan.workshop.common.constant.OrderBillStatus;
 import com.epoch.loan.workshop.common.constant.OrderExamineStatus;
 import com.epoch.loan.workshop.common.constant.OrderStatus;
-import com.epoch.loan.workshop.common.entity.LoanOrderBillEntity;
-import com.epoch.loan.workshop.common.entity.LoanOrderEntity;
+import com.epoch.loan.workshop.common.entity.mysql.*;
 import com.epoch.loan.workshop.common.mq.order.params.OrderParams;
+import com.epoch.loan.workshop.common.mq.repayment.params.DistributionRepaymentParams;
 import com.epoch.loan.workshop.common.util.DateUtil;
 import com.epoch.loan.workshop.common.util.LogUtil;
 import lombok.Data;
@@ -15,10 +15,10 @@ import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyStatus;
 import org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently;
 import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.common.message.MessageExt;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -35,13 +35,6 @@ import java.util.Map;
 @Component
 @Data
 public class OrderWay extends BaseOrderMQListener implements MessageListenerConcurrently {
-
-    /**
-     * 标签
-     */
-    @Value("${rocket.order.orderWay.subExpression}")
-    private String subExpression;
-
     /**
      * 消息监听器
      */
@@ -49,6 +42,10 @@ public class OrderWay extends BaseOrderMQListener implements MessageListenerConc
 
     /**
      * 消费任务
+     *
+     * @param msgs    消息列表
+     * @param context 消息轨迹对象
+     * @return
      */
     @Override
     public ConsumeConcurrentlyStatus consumeMessage(List<MessageExt> msgs, ConsumeConcurrentlyContext context) {
@@ -65,9 +62,9 @@ public class OrderWay extends BaseOrderMQListener implements MessageListenerConc
                 }
 
                 // 队列拦截
-                if (intercept(orderParams.getGroupName(), subExpression)) {
+                if (intercept(orderParams.getGroupName(), subExpression())) {
                     // 等待重试
-                    retry(orderParams, subExpression);
+                    retry(orderParams, subExpression());
                     continue;
                 }
 
@@ -103,32 +100,50 @@ public class OrderWay extends BaseOrderMQListener implements MessageListenerConc
                 // 查询订单账单列表
                 List<LoanOrderBillEntity> loanOrderBillEntityList = loanOrderBillDao.findOrderBillByOrderId(orderId);
 
+
                 // 修改订单账单还款实际及还款金额
-                loanOrderBillEntityList.parallelStream().forEach(loanOrderBillEntity -> {
+                LoanOrderBillEntity orderBillEntity = null;
+                for (LoanOrderBillEntity loanOrderBillEntity : loanOrderBillEntityList) {
+                    // 取期数为1的账单id
+                    if (loanOrderBillEntity.getStages().equals(1)){
+                        orderBillEntity = loanOrderBillEntity;
+                    }
+
                     // 修改应还金额
                     loanOrderBillDao.updateOrderBillRepaymentAmount(loanOrderBillEntity.getId(), repaymentAmount, new Date());
 
                     // 修改还款时间
-                    loanOrderBillDao.updateOrderBillRepaymentTime(loanOrderBillEntity.getId(), DateUtil.StringToDate(DateUtil.DateToString(repaymentTimeMap.get(loanOrderBillEntity.getStages()), "yyyy-MM-dd") + " 23:59:59", "yyyy-MM-dd HH:mm:ss"), new Date());
-                });
+                    Date repaymentTime = DateUtil.StringToDate(DateUtil.DateToString(repaymentTimeMap.get(loanOrderBillEntity.getStages()), "yyyy-MM-dd") + " 23:59:59", "yyyy-MM-dd HH:mm:ss");
+                    loanOrderBillEntity.setRepaymentTime(repaymentTime);
+                    loanOrderBillDao.updateOrderBillRepaymentTime(loanOrderBillEntity.getId(), repaymentTime, new Date());
+                }
+
+                // 新增还款计划 TODO 新老表 需要SKF写
+                addrepaymentPlan(loanOrderEntity, orderBillEntity, 0);
 
                 // 修改订单和订单账单状态为在途  FIXME 新老表
                 updateOrderStatus(orderId, OrderStatus.WAY);
-                updateOrderBillStatus(orderId, OrderBillStatus.WAY);
+                updateOrderBillStatusByOrderId(orderId, OrderBillStatus.WAY);
                 platformOrderDao.updateOrderStatus(orderId, 170, new Date());
 
+                // 发送还款策略组分配队列计算还款策略
+                DistributionRepaymentParams distributionRepaymentParams = new DistributionRepaymentParams();
+                distributionRepaymentParams.setOrderId(orderId);
+                distributionRepaymentParams.setOrderBillId(orderBillEntity.getId());
+                sendRepaymentDistribution(distributionRepaymentParams);
+
                 // 修改审核状态
-                updateModeExamine(orderId, subExpression, OrderExamineStatus.PASS);
+                updateModeExamine(orderId, subExpression(), OrderExamineStatus.PASS);
 
                 // 发送到下一模型
-                sendNextModel(orderParams, subExpression);
+                sendNextModel(orderParams, subExpression());
             } catch (Exception e) {
                 try {
                     // 更新对应模型审核状态
-                    updateModeExamine(orderParams.getOrderId(), subExpression, OrderExamineStatus.FAIL);
+                    updateModeExamine(orderParams.getOrderId(), subExpression(), OrderExamineStatus.FAIL);
 
                     // 异常,重试
-                    retry(orderParams, subExpression);
+                    retry(orderParams, subExpression());
                 } catch (Exception exception) {
                     LogUtil.sysError("[OrderWay]", exception);
                 }

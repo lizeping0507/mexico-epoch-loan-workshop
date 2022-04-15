@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.epoch.loan.workshop.common.dao.LoanOrderExamineDao">
+<mapper namespace="com.epoch.loan.workshop.common.dao.mysql.LoanOrderExamineDao">
 
     <update id="updateOrderExamineRequest">
         UPDATE
@@ -38,15 +38,15 @@
         SELECT status FROM loan_order_examine WHERE order_id=#{orderId} AND model_name=#{modelName}
     </select>
     <select id="findByModelNameAndStatusBeforTime"
-            resultType="com.epoch.loan.workshop.common.entity.LoanOrderExamineEntity">
+            resultType="com.epoch.loan.workshop.common.entity.mysql.LoanOrderExamineEntity">
         SELECT *
         FROM loan_order_examine
         WHERE model_name = #{modelName}
-          AND status = #{status}
-          AND update_time &lt; #{datePoint}
+        AND status = #{status}
+        AND update_time &lt; #{datePoint}
     </select>
     <select id="findByModelNameAndOrderId"
-            resultType="com.epoch.loan.workshop.common.entity.LoanOrderExamineEntity">
+            resultType="com.epoch.loan.workshop.common.entity.mysql.LoanOrderExamineEntity">
         SELECT * FROM loan_order_examine WHERE order_id=#{orderId} AND model_name=#{modelName}
     </select>
 </mapper>

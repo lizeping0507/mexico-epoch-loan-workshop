@@ -1,7 +1,6 @@
 package com.epoch.loan.workshop.common.service;
 
 import com.epoch.loan.workshop.common.params.params.request.*;
-import com.epoch.loan.workshop.common.params.result.Result;
 
 /**
  * @author : Shangkunfeng
@@ -50,6 +49,7 @@ public interface PaymentCallbackService {
      * @return String
      */
     String acPay(AcPayCallBackParams params) throws Exception;
+
     /**
      * incashPay支付回调处理
      *
@@ -57,6 +57,7 @@ public interface PaymentCallbackService {
      * @return String
      */
     Object incashPay(IncashPayCallBackParams params) throws Exception;
+
     /**
      * incashXjdPay支付回调处理
      *
@@ -64,6 +65,7 @@ public interface PaymentCallbackService {
      * @return String
      */
     Object incashXjdPay(IncashPayCallBackParams params) throws Exception;
+
     /**
      * trustPay支付回调处理
      *
@@ -71,6 +73,7 @@ public interface PaymentCallbackService {
      * @return String
      */
     Object trustPay(TrustPayCallBackParams params) throws Exception;
+
     /**
      * qePay支付回调处理
      *
@@ -78,6 +81,7 @@ public interface PaymentCallbackService {
      * @return String
      */
     Object qePay(QePayCallBackParams params) throws Exception;
+
     /**
      * hrPay支付回调处理
      *
@@ -85,6 +89,7 @@ public interface PaymentCallbackService {
      * @return String
      */
     Object hrPay(HrPayCallBackParams params) throws Exception;
+
     /**
      * globPay支付回调处理
      *

@@ -15,6 +15,9 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 public class Result<T> implements Serializable {
+
+    private static final long serialVersionUID = 116541653165465L;
+
     /**
      * 页大小
      */
@@ -44,11 +47,6 @@ public class Result<T> implements Serializable {
      * 异常信息
      */
     private String ex;
-
-    /**
-     * 响应时间时间戳
-     */
-    private String responseTime;
 
     /**
      * 请求流水号

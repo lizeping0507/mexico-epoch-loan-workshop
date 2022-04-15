@@ -3,22 +3,19 @@ package com.epoch.loan.workshop.mq.remittance.payment.ac;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.NumberUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.constant.LoanRemittanceOrderRecordStatus;
 import com.epoch.loan.workshop.common.constant.LoanRemittancePaymentRecordStatus;
 import com.epoch.loan.workshop.common.constant.PaymentField;
-import com.epoch.loan.workshop.common.entity.LoanPaymentEntity;
-import com.epoch.loan.workshop.common.entity.LoanRemittanceOrderRecordEntity;
-import com.epoch.loan.workshop.common.entity.LoanRemittancePaymentRecordEntity;
+import com.epoch.loan.workshop.common.entity.mysql.LoanPaymentEntity;
+import com.epoch.loan.workshop.common.entity.mysql.LoanRemittanceOrderRecordEntity;
+import com.epoch.loan.workshop.common.entity.mysql.LoanRemittancePaymentRecordEntity;
 import com.epoch.loan.workshop.common.mq.remittance.params.RemittanceParams;
-import com.epoch.loan.workshop.common.params.system.AccessLogParams;
 import com.epoch.loan.workshop.common.util.HttpUtils;
 import com.epoch.loan.workshop.common.util.LogUtil;
 import com.epoch.loan.workshop.mq.remittance.payment.BaseRemittancePaymentMQListener;
 import lombok.Data;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyContext;
@@ -26,19 +23,14 @@ import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyStatus;
 import org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently;
 import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.common.message.MessageExt;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.Signature;
-import java.security.SignatureException;
 import java.security.spec.PKCS8EncodedKeySpec;
-import java.text.DecimalFormat;
 import java.util.*;
 
 /**
@@ -53,19 +45,61 @@ import java.util.*;
 @Data
 public class AcPay extends BaseRemittancePaymentMQListener implements MessageListenerConcurrently {
     /**
-     * 放款队列标签标签
-     */
-    @Value("${rocket.remittance.acPay.subExpression}")
-    protected String subExpression;
-
-    /**
      * 消息监听器
      */
     private MessageListenerConcurrently messageListener = this;
 
+    /**
+     * 参数签名:
+     * 将接口中的请求字段按照Ascii码方式进行升序排序
+     * 按照key1=val1&key2=val2&key3=val3....&key=md5秘钥 生成加密字符串
+     * 将上一步生成的字符串进行MD5加密，并转换成大写
+     * 使用您的私钥对第3步生成的密文进行签名即可
+     *
+     * @param param
+     * @param md5
+     * @param key
+     * @return
+     * @throws Exception
+     */
+    public static String sign(Object param, String md5, String key)
+            throws Exception {
+
+        StringBuilder tempSign = new StringBuilder();
+        // Bean转Map
+        Map<String, Object> map = BeanUtil.beanToMap(param);
+        // 取所有字段名并排序
+        List<String> filedList = new ArrayList<>(map.keySet());
+        Collections.sort(filedList);
+        // 拼接kv
+        for (String filed : filedList) {
+            Object value = map.get(filed);
+            if (value != null && !"".equals(value)) {
+                tempSign.append(filed).append("=").append(value).append("&");
+            }
+        }
+        tempSign.append("key=").append(md5);
+        String data = SecureUtil.md5(tempSign.toString()).toUpperCase();
+        try {
+            //通过PKCS#8编码的Key指令获得私钥对象
+            PKCS8EncodedKeySpec pkcs8KeySpec = new PKCS8EncodedKeySpec(Base64.getDecoder().decode(key));
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            PrivateKey privateKey = keyFactory.generatePrivate(pkcs8KeySpec);
+            Signature signature = Signature.getInstance("SHA256WithRSA");
+            signature.initSign(privateKey);
+            signature.update(data.getBytes(StandardCharsets.UTF_8));
+            return Base64.getEncoder().encodeToString(signature.sign());
+        } catch (Exception e) {
+            throw new RuntimeException("签名字符串[" + data + "]时遇到异常", e);
+        }
+    }
 
     /**
      * 消费任务
+     *
+     * @param msgs
+     * @param context
+     * @return
      */
     @Override
     public ConsumeConcurrentlyStatus consumeMessage(List<MessageExt> msgs, ConsumeConcurrentlyContext context) {
@@ -85,7 +119,6 @@ public class AcPay extends BaseRemittancePaymentMQListener implements MessageLis
 
                 // 查询放款详情记录
                 LoanRemittancePaymentRecordEntity paymentRecord = loanRemittancePaymentRecordDao.getById(id);
-                LogUtil.sysInfo("[AcPay paymentRecord:{}]", paymentRecord);
                 if (ObjectUtils.isEmpty(paymentRecord)) {
                     continue;
                 }
@@ -98,17 +131,18 @@ public class AcPay extends BaseRemittancePaymentMQListener implements MessageLis
 
                 // 查询放款记录
                 LoanRemittanceOrderRecordEntity orderRecord = loanRemittanceOrderRecordDao.getById(paymentRecord.getRemittanceOrderRecordId());
-                LogUtil.sysInfo("[AcPay orderRecord:{}]", orderRecord);
                 if (ObjectUtils.isEmpty(orderRecord)) {
                     continue;
                 }
 
                 // 查询渠道信息
                 LoanPaymentEntity loanPayment = loanPaymentDao.getById(paymentRecord.getPaymentId());
-                LogUtil.sysInfo("[AcPay loanPayment:{}]", loanPayment);
                 if (ObjectUtils.isEmpty(loanPayment)) {
                     continue;
                 }
+
+                // 订单支付记录ID
+                String orderRecordId = orderRecord.getId();
 
                 // 更新放款记录状态为 "进行中"
                 updateRemittanceOrderRecordStatus(paymentRecord.getRemittanceOrderRecordId(), LoanRemittanceOrderRecordStatus.PROCESS);
@@ -117,12 +151,12 @@ public class AcPay extends BaseRemittancePaymentMQListener implements MessageLis
                 if (paymentRecord.getStatus().equals(LoanRemittancePaymentRecordStatus.CREATE)) {
                     // 创建状态 发起放款
                     Integer payoutResult = payout(loanPayment, orderRecord, paymentRecord);
-                    LogUtil.sysInfo("[AcPay payoutResult:{}]", payoutResult);
 
+                    // 判断支付状态
                     if (payoutResult.equals(PaymentField.PAYOUT_SUCCESS)) {
                         // 发起成功 修改状态
                         updateLoanRemittancePaymentRecordStatus(id, LoanRemittancePaymentRecordStatus.PROCESS);
-                        retryRemittance(remittanceParams, subExpression);
+                        retryRemittance(remittanceParams, subExpression());
                         continue;
                     } else {
                         // 发起失败 标记渠道 重回分配队列
@@ -133,16 +167,18 @@ public class AcPay extends BaseRemittancePaymentMQListener implements MessageLis
                 } else if (paymentRecord.getStatus().equals(LoanRemittancePaymentRecordStatus.PROCESS)) {
                     // 进行中状态 查询放款结果
                     int res = queryOrder(orderRecord, paymentRecord, loanPayment);
-                    LogUtil.sysInfo("[AcPay res:{}]", res);
+
+                    // 判断支付状态
                     if (res == PaymentField.PAYOUT_SUCCESS) {
                         // 成功 修改支付记录状态及支付详情记录状态
                         updateRemittanceOrderRecordStatus(orderRecord.getId(), LoanRemittanceOrderRecordStatus.SUCCESS);
                         updateLoanRemittancePaymentRecordStatus(paymentRecord.getId(), LoanRemittancePaymentRecordStatus.SUCCESS);
-                        updateSuccessRemittancePaymentRecordId(orderRecord.getId(), paymentRecord.getId());
+                        updateProcessRemittancePaymentRecordId(orderRecordId, "");
+                        updateSuccessRemittancePaymentRecordId(orderRecordId, paymentRecord.getId());
                         continue;
                     } else if (res == PaymentField.PAYOUT_PROCESS || res == PaymentField.PAYOUT_QUERY_ERROR) {
                         //  进行中 重回放款队列
-                        retryRemittance(remittanceParams, subExpression);
+                        retryRemittance(remittanceParams, subExpression());
                         continue;
                     } else if (res == PaymentField.PAYOUT_FAILED) {
                         // 失败 标记过滤渠道 重回分配队列
@@ -154,7 +190,7 @@ public class AcPay extends BaseRemittancePaymentMQListener implements MessageLis
             } catch (Exception e) {
                 try {
                     // 异常,重试
-                    retryRemittance(remittanceParams, subExpression);
+                    retryRemittance(remittanceParams, subExpression());
                 } catch (Exception exception) {
                     LogUtil.sysError("[AcPay]", exception);
                 }
@@ -195,7 +231,6 @@ public class AcPay extends BaseRemittancePaymentMQListener implements MessageLis
         try {
             // 发送第三方代付请求
             returnResult = HttpUtils.POST(payoutUrl, JSONObject.toJSONString(param));
-            LogUtil.sysInfo("[AcPay param:{} returnResult:{}]", param, returnResult);
         } catch (Exception e) {
             updateLoanRemittancePaymentRecordLog(paymentRecord.getId(), JSONObject.toJSONString(param), "异常");
             LogUtil.sysError("ACPAY发起放款异常", e);
@@ -248,7 +283,6 @@ public class AcPay extends BaseRemittancePaymentMQListener implements MessageLis
         try {
             // 发送第三方提现请求
             returnResult = HttpUtils.POST(queryUrl, JSONObject.toJSONString(param));
-            LogUtil.sysInfo("[AcPay search returnResult:{}]", returnResult);
         } catch (Exception e) {
             // 请求异常
             LogUtil.sysError("AcPay查询代付异常:", e);
@@ -290,45 +324,6 @@ public class AcPay extends BaseRemittancePaymentMQListener implements MessageLis
         } else {
             // 其他状态 进行中
             return PaymentField.PAYOUT_PROCESS;
-        }
-    }
-
-    /**
-     * 参数签名:
-     * 将接口中的请求字段按照Ascii码方式进行升序排序
-     * 按照key1=val1&key2=val2&key3=val3....&key=md5秘钥 生成加密字符串
-     * 将上一步生成的字符串进行MD5加密，并转换成大写
-     * 使用您的私钥对第3步生成的密文进行签名即可
-     */
-    public static String sign(Object param, String md5, String key)
-            throws Exception {
-
-        StringBuilder tempSign = new StringBuilder();
-        // Bean转Map
-        Map<String, Object> map = BeanUtil.beanToMap(param);
-        // 取所有字段名并排序
-        List<String> filedList = new ArrayList<>(map.keySet());
-        Collections.sort(filedList);
-        // 拼接kv
-        for (String filed : filedList) {
-            Object value = map.get(filed);
-            if (value != null && !"".equals(value)) {
-                tempSign.append(filed).append("=").append(value).append("&");
-            }
-        }
-        tempSign.append("key=").append(md5);
-        String data = SecureUtil.md5(tempSign.toString()).toUpperCase();
-        try {
-            //通过PKCS#8编码的Key指令获得私钥对象
-            PKCS8EncodedKeySpec pkcs8KeySpec = new PKCS8EncodedKeySpec(Base64.getDecoder().decode(key));
-            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-            PrivateKey privateKey = keyFactory.generatePrivate(pkcs8KeySpec);
-            Signature signature = Signature.getInstance("SHA256WithRSA");
-            signature.initSign(privateKey);
-            signature.update(data.getBytes(StandardCharsets.UTF_8));
-            return Base64.getEncoder().encodeToString(signature.sign());
-        } catch (Exception e) {
-            throw new RuntimeException("签名字符串[" + data + "]时遇到异常", e);
         }
     }
 }

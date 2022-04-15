@@ -7,9 +7,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.constant.LoanRemittanceOrderRecordStatus;
 import com.epoch.loan.workshop.common.constant.LoanRemittancePaymentRecordStatus;
 import com.epoch.loan.workshop.common.constant.PaymentField;
-import com.epoch.loan.workshop.common.entity.LoanPaymentEntity;
-import com.epoch.loan.workshop.common.entity.LoanRemittanceOrderRecordEntity;
-import com.epoch.loan.workshop.common.entity.LoanRemittancePaymentRecordEntity;
+import com.epoch.loan.workshop.common.entity.mysql.LoanPaymentEntity;
+import com.epoch.loan.workshop.common.entity.mysql.LoanRemittanceOrderRecordEntity;
+import com.epoch.loan.workshop.common.entity.mysql.LoanRemittancePaymentRecordEntity;
 import com.epoch.loan.workshop.common.mq.remittance.params.RemittanceParams;
 import com.epoch.loan.workshop.common.util.HttpUtils;
 import com.epoch.loan.workshop.common.util.LogUtil;
@@ -22,7 +22,6 @@ import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyStatus;
 import org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently;
 import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.common.message.MessageExt;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 
@@ -43,19 +42,53 @@ import java.util.Map;
 @Data
 public class InCashPay extends BaseRemittancePaymentMQListener implements MessageListenerConcurrently {
     /**
-     * 放款队列标签标签
-     */
-    @Value("${rocket.remittance.inCashPay.subExpression}")
-    protected String subExpression;
-
-    /**
      * 消息监听器
      */
     private MessageListenerConcurrently messageListener = this;
 
+    /**
+     * 第一步，设所有发送或者接收到的数据为集合M，去掉sign参数、去掉空值参数得到的集合N，将集合N内所有参数按照参数名ASCII码从小到大排序（字典序），使用URL键值对的格式（即key1=value1&key2=value2…）拼接成字符串stringA。
+     * <p>
+     * 第二步，在stringA最后拼接上&key=bHXJGsw6CsxkSb…得到stringSignTemp字符串，stringSignTemp=”amount=amount&callbackUrl=callbackUrl&customEmail=email&customMobile=mobile&customName=name&merchant=merchant¬ifyUrl=notifyUrl&key=bHXJGsw6CsxkSb…”
+     * （PS 若显示文档出现“¬ifyUrl”等异常，请参照：）
+     * <p>
+     * 第三步，对stringSignTemp进行MD5运算，再将得到的字符串所有字符转换为小写，得到sign值signValue， sign=MD5(stringSignTemp).toLowerCase()
+     *
+     * @param param
+     * @param key
+     * @return
+     */
+    public static String sign(Object param, String key) {
+        StringBuilder tempSign = new StringBuilder();
+
+        // Bean转Map
+        Map<String, Object> map = BeanUtil.beanToMap(param);
+
+        // 取所有字段名并排序
+        List<String> filedList = new ArrayList<>(map.keySet());
+        Collections.sort(filedList);
+
+        // 拼接kv
+        for (String filed : filedList) {
+            Object value = map.get(filed);
+            if (value != null) {
+                tempSign.append(filed).append("=").append(value).append("&");
+            }
+        }
+
+        // 拼接key
+        tempSign.append("key=").append(key);
+
+        // md5并转小写
+        return SecureUtil.md5(tempSign.toString()).toLowerCase();
+    }
 
     /**
      * 消费任务
+     *
+     * @param msgs
+     * @param context
+     * @return
      */
     @Override
     public ConsumeConcurrentlyStatus consumeMessage(List<MessageExt> msgs, ConsumeConcurrentlyContext context) {
@@ -108,7 +141,7 @@ public class InCashPay extends BaseRemittancePaymentMQListener implements Messag
                     if (payoutResult.equals(PaymentField.PAYOUT_SUCCESS)) {
                         // 发起成功 修改状态
                         updateLoanRemittancePaymentRecordStatus(id, LoanRemittancePaymentRecordStatus.PROCESS);
-                        retryRemittance(remittanceParams, subExpression);
+                        retryRemittance(remittanceParams, subExpression());
                         continue;
                     } else {
                         // 发起失败 标记渠道 重回分配队列
@@ -127,7 +160,7 @@ public class InCashPay extends BaseRemittancePaymentMQListener implements Messag
                         continue;
                     } else if (res == PaymentField.PAYOUT_PROCESS || res == PaymentField.PAYOUT_QUERY_ERROR) {
                         //  进行中 重回放款队列
-                        retryRemittance(remittanceParams, subExpression);
+                        retryRemittance(remittanceParams, subExpression());
                         continue;
                     } else if (res == PaymentField.PAYOUT_FAILED) {
                         // 失败 标记过滤渠道 重回分配队列
@@ -139,7 +172,7 @@ public class InCashPay extends BaseRemittancePaymentMQListener implements Messag
             } catch (Exception e) {
                 try {
                     // 异常,重试
-                    retryRemittance(remittanceParams, subExpression);
+                    retryRemittance(remittanceParams, subExpression());
                 } catch (Exception exception) {
                     LogUtil.sysError("[inCashPay]", exception);
                 }
@@ -151,9 +184,13 @@ public class InCashPay extends BaseRemittancePaymentMQListener implements Messag
 
     /**
      * 放款
+     *
+     * @param paymentEntity
+     * @param orderRecord
+     * @param paymentRecord
+     * @return
      */
     public Integer payout(LoanPaymentEntity paymentEntity, LoanRemittanceOrderRecordEntity orderRecord, LoanRemittancePaymentRecordEntity paymentRecord) {
-
         // 获取渠道配置信息
         JSONObject paymentConfig = JSONObject.parseObject(paymentEntity.getConfig());
         String merchantId = paymentConfig.getString(PaymentField.INCASHPAY_MERCHANT_ID);
@@ -214,6 +251,11 @@ public class InCashPay extends BaseRemittancePaymentMQListener implements Messag
 
     /**
      * 订单查询
+     *
+     * @param orderRecord
+     * @param paymentRecord
+     * @param paymentEntity
+     * @return
      */
     private int queryOrder(LoanRemittanceOrderRecordEntity orderRecord, LoanRemittancePaymentRecordEntity paymentRecord, LoanPaymentEntity paymentEntity) {
         // 获取渠道配置信息
@@ -273,39 +315,6 @@ public class InCashPay extends BaseRemittancePaymentMQListener implements Messag
             // 其他状态 进行中
             return PaymentField.PAYOUT_PROCESS;
         }
-    }
-
-    /**
-     * 第一步，设所有发送或者接收到的数据为集合M，去掉sign参数、去掉空值参数得到的集合N，将集合N内所有参数按照参数名ASCII码从小到大排序（字典序），使用URL键值对的格式（即key1=value1&key2=value2…）拼接成字符串stringA。
-     *
-     * 第二步，在stringA最后拼接上&key=bHXJGsw6CsxkSb…得到stringSignTemp字符串，stringSignTemp=”amount=amount&callbackUrl=callbackUrl&customEmail=email&customMobile=mobile&customName=name&merchant=merchant¬ifyUrl=notifyUrl&key=bHXJGsw6CsxkSb…”
-     * （PS 若显示文档出现“¬ifyUrl”等异常，请参照：）
-     *
-     * 第三步，对stringSignTemp进行MD5运算，再将得到的字符串所有字符转换为小写，得到sign值signValue， sign=MD5(stringSignTemp).toLowerCase()
-     */
-    public static String sign(Object param, String key) {
-        StringBuilder tempSign = new StringBuilder();
-
-        // Bean转Map
-        Map<String, Object> map = BeanUtil.beanToMap(param);
-
-        // 取所有字段名并排序
-        List<String> filedList = new ArrayList<>(map.keySet());
-        Collections.sort(filedList);
-
-        // 拼接kv
-        for (String filed : filedList) {
-            Object value = map.get(filed);
-            if (value != null) {
-                tempSign.append(filed).append("=").append(value).append("&");
-            }
-        }
-
-        // 拼接key
-        tempSign.append("key=").append(key);
-
-        // md5并转小写
-        return SecureUtil.md5(tempSign.toString()).toLowerCase();
     }
 
 }
