@@ -184,6 +184,7 @@ public class UserController extends BaseController {
         Result<MineResult> result = new Result<>();
 
         try {
+
             // 密码登录
             return userService.mine(mineParams);
         } catch (Exception e) {
