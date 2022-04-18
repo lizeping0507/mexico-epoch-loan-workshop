@@ -24,6 +24,11 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @description : 支付基类
  */
 public class BaseService {
+    /**
+     * 新用户表
+     */
+    @Autowired
+    public LoanUserDao loanUserDao;
 
 
     /**

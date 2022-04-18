@@ -37,6 +37,11 @@ spring:
     name: epoch-loan-workshop-account
   cloud:
     nacos:
+      discovery:
+        # 服务中心
+        server-addr: loan-1:8848
+        # 配置中心命名空间ID
+        namespace: ${namespace}
       config:
         # 动态配置
         enabled: true

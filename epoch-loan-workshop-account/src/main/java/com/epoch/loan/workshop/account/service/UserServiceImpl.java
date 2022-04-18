@@ -14,6 +14,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,47 +31,30 @@ public class UserServiceImpl extends BaseService implements UserService {
     /**
      * 判断手机号是否已经注册
      *
-     * @param isRegisterParams 请求参数封装
+     * @param params 请求参数封装
      * @return Result<IsRegisterResult>
      * @throws Exception 请求异常
      */
     @Override
-    public Result<IsRegisterResult> isRegister(IsRegisterParams isRegisterParams) throws Exception {
-        // 结果结果集
+    public Result<IsRegisterResult> isRegister(IsRegisterParams params) throws Exception {
+        // 结果集
         Result<IsRegisterResult> result = new Result<>();
-
-        // 拼接请求路径
-        String url = platformConfig.getPlatformDomain() + PlatformUrl.PLATFORM_ISREGISTER + isRegisterParams.getPhoneNumber();
-
-        // 封装请求参数
-        JSONObject requestParam = new JSONObject();
-        requestParam.put("appFlag", isRegisterParams.getAppName());
-        requestParam.put("phoneNumber", isRegisterParams.getPhoneNumber());
-        requestParam.put("versionNumber", isRegisterParams.getAppVersion());
-        requestParam.put("mobileType", isRegisterParams.getMobileType());
-
-        // 请求
-        String responseStr = HttpUtils.POST(url, requestParam.toJSONString());
-
-        // 解析响应结果
-        JSONObject responseJson = JSONObject.parseObject(responseStr);
-
-        // 判断接口响应是否正常
-        if (!PlatformUtil.checkResponseCode(result, IsRegisterResult.class, responseJson)) {
-            return result;
-        }
-
-        // 获取结果集
-        JSONObject data = responseJson.getJSONObject("data");
-
-        // 封装结果就
-        IsRegisterResult isRegisterResult = new IsRegisterResult();
-        isRegisterResult.setIsExists(data.getString("isExists"));
-
-        // 封装结果
         result.setReturnCode(ResultEnum.SUCCESS.code());
         result.setMessage(ResultEnum.SUCCESS.message());
-        result.setData(isRegisterResult);
+        IsRegisterResult resData = new IsRegisterResult();
+        result.setData(resData);
+
+        // 根据appName和手机号查询用户
+        Integer isExit = loanUserDao.exitByAppNameAndLoginName(params.getAppName(), params.getPhoneNumber());
+
+        if (isExit == 0){
+            // 用户未注册
+            resData.setIsExists("10");
+        }else{
+            // 用户已注册
+            resData.setIsExists("20");
+        }
+
         return result;
     }
 
