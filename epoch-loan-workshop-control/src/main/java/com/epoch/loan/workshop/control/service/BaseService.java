@@ -2,6 +2,7 @@ package com.epoch.loan.workshop.control.service;
 
 import com.epoch.loan.workshop.common.config.PlatformConfig;
 import com.epoch.loan.workshop.common.dao.mysql.LoanDynamicRequestDao;
+import com.epoch.loan.workshop.common.dao.mysql.LoanOcrProviderConfigDao;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -12,14 +13,22 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @description : control模块业务基类
  */
 public class BaseService {
+
     /**
      * 动态接口配置
      */
     @Autowired
     public LoanDynamicRequestDao dynamicRequestDao;
+
     /**
      * 贷超相关配置
      */
     @Autowired
     PlatformConfig platformConfig;
+
+    /**
+     * 三方相关配置
+     */
+    @Autowired
+    public LoanOcrProviderConfigDao loanOcrProviderConfigDao;
 }
