@@ -1,5 +1,6 @@
 package com.epoch.loan.workshop.api.controller;
 
+import com.epoch.loan.workshop.api.annotated.Authentication;
 import com.epoch.loan.workshop.common.config.URL;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
 import com.epoch.loan.workshop.common.params.params.request.*;
@@ -52,6 +53,7 @@ public class UserController extends BaseController {
      * @param registerParams
      * @return 结果
      */
+    @Authentication(auth = false)
     @PostMapping(URL.REGISTER)
     public Result<RegisterResult> register(RegisterParams registerParams) {
         // 结果集

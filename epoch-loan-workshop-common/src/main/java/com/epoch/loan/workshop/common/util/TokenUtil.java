@@ -2,8 +2,8 @@ package com.epoch.loan.workshop.common.util;
 
 import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.constant.RedisKeyField;
+import com.epoch.loan.workshop.common.params.User;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserCache;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
@@ -62,12 +62,37 @@ public class TokenUtil {
     }
 
     /**
+     * 更新用户缓存
+     *
+     * @param user
+     */
+    public void updateUserCache(User user) {
+
+    }
+
+    /**
+     * 更新用户Token
+     *
+     * @param userId
+     * @return
+     */
+    public String updateUserToken(String userId) {
+        // 生成Token
+        String token = ObjectIdUtil.getObjectId();
+
+        // 增加Token
+        redisUtil.set(RedisKeyField.TOKEN + token, userId);
+        redisUtil.set(RedisKeyField.USER_TOKEN + userId, token);
+        return token;
+    }
+
+    /**
      * 获取用户
      *
      * @param token
      * @return
      */
-    public UserCache getUserCache(String token) {
+    public User getUserCache(String token) {
         // Token有效性校验
         if (!userOnline(token)) {
             return null;
@@ -89,7 +114,7 @@ public class TokenUtil {
         }
 
         // 用户缓存
-        UserCache userCache = JSONObject.parseObject(String.valueOf(userCacheObject), UserCache.class);
-        return userCache;
+        User user = JSONObject.parseObject(String.valueOf(userCacheObject), User.class);
+        return user;
     }
 }

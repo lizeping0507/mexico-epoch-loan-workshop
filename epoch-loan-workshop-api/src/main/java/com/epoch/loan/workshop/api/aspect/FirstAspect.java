@@ -8,6 +8,7 @@ import com.epoch.loan.workshop.common.constant.DynamicRequest;
 import com.epoch.loan.workshop.common.constant.Field;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
 import com.epoch.loan.workshop.common.mq.log.params.AccessLogParams;
+import com.epoch.loan.workshop.common.params.User;
 import com.epoch.loan.workshop.common.params.params.result.Result;
 import com.epoch.loan.workshop.common.util.LogUtil;
 import com.epoch.loan.workshop.common.util.ThrowableUtils;
@@ -193,7 +194,12 @@ public class FirstAspect {
             jsonParams.put(Field.CHANNEL_CODE, channelCode);
         }
 
-
+        // 用户信息
+        Object objectUser = request.getAttribute(Field.USER);
+        if (ObjectUtils.isNotEmpty(objectUser)) {
+            User user = (User) objectUser;
+            jsonParams.put(Field.USER, user);
+        }
     }
 
     /**

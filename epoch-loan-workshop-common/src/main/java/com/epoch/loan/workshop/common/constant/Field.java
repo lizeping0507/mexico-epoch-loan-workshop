@@ -306,4 +306,9 @@ public class Field {
      * GPS地址
      */
     public static final String GPS_ADDRESS = "gpsAddress";
+
+    /**
+     * 用户
+     */
+    public static final String USER = "user";
 }
