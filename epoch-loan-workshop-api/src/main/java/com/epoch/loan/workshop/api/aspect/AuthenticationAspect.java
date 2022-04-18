@@ -45,7 +45,7 @@ public class AuthenticationAspect {
     /**
      * 定义注解@Authentication 为切入点
      */
-    @Pointcut("@annotation(com.epoch.pf.option.api.annotated.Authentication)")
+    @Pointcut("@annotation(com.epoch.loan.workshop.api.annotated.Authentication)")
     public void authentication() {
 
     }
