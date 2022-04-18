@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.epoch.loan.workshop.common.constant.DynamicRequest;
 import com.epoch.loan.workshop.common.entity.mysql.LoanDynamicRequestEntity;
-import com.epoch.loan.workshop.common.params.result.Result;
+import com.epoch.loan.workshop.common.params.params.result.Result;
 import com.epoch.loan.workshop.common.util.LogUtil;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

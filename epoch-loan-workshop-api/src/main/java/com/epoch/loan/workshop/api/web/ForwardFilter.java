@@ -1,23 +1,14 @@
 package com.epoch.loan.workshop.api.web;
 
-import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.constant.DynamicRequest;
 import com.epoch.loan.workshop.common.constant.Field;
-import com.epoch.loan.workshop.common.constant.ResultEnum;
-import com.epoch.loan.workshop.common.params.result.Result;
-import com.epoch.loan.workshop.common.util.LogUtil;
-import com.epoch.loan.workshop.common.util.ObjectIdUtil;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Set;
 
 /**
  * @author : Shangkunfeng

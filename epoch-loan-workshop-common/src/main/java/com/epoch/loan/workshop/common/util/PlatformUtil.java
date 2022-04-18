@@ -2,7 +2,7 @@ package com.epoch.loan.workshop.common.util;
 
 import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
-import com.epoch.loan.workshop.common.params.result.Result;
+import com.epoch.loan.workshop.common.params.params.result.Result;
 import org.apache.commons.lang3.StringUtils;
 
 /**

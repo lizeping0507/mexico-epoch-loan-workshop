@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.constant.PlatformUrl;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
 import com.epoch.loan.workshop.common.params.params.request.*;
-import com.epoch.loan.workshop.common.params.result.*;
+import com.epoch.loan.workshop.common.params.params.result.*;
 import com.epoch.loan.workshop.common.service.UserService;
 import com.epoch.loan.workshop.common.util.CheckFieldUtils;
 import com.epoch.loan.workshop.common.util.HttpUtils;

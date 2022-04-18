@@ -3,7 +3,7 @@ package com.epoch.loan.workshop.common.service;
 import com.epoch.loan.workshop.common.params.params.request.BankCardParams;
 import com.epoch.loan.workshop.common.params.params.request.BindBankCardParams;
 import com.epoch.loan.workshop.common.params.params.request.ParentParams;
-import com.epoch.loan.workshop.common.params.result.*;
+import com.epoch.loan.workshop.common.params.params.result.*;
 
 /**
  * @author 魏玉强

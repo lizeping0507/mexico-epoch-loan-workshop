@@ -7,7 +7,7 @@ import com.epoch.loan.workshop.common.constant.ResultEnum;
 import com.epoch.loan.workshop.common.params.params.request.BankCardParams;
 import com.epoch.loan.workshop.common.params.params.request.BindBankCardParams;
 import com.epoch.loan.workshop.common.params.params.request.ParentParams;
-import com.epoch.loan.workshop.common.params.result.*;
+import com.epoch.loan.workshop.common.params.params.result.*;
 import com.epoch.loan.workshop.common.service.BankCardService;
 import com.epoch.loan.workshop.common.util.HttpUtils;
 import com.epoch.loan.workshop.common.util.PlatformUtil;

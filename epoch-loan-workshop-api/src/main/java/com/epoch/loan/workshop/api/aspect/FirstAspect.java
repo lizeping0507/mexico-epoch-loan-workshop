@@ -8,7 +8,7 @@ import com.epoch.loan.workshop.common.constant.DynamicRequest;
 import com.epoch.loan.workshop.common.constant.Field;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
 import com.epoch.loan.workshop.common.mq.log.params.AccessLogParams;
-import com.epoch.loan.workshop.common.params.result.Result;
+import com.epoch.loan.workshop.common.params.params.result.Result;
 import com.epoch.loan.workshop.common.util.LogUtil;
 import com.epoch.loan.workshop.common.util.ThrowableUtils;
 import org.apache.commons.lang3.ObjectUtils;

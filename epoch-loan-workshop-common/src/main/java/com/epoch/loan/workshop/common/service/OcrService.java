@@ -3,10 +3,10 @@ package com.epoch.loan.workshop.common.service;
 import com.epoch.loan.workshop.common.params.params.BaseParams;
 import com.epoch.loan.workshop.common.params.params.request.MineParams;
 import com.epoch.loan.workshop.common.params.params.request.UserLivenessScoreParams;
-import com.epoch.loan.workshop.common.params.result.ChannelTypeResult;
-import com.epoch.loan.workshop.common.params.result.LicenseResult;
-import com.epoch.loan.workshop.common.params.result.Result;
-import com.epoch.loan.workshop.common.params.result.UserLivenessScoreResult;
+import com.epoch.loan.workshop.common.params.params.result.ChannelTypeResult;
+import com.epoch.loan.workshop.common.params.params.result.LicenseResult;
+import com.epoch.loan.workshop.common.params.params.result.Result;
+import com.epoch.loan.workshop.common.params.params.result.UserLivenessScoreResult;
 
 /**
  * @author 魏玉强

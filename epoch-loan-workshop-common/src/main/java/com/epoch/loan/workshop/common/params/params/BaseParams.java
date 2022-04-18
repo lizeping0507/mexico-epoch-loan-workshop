@@ -1,5 +1,6 @@
 package com.epoch.loan.workshop.common.params.params;
 
+import com.epoch.loan.workshop.common.params.User;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -46,4 +47,9 @@ public class BaseParams implements Serializable {
      * 设备类型
      */
     public String mobileType;
+
+    /**
+     * 用户信息
+     */
+    public User user;
 }

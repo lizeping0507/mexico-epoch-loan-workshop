@@ -2,8 +2,8 @@ package com.epoch.loan.workshop.common.service;
 
 import com.epoch.loan.workshop.common.params.params.request.SdkPushInfoParams;
 import com.epoch.loan.workshop.common.params.params.request.SdkUploadParams;
-import com.epoch.loan.workshop.common.params.result.Result;
-import com.epoch.loan.workshop.common.params.result.SdkPushInfoResult;
+import com.epoch.loan.workshop.common.params.params.result.Result;
+import com.epoch.loan.workshop.common.params.params.result.SdkPushInfoResult;
 
 /**
  * @author : ljy

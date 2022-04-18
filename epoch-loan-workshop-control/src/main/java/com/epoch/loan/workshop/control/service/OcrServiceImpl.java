@@ -6,13 +6,12 @@ import com.epoch.loan.workshop.common.constant.ResultEnum;
 import com.epoch.loan.workshop.common.params.params.BaseParams;
 import com.epoch.loan.workshop.common.params.params.request.MineParams;
 import com.epoch.loan.workshop.common.params.params.request.UserLivenessScoreParams;
-import com.epoch.loan.workshop.common.params.result.ChannelTypeResult;
-import com.epoch.loan.workshop.common.params.result.LicenseResult;
-import com.epoch.loan.workshop.common.params.result.Result;
-import com.epoch.loan.workshop.common.params.result.UserLivenessScoreResult;
+import com.epoch.loan.workshop.common.params.params.result.ChannelTypeResult;
+import com.epoch.loan.workshop.common.params.params.result.LicenseResult;
+import com.epoch.loan.workshop.common.params.params.result.Result;
+import com.epoch.loan.workshop.common.params.params.result.UserLivenessScoreResult;
 import com.epoch.loan.workshop.common.service.OcrService;
 import com.epoch.loan.workshop.common.util.HttpUtils;
-import com.epoch.loan.workshop.common.util.LogUtil;
 import com.epoch.loan.workshop.common.util.PlatformUtil;
 import org.apache.dubbo.config.annotation.DubboService;
 

@@ -1,7 +1,7 @@
 package com.epoch.loan.workshop.common.service;
 
 import com.epoch.loan.workshop.common.params.params.request.SendRegisterMessageParams;
-import com.epoch.loan.workshop.common.params.result.Result;
+import com.epoch.loan.workshop.common.params.params.result.Result;
 
 /**
  * @author : Duke

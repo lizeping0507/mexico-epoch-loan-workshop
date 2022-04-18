@@ -3,7 +3,7 @@ package com.epoch.loan.workshop.common.service;
 import com.epoch.loan.workshop.common.params.params.request.RepaymentParams;
 import com.epoch.loan.workshop.common.params.params.request.UtrParams;
 import com.epoch.loan.workshop.common.params.params.request.YeahPayRepamentCallbackParam;
-import com.epoch.loan.workshop.common.params.result.Result;
+import com.epoch.loan.workshop.common.params.params.result.Result;
 
 /**
  * @author : Shangkunfeng
