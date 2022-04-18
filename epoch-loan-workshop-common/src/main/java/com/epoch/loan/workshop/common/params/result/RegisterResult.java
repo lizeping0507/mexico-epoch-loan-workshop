@@ -19,24 +19,4 @@ public class RegisterResult implements Serializable {
      * token
      */
     private String token;
-
-    /**
-     * 用户id
-     */
-    private String userId;
-
-    /**
-     * 是否需要抓取
-     */
-    private Boolean needCatchData;
-
-    /**
-     * Appid
-     */
-    private String appId;
-
-    /**
-     * 用户数据抓取
-     */
-    private String dataNo;
 }

@@ -1,6 +1,5 @@
 package com.epoch.loan.workshop.api.controller;
 
-import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.config.URL;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
 import com.epoch.loan.workshop.common.params.params.request.*;
@@ -59,6 +58,29 @@ public class UserController extends BaseController {
         Result<RegisterResult> result = new Result<>();
 
         try {
+            // 验证请求参数是否合法
+            if (registerParams.isMobileLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":mobile");
+                return result;
+            }
+
+            if (registerParams.isPasswordLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":password");
+                return result;
+
+            }
+
+            if (registerParams.isSmsCodeLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":smsCode");
+                return result;
+            }
+
             // 用户注册
             return userService.register(registerParams);
         } catch (Exception e) {

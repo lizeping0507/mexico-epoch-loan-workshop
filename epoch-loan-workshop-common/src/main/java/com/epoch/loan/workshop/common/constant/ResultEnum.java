@@ -58,14 +58,17 @@ public enum ResultEnum {
      * 服务端错误
      */
     SERVER_ERROR(5000, "Server error"),
+
     /**
      * 服务端错误
      */
     SERVICE_ERROR(5001, "Service exception"),
+
     /**
      * 系统错误
      */
     SYSTEM_ERROR(5002, "System exception, please try again later"),
+
     /**
      * 超时
      */

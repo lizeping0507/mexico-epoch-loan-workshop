@@ -1,27 +1,72 @@
-package com.epoch.loan.workshop.common.entity.mysql;
+package com.epoch.loan.workshop.common.params;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * @author : Duke
- * @packageName : com.epoch.loan.workshop.common.entity.mysql
- * @className : LoanUserInfoEntity
- * @createTime : 2022/4/18 14:24
- * @description : 用户详细信息
+ * @packageName : com.epoch.loan.workshop.common.params
+ * @className : UserCache
+ * @createTime : 2022/4/18 15:11
+ * @description : 用户缓存
  */
 @Data
-public class LoanUserInfoEntity {
-
-
+@NoArgsConstructor
+public class UserCache {
     /**
-     * 用户详细信息id
+     * 用户ID
      */
     private String id;
 
     /**
-     * 用户id
+     * 安卓ID
      */
-    private String userId;
+    private String androidId;
+
+    /**
+     * 渠道ID
+     */
+    private String channelId;
+
+    /**
+     * 推广ID
+     */
+    private String gaId;
+
+    /**
+     * 手机imei
+     */
+    private String imei;
+
+    /**
+     * 运行平台
+     */
+    private String platform;
+
+    /**
+     * 登录名
+     */
+    private String loginName;
+
+    /**
+     * 密码
+     */
+    private String password;
+
+    /**
+     * App名称
+     */
+    private String appName;
+
+    /**
+     * App版本
+     */
+    private String appVersion;
+
+    /**
+     * 用户详细信息id
+     */
+    private String userInfoId;
 
     /**
      * 手机号
@@ -147,15 +192,4 @@ public class LoanUserInfoEntity {
      * 选民id
      */
     private String papersVoterId;
-
-    /**
-     * 更新时间
-     */
-    private String updateTime;
-
-    /**
-     * 创建时间
-     */
-    private String createTime;
-
 }

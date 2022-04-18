@@ -3,6 +3,7 @@ package com.epoch.loan.workshop.common.params.params.request;
 import com.epoch.loan.workshop.common.params.params.BaseParams;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author : Shangkunfeng
@@ -17,7 +18,7 @@ public class RegisterParams extends BaseParams {
     /**
      * 手机号
      */
-    private String phoneNumber;
+    private String mobile;
 
     /**
      * 密码
@@ -53,4 +54,43 @@ public class RegisterParams extends BaseParams {
      * 手机imei
      */
     private String imei;
+
+    /**
+     * 验证验证码是否合法
+     *
+     * @return
+     */
+    public boolean isSmsCodeLegal() {
+        if (StringUtils.isEmpty(this.smsCode)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * 验证密码是否合法
+     *
+     * @return
+     */
+    public boolean isPasswordLegal() {
+        if (StringUtils.isEmpty(this.password)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * 验证手机号是否合法
+     *
+     * @return
+     */
+    public boolean isMobileLegal() {
+        if (StringUtils.isEmpty(this.mobile)) {
+            return false;
+        }
+
+        return true;
+    }
 }

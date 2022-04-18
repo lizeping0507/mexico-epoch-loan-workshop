@@ -6,7 +6,10 @@ import com.epoch.loan.workshop.common.constant.ResultEnum;
 import com.epoch.loan.workshop.common.params.params.request.*;
 import com.epoch.loan.workshop.common.params.result.*;
 import com.epoch.loan.workshop.common.service.UserService;
-import com.epoch.loan.workshop.common.util.*;
+import com.epoch.loan.workshop.common.util.CheckFieldUtils;
+import com.epoch.loan.workshop.common.util.HttpUtils;
+import com.epoch.loan.workshop.common.util.ObjectIdUtil;
+import com.epoch.loan.workshop.common.util.PlatformUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 
@@ -85,53 +88,12 @@ public class UserServiceImpl extends BaseService implements UserService {
         // 结果结果集
         Result<RegisterResult> result = new Result<>();
 
-        // 拼接请求路径
-        String url = platformConfig.getPlatformDomain() + PlatformUrl.PLATFORM_REGISTER;
 
-        // 封装请求参数
-        JSONObject requestParam = new JSONObject();
-        requestParam.put("phoneNumber", registerParams.getPhoneNumber());
-        requestParam.put("passwd", registerParams.getPassword());
-        requestParam.put("smsCode", registerParams.getSmsCode());
-        requestParam.put("channelCode", registerParams.getChannelCode());
-        requestParam.put("platform", registerParams.getPlatform());
-        requestParam.put("registerAddr", "");
-        requestParam.put("gpsLocation", "");
-        requestParam.put("afId", registerParams.getAfId());
-        requestParam.put("gpsAdId", registerParams.getGaId());
-        requestParam.put("versionNumber", registerParams.getAppVersion());
-        requestParam.put("androidId", registerParams.getAndroidId());
-        requestParam.put("imei", registerParams.getImei());
-        requestParam.put("mobileType", registerParams.getMobileType());
-        requestParam.put("appFlag", registerParams.getAppName());
 
-        // 请求
-        String responseStr = HttpUtils.POST(url, requestParam.toJSONString());
-
-        // 解析响应结果
-        JSONObject responseJson = JSONObject.parseObject(responseStr);
-
-        // 判断接口响应是否正常
-        if (!PlatformUtil.checkResponseCode(result, RegisterResult.class, responseJson)) {
-            return result;
-        }
-
-        // 获取结果集
-        JSONObject data = responseJson.getJSONObject("data");
-
-        // 封装结果就
-        RegisterResult registerResult = new RegisterResult();
-        registerResult.setUserId(data.getString("userId"));
-        registerResult.setToken(data.getString("token"));
-        registerResult.setAppId(data.getString("appId"));
-        Boolean needCatchData = data.getBoolean("needCatchData");
-        registerResult.setNeedCatchData(needCatchData);
-        registerResult.setDataNo(data.getString("dataNo"));
 
         // 封装结果
         result.setReturnCode(ResultEnum.SUCCESS.code());
         result.setMessage(ResultEnum.SUCCESS.message());
-        result.setData(registerResult);
         return result;
     }
 
