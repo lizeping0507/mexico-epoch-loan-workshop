@@ -91,6 +91,12 @@ public class UserServiceImpl extends BaseService implements UserService {
 
 
 
+        String usrId = registerParams.getUser().getId();
+
+
+
+
+
         // 封装结果
         result.setReturnCode(ResultEnum.SUCCESS.code());
         result.setMessage(ResultEnum.SUCCESS.message());
