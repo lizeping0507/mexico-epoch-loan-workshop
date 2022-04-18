@@ -21,7 +21,7 @@ public class LoanUserInfoEntity {
     /**
      * 用户id
      */
-    private String user_id;
+    private String userId;
 
     /**
      * GPS(实时)
@@ -31,17 +31,17 @@ public class LoanUserInfoEntity {
     /**
      * GPS地址(实时)
      */
-    private String gps_address;
+    private String gpsAddress;
 
     /**
      * 注册GPS
      */
-    private String register_gps;
+    private String registerGps;
 
     /**
      * 注册GPS地址
      */
-    private String register_address;
+    private String registerAddress;
 
     /**
      * IP(实时)
@@ -51,7 +51,7 @@ public class LoanUserInfoEntity {
     /**
      * IP地址(实时)
      */
-    private String ip_address;
+    private String ipAddress;
 
     /**
      * 紧急联系人信息(JSON)
@@ -61,12 +61,12 @@ public class LoanUserInfoEntity {
     /**
      * 月收入
      */
-    private String monthly_income;
+    private String monthlyIncome;
 
     /**
      * 发薪周期
      */
-    private String pay_period;
+    private String payPeriod;
 
     /**
      * 职业
@@ -76,7 +76,7 @@ public class LoanUserInfoEntity {
     /**
      * 工资发放方式
      */
-    private String pay_method;
+    private String payMethod;
 
     /**
      * 邮箱
@@ -96,53 +96,53 @@ public class LoanUserInfoEntity {
     /**
      * 孩子数量
      */
-    private String children_number;
+    private String childrenNumber;
 
 
     /**
      * 借款目的
      */
-    private String loan_purpose;
+    private String loanPurpose;
 
     /**
      * 居住类型
      */
-    private String live_type;
+    private String liveType;
 
     /**
      * 地址
      */
-    private String papers_address;
+    private String papersAddress;
 
     /**
      * 父亲名字
      */
-    private String papers_father_name;
+    private String papersFatherName;
 
     /**
      * 全名
      */
-    private String papers_full_name;
+    private String papersFullName;
 
     /**
      * 母亲名字
      */
-    private String papers_mother_name;
+    private String papersMotherName;
 
     /**
      * 证件iid
      */
-    private String papers_id;
+    private String papersId;
 
     /**
      * 姓名
      */
-    private String papers_name;
+    private String papersName;
 
     /**
      * 选民id
      */
-    private String papers_voter_id;
+    private String papersVoterId;
 
     /**
      * 更新时间
