@@ -57,7 +57,7 @@ public class BaseParams implements Serializable {
     /**
      * 验证 app名称 是否合法
      *
-     * @return
+     * @return true或false
      */
     public boolean isAppNameLegal() {
         if (StringUtils.isEmpty(this.appName)) {

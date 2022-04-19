@@ -2,19 +2,22 @@ package com.epoch.loan.workshop.control.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.constant.OcrField;
-import com.epoch.loan.workshop.common.constant.PlatformUrl;
 import com.epoch.loan.workshop.common.constant.RedisKeyField;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
 import com.epoch.loan.workshop.common.entity.mysql.LoanOcrProviderConfig;
+import com.epoch.loan.workshop.common.params.advance.liveness.ScoreResponse;
+import com.epoch.loan.workshop.common.params.advance.liveness.ScoreResult;
 import com.epoch.loan.workshop.common.params.params.BaseParams;
 import com.epoch.loan.workshop.common.params.params.request.MineParams;
 import com.epoch.loan.workshop.common.params.params.request.UserLivenessScoreParams;
 import com.epoch.loan.workshop.common.params.params.result.ChannelTypeResult;
 import com.epoch.loan.workshop.common.params.params.result.LicenseResult;
 import com.epoch.loan.workshop.common.params.params.result.Result;
-import com.epoch.loan.workshop.common.params.params.result.UserLivenessScoreResult;
+import com.epoch.loan.workshop.common.params.advance.license.AdvanceLicenseResponse;
+import com.epoch.loan.workshop.common.params.advance.license.AdvanceLicenseResult;
 import com.epoch.loan.workshop.common.service.OcrService;
 import com.epoch.loan.workshop.common.util.HttpUtils;
+import com.epoch.loan.workshop.common.util.JsonUtils;
 import com.epoch.loan.workshop.common.util.LogUtil;
 import com.epoch.loan.workshop.common.util.PlatformUtil;
 import com.google.common.collect.Maps;
@@ -24,12 +27,11 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.http.protocol.HTTP;
-import org.springframework.data.redis.core.HashOperations;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Value;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.math.BigDecimal;
+import java.util.*;
 
 /**
  * @author 魏玉强
@@ -40,6 +42,27 @@ import java.util.Random;
  */
 @DubboService(timeout = 5000)
 public class OcrServiceImpl extends BaseService implements OcrService {
+
+    /**
+     * advance 通用key
+     */
+    @Value("${advance.accesskey}")
+    private String accessKey;
+
+    /**
+     * advance 获取license请求地址
+     */
+    @Value("${advance.license.url}")
+    private String advanceLicenseUrl;
+
+    /**
+     * advance 获取活体检测结果请求地址
+     */
+    @Value("${advance.liveness.score.url}")
+    private String advanceLivenessScore;
+
+    @Value("${advance.liveness.score.threshold}")
+    private Integer livenessThreshold;
 
     /**
      * 获取用户OCR认证提供商
@@ -85,52 +108,51 @@ public class OcrServiceImpl extends BaseService implements OcrService {
         // 结果集
         Result<LicenseResult> result = new Result<>();
 
-        App app = appService.findOneByName(params.getAppName());
-        if (org.springframework.util.StringUtils.isEmpty(app)) {
-            response.setCode(ResponseEnum.CUSTOM_ERROR.value());
-            response.setMsg(ResponseEnum.CUSTOM_ERROR.getReasonPhrase());
-            log.debug("获取advance license失败,找不到对应的 app信息");
-        }
-        String afAppId = appTagService.getAfAppId();
-        if (org.apache.commons.lang3.StringUtils.isBlank(appFlag)) {
-            response.setCode(ResponseEnum.CUSTOM_ERROR.value());
-            response.setMsg(ResponseEnum.CUSTOM_ERROR.getReasonPhrase());
-            log.debug("获取advance license失败,找不到对应的 app信息的包名");
-        }
+        // TODO 根据appFlag, 获取包名
+        String afAppId = "";
+
         // 先查询 redis中 license是否过期
         String licenseExpireTimeCache = getLicenseExpireTimeCache();
 
         // license过期或者为空时,请求advance
         if (StringUtils.isBlank(licenseExpireTimeCache)) {
-            headers.put(OcrField.ADVANCE_ACCESS_KEY_KEY, accessKey);
-            headers.put(HTTP.CONTENT_TYPE, HttpUtils.CONTENT_TYPE_JSON);
+            Map<String, String> headers = getAdvanceHeard();
+
+            HashMap<String, String> param = Maps.newHashMap();
             param.put(OcrField.ADVANCE_APP_ID_KEY, afAppId);
             param.put(OcrField.ADVANCE_LICENSE_EFFECTIVE_SECONDS, OcrField.ADVANCE_LICENSE_SECONDS);
 
+            // 发送请求
+            String response = HttpUtils.POST_WITH_HEADER(advanceLicenseUrl, param, headers);
 
-
+            // 处理响应信息
+            if(StringUtils.isNotBlank(response)){
+                AdvanceLicenseResult licenseResult = JsonUtils.fromJson(response, AdvanceLicenseResult.class);
+                String code = licenseResult.getCode();
+                if(OcrField.ADVANCE_SUCCESS_CODE.equalsIgnoreCase(code)){
+                    AdvanceLicenseResponse licenseResponse = licenseResult.getData();
+                    if(ObjectUtils.isNotEmpty(licenseResponse)){
+                        Long expireTimestamp = licenseResponse.getExpireTimestamp();
+                        licenseExpireTimeCache = licenseResponse.getLicense();
+                        if(ObjectUtils.isNotEmpty(expireTimestamp) && StringUtils.isNotBlank(licenseExpireTimeCache)){
+                            setLicenseExpireTimeStore(expireTimestamp, licenseExpireTimeCache);
+                        }
+                    }
+                }
+            }
         }
 
-
-
-        // 解析响应结果
-        JSONObject responseJson = JSONObject.parseObject(responseStr);
-
-        // 判断接口响应是否正常
-        if (!PlatformUtil.checkResponseCode(result, LicenseResult.class, responseJson)) {
+        // 再次判断 license 是否为空
+        if (StringUtils.isBlank(licenseExpireTimeCache)) {
+            result.setReturnCode(ResultEnum.SERVICE_ERROR.code());
+            result.setMessage(ResultEnum.SERVICE_ERROR.message());
             return result;
         }
-
-        // 获取结果集
-        JSONObject data = responseJson.getJSONObject("data");
-
-        // 封装结果就
-        LicenseResult licenseResult = JSONObject.parseObject(data.toJSONString(), LicenseResult.class);
 
         // 封装结果
         result.setReturnCode(ResultEnum.SUCCESS.code());
         result.setMessage(ResultEnum.SUCCESS.message());
-        result.setData(licenseResult);
+        result.setData(new LicenseResult(licenseExpireTimeCache));
         return result;
     }
 
@@ -142,46 +164,64 @@ public class OcrServiceImpl extends BaseService implements OcrService {
      * @throws Exception
      */
     @Override
-    public Result<UserLivenessScoreResult> advanceLivenessScore(UserLivenessScoreParams params) throws Exception {
+    public Result<ScoreResponse> advanceLivenessScore(UserLivenessScoreParams params) throws Exception {
         // 结果集
-        Result<UserLivenessScoreResult> result = new Result<>();
-
-        // 拼接请求路径
-        String url = platformConfig.getPlatformDomain() + PlatformUrl.PLATFORM_OCR_ADVANCE_LIVENESS_SCORE;
+        Result<ScoreResponse> result = new Result<>();
 
         // 封装请求参数
-        JSONObject requestParam = new JSONObject();
-        requestParam.put("appFlag", params.getAppName());
-        requestParam.put("versionNumber", params.getAppVersion());
-        requestParam.put("mobileType", params.getMobileType());
-        requestParam.put("userId", params.getUserId());
-        requestParam.put("aadharFaceMatch", params.getLivenessId());
+        HashMap<String, String> param = Maps.newHashMap();
+        param.put(OcrField.ADVANCE_FACE_IMAGE_ID, params.getLivenessId());
+        param.put(OcrField.ADVANCE_RESULT_TYPE, OcrField.ADVANCE_DEFAULT_IMAGE_TYPE);
 
         // 封装请求头
-        Map<String, String> headers = new HashMap<>();
-        headers.put("token", params.getToken());
+        Map<String, String> headers = getAdvanceHeard();
 
         // 请求
-        String responseStr = HttpUtils.POST_WITH_HEADER(url, requestParam.toJSONString(), headers);
+        String responseStr = HttpUtils.POST_WITH_HEADER(advanceLivenessScore, param, headers);
 
-        // 解析响应结果
-        JSONObject responseJson = JSONObject.parseObject(responseStr);
+        ScoreResponse data = null;
+        if(StringUtils.isNotBlank(responseStr)){
+            ScoreResult scoreResult = JsonUtils.fromJson(responseStr, ScoreResult.class);
+            String code = scoreResult.getCode();
 
-        // 判断接口响应是否正常
-        if (!PlatformUtil.checkResponseCode(result, UserLivenessScoreResult.class, responseJson)) {
+            // TODO 检测日志写入Elastic
+            //UserOcrLivingDetectionLog userOcrLivingDetectionLog = new UserOcrLivingDetectionLog();
+            if(OcrField.ADVANCE_SUCCESS_CODE.equals(code)){
+                data = result.getData();
+                //BeanUtils.copyProperties(data, userOcrLivingDetectionLog);
+
+                String livenessScore = data.getLivenessScore();
+
+                // 赋值，保存数据
+//                userOcrLivingDetectionLog.setLivenessScore(data.getLivenessScore().toString());
+//                userOcrLivingDetectionLog.setDetectionResult(data.getDetectionResult());
+
+                if(ObjectUtils.isNotEmpty(livenessScore)){
+//
+                    //活体分小于50认为是恶意攻击
+                    if(new BigDecimal(livenessScore).compareTo(new BigDecimal(livenessThreshold)) >0){
+                        result.setData(data);
+                    }
+                }
+            }
+
+            // 保存检测日志
+//            BeanUtils.copyProperties(result, userOcrLivingDetectionLog);
+//            userOcrLivingDetectionLog.setUserId(userId);
+//            userOcrLivingDetectionLog.setCreateTime(new Date());
+//            userOcrLivingDetectionLogService.add(userOcrLivingDetectionLog);
+        }
+
+        // 封装结果
+        if (ObjectUtils.isEmpty(data)) {
+            result.setReturnCode(ResultEnum.SERVICE_ERROR.code());
+            result.setMessage(ResultEnum.SERVICE_ERROR.message());
             return result;
         }
 
-        // 获取结果集
-        JSONObject data = responseJson.getJSONObject("data");
-
-        // 封装结果就
-        UserLivenessScoreResult scoreResult = JSONObject.parseObject(data.toJSONString(), UserLivenessScoreResult.class);
-
-        // 封装结果
         result.setReturnCode(ResultEnum.SUCCESS.code());
         result.setMessage(ResultEnum.SUCCESS.message());
-        result.setData(scoreResult);
+        result.setData(data);
         return result;
     }
 
@@ -222,6 +262,16 @@ public class OcrServiceImpl extends BaseService implements OcrService {
         LogUtil.sysInfo("providerConfig res:{}", res);
 
         return res;
+    }
+
+    /**
+     * 获取advance 请求头
+     */
+    public Map<String,String> getAdvanceHeard(){
+        HashMap<String, String> headers = Maps.newHashMap();
+        headers.put(OcrField.ADVANCE_ACCESS_KEY_KEY, accessKey);
+        headers.put(HTTP.CONTENT_TYPE, HttpUtils.CONTENT_TYPE_JSON);
+        return headers;
     }
 
     /**
