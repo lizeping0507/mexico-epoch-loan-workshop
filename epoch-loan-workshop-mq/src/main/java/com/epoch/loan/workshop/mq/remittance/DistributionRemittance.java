@@ -64,6 +64,11 @@ public class DistributionRemittance extends BaseRemittanceMQListener implements 
                     continue;
                 }
 
+                int count = loanRemittancePaymentRecordDao.countByRecordIdAndLatterThanStatus(LoanRemittancePaymentRecordStatus.FAILED, distributionParams.getId());
+                if (count >= 1){
+                    continue;
+                }
+
                 // 查询支付分配列表
                 List<LoanRemittanceDistributionEntity> loanRemittanceDistributions = loanRemittanceDistributionDao.findRemittanceDistribution(distributionRemittanceParams.getGroupName());
 

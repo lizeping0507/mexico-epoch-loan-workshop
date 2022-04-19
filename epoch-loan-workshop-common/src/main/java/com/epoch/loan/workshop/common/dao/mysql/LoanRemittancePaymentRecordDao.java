@@ -112,4 +112,13 @@ public interface LoanRemittancePaymentRecordDao {
      * @return
      */
     LoanRemittancePaymentRecordEntity findById(@Param("id") String id);
+
+    /**
+     * 查询小于指定状态 且放款记录id为指定Id的 放款详情条数
+     *
+     * @param maxStatus
+     * @param recordId
+     * @return
+     */
+    int countByRecordIdAndLatterThanStatus(int maxStatus, String recordId);
 }

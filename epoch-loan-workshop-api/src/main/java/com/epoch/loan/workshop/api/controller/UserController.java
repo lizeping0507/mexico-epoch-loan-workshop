@@ -5,8 +5,6 @@ import com.epoch.loan.workshop.common.config.URL;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
 import com.epoch.loan.workshop.common.params.params.request.*;
 import com.epoch.loan.workshop.common.params.params.result.*;
-import com.epoch.loan.workshop.common.params.result.*;
-import com.epoch.loan.workshop.common.util.DateUtil;
 import com.epoch.loan.workshop.common.util.LogUtil;
 import com.epoch.loan.workshop.common.util.ThrowableUtils;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -187,6 +185,8 @@ public class UserController extends BaseController {
         Result<LoginResult> result = new Result<>();
 
         try {
+            // 参数校验
+
             // 密码登录
             return userService.login(loginParams);
         } catch (Exception e) {
