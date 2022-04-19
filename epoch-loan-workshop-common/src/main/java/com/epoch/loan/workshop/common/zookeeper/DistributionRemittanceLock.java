@@ -5,17 +5,17 @@ import lombok.Data;
 /**
  * @author : Duke
  * @packageName : com.epoch.loan.workshop.common.zookeeper
- * @className : Lock
+ * @className : DistributionRemittanceLock
  * @createTime : 2022/4/18 23:32
  * @description : 锁
  */
 @Data
-public abstract class Lock<String> extends AbstractZookeeperLock<String> {
+public abstract class DistributionRemittanceLock<String> extends AbstractZookeeperLock<String> {
 
     /**
      * 锁路径
      */
-    private static final java.lang.String LOCK_PATH = "_lock_";
+    private static final java.lang.String LOCK_PATH = "_distribution_remittance_lock_";
 
     /**
      * 锁id
@@ -33,7 +33,7 @@ public abstract class Lock<String> extends AbstractZookeeperLock<String> {
     }
 
 
-    public Lock(String lockId) {
+    public DistributionRemittanceLock(String lockId) {
         this.lockId = lockId;
     }
 

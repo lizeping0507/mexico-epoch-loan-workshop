@@ -11,7 +11,7 @@ import com.epoch.loan.workshop.common.mq.remittance.params.DistributionRemittanc
 import com.epoch.loan.workshop.common.mq.remittance.params.RemittanceParams;
 import com.epoch.loan.workshop.common.util.LogUtil;
 import com.epoch.loan.workshop.common.util.ObjectIdUtil;
-import com.epoch.loan.workshop.common.zookeeper.Lock;
+import com.epoch.loan.workshop.common.zookeeper.DistributionRemittanceLock;
 import lombok.Data;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
@@ -124,7 +124,7 @@ public class DistributionRemittance extends BaseRemittanceMQListener implements 
                     String paymentLogId = ObjectIdUtil.getObjectId();
 
                     // 使用分布式锁，防止同时创建多条放款订单
-                    String status = zookeeperClient.lock(new Lock<String>(remittanceOrderRecordId) {
+                    String status = zookeeperClient.lock(new DistributionRemittanceLock<String>(remittanceOrderRecordId) {
                         @Override
                         public String execute() {
                             try {
