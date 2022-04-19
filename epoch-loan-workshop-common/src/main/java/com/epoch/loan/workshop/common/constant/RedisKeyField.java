@@ -33,4 +33,9 @@ public class RedisKeyField {
      * 订单逾期计算锁
      */
     public final static String ORDER_BILL_DUE_LOCK = "orderBillDueLock" + SPLIT;
+
+    /**
+     * advance License记录
+     */
+    public final static String ADVANCE_LICENSE = "advanceLicenseCacheKey";
 }

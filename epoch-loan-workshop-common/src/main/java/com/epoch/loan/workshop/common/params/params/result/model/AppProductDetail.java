@@ -30,7 +30,7 @@ public class AppProductDetail implements Serializable {
     /**
      * 是否需要sdk抓取并上报数据
      */
-    private boolean needCatchData;
+    private Boolean needCatchData;
 
     /**
      * app标识

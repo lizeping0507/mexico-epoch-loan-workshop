@@ -1,7 +1,9 @@
 package com.epoch.loan.workshop.control.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.epoch.loan.workshop.common.constant.OcrField;
 import com.epoch.loan.workshop.common.constant.PlatformUrl;
+import com.epoch.loan.workshop.common.constant.RedisKeyField;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
 import com.epoch.loan.workshop.common.entity.mysql.LoanOcrProviderConfig;
 import com.epoch.loan.workshop.common.params.params.BaseParams;
@@ -15,9 +17,14 @@ import com.epoch.loan.workshop.common.service.OcrService;
 import com.epoch.loan.workshop.common.util.HttpUtils;
 import com.epoch.loan.workshop.common.util.LogUtil;
 import com.epoch.loan.workshop.common.util.PlatformUtil;
+import com.google.common.collect.Maps;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.apache.http.protocol.HTTP;
+import org.springframework.data.redis.core.HashOperations;
 
 import java.util.HashMap;
 import java.util.List;
@@ -78,21 +85,33 @@ public class OcrServiceImpl extends BaseService implements OcrService {
         // 结果集
         Result<LicenseResult> result = new Result<>();
 
-        // 拼接请求路径
-        String url = platformConfig.getPlatformDomain() + PlatformUrl.PLATFORM_OCR_ADVANCE_LICENSE;
+        App app = appService.findOneByName(params.getAppName());
+        if (org.springframework.util.StringUtils.isEmpty(app)) {
+            response.setCode(ResponseEnum.CUSTOM_ERROR.value());
+            response.setMsg(ResponseEnum.CUSTOM_ERROR.getReasonPhrase());
+            log.debug("获取advance license失败,找不到对应的 app信息");
+        }
+        String afAppId = appTagService.getAfAppId();
+        if (org.apache.commons.lang3.StringUtils.isBlank(appFlag)) {
+            response.setCode(ResponseEnum.CUSTOM_ERROR.value());
+            response.setMsg(ResponseEnum.CUSTOM_ERROR.getReasonPhrase());
+            log.debug("获取advance license失败,找不到对应的 app信息的包名");
+        }
+        // 先查询 redis中 license是否过期
+        String licenseExpireTimeCache = getLicenseExpireTimeCache();
 
-        // 封装请求参数
-        JSONObject requestParam = new JSONObject();
-        requestParam.put("appFlag", params.getAppName());
-        requestParam.put("versionNumber", params.getAppVersion());
-        requestParam.put("mobileType", params.getMobileType());
+        // license过期或者为空时,请求advance
+        if (StringUtils.isBlank(licenseExpireTimeCache)) {
+            headers.put(OcrField.ADVANCE_ACCESS_KEY_KEY, accessKey);
+            headers.put(HTTP.CONTENT_TYPE, HttpUtils.CONTENT_TYPE_JSON);
+            param.put(OcrField.ADVANCE_APP_ID_KEY, afAppId);
+            param.put(OcrField.ADVANCE_LICENSE_EFFECTIVE_SECONDS, OcrField.ADVANCE_LICENSE_SECONDS);
 
-        // 封装请求头
-        Map<String, String> headers = new HashMap<>();
-        headers.put("token", params.getToken());
 
-        // 请求
-        String responseStr = HttpUtils.POST_WITH_HEADER(url, requestParam.toJSONString(), headers);
+
+        }
+
+
 
         // 解析响应结果
         JSONObject responseJson = JSONObject.parseObject(responseStr);
@@ -205,4 +224,53 @@ public class OcrServiceImpl extends BaseService implements OcrService {
         return res;
     }
 
+    /**
+     * 获取advance license
+     * @return
+     */
+    public String getLicenseExpireTimeCache(){
+        String license = null;
+        Boolean hasKey = redisUtil.hasKey(RedisKeyField.ADVANCE_LICENSE);
+
+        if(hasKey){
+            Map< Object, Object> values = redisUtil.hmget(RedisKeyField.ADVANCE_LICENSE);
+            if(MapUtils.isNotEmpty(values)){
+                Object object = values.get("expireTime");
+                if(object != null){
+                    long expireTime = Long.parseLong(String.valueOf(object));
+                    if(expireTime > System.currentTimeMillis()){
+                        Object object2 = values.get("license");
+                        if(object2 != null){
+                            license = String.valueOf(object2);
+                        }
+                    }else{
+                        redisUtil.del(RedisKeyField.ADVANCE_LICENSE);
+                    }
+                }
+            }
+        }
+        return license;
+    }
+
+    /**
+     * 存储advance license
+     * @return
+     */
+    public void setLicenseExpireTimeStore(Long expireTime, String license) {
+        try {
+            if (expireTime != null && StringUtils.isNotBlank(license)) {
+                Boolean hasKey = redisUtil.hasKey(RedisKeyField.ADVANCE_LICENSE);
+                if (hasKey) {
+                    redisUtil.del(RedisKeyField.ADVANCE_LICENSE);
+                }
+
+                HashMap<Object, Object> map = Maps.newHashMap();
+                map.put("license", license);
+                map.put("expireTime", expireTime);
+                redisUtil.hmset(RedisKeyField.ADVANCE_LICENSE, map);
+            }
+        } catch (Exception e) {
+           e.printStackTrace();
+        }
+    }
 }

@@ -3,6 +3,7 @@ package com.epoch.loan.workshop.control.service;
 import com.epoch.loan.workshop.common.config.PlatformConfig;
 import com.epoch.loan.workshop.common.dao.mysql.LoanDynamicRequestDao;
 import com.epoch.loan.workshop.common.dao.mysql.LoanOcrProviderConfigDao;
+import com.epoch.loan.workshop.common.util.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -27,8 +28,14 @@ public class BaseService {
     PlatformConfig platformConfig;
 
     /**
-     * 三方相关配置
+     * 三方OCR相关配置
      */
     @Autowired
     public LoanOcrProviderConfigDao loanOcrProviderConfigDao;
+
+    /**
+     * Redis工具类
+     */
+    @Autowired
+    public RedisUtil redisUtil;
 }

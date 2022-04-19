@@ -3,6 +3,7 @@ package com.epoch.loan.workshop.common.params.params;
 import com.epoch.loan.workshop.common.params.User;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 
@@ -52,4 +53,18 @@ public class BaseParams implements Serializable {
      * 用户信息
      */
     public User user;
+
+    /**
+     * 验证 app名称 是否合法
+     *
+     * @return
+     */
+    public boolean isAppNameLegal() {
+        if (StringUtils.isEmpty(this.appName)) {
+            return false;
+        }
+        return true;
+    }
+
+
 }
