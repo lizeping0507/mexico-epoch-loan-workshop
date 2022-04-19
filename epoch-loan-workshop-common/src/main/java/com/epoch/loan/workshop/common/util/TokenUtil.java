@@ -3,6 +3,7 @@ package com.epoch.loan.workshop.common.util;
 import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.constant.RedisKeyField;
 import com.epoch.loan.workshop.common.params.User;
+import com.epoch.loan.workshop.common.redis.RedisClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
@@ -22,7 +23,7 @@ public class TokenUtil {
      * Redis工具类
      */
     @Autowired
-    private RedisUtil redisUtil;
+    private RedisClient redisClient;
 
     /**
      * 用户是否在线
@@ -37,7 +38,7 @@ public class TokenUtil {
         }
 
         // 通过redis获取用户信息
-        Object userIdObject = redisUtil.get(RedisKeyField.TOKEN + token);
+        Object userIdObject = redisClient.get(RedisKeyField.TOKEN + token);
         if (ObjectUtils.isEmpty(userIdObject)) {
             return false;
         }
@@ -46,7 +47,7 @@ public class TokenUtil {
         String userId = String.valueOf(userIdObject);
 
         // 判断用户Token是否为最新
-        Object userTokenObject = redisUtil.get(RedisKeyField.USER_TOKEN + userId);
+        Object userTokenObject = redisClient.get(RedisKeyField.USER_TOKEN + userId);
         if (ObjectUtils.isEmpty(userTokenObject)) {
             return false;
         }
@@ -81,8 +82,8 @@ public class TokenUtil {
         String token = ObjectIdUtil.getObjectId();
 
         // 增加Token
-        redisUtil.set(RedisKeyField.TOKEN + token, userId);
-        redisUtil.set(RedisKeyField.USER_TOKEN + userId, token);
+        redisClient.set(RedisKeyField.TOKEN + token, userId);
+        redisClient.set(RedisKeyField.USER_TOKEN + userId, token);
         return token;
     }
 
@@ -99,7 +100,7 @@ public class TokenUtil {
         }
 
         // 通过redis获取用户信息
-        Object userIdObject = redisUtil.get(RedisKeyField.TOKEN + token);
+        Object userIdObject = redisClient.get(RedisKeyField.TOKEN + token);
         if (ObjectUtils.isEmpty(userIdObject)) {
             return null;
         }
@@ -108,7 +109,7 @@ public class TokenUtil {
         String userId = String.valueOf(userIdObject);
 
         // 用户缓存
-        Object userCacheObject = redisUtil.get(RedisKeyField.USER_CACHE + userId);
+        Object userCacheObject = redisClient.get(RedisKeyField.USER_CACHE + userId);
         if (ObjectUtils.isEmpty(userCacheObject)) {
             return null;
         }

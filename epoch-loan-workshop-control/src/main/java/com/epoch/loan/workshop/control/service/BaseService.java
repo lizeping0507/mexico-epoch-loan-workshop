@@ -3,7 +3,7 @@ package com.epoch.loan.workshop.control.service;
 import com.epoch.loan.workshop.common.config.PlatformConfig;
 import com.epoch.loan.workshop.common.dao.mysql.LoanDynamicRequestDao;
 import com.epoch.loan.workshop.common.dao.mysql.LoanOcrProviderConfigDao;
-import com.epoch.loan.workshop.common.util.RedisUtil;
+import com.epoch.loan.workshop.common.redis.RedisClient;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -37,5 +37,5 @@ public class BaseService {
      * Redis工具类
      */
     @Autowired
-    public RedisUtil redisUtil;
+    public RedisClient redisClient;
 }

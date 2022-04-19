@@ -17,7 +17,6 @@ import org.apache.rocketmq.common.message.MessageExt;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -134,7 +133,7 @@ public class OrderDue extends BaseOrderMQListener implements MessageListenerConc
                 addrepaymentPlan(loanOrderEntity, loanOrderBillEntity, punishmentAmount);
 
                 // 删除计算标识
-                redisUtil.del(RedisKeyField.ORDER_BILL_DUE_LOCK + orderId);
+                redisClient.del(RedisKeyField.ORDER_BILL_DUE_LOCK + orderId);
 
                 continue;
             } catch (Exception e) {

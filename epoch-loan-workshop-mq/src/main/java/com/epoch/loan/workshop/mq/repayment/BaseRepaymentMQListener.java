@@ -10,7 +10,7 @@ import com.epoch.loan.workshop.common.mq.order.params.OrderParams;
 import com.epoch.loan.workshop.common.mq.repayment.RepaymentMQManager;
 import com.epoch.loan.workshop.common.mq.repayment.params.DistributionRepaymentParams;
 import com.epoch.loan.workshop.common.mq.repayment.params.RepaymentParams;
-import com.epoch.loan.workshop.common.util.RedisUtil;
+import com.epoch.loan.workshop.common.redis.RedisClient;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently;
 import org.apache.rocketmq.common.message.Message;
@@ -68,7 +68,7 @@ public abstract class BaseRepaymentMQListener {
      * redis工具类
      */
     @Autowired
-    public RedisUtil redisUtil;
+    public RedisClient redisClient;
 
     /**
      * 获取子类消息监听

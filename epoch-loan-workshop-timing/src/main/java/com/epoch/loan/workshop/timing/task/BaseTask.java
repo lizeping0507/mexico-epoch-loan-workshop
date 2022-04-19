@@ -4,7 +4,7 @@ import com.epoch.loan.workshop.common.dao.mysql.*;
 import com.epoch.loan.workshop.common.mq.order.OrderMQManager;
 import com.epoch.loan.workshop.common.mq.remittance.RemittanceMQManager;
 import com.epoch.loan.workshop.common.mq.repayment.RepaymentMQManager;
-import com.epoch.loan.workshop.common.util.RedisUtil;
+import com.epoch.loan.workshop.common.redis.RedisClient;
 import org.quartz.JobExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -77,7 +77,7 @@ public class BaseTask {
      * Redis工具类
      */
     @Autowired
-    public RedisUtil redisUtil;
+    public RedisClient redisClient;
 
     /**
      * 还款队列生产

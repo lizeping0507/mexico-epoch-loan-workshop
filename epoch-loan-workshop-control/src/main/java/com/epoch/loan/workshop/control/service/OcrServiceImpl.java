@@ -1,6 +1,5 @@
 package com.epoch.loan.workshop.control.service;
 
-import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.constant.OcrField;
 import com.epoch.loan.workshop.common.constant.RedisKeyField;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
@@ -19,7 +18,6 @@ import com.epoch.loan.workshop.common.service.OcrService;
 import com.epoch.loan.workshop.common.util.HttpUtils;
 import com.epoch.loan.workshop.common.util.JsonUtils;
 import com.epoch.loan.workshop.common.util.LogUtil;
-import com.epoch.loan.workshop.common.util.PlatformUtil;
 import com.google.common.collect.Maps;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
@@ -27,7 +25,6 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.http.protocol.HTTP;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.math.BigDecimal;
@@ -280,10 +277,10 @@ public class OcrServiceImpl extends BaseService implements OcrService {
      */
     public String getLicenseExpireTimeCache(){
         String license = null;
-        Boolean hasKey = redisUtil.hasKey(RedisKeyField.ADVANCE_LICENSE);
+        Boolean hasKey = redisClient.hasKey(RedisKeyField.ADVANCE_LICENSE);
 
         if(hasKey){
-            Map< Object, Object> values = redisUtil.hmget(RedisKeyField.ADVANCE_LICENSE);
+            Map< Object, Object> values = redisClient.hmget(RedisKeyField.ADVANCE_LICENSE);
             if(MapUtils.isNotEmpty(values)){
                 Object object = values.get("expireTime");
                 if(object != null){
@@ -294,7 +291,7 @@ public class OcrServiceImpl extends BaseService implements OcrService {
                             license = String.valueOf(object2);
                         }
                     }else{
-                        redisUtil.del(RedisKeyField.ADVANCE_LICENSE);
+                        redisClient.del(RedisKeyField.ADVANCE_LICENSE);
                     }
                 }
             }
@@ -309,15 +306,15 @@ public class OcrServiceImpl extends BaseService implements OcrService {
     public void setLicenseExpireTimeStore(Long expireTime, String license) {
         try {
             if (expireTime != null && StringUtils.isNotBlank(license)) {
-                Boolean hasKey = redisUtil.hasKey(RedisKeyField.ADVANCE_LICENSE);
+                Boolean hasKey = redisClient.hasKey(RedisKeyField.ADVANCE_LICENSE);
                 if (hasKey) {
-                    redisUtil.del(RedisKeyField.ADVANCE_LICENSE);
+                    redisClient.del(RedisKeyField.ADVANCE_LICENSE);
                 }
 
                 HashMap<Object, Object> map = Maps.newHashMap();
                 map.put("license", license);
                 map.put("expireTime", expireTime);
-                redisUtil.hmset(RedisKeyField.ADVANCE_LICENSE, map);
+                redisClient.hmset(RedisKeyField.ADVANCE_LICENSE, map);
             }
         } catch (Exception e) {
            e.printStackTrace();

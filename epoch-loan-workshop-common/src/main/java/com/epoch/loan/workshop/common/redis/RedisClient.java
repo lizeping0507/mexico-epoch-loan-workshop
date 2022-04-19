@@ -1,4 +1,4 @@
-package com.epoch.loan.workshop.common.util;
+package com.epoch.loan.workshop.common.redis;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -19,11 +19,11 @@ import java.util.concurrent.TimeUnit;
  * @since 2020/12/9 14:24
  */
 @Component
-public class RedisUtil {
+public class RedisClient {
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
 
-    public RedisUtil(RedisTemplate<String, Object> redisTemplate) {
+    public RedisClient(RedisTemplate<String, Object> redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
 

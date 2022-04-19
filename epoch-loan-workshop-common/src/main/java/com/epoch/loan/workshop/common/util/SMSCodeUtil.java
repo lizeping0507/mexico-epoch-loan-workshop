@@ -1,6 +1,7 @@
 package com.epoch.loan.workshop.common.util;
 
 import com.epoch.loan.workshop.common.constant.RedisKeyField;
+import com.epoch.loan.workshop.common.redis.RedisClient;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -20,7 +21,7 @@ public class SMSCodeUtil {
      * Redis工具类
      */
     @Autowired
-    private RedisUtil redisUtil;
+    private RedisClient redisClient;
 
     /**
      * 更新注册用验证码
@@ -31,7 +32,7 @@ public class SMSCodeUtil {
      * @param time        有效时间
      */
     public void updateRegisterCode(String phoneNumber, String appName, String smsCode, long time) {
-        redisUtil.set(RedisKeyField.REGISTER_SMS_CODE + appName + RedisKeyField.SPLIT + phoneNumber, smsCode,time);
+        redisClient.set(RedisKeyField.REGISTER_SMS_CODE + appName + RedisKeyField.SPLIT + phoneNumber, smsCode,time);
     }
 
     /**
@@ -42,7 +43,7 @@ public class SMSCodeUtil {
      * @return 验证码
      */
     public String getRegisterCode(String phoneNumber, String appName) {
-        Object smsCodeObject = redisUtil.get(RedisKeyField.REGISTER_SMS_CODE + appName + RedisKeyField.SPLIT + phoneNumber);
+        Object smsCodeObject = redisClient.get(RedisKeyField.REGISTER_SMS_CODE + appName + RedisKeyField.SPLIT + phoneNumber);
 
         if (ObjectUtils.isEmpty(smsCodeObject)) {
             return null;

@@ -1,6 +1,5 @@
 package com.epoch.loan.workshop.mq.repayment;
 
-import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.constant.OrderBillStatus;
 import com.epoch.loan.workshop.common.constant.RedisKeyField;
 import com.epoch.loan.workshop.common.entity.mysql.LoanOrderBillEntity;
@@ -65,7 +64,7 @@ public class DistributionRepayment extends BaseRepaymentMQListener implements Me
                 String orderBillId = distributionRepaymentParams.getOrderBillId();
 
                 // 判断是否正在计算逾期
-                Object orderBillDueLock = redisUtil.get(RedisKeyField.ORDER_BILL_DUE_LOCK + orderId);
+                Object orderBillDueLock = redisClient.get(RedisKeyField.ORDER_BILL_DUE_LOCK + orderId);
                 if (ObjectUtils.isNotEmpty(orderBillDueLock)) {
                     // 等待重试
                     retryDistributionRepayment(distributionRepaymentParams, subExpression());

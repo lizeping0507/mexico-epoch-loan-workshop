@@ -44,7 +44,7 @@ public class OrderDueTask extends BaseTask implements Job {
                 String orderBillId = loanOrderBillEntity.getId();
 
                 // 增加逾期计算标识
-                redisUtil.set(RedisKeyField.ORDER_BILL_DUE_LOCK + orderId, orderBillId);
+                redisClient.set(RedisKeyField.ORDER_BILL_DUE_LOCK + orderId, orderBillId);
 
                 OrderParams params = new OrderParams();
                 params.setGroupName("SYSTEM");
@@ -68,7 +68,7 @@ public class OrderDueTask extends BaseTask implements Job {
                 String orderBillId = loanOrderBillEntity.getId();
 
                 // 增加逾期计算标识
-                redisUtil.set(RedisKeyField.ORDER_BILL_DUE_LOCK + orderId, orderBillId);
+                redisClient.set(RedisKeyField.ORDER_BILL_DUE_LOCK + orderId, orderBillId);
 
                 OrderParams params = new OrderParams();
                 params.setGroupName("SYSTEM");

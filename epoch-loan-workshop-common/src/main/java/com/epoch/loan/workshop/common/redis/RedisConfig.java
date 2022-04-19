@@ -1,4 +1,4 @@
-package com.epoch.loan.workshop.common.config;
+package com.epoch.loan.workshop.common.redis;
 
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;

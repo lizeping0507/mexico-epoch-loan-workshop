@@ -12,7 +12,7 @@ import com.epoch.loan.workshop.common.mq.remittance.params.DistributionRemittanc
 import com.epoch.loan.workshop.common.mq.repayment.RepaymentMQManager;
 import com.epoch.loan.workshop.common.mq.repayment.params.DistributionRepaymentParams;
 import com.epoch.loan.workshop.common.util.DateUtil;
-import com.epoch.loan.workshop.common.util.RedisUtil;
+import com.epoch.loan.workshop.common.redis.RedisClient;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -41,7 +41,7 @@ public abstract class BaseOrderMQListener {
      * Redis工具累
      */
     @Autowired
-    public RedisUtil redisUtil;
+    public RedisClient redisClient;
 
     /**
      * 风控配置
