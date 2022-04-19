@@ -56,6 +56,45 @@ public class RegisterParams extends BaseParams {
     private String imei;
 
     /**
+     * 验证AF 推广id是否合法
+     *
+     * @return
+     */
+    public boolean isGaIdLegal() {
+        if (StringUtils.isEmpty(this.gaId)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * 验证安卓id是否合法
+     *
+     * @return
+     */
+    public boolean isAndroidIdLegal() {
+        if (StringUtils.isEmpty(this.androidId)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * 验证手机系统是否合法
+     *
+     * @return
+     */
+    public boolean isPlatformLegal() {
+        if (StringUtils.isEmpty(this.platform)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * 验证验证码是否合法
      *
      * @return

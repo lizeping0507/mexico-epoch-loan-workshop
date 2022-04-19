@@ -11,8 +11,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Date;
-
 /**
  * @author : Shangkunfeng
  * @packageName : com.epoch.loan.workshop.api.controller;
@@ -82,6 +80,27 @@ public class UserController extends BaseController {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
                 result.setMessage(ResultEnum.PARAM_ERROR.message() + ":smsCode");
+                return result;
+            }
+
+            if (registerParams.isAndroidIdLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":androidId");
+                return result;
+            }
+
+            if (registerParams.isPlatformLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":platform");
+                return result;
+            }
+
+            if (registerParams.isGaIdLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":gaId");
                 return result;
             }
 
