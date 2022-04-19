@@ -11,9 +11,11 @@ import com.epoch.loan.workshop.common.mq.remittance.params.DistributionRemittanc
 import com.epoch.loan.workshop.common.mq.remittance.params.RemittanceParams;
 import com.epoch.loan.workshop.common.util.LogUtil;
 import com.epoch.loan.workshop.common.util.ObjectIdUtil;
+import com.epoch.loan.workshop.common.zookeeper.Lock;
 import lombok.Data;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyContext;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyStatus;
 import org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently;
@@ -64,19 +66,22 @@ public class DistributionRemittance extends BaseRemittanceMQListener implements 
                     continue;
                 }
 
-                int count = loanRemittancePaymentRecordDao.countByRecordIdAndLatterThanStatus(LoanRemittancePaymentRecordStatus.FAILED, distributionRemittanceParams.getId());
-                if (count >= 1){
-                    continue;
-                }
+                // 订单支付记录id
+                String remittanceOrderRecordId = distributionRemittanceParams.getId();
+
+                // 支付组名
+                String groupName = distributionRemittanceParams.getGroupName();
+
+                // 过滤条件
+                List<String> paymentFilter = distributionRemittanceParams.getPaymentFilter();
 
                 // 查询支付分配列表
-                List<LoanRemittanceDistributionEntity> loanRemittanceDistributions = loanRemittanceDistributionDao.findRemittanceDistribution(distributionRemittanceParams.getGroupName());
+                List<LoanRemittanceDistributionEntity> loanRemittanceDistributions = loanRemittanceDistributionDao.findRemittanceDistribution(groupName);
 
                 // 去除已过滤列表
-                List<String> paymentFilter = distributionRemittanceParams.getPaymentFilter();
                 if (CollectionUtils.isNotEmpty(paymentFilter)) {
                     for (int i = loanRemittanceDistributions.size() - 1; i >= 0; i--) {
-                        if (paymentFilter.contains(loanRemittanceDistributions.get(i).getPaymentId())) {
+                        if (paymentFilter.contains(loanRemittanceDistributions.get(i).getPaymentId()) || loanRemittanceDistributions.get(i).getProportion() == 0) {
                             loanRemittanceDistributions.remove(i);
                         }
                     }
@@ -87,12 +92,12 @@ public class DistributionRemittance extends BaseRemittanceMQListener implements 
                 // 备选渠道判空
                 if (CollectionUtils.isEmpty(loanRemittanceDistributions)) {
                     // 修改状态
-                    updateRemittanceOrderRecordStatus(distributionRemittanceParams.getId(), LoanRemittanceOrderRecordStatus.FAILED);
+                    updateRemittanceOrderRecordStatus(remittanceOrderRecordId, LoanRemittanceOrderRecordStatus.FAILED);
                     continue;
                 }
 
                 // 查询挑选策略
-                LoanProductRemittanceConfigEntity config = loanProductRemittanceConfigDao.findByGroupName(distributionRemittanceParams.getGroupName());
+                LoanProductRemittanceConfigEntity config = loanProductRemittanceConfigDao.findByGroupName(groupName);
 
                 // 根据策略挑选渠道
                 LoanRemittanceDistributionEntity selectedRemittanceDistribution = null;
@@ -101,7 +106,7 @@ public class DistributionRemittance extends BaseRemittanceMQListener implements 
                     selectedRemittanceDistribution = chooseByWeight(loanRemittanceDistributions);
                     if (ObjectUtils.isEmpty(selectedRemittanceDistribution)) {
                         // 修改状态
-                        updateRemittanceOrderRecordStatus(distributionRemittanceParams.getId(), LoanRemittanceOrderRecordStatus.FAILED);
+                        updateRemittanceOrderRecordStatus(remittanceOrderRecordId, LoanRemittanceOrderRecordStatus.FAILED);
                         continue;
                     }
 
@@ -115,30 +120,61 @@ public class DistributionRemittance extends BaseRemittanceMQListener implements 
                         continue;
                     }
 
-                    // 创建订单详情记录
-                    LoanRemittancePaymentRecordEntity loanRemittancePaymentRecordEntity = new LoanRemittancePaymentRecordEntity();
+                    // 支付记录id
                     String paymentLogId = ObjectIdUtil.getObjectId();
-                    loanRemittancePaymentRecordEntity.setId(paymentLogId);
-                    loanRemittancePaymentRecordEntity.setStatus(LoanRemittancePaymentRecordStatus.CREATE);
-                    loanRemittancePaymentRecordEntity.setPaymentId(paymentId);
-                    loanRemittancePaymentRecordEntity.setRemittanceOrderRecordId(distributionRemittanceParams.getId());
-                    loanRemittancePaymentRecordEntity.setCreateTime(new Date());
-                    loanRemittancePaymentRecordEntity.setUpdateTime(new Date());
-                    loanRemittancePaymentRecordDao.insert(loanRemittancePaymentRecordEntity);
 
-                    // 更新渠道
-                    updateRemittanceOrderRecordPayment(distributionRemittanceParams.getId(), paymentId);
+                    // 使用分布式锁，防止同时创建多条放款订单
+                    String status = zookeeperClient.lock(new Lock<String>(remittanceOrderRecordId) {
+                        @Override
+                        public String execute() {
+                            try {
+                                int count = loanRemittancePaymentRecordDao.countByRecordIdAndLatterThanStatus(LoanRemittancePaymentRecordStatus.FAILED, remittanceOrderRecordId);
+                                if (count >= 1) {
+                                    return "EXIST";
+                                }
 
-                    // 进行中订单详情Id
-                    updateProcessRemittancePaymentRecordId(distributionRemittanceParams.getId(), paymentLogId);
+                                // 创建订单详情记录
+                                LoanRemittancePaymentRecordEntity loanRemittancePaymentRecordEntity = new LoanRemittancePaymentRecordEntity();
+                                loanRemittancePaymentRecordEntity.setId(paymentLogId);
+                                loanRemittancePaymentRecordEntity.setStatus(LoanRemittancePaymentRecordStatus.CREATE);
+                                loanRemittancePaymentRecordEntity.setPaymentId(paymentId);
+                                loanRemittancePaymentRecordEntity.setRemittanceOrderRecordId(remittanceOrderRecordId);
+                                loanRemittancePaymentRecordEntity.setCreateTime(new Date());
+                                loanRemittancePaymentRecordEntity.setUpdateTime(new Date());
+                                loanRemittancePaymentRecordDao.insert(loanRemittancePaymentRecordEntity);
+
+                                // 更新渠道
+                                updateRemittanceOrderRecordPayment(remittanceOrderRecordId, paymentId);
+
+                                // 进行中订单详情Id
+                                updateProcessRemittancePaymentRecordId(remittanceOrderRecordId, paymentLogId);
+
+                                // 返回详细记录ID
+                                return "SUCCESS";
+                            } catch (Exception e) {
+                                LogUtil.sysError("[DistributionRemittance]", e);
+                            }
+
+                            return null;
+                        }
+                    });
+
+                    // 判断同步锁新增支付记录状态
+                    if (StringUtils.isEmpty(status)) {
+                        // 未获取到锁或者异常
+                        // 重回分配队列
+                        retryDistribution(distributionRemittanceParams, subExpression());
+                        continue;
+                    } else if (status.equals("EXIST")) {
+                        continue;
+                    }
 
                     // 进入放款队列
                     RemittanceParams params = new RemittanceParams();
                     params.setId(paymentLogId);
-                    params.setGroupName(distributionRemittanceParams.getGroupName());
-                    params.setPaymentFilter(distributionRemittanceParams.getPaymentFilter());
+                    params.setGroupName(groupName);
+                    params.setPaymentFilter(paymentFilter);
                     sendToRemittance(params, loanPayment.getName());
-
                 } else {
                     // 修改状态
                     updateRemittanceOrderRecordStatus(distributionRemittanceParams.getId(), LoanRemittanceOrderRecordStatus.EXCEPTION);

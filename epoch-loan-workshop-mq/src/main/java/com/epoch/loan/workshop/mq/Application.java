@@ -4,6 +4,7 @@ import com.epoch.loan.workshop.common.config.StartConfig;
 import com.epoch.loan.workshop.common.mq.order.OrderMQManager;
 import com.epoch.loan.workshop.common.mq.remittance.RemittanceMQManager;
 import com.epoch.loan.workshop.common.mq.repayment.RepaymentMQManager;
+import com.epoch.loan.workshop.common.zookeeper.ZookeeperClient;
 import com.epoch.loan.workshop.mq.log.AccessLogStorage;
 import com.epoch.loan.workshop.mq.order.*;
 import com.epoch.loan.workshop.mq.order.screen.*;
@@ -228,6 +229,12 @@ public class Application {
     public DistributionRepayment distributionRepayment;
 
     /**
+     * Zookeeper工具类
+     */
+    @Autowired
+    public ZookeeperClient zookeeperClient;
+
+    /**
      * 启动类
      *
      * @param args
@@ -247,6 +254,7 @@ public class Application {
      */
     @PostConstruct
     public void startJob() throws Exception {
+        zookeeperClient.init();
         orderMQManager.init();
         repaymentMQManager.init();
         remittanceMQManagerProduct.init();

@@ -5,6 +5,7 @@ import com.epoch.loan.workshop.common.dao.mysql.*;
 import com.epoch.loan.workshop.common.mq.remittance.RemittanceMQManager;
 import com.epoch.loan.workshop.common.mq.remittance.params.DistributionRemittanceParams;
 import com.epoch.loan.workshop.common.mq.remittance.params.RemittanceParams;
+import com.epoch.loan.workshop.common.zookeeper.ZookeeperClient;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently;
 import org.apache.rocketmq.common.message.Message;
@@ -60,6 +61,12 @@ public abstract class BaseRemittanceMQListener {
      */
     @Autowired
     public RemittanceMQManager remittanceMQManager;
+
+    /**
+     * Zookeeper工具类
+     */
+    @Autowired
+    public ZookeeperClient zookeeperClient;
 
     /**
      * 获取子类消息监听
