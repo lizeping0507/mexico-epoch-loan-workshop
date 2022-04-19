@@ -12,7 +12,7 @@ import com.epoch.loan.workshop.common.mq.remittance.RemittanceMQManager;
 import com.epoch.loan.workshop.common.mq.remittance.params.RemittanceParams;
 import com.epoch.loan.workshop.common.mq.repayment.RepaymentMQManager;
 import com.epoch.loan.workshop.common.util.SMSCodeUtil;
-import com.epoch.loan.workshop.common.authentication.Token;
+import com.epoch.loan.workshop.common.authentication.TokenManager;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +34,7 @@ public class BaseService {
      * token工具
      */
     @Autowired
-    public Token token;
+    public TokenManager tokenManager;
     /**
      * 新用户表
      */

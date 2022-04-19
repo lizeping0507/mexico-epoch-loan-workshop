@@ -114,7 +114,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         loanUserInfoDao.insert(userInfo);
 
         // 生成token
-        String token = this.token.updateUserToken(user.getId());
+        String token = this.tokenManager.updateUserToken(user.getId());
 
         // 封装结果
         RegisterResult registerResult = new RegisterResult();
@@ -310,7 +310,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         }
 
         // 生成并更新token
-        String token = this.token.updateUserToken(user.getId());
+        String token = this.tokenManager.updateUserToken(user.getId());
 
         // TODO 新增或更新afid
 

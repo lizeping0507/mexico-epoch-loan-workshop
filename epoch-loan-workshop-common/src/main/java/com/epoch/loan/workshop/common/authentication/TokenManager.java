@@ -18,7 +18,7 @@ import org.springframework.util.StringUtils;
  * @description : Token工具类
  */
 @Component
-public class Token {
+public class TokenManager {
 
     /**
      * Redis工具类
