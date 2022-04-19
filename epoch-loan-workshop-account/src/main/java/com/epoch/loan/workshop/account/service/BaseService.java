@@ -11,9 +11,8 @@ import com.epoch.loan.workshop.common.entity.mysql.LoanRemittancePaymentRecordEn
 import com.epoch.loan.workshop.common.mq.remittance.RemittanceMQManager;
 import com.epoch.loan.workshop.common.mq.remittance.params.RemittanceParams;
 import com.epoch.loan.workshop.common.mq.repayment.RepaymentMQManager;
-import com.epoch.loan.workshop.common.util.LogUtil;
 import com.epoch.loan.workshop.common.util.SMSCodeUtil;
-import com.epoch.loan.workshop.common.util.TokenUtil;
+import com.epoch.loan.workshop.common.authentication.Token;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +34,7 @@ public class BaseService {
      * token工具
      */
     @Autowired
-    public TokenUtil tokenUtil;
+    public Token token;
     /**
      * 新用户表
      */

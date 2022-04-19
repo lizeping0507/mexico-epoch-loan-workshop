@@ -3,7 +3,6 @@ package com.epoch.loan.workshop.account.service;
 import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.constant.PlatformUrl;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
-import com.epoch.loan.workshop.common.dao.mysql.LoanUserDao;
 import com.epoch.loan.workshop.common.entity.mysql.LoanUserEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanUserInfoEntity;
 import com.epoch.loan.workshop.common.params.params.request.*;
@@ -18,7 +17,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -116,7 +114,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         loanUserInfoDao.insert(userInfo);
 
         // 生成token
-        String token = tokenUtil.updateUserToken(user.getId());
+        String token = this.token.updateUserToken(user.getId());
 
         // 封装结果
         RegisterResult registerResult = new RegisterResult();
@@ -312,7 +310,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         }
 
         // 生成并更新token
-        String token = tokenUtil.updateUserToken(user.getId());
+        String token = this.token.updateUserToken(user.getId());
 
         // TODO 新增或更新afid
 

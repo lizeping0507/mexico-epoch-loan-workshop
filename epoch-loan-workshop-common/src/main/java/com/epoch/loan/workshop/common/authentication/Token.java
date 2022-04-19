@@ -1,9 +1,10 @@
-package com.epoch.loan.workshop.common.util;
+package com.epoch.loan.workshop.common.authentication;
 
 import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.constant.RedisKeyField;
 import com.epoch.loan.workshop.common.params.User;
 import com.epoch.loan.workshop.common.redis.RedisClient;
+import com.epoch.loan.workshop.common.util.ObjectIdUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
@@ -17,7 +18,7 @@ import org.springframework.util.StringUtils;
  * @description : Token工具类
  */
 @Component
-public class TokenUtil {
+public class Token {
 
     /**
      * Redis工具类

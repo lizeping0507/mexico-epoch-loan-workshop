@@ -7,7 +7,7 @@ import com.epoch.loan.workshop.common.params.User;
 import com.epoch.loan.workshop.common.params.params.result.Result;
 import com.epoch.loan.workshop.common.util.LogUtil;
 import com.epoch.loan.workshop.common.util.ThrowableUtils;
-import com.epoch.loan.workshop.common.util.TokenUtil;
+import com.epoch.loan.workshop.common.authentication.Token;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -39,7 +39,7 @@ public class AuthenticationAspect {
      * Token工具类
      */
     @Autowired
-    private TokenUtil tokenUtil;
+    private Token token;
 
 
     /**
@@ -85,14 +85,14 @@ public class AuthenticationAspect {
             }
 
             // 判断用户是否在线
-            if (!tokenUtil.userOnline(token)) {
+            if (!this.token.userOnline(token)) {
                 result.setReturnCode(ResultEnum.NO_LOGIN.code());
                 result.setMessage(ResultEnum.NO_LOGIN.message());
                 return result;
             }
 
             // 获取用户缓存
-            User user = tokenUtil.getUserCache(token);
+            User user = this.token.getUserCache(token);
             request.setAttribute(Field.USER, user);
 
             // 调用下一级
