@@ -2,6 +2,8 @@ package com.epoch.loan.workshop.common.entity.mysql;
 
 import lombok.Data;
 
+import java.util.Date;
+
 /**
  * @author : Duke
  * @packageName : com.epoch.loan.workshop.common.entity.mysql
@@ -151,11 +153,11 @@ public class LoanUserInfoEntity {
     /**
      * 更新时间
      */
-    private String updateTime;
+    private Date updateTime;
 
     /**
      * 创建时间
      */
-    private String createTime;
+    private Date createTime;
 
 }

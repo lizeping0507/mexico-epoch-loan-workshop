@@ -3,13 +3,14 @@ package com.epoch.loan.workshop.account.service;
 import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.constant.PlatformUrl;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
+import com.epoch.loan.workshop.common.dao.mysql.LoanUserDao;
+import com.epoch.loan.workshop.common.entity.mysql.LoanUserEntity;
+import com.epoch.loan.workshop.common.entity.mysql.LoanUserInfoEntity;
 import com.epoch.loan.workshop.common.params.params.request.*;
 import com.epoch.loan.workshop.common.params.params.result.*;
 import com.epoch.loan.workshop.common.service.UserService;
-import com.epoch.loan.workshop.common.util.CheckFieldUtils;
-import com.epoch.loan.workshop.common.util.HttpUtils;
-import com.epoch.loan.workshop.common.util.ObjectIdUtil;
-import com.epoch.loan.workshop.common.util.PlatformUtil;
+import com.epoch.loan.workshop.common.util.*;
+import com.sun.org.apache.regexp.internal.RE;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 
@@ -64,27 +65,65 @@ public class UserServiceImpl extends BaseService implements UserService {
     /**
      * 用户注册
      *
-     * @param registerParams 请求参数封装
+     * @param params 请求参数封装
      * @return Result<RegisterResult>
      * @throws Exception 请求异常
      */
     @Override
-    public Result<RegisterResult> register(RegisterParams registerParams) throws Exception {
+    public Result<RegisterResult> register(RegisterParams params) throws Exception {
         // 结果结果集
         Result<RegisterResult> result = new Result<>();
 
+        // 手机号是否已经注册
+        Integer isExit = loanUserDao.exitByAppNameAndLoginName(params.getAppName(), params.getMobile());
+        if (isExit != 0){
+            result.setReturnCode(ResultEnum.PHONE_EXIT.code());
+            result.setMessage(ResultEnum.PHONE_EXIT.message());
+            return result;
+        }
 
+        // 验证码校验
+        String registerCode = smsCodeUtil.getRegisterCode(params.getMobile(), params.getAppName());
+        if(StringUtils.isEmpty(registerCode) || !registerCode.equals(params.getSmsCode())){
+            result.setReturnCode(ResultEnum.SMSCODE_ERROR.code());
+            result.setMessage(ResultEnum.SMSCODE_ERROR.message());
+            return result;
+        }
 
+        // 生成user记录
+        LoanUserEntity user = new LoanUserEntity();
+        user.setId(ObjectIdUtil.getObjectId());
+        user.setAndroidId(params.getAndroidId());
+        user.setChannelId(params.getChannelCode());
+        user.setGaId(params.getGaId());
+        user.setImei(params.getImei());
+        user.setPlatform(params.getPlatform());
+        user.setLoginName(params.getMobile());
+        user.setPassword(params.getPassword());
+        user.setAppName(params.getAppName());
+        user.setAppVersion(params.getAppVersion());
+        user.setUpdateTime(new Date());
+        user.setCreateTime(new Date());
+        loanUserDao.insert(user);
 
-        String usrId = registerParams.getUser().getId();
+        // 生成userInfo记录
+        LoanUserInfoEntity userInfo = new LoanUserInfoEntity();
+        userInfo.setId(ObjectIdUtil.getObjectId());
+        userInfo.setUserId(user.getId());
+        userInfo.setMobile(params.getMobile());
+        userInfo.setUpdateTime(new Date());
+        userInfo.setCreateTime(new Date());
+        loanUserInfoDao.insert(userInfo);
 
-
-
-
+        // 生成token
+        String token = tokenUtil.updateUserToken(user.getId());
 
         // 封装结果
+        RegisterResult registerResult = new RegisterResult();
+        registerResult.setToken(token);
         result.setReturnCode(ResultEnum.SUCCESS.code());
         result.setMessage(ResultEnum.SUCCESS.message());
+        result.setData(registerResult);
         return result;
     }
 
@@ -255,38 +294,35 @@ public class UserServiceImpl extends BaseService implements UserService {
         // 结果结果集
         Result<LoginResult> result = new Result<>();
 
-        // 拼接请求路径
-        String url = platformConfig.getPlatformDomain() + PlatformUrl.PLATFORM_PWREGISTER;
+        // 查询用户
+        LoanUserEntity user = loanUserDao.findByLoginNameAndAppName(params.getLoginName(),params.getAppName());
 
-        // 封装请求参数
-        JSONObject requestParam = new JSONObject();
-        requestParam.put("loginName", params.getLoginName());
-        requestParam.put("passwd", params.getPassword());
-        requestParam.put("versionNumber", params.getAppVersion());
-        requestParam.put("mobileType", params.getMobileType());
-        requestParam.put("appFlag", params.getAppName());
-
-        // 请求
-        String responseStr = HttpUtils.POST(url, requestParam.toJSONString());
-
-        // 解析响应结果
-        JSONObject responseJson = JSONObject.parseObject(responseStr);
-
-        // 判断接口响应是否正常
-        if (!PlatformUtil.checkResponseCode(result, LoginResult.class, responseJson)) {
+        // 用户是否存在
+        if (null == user){
+            result.setReturnCode(ResultEnum.PHONE_NO_EXIT.code());
+            result.setMessage(ResultEnum.PHONE_NO_EXIT.message());
             return result;
         }
 
-        // 获取结果集
-        JSONObject data = responseJson.getJSONObject("data");
+        // 密码匹配
+        if (params.getPassword().equals(user.getPassword())){
+            result.setReturnCode(ResultEnum.PASSWORD_INVALID.code());
+            result.setMessage(ResultEnum.PASSWORD_INVALID.message());
+            return result;
+        }
 
-        // 封装结果就
+        // 生成并更新token
+        String token = tokenUtil.updateUserToken(user.getId());
+
+        // TODO 新增或更新afid
+
+        // 更新版本号,方便指定版本控制
+        loanUserDao.updateAppVersion(user.getId(),params.getAppVersion());
+
+        // 封装结果集
         LoginResult loginResult = new LoginResult();
-        loginResult.setUserId(data.getString("userId"));
-        loginResult.setToken(data.getString("token"));
-        loginResult.setAppId(data.getString("appId"));
-        loginResult.setNeedCatchData(data.getBoolean("needCatchData"));
-        loginResult.setDataNo(data.getString("dataNo"));
+        loginResult.setUserId(user.getId());
+        loginResult.setToken(token);
 
         // 封装结果
         result.setReturnCode(ResultEnum.SUCCESS.code());

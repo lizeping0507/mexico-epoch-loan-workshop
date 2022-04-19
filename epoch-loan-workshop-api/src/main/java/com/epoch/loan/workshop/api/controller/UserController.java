@@ -212,6 +212,18 @@ public class UserController extends BaseController {
 
         try {
             // 参数校验
+            if (loginParams.isLoginNameLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":loginName");
+                return result;
+            }
+            if (loginParams.isPasswordNameLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":password");
+                return result;
+            }
 
             // 密码登录
             return userService.login(loginParams);

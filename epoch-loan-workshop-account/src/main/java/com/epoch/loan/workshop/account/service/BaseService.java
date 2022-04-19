@@ -12,6 +12,8 @@ import com.epoch.loan.workshop.common.mq.remittance.RemittanceMQManager;
 import com.epoch.loan.workshop.common.mq.remittance.params.RemittanceParams;
 import com.epoch.loan.workshop.common.mq.repayment.RepaymentMQManager;
 import com.epoch.loan.workshop.common.util.LogUtil;
+import com.epoch.loan.workshop.common.util.SMSCodeUtil;
+import com.epoch.loan.workshop.common.util.TokenUtil;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,12 +27,25 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class BaseService {
     /**
+     * token工具
+     */
+    @Autowired
+    public SMSCodeUtil smsCodeUtil;
+    /**
+     * token工具
+     */
+    @Autowired
+    public TokenUtil tokenUtil;
+    /**
      * 新用户表
      */
     @Autowired
     public LoanUserDao loanUserDao;
-
-
+    /**
+     * 新用户详细表
+     */
+    @Autowired
+    public LoanUserInfoDao loanUserInfoDao;
     /**
      * 还款分配队列
      */

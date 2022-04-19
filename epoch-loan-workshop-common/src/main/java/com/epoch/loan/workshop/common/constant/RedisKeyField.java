@@ -33,4 +33,12 @@ public class RedisKeyField {
      * 订单逾期计算锁
      */
     public final static String ORDER_BILL_DUE_LOCK = "orderBillDueLock" + SPLIT;
+
+
+    /**
+     * 注册验证码
+     */
+    public final static String REGISTER_SMS_CODE = "registerSmsCode" + SPLIT;
+
+
 }

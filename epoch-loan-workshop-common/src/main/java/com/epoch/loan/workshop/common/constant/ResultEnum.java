@@ -52,6 +52,22 @@ public enum ResultEnum {
      * url 未映射
      */
     URL_NOT_MAPPING(4007, "Url is not mapping"),
+    /**
+     * 手机号不存在
+     */
+    PHONE_NO_EXIT(4008, "Unrecorded phone number, please enter the correct one"),
+    /**
+     * 密码不正确
+     */
+    PASSWORD_INVALID(4009, "The password is incorrect，please try again"),
+    /**
+     * 手机号已存在
+     */
+    PHONE_EXIT(4010, ""),
+    /**
+     * 手机号已存在
+     */
+    SMSCODE_ERROR(4011, "OTP error, please try again"),
 
     // ======= 服务端错误 ========
     /**

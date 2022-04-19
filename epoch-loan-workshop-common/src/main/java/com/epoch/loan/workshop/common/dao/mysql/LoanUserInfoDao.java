@@ -1,5 +1,6 @@
 package com.epoch.loan.workshop.common.dao.mysql;
 
+import com.epoch.loan.workshop.common.entity.mysql.LoanUserInfoEntity;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
@@ -11,4 +12,10 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface LoanUserInfoDao {
+    /**
+     * 插入新记录
+     *
+     * @param loanUserInfoEntity
+     */
+    void insert(LoanUserInfoEntity loanUserInfoEntity);
 }
