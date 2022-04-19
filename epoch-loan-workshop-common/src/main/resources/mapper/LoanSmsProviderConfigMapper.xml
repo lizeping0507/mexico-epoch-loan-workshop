@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.epoch.loan.workshop.common.dao.mysql.LoanSmsProviderConfigDao">
+
+
+    <select id="findProviderConfig"
+            resultType="com.epoch.loan.workshop.common.entity.mysql.LoanSmsProviderConfig">
+        SELECT * FROM loan_sms_provider_config WHERE status = 1
+    </select>
+</mapper>

@@ -2,6 +2,7 @@ package com.epoch.loan.workshop.common.params.params.request;
 
 import com.epoch.loan.workshop.common.params.params.BaseParams;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author 魏玉强
@@ -19,7 +20,19 @@ public class UserLivenessScoreParams extends BaseParams {
     private String userId;
 
     /**
-     * 证件类型，advance获取活体分唯一标识
+     * 用户面部照片的标识符
      */
     private String livenessId;
+
+    /**
+     * 用户面部照片的标识符 是否合法
+     *
+     * @return true或false
+     */
+    public boolean isLivenessIdLegal() {
+        if (StringUtils.isEmpty(this.livenessId)) {
+            return false;
+        }
+        return true;
+    }
 }

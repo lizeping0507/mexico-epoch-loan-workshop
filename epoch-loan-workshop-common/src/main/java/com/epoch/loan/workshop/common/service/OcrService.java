@@ -1,12 +1,12 @@
 package com.epoch.loan.workshop.common.service;
 
+import com.epoch.loan.workshop.common.params.advance.liveness.ScoreResponse;
 import com.epoch.loan.workshop.common.params.params.BaseParams;
 import com.epoch.loan.workshop.common.params.params.request.MineParams;
 import com.epoch.loan.workshop.common.params.params.request.UserLivenessScoreParams;
 import com.epoch.loan.workshop.common.params.params.result.ChannelTypeResult;
 import com.epoch.loan.workshop.common.params.params.result.LicenseResult;
 import com.epoch.loan.workshop.common.params.params.result.Result;
-import com.epoch.loan.workshop.common.params.params.result.UserLivenessScoreResult;
 
 /**
  * @author 魏玉强
@@ -42,5 +42,5 @@ public interface OcrService {
      * @return 查询活体分结果
      * @throws Exception
      */
-    Result<UserLivenessScoreResult> advanceLivenessScore(UserLivenessScoreParams params) throws Exception;
+    Result<ScoreResponse> advanceLivenessScore(UserLivenessScoreParams params) throws Exception;
 }

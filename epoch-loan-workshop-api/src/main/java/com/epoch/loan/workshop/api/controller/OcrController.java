@@ -1,7 +1,9 @@
 package com.epoch.loan.workshop.api.controller;
 
+import com.epoch.loan.workshop.api.annotated.Authentication;
 import com.epoch.loan.workshop.common.config.URL;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
+import com.epoch.loan.workshop.common.params.advance.liveness.ScoreResponse;
 import com.epoch.loan.workshop.common.params.params.BaseParams;
 import com.epoch.loan.workshop.common.params.params.request.*;
 import com.epoch.loan.workshop.common.params.params.result.*;
@@ -35,6 +37,7 @@ public class OcrController extends BaseController {
      * @param mineParams 查询OCR提供商封装类
      * @return 本次使用哪个OCR提供商
      */
+    @Authentication
     @PostMapping(URL.OCR_CHANNEL_TYPE)
     public Result<ChannelTypeResult> getOcrChannelType(MineParams mineParams) {
         // 结果集
@@ -60,12 +63,21 @@ public class OcrController extends BaseController {
      * @param params license请求参数
      * @return advance的license
      */
+    @Authentication
     @PostMapping(URL.OCR_ADVANCE_LICENSE)
     public Result<LicenseResult> advanceLicense(BaseParams params) {
         // 结果集
         Result<LicenseResult> result = new Result<>();
 
         try {
+            // 验证请求参数是否合法
+            if (params.isAppNameLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":appName");
+                return result;
+            }
+
             // 获取用户OCR认证提供商
             return ocrService.advanceLicense(params);
         } catch (Exception e) {
@@ -86,11 +98,20 @@ public class OcrController extends BaseController {
      * @return 查询活体分结果
      */
     @PostMapping(URL.OCR_ADVANCE_LIVENESS_SCORE)
-    public Result<UserLivenessScoreResult> advanceLivenessScore(UserLivenessScoreParams params) {
+    public Result<ScoreResponse> advanceLivenessScore(UserLivenessScoreParams params) {
         // 结果集
-        Result<UserLivenessScoreResult> result = new Result<>();
+        Result<ScoreResponse> result = new Result<>();
 
         try {
+            // 验证请求参数是否合法
+            if (params.isLivenessIdLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":livenessId");
+                return result;
+            }
+
+
             // 获取用户OCR认证提供商
             return ocrService.advanceLivenessScore(params);
         } catch (Exception e) {

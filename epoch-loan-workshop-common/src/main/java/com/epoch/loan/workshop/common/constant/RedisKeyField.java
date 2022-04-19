@@ -34,11 +34,13 @@ public class RedisKeyField {
      */
     public final static String ORDER_BILL_DUE_LOCK = "orderBillDueLock" + SPLIT;
 
-
     /**
      * 注册验证码
      */
     public final static String REGISTER_SMS_CODE = "registerSmsCode" + SPLIT;
 
-
+    /**
+     * advance License记录
+     */
+    public final static String ADVANCE_LICENSE = "advanceLicenseCacheKey";
 }
