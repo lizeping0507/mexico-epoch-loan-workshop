@@ -64,7 +64,7 @@ public class DistributionRemittance extends BaseRemittanceMQListener implements 
                     continue;
                 }
 
-                int count = loanRemittancePaymentRecordDao.countByRecordIdAndLatterThanStatus(LoanRemittancePaymentRecordStatus.FAILED, distributionParams.getId());
+                int count = loanRemittancePaymentRecordDao.countByRecordIdAndLatterThanStatus(LoanRemittancePaymentRecordStatus.FAILED, distributionRemittanceParams.getId());
                 if (count >= 1){
                     continue;
                 }
