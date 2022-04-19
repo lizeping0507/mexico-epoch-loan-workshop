@@ -104,6 +104,13 @@ public class UserController extends BaseController {
                 return result;
             }
 
+            if (registerParams.isImeiLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":imei");
+                return result;
+            }
+
             // 用户注册
             return userService.register(registerParams);
         } catch (Exception e) {

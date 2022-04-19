@@ -60,6 +60,19 @@ public class RegisterParams extends BaseParams {
      *
      * @return
      */
+    public boolean isImeiLegal() {
+        if (StringUtils.isEmpty(this.imei)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * 验证AF 推广id是否合法
+     *
+     * @return
+     */
     public boolean isGaIdLegal() {
         if (StringUtils.isEmpty(this.gaId)) {
             return false;
