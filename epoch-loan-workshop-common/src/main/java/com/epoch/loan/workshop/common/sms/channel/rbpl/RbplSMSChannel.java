@@ -18,21 +18,10 @@ import java.util.Map;
  * @description : Rbpl短信渠道
  */
 public class RbplSMSChannel implements SMSChannel {
-
-    /**
-     * 有参构造函数
-     *
-     * @param loanSMSChannelConfigEntity
-     */
-    public RbplSMSChannel(LoanSMSChannelConfigEntity loanSMSChannelConfigEntity) {
-        this.loanSMSChannelConfigEntity = loanSMSChannelConfigEntity;
-    }
-
     /**
      * 短信对象
      */
     private LoanSMSChannelConfigEntity loanSMSChannelConfigEntity;
-
 
     /**
      * 发送短信验证码
@@ -103,5 +92,14 @@ public class RbplSMSChannel implements SMSChannel {
         // 发送成功
         situation.setResult(true);
         return situation;
+    }
+
+    /**
+     * 有参构造函数
+     *
+     * @param loanSMSChannelConfigEntity
+     */
+    public RbplSMSChannel(LoanSMSChannelConfigEntity loanSMSChannelConfigEntity) {
+        this.loanSMSChannelConfigEntity = loanSMSChannelConfigEntity;
     }
 }
