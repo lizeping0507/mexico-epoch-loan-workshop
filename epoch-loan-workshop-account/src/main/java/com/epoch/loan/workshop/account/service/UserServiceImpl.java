@@ -157,38 +157,40 @@ public class UserServiceImpl extends BaseService implements UserService {
         // 结果结果集
         Result<ChangePasswordResult> result = new Result<>();
 
-        // 拼接请求路径
-        String url = platformConfig.getPlatformDomain() + PlatformUrl.PLATFORM_FORGOTPWD;
-
-        // 封装请求参数
-        JSONObject requestParam = new JSONObject();
-        requestParam.put("phoneNumber", params.getPhoneNumber());
-        requestParam.put("passwd", params.getPasswd());
-        requestParam.put("smsCode", params.getSmsCode());
-        requestParam.put("appFlag", params.getAppName());
-        requestParam.put("versionNumber", params.getAppVersion());
-        requestParam.put("mobileType", params.getMobileType());
-
-        // 请求
-        String responseStr = HttpUtils.POST(url, requestParam.toJSONString());
-
-        // 解析响应结果
-        JSONObject responseJson = JSONObject.parseObject(responseStr);
-
-        // 判断接口响应是否正常
-        if (!PlatformUtil.checkResponseCode(result, ChangePasswordResult.class, responseJson)) {
+        // 通过Nacos命名空间判断环境 非生产环境验证码默认使用 0000
+        String registerCode;
+        if (namespace.contains("dev") || namespace.contains("test")) {
+            registerCode = "0000";
+        } else {
+            registerCode = (String) redisClient.get(RedisKeyField.FORGOTPWD_SMS_CODE + RedisKeyField.SPLIT + params.getAppName() + RedisKeyField.SPLIT + params.getPhoneNumber());
+            LogUtil.sysInfo("忘记密码 : registerCode {}", JSONObject.toJSONString(registerCode));
+            // TODO 测试用
+            registerCode = "0000";
+        }
+        if (StringUtils.isEmpty(registerCode) || !registerCode.equals(params.getSmsCode())) {
+            result.setReturnCode(ResultEnum.SMSCODE_ERROR.code());
+            result.setMessage(ResultEnum.SMSCODE_ERROR.message());
             return result;
         }
 
-        // 获取结果集
-        JSONObject data = responseJson.getJSONObject("data");
+        // 查询用户
+        LoanUserEntity user = loanUserDao.findByLoginNameAndAppName(params.getPhoneNumber(), params.appName);
+        if (null == user){
+            result.setReturnCode(ResultEnum.PHONE_NO_EXIT.code());
+            result.setMessage(ResultEnum.PHONE_NO_EXIT.message());
+            return result;
+        }
 
-        // 封装结果就
-        ChangePasswordResult changePasswordResult = new ChangePasswordResult();
-        changePasswordResult.setToken(data.getString("token"));
-        changePasswordResult.setUserId(data.getString("userId"));
+        // 更新密码
+        loanUserDao.updatePassword(user.getId(), params.getPasswd());
+
+        // 生成Token
+        String token1 = tokenManager.updateUserToken(user.getId());
 
         // 封装结果
+        ChangePasswordResult changePasswordResult = new ChangePasswordResult();
+        changePasswordResult.setToken(token1);
+        changePasswordResult.setUserId(user.getId());
         result.setReturnCode(ResultEnum.SUCCESS.code());
         result.setMessage(ResultEnum.SUCCESS.message());
         result.setData(changePasswordResult);

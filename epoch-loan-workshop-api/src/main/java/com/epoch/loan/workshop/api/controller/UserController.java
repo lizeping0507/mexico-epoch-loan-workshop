@@ -178,6 +178,31 @@ public class UserController extends BaseController {
         Result<ChangePasswordResult> result = new Result<>();
 
         try {
+            // 验证请求参数是否合法
+            if (!modifyPasswordParams.isPhoneNumberLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":PhoneNumber");
+                return result;
+            }
+            if (!modifyPasswordParams.isOldPasswordLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":OldPassword");
+                return result;
+            }
+            if (!modifyPasswordParams.isNewPasswordLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":NewPassword");
+                return result;
+            }
+            if (!modifyPasswordParams.isEnterPasswordLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":EnterPassword");
+                return result;
+            }
             // 更新密码
             return userService.modifyPassword(modifyPasswordParams);
         } catch (Exception e) {
@@ -203,6 +228,28 @@ public class UserController extends BaseController {
         Result<ChangePasswordResult> result = new Result<>();
 
         try {
+            // 参数校验
+            if (!forgotPwdParams.isPasswdLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":Passwd");
+                return result;
+            }
+            // 参数校验
+            if (!forgotPwdParams.isPhoneNumberLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":PhoneNumber");
+                return result;
+            }
+            // 参数校验
+            if (!forgotPwdParams.isSmsCodeLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":SmsCode");
+                return result;
+            }
+
             // 忘记密码
             return userService.forgotPwd(forgotPwdParams);
         } catch (Exception e) {

@@ -3,6 +3,7 @@ package com.epoch.loan.workshop.common.params.params.request;
 import com.epoch.loan.workshop.common.params.params.BaseParams;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author 魏玉强
@@ -33,4 +34,48 @@ public class ModifyPasswordParams extends BaseParams {
      * 用户新密码确认md5值
      */
     private String enterPassword;
+
+    /**
+     * 手机号
+     * @return
+     */
+    public boolean isPhoneNumberLegal() {
+        if (StringUtils.isEmpty(this.phoneNumber)) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * 验证旧密码是否合法
+     * @return
+     */
+    public boolean isOldPasswordLegal() {
+        if (StringUtils.isEmpty(this.oldPassword)) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * 验证新密码是否合法
+     * @return
+     */
+    public boolean isNewPasswordLegal() {
+        if (StringUtils.isEmpty(this.newPassword)) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * 验证确认密码是否合法
+     * @return
+     */
+    public boolean isEnterPasswordLegal() {
+        if (StringUtils.isEmpty(this.enterPassword)) {
+            return false;
+        }
+        return true;
+    }
 }
