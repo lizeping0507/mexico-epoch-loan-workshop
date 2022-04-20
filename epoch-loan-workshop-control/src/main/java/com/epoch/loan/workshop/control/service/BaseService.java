@@ -1,6 +1,7 @@
 package com.epoch.loan.workshop.control.service;
 
 import com.epoch.loan.workshop.common.config.PlatformConfig;
+import com.epoch.loan.workshop.common.dao.elastic.OcrLivingDetectionLogElasticDao;
 import com.epoch.loan.workshop.common.dao.mysql.LoanDynamicRequestDao;
 import com.epoch.loan.workshop.common.dao.mysql.LoanOcrProviderConfigDao;
 import com.epoch.loan.workshop.common.redis.RedisClient;
@@ -38,4 +39,10 @@ public class BaseService {
      */
     @Autowired
     public RedisClient redisClient;
+
+    /**
+     * advance 活体检测日志
+     */
+    @Autowired
+    public OcrLivingDetectionLogElasticDao ocrLivingDetectionLogElasticDao;
 }
