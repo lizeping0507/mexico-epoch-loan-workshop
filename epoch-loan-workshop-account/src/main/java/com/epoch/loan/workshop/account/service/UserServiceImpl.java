@@ -89,6 +89,8 @@ public class UserServiceImpl extends BaseService implements UserService {
             registerCode = "0000";
         }else {
             registerCode = smsCodeUtil.getRegisterCode(params.getMobile(), params.getAppName());
+            // TODO 测试用
+            registerCode = "0000";
         }
         if (StringUtils.isEmpty(registerCode) || !registerCode.equals(params.getSmsCode())) {
             result.setReturnCode(ResultEnum.SMSCODE_ERROR.code());
