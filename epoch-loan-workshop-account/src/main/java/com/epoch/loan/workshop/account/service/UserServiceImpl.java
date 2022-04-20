@@ -54,10 +54,10 @@ public class UserServiceImpl extends BaseService implements UserService {
         // 根据appName和手机号查询用户
         Integer isExit = loanUserDao.exitByAppNameAndLoginName(params.getAppName(), params.getPhoneNumber());
 
-        if (isExit == 0){
+        if (isExit == 0) {
             // 用户未注册
             resData.setIsExists("10");
-        }else{
+        } else {
             // 用户已注册
             resData.setIsExists("20");
         }
@@ -80,7 +80,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         // 手机号是否已经注册
         Integer isExit = loanUserDao.exitByAppNameAndLoginName(params.getAppName(), params.getMobile());
         LogUtil.sysInfo("用户注册 : isExit {}", JSONObject.toJSONString(isExit));
-        if (isExit != 0){
+        if (isExit != 0) {
             result.setReturnCode(ResultEnum.PHONE_EXIT.code());
             result.setMessage(ResultEnum.PHONE_EXIT.message());
             return result;
@@ -90,7 +90,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         String registerCode;
         if (namespace.contains("dev") || namespace.contains("test")) {
             registerCode = "0000";
-        }else {
+        } else {
             registerCode = (String) redisClient.get(RedisKeyField.REGISTER_SMS_CODE + RedisKeyField.SPLIT + params.getAppName() + RedisKeyField.SPLIT + params.getMobile());
             LogUtil.sysInfo("用户注册 : registerCode {}", JSONObject.toJSONString(registerCode));
             // TODO 测试用
@@ -307,17 +307,17 @@ public class UserServiceImpl extends BaseService implements UserService {
         Result<LoginResult> result = new Result<>();
 
         // 查询用户
-        LoanUserEntity user = loanUserDao.findByLoginNameAndAppName(params.getLoginName(),params.getAppName());
+        LoanUserEntity user = loanUserDao.findByLoginNameAndAppName(params.getLoginName(), params.getAppName());
 
         // 用户是否存在
-        if (null == user){
+        if (null == user) {
             result.setReturnCode(ResultEnum.PHONE_NO_EXIT.code());
             result.setMessage(ResultEnum.PHONE_NO_EXIT.message());
             return result;
         }
 
         // 密码匹配
-        if (params.getPassword().equals(user.getPassword())){
+        if (params.getPassword().equals(user.getPassword())) {
             result.setReturnCode(ResultEnum.PASSWORD_INVALID.code());
             result.setMessage(ResultEnum.PASSWORD_INVALID.message());
             return result;
@@ -329,7 +329,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         // TODO 新增或更新afid
 
         // 更新版本号,方便指定版本控制
-        loanUserDao.updateAppVersion(user.getId(),params.getAppVersion());
+        loanUserDao.updateAppVersion(user.getId(), params.getAppVersion());
 
         // 封装结果集
         LoginResult loginResult = new LoginResult();

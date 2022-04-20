@@ -209,6 +209,7 @@ public class UserController extends BaseController {
      */
     @PostMapping(URL.LOGIN)
     public Result<LoginResult> login(LoginParams loginParams) {
+        LogUtil.sysInfo("密码登录 : {}", JSONObject.toJSONString(loginParams));
         // 结果集
         Result<LoginResult> result = new Result<>();
 
