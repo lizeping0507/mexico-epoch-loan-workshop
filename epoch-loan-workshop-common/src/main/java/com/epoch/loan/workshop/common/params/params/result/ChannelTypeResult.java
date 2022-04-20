@@ -19,7 +19,7 @@ import java.io.Serializable;
 public class ChannelTypeResult implements Serializable {
 
     /**
-     * 聚道类型：OCR时  2-ACC  3-闪云金科 4-advance
+     * 聚道类型：OCR时  advance
      */
     private String type;
 }

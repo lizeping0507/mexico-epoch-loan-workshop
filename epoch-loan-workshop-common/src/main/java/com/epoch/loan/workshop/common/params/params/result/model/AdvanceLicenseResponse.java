@@ -1,4 +1,4 @@
-package com.epoch.loan.workshop.common.params.advance.license;
+package com.epoch.loan.workshop.common.params.params.result.model;
 
 import lombok.Data;
 
@@ -6,7 +6,7 @@ import java.io.Serializable;
 
 /**
  * @author 魏玉强
- * @packagename : com.epoch.loan.workshop.common.params.advance.license
+ * @packagename : com.epoch.loan.workshop.common.params.params.result.model
  * @className : UserLicenseResponse
  * @createTime : 2022/04/19 15:24
  * @Description: advance 授权码信息

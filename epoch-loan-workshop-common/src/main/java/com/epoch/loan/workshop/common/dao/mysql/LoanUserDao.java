@@ -2,6 +2,7 @@ package com.epoch.loan.workshop.common.dao.mysql;
 
 import com.epoch.loan.workshop.common.entity.mysql.LoanUserEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface LoanUserDao {
@@ -36,5 +37,5 @@ public interface LoanUserDao {
      *
      * @param loanUserEntity
      */
-    void insert(LoanUserEntity loanUserEntity);
+    void insert(@Param("loanUserEntity") LoanUserEntity loanUserEntity);
 }

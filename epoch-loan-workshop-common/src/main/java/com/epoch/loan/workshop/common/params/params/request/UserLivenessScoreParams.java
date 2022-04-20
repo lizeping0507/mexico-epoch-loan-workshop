@@ -15,11 +15,6 @@ import org.apache.commons.lang3.StringUtils;
 public class UserLivenessScoreParams extends BaseParams {
 
     /**
-     * 用户id
-     */
-    private String userId;
-
-    /**
      * 用户面部照片的标识符
      */
     private String livenessId;

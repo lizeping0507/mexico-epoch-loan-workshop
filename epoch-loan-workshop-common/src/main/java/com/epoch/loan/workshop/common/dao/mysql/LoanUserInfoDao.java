@@ -2,6 +2,7 @@ package com.epoch.loan.workshop.common.dao.mysql;
 
 import com.epoch.loan.workshop.common.entity.mysql.LoanUserInfoEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * @author : Duke
@@ -17,5 +18,5 @@ public interface LoanUserInfoDao {
      *
      * @param loanUserInfoEntity
      */
-    void insert(LoanUserInfoEntity loanUserInfoEntity);
+    void insert(@Param("loanUserInfoEntity")LoanUserInfoEntity loanUserInfoEntity);
 }
