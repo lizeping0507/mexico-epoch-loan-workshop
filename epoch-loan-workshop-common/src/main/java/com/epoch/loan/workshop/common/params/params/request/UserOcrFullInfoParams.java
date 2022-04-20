@@ -2,6 +2,7 @@ package com.epoch.loan.workshop.common.params.params.request;
 
 import com.epoch.loan.workshop.common.params.params.BaseParams;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author 魏玉强
@@ -14,11 +15,6 @@ import lombok.Data;
 public class UserOcrFullInfoParams extends BaseParams {
 
     /**
-     * 用户标识
-     */
-    private String userId;
-
-    /**
      * 识别类型 AADHAAR_FRON: ad卡正面; AADHAAR_BACK: ad卡背面; PAN_FRONT :pan卡
      */
     private String imageType;
@@ -27,4 +23,17 @@ public class UserOcrFullInfoParams extends BaseParams {
      * 证件图片
      */
     private byte[] imageData;
+
+    /**
+     * 验证 识别类型 是否合法
+     *
+     * @return true或false
+     */
+    public boolean isImageTypeLegal() {
+        if (StringUtils.isEmpty(this.imageType)) {
+            return false;
+        }
+        return true;
+    }
+
 }

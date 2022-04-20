@@ -15,12 +15,12 @@ import org.apache.commons.lang3.StringUtils;
 public class UserLivenessScoreParams extends BaseParams {
 
     /**
-     * 用户面部照片的标识符
+     * 用户面部照片唯一标识符
      */
     private String livenessId;
 
     /**
-     * 用户面部照片的标识符 是否合法
+     * 用户面部照片唯一标识符 是否合法
      *
      * @return true或false
      */

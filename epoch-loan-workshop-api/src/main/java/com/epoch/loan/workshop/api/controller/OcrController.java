@@ -284,6 +284,7 @@ public class OcrController extends BaseController {
      * advance获取证件信息
      *
      * @param params 获取证件信息请求参数封装类
+     * @param request 请求
      * @return 证件信息
      */
     @PostMapping(URL.USER_OCR_INFO)
@@ -292,10 +293,24 @@ public class OcrController extends BaseController {
         Result<UserOcrResult> result = new Result<>();
 
         try {
+            // 验证请求参数是否合法
+            if (params.isAppNameLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":appName");
+                return result;
+            }
+
+            if (params.isImageTypeLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":imageType");
+                return result;
+            }
+
             MultipartResolver resolver = new StandardServletMultipartResolver();
             MultipartHttpServletRequest mRequest = resolver.resolveMultipart(request);
             Map<String, MultipartFile> fileMap = mRequest.getFileMap();
-
             params.setImageData(fileMap.get("image").getBytes());
 
             // 获取证件信息

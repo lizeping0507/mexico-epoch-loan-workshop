@@ -1,6 +1,7 @@
 package com.epoch.loan.workshop.control.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.epoch.loan.workshop.common.constant.OcrChannelConfigStatus;
 import com.epoch.loan.workshop.common.constant.OcrField;
 import com.epoch.loan.workshop.common.constant.RedisKeyField;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
@@ -47,7 +48,7 @@ public class OcrServiceImpl extends BaseService implements OcrService {
     public Result<ChannelTypeResult> getOcrChannelType(BaseParams params) {
         // 结果集
         Result<ChannelTypeResult> result = new Result<>();
-        List<LoanOcrProviderConfig> thirdConfigList = loanOcrProviderConfigDao.findProviderConfig(params.getAppName());
+        List<LoanOcrProviderConfig> thirdConfigList = loanOcrProviderConfigDao.findProviderConfigListByAppNameAndStatus(params.getAppName(), OcrChannelConfigStatus.START);
 
         // 该APP是否有可用聚道
         if (CollectionUtils.isNotEmpty(thirdConfigList)) {
@@ -75,7 +76,7 @@ public class OcrServiceImpl extends BaseService implements OcrService {
      *
      * @param params license请求参数
      * @return advance的license
-     * @throws Exception  请求异常
+     * @throws Exception 请求异常
      */
     @Override
     public Result<LicenseResult> advanceLicense(BaseParams params) throws Exception {
@@ -317,7 +318,7 @@ public class OcrServiceImpl extends BaseService implements OcrService {
      */
     private String getAdvanceConfig(String appName, String configKey) {
         // 获取advance相关配置
-        String advanceConfig = loanOcrProviderConfigDao.selectAdvanceConfig(appName);
+        String advanceConfig = loanOcrProviderConfigDao.selectAdvanceConfigByAppNameAndStatus(appName, OcrChannelConfigStatus.START);
         String result = null;
         if (StringUtils.isNotBlank(advanceConfig)) {
             JSONObject config = JSONObject.parseObject(advanceConfig);

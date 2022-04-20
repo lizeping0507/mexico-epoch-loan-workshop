@@ -114,6 +114,13 @@ public class BaseService {
     LoanRemittancePaymentRecordDao paymentRecordDao;
 
     /**
+     * 三方OCR相关配置
+     */
+    @Autowired
+    public LoanOcrProviderConfigDao loanOcrProviderConfigDao;
+
+
+    /**
      * 发送队列
      *
      * @param orderId 订单号

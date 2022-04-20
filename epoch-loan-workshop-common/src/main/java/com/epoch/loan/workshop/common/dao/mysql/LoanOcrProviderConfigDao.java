@@ -19,15 +19,17 @@ public interface LoanOcrProviderConfigDao {
      * 查询 渠道配置
      *
      * @param appName app标识
+     * @param status  状态
      * @return 渠道配置列表
      */
-    List<LoanOcrProviderConfig> findProviderConfig(String appName);
+    List<LoanOcrProviderConfig> findProviderConfigListByAppNameAndStatus(String appName, Integer status);
 
     /**
      * 查询 advance配置
      *
      * @param appName app标识
+     * @param status  状态
      * @return advance JSON配置字符串
      */
-    String selectAdvanceConfig(String appName);
+    String selectAdvanceConfigByAppNameAndStatus(String appName, Integer status);
 }

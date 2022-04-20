@@ -25,6 +25,11 @@ public class OcrField {
     public static final String ADVANCE_ACCESS_KEY_KEY = "X-ADVAI-KEY";
 
     /**
+     * advance 发送带图请求头CONTENT_TYPE的值
+     */
+    public static final String ADVANCE_MULTIPART_VALUE= "multipart/form-data; boundary=----------ThIs_Is_tHe_bouNdaRY_$";
+
+    /**
      * advance后台配置的 app包路径
      */
     public static final String ADVANCE_APP_ID_KEY = "applicationId";

@@ -2,13 +2,13 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.epoch.loan.workshop.common.dao.mysql.LoanOcrProviderConfigDao">
 
-    <select id="findProviderConfig"
+    <select id="findProviderConfigListByAppNameAndStatus"
             resultType="com.epoch.loan.workshop.common.entity.mysql.LoanOcrProviderConfig">
-        SELECT * FROM loan_ocr_provider_config WHERE app_name = #{appName} AND  status = 1
+        SELECT * FROM loan_ocr_provider_config WHERE app_name = #{appName} AND  status = #{status}
     </select>
 
-    <select id="selectAdvanceConfig"
+    <select id="selectAdvanceConfigByAppNameAndStatus"
             resultType="java.lang.String">
-        SELECT * FROM loan_ocr_provider_config WHERE app_name = #{appName} AND  status = 1 AND channel_code = 1
+        SELECT * FROM loan_ocr_provider_config WHERE app_name = #{appName} AND  status = #{status} AND channel_code = 1
     </select>
 </mapper>
