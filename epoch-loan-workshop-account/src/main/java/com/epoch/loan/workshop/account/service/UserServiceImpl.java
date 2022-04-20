@@ -2,11 +2,7 @@ package com.epoch.loan.workshop.account.service;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
-import com.epoch.loan.workshop.common.constant.OcrChannelConfigStatus;
-import com.epoch.loan.workshop.common.constant.OcrField;
-import com.epoch.loan.workshop.common.constant.PlatformUrl;
-import com.epoch.loan.workshop.common.constant.RedisKeyField;
-import com.epoch.loan.workshop.common.constant.ResultEnum;
+import com.epoch.loan.workshop.common.constant.*;
 import com.epoch.loan.workshop.common.entity.mysql.LoanUserEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanUserInfoEntity;
 import com.epoch.loan.workshop.common.params.User;
@@ -366,40 +362,30 @@ public class UserServiceImpl extends BaseService implements UserService {
     public Result<MineResult> mine(MineParams params) throws Exception {
         // 结果结果集
         Result<MineResult> result = new Result<>();
+        MineResult data = new MineResult();
 
-        // 拼接请求路径
-        String url = platformConfig.getPlatformDomain() + PlatformUrl.PLATFORM_MINE + params.getUserId();
-
-        // 封装请求参数
-        JSONObject requestParam = new JSONObject();
-        requestParam.put("userId", params.getUserId());
-        requestParam.put("appFlag", params.getAppName());
-        requestParam.put("versionNumber", params.getAppVersion());
-        requestParam.put("mobileType", params.getMobileType());
-
-        // 请求
-        String responseStr = HttpUtils.POST(url, requestParam.toJSONString());
-
-        // 解析响应结果
-        JSONObject responseJson = JSONObject.parseObject(responseStr);
-
-        // 判断接口响应是否正常
-        if (!PlatformUtil.checkResponseCode(result, MineResult.class, responseJson)) {
+        // token校验
+        String token = params.getToken();
+        User userCache = tokenManager.getUserCache(token);
+        if (null == userCache) {
+            result.setReturnCode(ResultEnum.NO_LOGIN.code());
+            result.setMessage(ResultEnum.NO_LOGIN.message());
             return result;
         }
 
-        // 获取结果集
-        JSONObject data = responseJson.getJSONObject("data");
+//        // 未完成的订单
+//        Integer uncompletedOrder =  platformOrderDao.findUserLessThanSpecificStatusOrderNum(userCache.getId(),OrderStatus.WAY);
+//        data.setUncompletedOrder(uncompletedOrder);
+//
+//        // 待还款订单数量-
+//        Integer noCompleteNum =  platformOrderDao.findUserLessThanSpecificStatusOrderNum(userCache.getId(),OrderStatus.COMPLETE);
+//        data.setUncompletedOrder(noCompleteNum - uncompletedOrder);
 
-        // 封装结果就
-        MineResult mineResult = new MineResult();
-        if (!CheckFieldUtils.checkObjAllFieldsIsNull(data)) {
-            mineResult.setPhoneNumber(data.getString("phoneNumber"));
-            mineResult.setUncompletedOrder(data.getInteger("uncompletedOrder"));
-            mineResult.setPenRepaymentOrder(data.getInteger("penRepaymentOrder"));
-            mineResult.setAllRepaymentOrder(data.getInteger("allRepaymentOrder"));
-            mineResult.setHelpUrl(data.getString("helpUrl"));
-        }
+        // 用户所有状态的订单数量
+
+        // 帮助中心地址 TODO 待确认
+
+
 
         // 封装结果
         result.setReturnCode(ResultEnum.SUCCESS.code());
