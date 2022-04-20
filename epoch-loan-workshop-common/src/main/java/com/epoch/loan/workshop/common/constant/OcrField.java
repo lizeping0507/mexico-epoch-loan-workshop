@@ -25,9 +25,19 @@ public class OcrField {
     public static final String ADVANCE_ACCESS_KEY_KEY = "X-ADVAI-KEY";
 
     /**
-     * advance appId key
+     * advance后台配置的 app包路径
      */
     public static final String ADVANCE_APP_ID_KEY = "applicationId";
+
+    /**
+     *  redis中存储的advance授权码key
+     */
+    public static final String ADVANCE_LICENSE_NAME = "license";
+
+    /**
+     * redis中存储的advance过期时间key
+     */
+    public static final String ADVANCE_LICENSE_EXPIRE_TIME = "expireTime";
 
     /**
      * advance license有效时间
@@ -53,4 +63,31 @@ public class OcrField {
      * advance图像默认格式
      */
     public static final String ADVANCE_DEFAULT_IMAGE_TYPE = "IMAGE_URL";
+
+    // ================ advance相关配置key ===================
+
+    /**
+     * advance 通用key
+     */
+    public static final String ADVANCE_ACCESS_KEY = "accessKey";
+
+    /**
+     * advance 包名配置key
+     */
+    public static final String ADVANCE_APP_PACKAGE_NAME = "appPackageName";
+
+    /**
+     * advance 获取license请求地址
+     */
+    public static final String ADVANCE_LICENSE_URL = "licenseUrl";
+
+    /**
+     * advance 获取活体检测结果请求地址
+     */
+    public static final String ADVANCE_LIVENESS_SCORE_URL="livenessScoreUrl";
+
+    /**
+     * advance 活体检测分建议阀值
+     */
+    public static final String LIVENESS_THRESHOLD = "livenessThreshold";
 }

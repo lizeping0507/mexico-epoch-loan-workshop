@@ -4,6 +4,11 @@
 
     <select id="findProviderConfig"
             resultType="com.epoch.loan.workshop.common.entity.mysql.LoanOcrProviderConfig">
-        SELECT * FROM loan_ocr_provider_config WHERE status = 1
+        SELECT * FROM loan_ocr_provider_config WHERE app_name = #{appName} AND  status = 1
+    </select>
+
+    <select id="selectAdvanceConfig"
+            resultType="java.lang.String">
+        SELECT * FROM loan_ocr_provider_config WHERE app_name = #{appName} AND  status = 1 AND channel_code = 1
     </select>
 </mapper>

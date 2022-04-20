@@ -16,9 +16,9 @@ import java.util.Date;
 public class LoanOcrProviderConfig implements Serializable {
 
     /**
-     * 三方服务商
+     * 三方服务商编号    1--advance
      */
-    private String channel;
+    private String channelCode;
 
     /**
      * 比重
@@ -26,19 +26,19 @@ public class LoanOcrProviderConfig implements Serializable {
     private Integer proportion;
 
     /**
-     * 描述
-     */
-    private String describe;
-
-    /**
-     * 状态
+     * 状态  0 停用 1 启用
      */
     private Integer status;
 
     /**
-     * appId
+     * 渠道配置
      */
-    private Integer appId;
+    private String config;
+
+    /**
+     * app标识
+     */
+    private Integer appName;
 
     /**
      * 更新时间
