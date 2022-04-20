@@ -9,10 +9,9 @@ import com.epoch.loan.workshop.common.params.params.request.*;
 import com.epoch.loan.workshop.common.params.params.result.*;
 import com.epoch.loan.workshop.common.service.UserService;
 import com.epoch.loan.workshop.common.util.*;
-import com.sun.org.apache.regexp.internal.RE;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
-
+import org.springframework.beans.factory.annotation.Value;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -30,6 +29,10 @@ import java.util.Map;
  */
 @DubboService(timeout = 5000)
 public class UserServiceImpl extends BaseService implements UserService {
+
+    @Value("${spring.cloud.nacos.discovery.namespace}")
+    private String namespace;
+
     /**
      * 判断手机号是否已经注册
      *
@@ -80,9 +83,14 @@ public class UserServiceImpl extends BaseService implements UserService {
             return result;
         }
 
-        // 验证码校验
-        String registerCode = smsCodeUtil.getRegisterCode(params.getMobile(), params.getAppName());
-        if(StringUtils.isEmpty(registerCode) || !registerCode.equals(params.getSmsCode())){
+        // 通过Nacos命名空间判断环境 非生产环境验证码默认使用 0000
+        String registerCode;
+        if (namespace.contains("dev") || namespace.contains("test")) {
+            registerCode = "0000";
+        }else {
+            registerCode = smsCodeUtil.getRegisterCode(params.getMobile(), params.getAppName());
+        }
+        if (StringUtils.isEmpty(registerCode) || !registerCode.equals(params.getSmsCode())) {
             result.setReturnCode(ResultEnum.SMSCODE_ERROR.code());
             result.setMessage(ResultEnum.SMSCODE_ERROR.message());
             return result;
