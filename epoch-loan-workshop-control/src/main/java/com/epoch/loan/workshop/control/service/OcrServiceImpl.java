@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.constant.OcrField;
 import com.epoch.loan.workshop.common.constant.RedisKeyField;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
+import com.epoch.loan.workshop.common.entity.elastic.OcrLivingDetectionLogElasticEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanOcrProviderConfig;
 import com.epoch.loan.workshop.common.params.params.result.*;
 import com.epoch.loan.workshop.common.params.params.BaseParams;
@@ -21,6 +22,7 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.http.protocol.HTTP;
+import org.springframework.beans.BeanUtils;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -40,7 +42,6 @@ public class OcrServiceImpl extends BaseService implements OcrService {
      *
      * @param params 查询OCR提供商封装类
      * @return 本次使用哪个OCR提供商
-     * @throws Exception
      */
     @Override
     public Result<ChannelTypeResult> getOcrChannelType(BaseParams params) {
@@ -74,7 +75,7 @@ public class OcrServiceImpl extends BaseService implements OcrService {
      *
      * @param params license请求参数
      * @return advance的license
-     * @throws Exception
+     * @throws Exception  请求异常
      */
     @Override
     public Result<LicenseResult> advanceLicense(BaseParams params) throws Exception {
@@ -135,7 +136,7 @@ public class OcrServiceImpl extends BaseService implements OcrService {
      *
      * @param params advance获取活体分封装类
      * @return 查询活体分结果
-     * @throws Exception
+     * @throws Exception 请求异常
      */
     @Override
     public Result<UserLivenessScoreResult> advanceLivenessScore(UserLivenessScoreParams params) throws Exception {
@@ -144,6 +145,7 @@ public class OcrServiceImpl extends BaseService implements OcrService {
         String scoreUrl = getAdvanceConfig(params.getAppName(), OcrField.ADVANCE_LIVENESS_SCORE_URL);
         String livenessThreshold = getAdvanceConfig(params.getAppName(), OcrField.LIVENESS_THRESHOLD);
         UserLivenessScoreResult data = null;
+        String userId = params.getUser().getId();
 
         // 封装请求参数
         HashMap<String, String> param = Maps.newHashMap();
@@ -161,20 +163,18 @@ public class OcrServiceImpl extends BaseService implements OcrService {
             AdvanceScoreResult scoreResult = JSONObject.parseObject(responseStr, AdvanceScoreResult.class);
             String code = scoreResult.getCode();
 
-            // TODO 检测日志写入Elastic
-            //UserOcrLivingDetectionLog userOcrLivingDetectionLog = new UserOcrLivingDetectionLog();
+            // 检测日志写入Elastic
+            OcrLivingDetectionLogElasticEntity livingDetectionLog = new OcrLivingDetectionLogElasticEntity();
+
             if (OcrField.ADVANCE_SUCCESS_CODE.equals(code)) {
                 data = result.getData();
-                //BeanUtils.copyProperties(data, userOcrLivingDetectionLog);
-
                 String livenessScore = data.getLivenessScore();
 
                 // 赋值，保存数据
-//                userOcrLivingDetectionLog.setLivenessScore(data.getLivenessScore().toString());
-//                userOcrLivingDetectionLog.setDetectionResult(data.getDetectionResult());
-
+                livingDetectionLog.setLivenessScore(data.getLivenessScore());
+                livingDetectionLog.setDetectionResult(data.getDetectionResult());
                 if (ObjectUtils.isNotEmpty(livenessScore)) {
-//
+
                     //活体分小于推荐阀值认为是恶意攻击
                     if (new BigDecimal(livenessScore).compareTo(new BigDecimal(livenessThreshold)) > 0) {
                         result.setData(data);
@@ -183,10 +183,10 @@ public class OcrServiceImpl extends BaseService implements OcrService {
             }
 
             // 保存检测日志
-//            BeanUtils.copyProperties(result, userOcrLivingDetectionLog);
-//            userOcrLivingDetectionLog.setUserId(userId);
-//            userOcrLivingDetectionLog.setCreateTime(new Date());
-//            userOcrLivingDetectionLogService.add(userOcrLivingDetectionLog);
+            BeanUtils.copyProperties(result, livingDetectionLog);
+            livingDetectionLog.setId(userId);
+            livingDetectionLog.setCreateTime(new Date());
+            ocrLivingDetectionLogElasticDao.save(livingDetectionLog);
         }
 
         // 封装结果
@@ -286,8 +286,9 @@ public class OcrServiceImpl extends BaseService implements OcrService {
 
     /**
      * 存储advance license
+     *
      * @param expireTime advance响应的过期时间点
-     * @param license advance授权码
+     * @param license    advance授权码
      */
     public void setLicenseExpireTimeStore(Long expireTime, String license) {
         try {
