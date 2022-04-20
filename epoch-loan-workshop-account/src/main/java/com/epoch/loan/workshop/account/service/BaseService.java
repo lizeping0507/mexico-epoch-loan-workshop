@@ -1,18 +1,14 @@
 package com.epoch.loan.workshop.account.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.epoch.loan.workshop.common.authentication.TokenManager;
 import com.epoch.loan.workshop.common.config.PlatformConfig;
 import com.epoch.loan.workshop.common.dao.mysql.*;
-import com.epoch.loan.workshop.common.dao.mysql.LoanOrderDao;
-import com.epoch.loan.workshop.common.dao.mysql.LoanPaymentDao;
-import com.epoch.loan.workshop.common.dao.mysql.LoanRemittanceOrderRecordDao;
-import com.epoch.loan.workshop.common.dao.mysql.LoanRemittancePaymentRecordDao;
 import com.epoch.loan.workshop.common.entity.mysql.LoanRemittancePaymentRecordEntity;
 import com.epoch.loan.workshop.common.mq.remittance.RemittanceMQManager;
 import com.epoch.loan.workshop.common.mq.remittance.params.RemittanceParams;
 import com.epoch.loan.workshop.common.mq.repayment.RepaymentMQManager;
-import com.epoch.loan.workshop.common.util.SMSCodeUtil;
-import com.epoch.loan.workshop.common.authentication.TokenManager;
+import com.epoch.loan.workshop.common.sms.SMSManager;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +25,7 @@ public class BaseService {
      * token工具
      */
     @Autowired
-    public SMSCodeUtil smsCodeUtil;
+    public SMSManager smsManager;
     /**
      * token工具
      */

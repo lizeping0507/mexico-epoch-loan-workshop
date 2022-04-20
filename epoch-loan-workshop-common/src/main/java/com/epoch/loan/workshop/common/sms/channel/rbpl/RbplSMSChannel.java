@@ -13,26 +13,15 @@ import java.util.Map;
 /**
  * @author : Duke
  * @packageName : com.epoch.loan.workshop.common.sms.channel.rbpl
- * @className : RbplSMSChannelImpl
+ * @className : RbplSMSChannel
  * @createTime : 2022/4/20 15:28
  * @description : Rbpl短信渠道
  */
-public class RbplSMSChannelImpl implements SMSChannel {
-
-    /**
-     * 有参构造函数
-     *
-     * @param loanSMSChannelConfigEntity
-     */
-    public RbplSMSChannelImpl(LoanSMSChannelConfigEntity loanSMSChannelConfigEntity) {
-        this.loanSMSChannelConfigEntity = loanSMSChannelConfigEntity;
-    }
-
+public class RbplSMSChannel implements SMSChannel {
     /**
      * 短信对象
      */
     private LoanSMSChannelConfigEntity loanSMSChannelConfigEntity;
-
 
     /**
      * 发送短信验证码
@@ -103,5 +92,14 @@ public class RbplSMSChannelImpl implements SMSChannel {
         // 发送成功
         situation.setResult(true);
         return situation;
+    }
+
+    /**
+     * 有参构造函数
+     *
+     * @param loanSMSChannelConfigEntity
+     */
+    public RbplSMSChannel(LoanSMSChannelConfigEntity loanSMSChannelConfigEntity) {
+        this.loanSMSChannelConfigEntity = loanSMSChannelConfigEntity;
     }
 }
