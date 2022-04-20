@@ -373,24 +373,24 @@ public class UserServiceImpl extends BaseService implements UserService {
             return result;
         }
 
-//        // 未完成的订单
-//        Integer uncompletedOrder =  platformOrderDao.findUserLessThanSpecificStatusOrderNum(userCache.getId(),OrderStatus.WAY);
-//        data.setUncompletedOrder(uncompletedOrder);
-//
-//        // 待还款订单数量-
-//        Integer noCompleteNum =  platformOrderDao.findUserLessThanSpecificStatusOrderNum(userCache.getId(),OrderStatus.COMPLETE);
-//        data.setUncompletedOrder(noCompleteNum - uncompletedOrder);
+        // 未完成的订单
+        Integer uncompletedOrder =  platformOrderDao.findUserLessThanSpecificStatusOrderNum(userCache.getId(), 110);
+        data.setUncompletedOrder(uncompletedOrder);
+
+        // 待还款订单数量-
+        Integer noCompleteNum =  platformOrderDao.findUserWaitRepaymentOrderNum(userCache.getId());
+        data.setUncompletedOrder(noCompleteNum - uncompletedOrder);
 
         // 用户所有状态的订单数量
+        Integer allOrderNum = platformOrderDao.findUserAllOrderNum(userCache.getId());
+        data.setAllRepaymentOrder(allOrderNum);
 
         // 帮助中心地址 TODO 待确认
-
-
 
         // 封装结果
         result.setReturnCode(ResultEnum.SUCCESS.code());
         result.setMessage(ResultEnum.SUCCESS.message());
-        result.setData(mineResult);
+        result.setData(data);
         return result;
     }
 

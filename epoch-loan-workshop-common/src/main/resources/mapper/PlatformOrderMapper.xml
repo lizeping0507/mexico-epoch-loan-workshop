@@ -45,4 +45,13 @@
     <select id="findByOrderNo" resultType="com.epoch.loan.workshop.common.entity.mysql.PlatformOrderEntity">
         SELECT * FROM platform_order WHERE order_no = #{orderNo} LIMIT 0,1
     </select>
+    <select id="findUserLessThanSpecificStatusOrderNum" resultType="java.lang.Integer">
+        SELECT conut(*) from platform_order WHERE user_id = #{userId} AND order_status &lt; #{status}
+    </select>
+    <select id="findUserWaitRepaymentOrderNum" resultType="java.lang.Integer">
+        SELECT conut(*) from platform_order WHERE user_id = #{userId} AND order_status IN (170,175,180)
+    </select>
+    <select id="findUserAllOrderNum" resultType="java.lang.Integer">
+        SELECT conut(*) from platform_order WHERE user_id = #{userId}
+    </select>
 </mapper>
