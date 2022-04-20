@@ -8,10 +8,14 @@ import com.epoch.loan.workshop.common.entity.mysql.LoanUserInfoEntity;
 import com.epoch.loan.workshop.common.params.params.request.*;
 import com.epoch.loan.workshop.common.params.params.result.*;
 import com.epoch.loan.workshop.common.service.UserService;
-import com.epoch.loan.workshop.common.util.*;
+import com.epoch.loan.workshop.common.util.CheckFieldUtils;
+import com.epoch.loan.workshop.common.util.HttpUtils;
+import com.epoch.loan.workshop.common.util.ObjectIdUtil;
+import com.epoch.loan.workshop.common.util.PlatformUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Value;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -88,7 +92,11 @@ public class UserServiceImpl extends BaseService implements UserService {
         if (namespace.contains("dev") || namespace.contains("test")) {
             registerCode = "0000";
         }else {
-            registerCode = smsCodeUtil.getRegisterCode(params.getMobile(), params.getAppName());
+
+            //  TODO SKF 这里是获取并发送验证码,获取到验证码后自己保存redis,不要给我写道工具类里
+            registerCode = smsManager.sendVerificationCode(params.getMobile());
+
+
             // TODO 测试用
             registerCode = "0000";
         }
