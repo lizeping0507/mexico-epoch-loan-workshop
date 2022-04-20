@@ -92,7 +92,7 @@ public class UserServiceImpl extends BaseService implements UserService {
             registerCode = "0000";
         }else {
             registerCode = (String) redisClient.get(RedisKeyField.REGISTER_SMS_CODE + RedisKeyField.SPLIT + params.getAppName() + RedisKeyField.SPLIT + params.getMobile());
-
+            LogUtil.sysInfo("用户注册 : registerCode {}", JSONObject.toJSONString(registerCode));
             // TODO 测试用
             registerCode = "0000";
         }

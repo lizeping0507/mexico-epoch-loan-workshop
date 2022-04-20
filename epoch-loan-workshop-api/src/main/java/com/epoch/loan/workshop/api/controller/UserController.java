@@ -214,13 +214,13 @@ public class UserController extends BaseController {
 
         try {
             // 参数校验
-            if (loginParams.isLoginNameLegal()) {
+            if (!loginParams.isLoginNameLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
                 result.setMessage(ResultEnum.PARAM_ERROR.message() + ":loginName");
                 return result;
             }
-            if (loginParams.isPasswordNameLegal()) {
+            if (!loginParams.isPasswordNameLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
                 result.setMessage(ResultEnum.PARAM_ERROR.message() + ":password");
