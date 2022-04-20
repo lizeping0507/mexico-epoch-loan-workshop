@@ -307,7 +307,9 @@ public class UserServiceImpl extends BaseService implements UserService {
         Result<LoginResult> result = new Result<>();
 
         // 查询用户
+        LogUtil.sysInfo("密码登录  params: {}", JSONObject.toJSONString(params));
         LoanUserEntity user = loanUserDao.findByLoginNameAndAppName(params.getLoginName(), params.getAppName());
+        LogUtil.sysInfo("密码登录  user: {}", JSONObject.toJSONString(user));
 
         // 用户是否存在
         if (null == user) {
