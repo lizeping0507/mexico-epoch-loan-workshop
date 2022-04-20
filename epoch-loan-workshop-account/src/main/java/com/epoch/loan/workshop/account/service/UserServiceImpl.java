@@ -1,23 +1,30 @@
 package com.epoch.loan.workshop.account.service;
 
 import cn.hutool.core.util.ObjectUtil;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.epoch.loan.workshop.common.constant.OcrChannelConfigStatus;
 import com.epoch.loan.workshop.common.constant.OcrField;
 import com.epoch.loan.workshop.common.constant.PlatformUrl;
 import com.epoch.loan.workshop.common.constant.RedisKeyField;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
+import com.epoch.loan.workshop.common.entity.elastic.OcrLivingDetectionLogElasticEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanUserEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanUserInfoEntity;
 import com.epoch.loan.workshop.common.params.User;
 import com.epoch.loan.workshop.common.params.params.request.*;
 import com.epoch.loan.workshop.common.params.params.result.*;
+import com.epoch.loan.workshop.common.params.params.result.model.AdvanceOcrBackInfoResult;
+import com.epoch.loan.workshop.common.params.params.result.model.AdvanceOcrFrontInfoResult;
+import com.epoch.loan.workshop.common.params.params.result.model.AdvanceOcrInfoResponse;
 import com.epoch.loan.workshop.common.service.UserService;
 import com.epoch.loan.workshop.common.util.*;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.http.protocol.HTTP;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.io.File;
@@ -908,18 +915,16 @@ public class UserServiceImpl extends BaseService implements UserService {
         // 结果集
         Result<UserOcrResult> result = new Result<>();
         String appName = params.getAppName();
+        String imageType = params.getImageType();
         String cardInfoUrl = getAdvanceConfig(appName, OcrField.ADVANCE_CARD_INFO_URL);
+        String userId = params.getUser().getId();
 
-        // 封装结果
-        result.setReturnCode(ResultEnum.SUCCESS.code());
-        result.setMessage(ResultEnum.SUCCESS.message());
-        //result.setData();
         // 请求头
         Map<String, String> heardMap = getAdvanceHeard(appName);
 
         // 请求参数
         HashMap<String, String> paramMap = Maps.newHashMap();
-        paramMap.put(OcrField.ADVANCE_CARD_TYPE, params.getImageType());
+        paramMap.put(OcrField.ADVANCE_CARD_TYPE, imageType);
 
         // 文件列表
         Map<String, File> fileMap = new HashMap(1);
@@ -927,7 +932,7 @@ public class UserServiceImpl extends BaseService implements UserService {
 
         // 发送请求
         String resultStr = HttpUtils.POST_WITH_HEADER_FORM_FILE(cardInfoUrl, paramMap, heardMap, fileMap);
-        LogUtil.sysInfo("advance获取证件信息,url {} , result: {}", cardInfoUrl,resultStr );
+        LogUtil.sysInfo("advance获取证件信息,url {} , result: {}", cardInfoUrl, resultStr);
 
         // 释放文件
         for (Map.Entry<String, File> entry : fileMap.entrySet()) {
@@ -936,6 +941,53 @@ public class UserServiceImpl extends BaseService implements UserService {
         }
 
         // 解析响应结果
+        if (StringUtils.isBlank(resultStr)) {
+            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
+            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
+            return result;
+        }
+        AdvanceOcrInfoResult ocrInfoResult = JSONObject.parseObject(resultStr, AdvanceOcrInfoResult.class);
+
+        // 日志写入Elastic
+        OcrLivingDetectionLogElasticEntity livingDetectionLog = new OcrLivingDetectionLogElasticEntity();
+        BeanUtils.copyProperties(ocrInfoResult, livingDetectionLog);
+        livingDetectionLog.setRequestUrl(cardInfoUrl);
+        livingDetectionLog.setRequestParam(paramMap);
+        livingDetectionLog.setRequestHeard(heardMap);
+        livingDetectionLog.setResponse(resultStr);
+        livingDetectionLog.setUserId(userId);
+        livingDetectionLog.setCreateTime(new Date());
+        ocrLivingDetectionLogElasticDao.save(livingDetectionLog);
+
+        // 根据code值进行判定
+        String code = ocrInfoResult.getCode();
+        if (!OcrField.ADVANCE_SUCCESS_CODE.equalsIgnoreCase(code)) {
+            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
+            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
+        }
+        UserOcrResult ocrResult = new UserOcrResult();
+
+        // 封装响应参数
+        JSONObject jsonObject = ocrInfoResult.getData();
+        if (OcrField.ADVANCE_USER_OCR_ID_FRONT.equals(imageType)) {
+            AdvanceOcrInfoResponse<AdvanceOcrFrontInfoResult> data
+                    = JSON.parseObject(jsonObject.toJSONString(), new TypeReference<AdvanceOcrInfoResponse<AdvanceOcrFrontInfoResult>>() {
+            });
+            ocrResult.setType(data.getCardType());
+            ocrResult.setInfo(JSONObject.toJSONString(data.getValues()));
+            result.setReturnCode(ResultEnum.SUCCESS.code());
+            result.setMessage(ResultEnum.SUCCESS.message());
+            result.setData(ocrResult);
+        } else if (OcrField.ADVANCE_USER_OCR_ID_BACK.equalsIgnoreCase(imageType)) {
+            AdvanceOcrInfoResponse<AdvanceOcrBackInfoResult> data
+                    = JSON.parseObject(jsonObject.toJSONString(), new TypeReference<AdvanceOcrInfoResponse<AdvanceOcrBackInfoResult>>() {
+            });
+            ocrResult.setType(data.getCardType());
+            ocrResult.setInfo(JSONObject.toJSONString(data.getValues()));
+            result.setReturnCode(ResultEnum.SUCCESS.code());
+            result.setMessage(ResultEnum.SUCCESS.message());
+            result.setData(ocrResult);
+        }
 
         return result;
     }

@@ -50,23 +50,24 @@ public class OcrServiceImpl extends BaseService implements OcrService {
         List<LoanOcrProviderConfig> thirdConfigList = loanOcrProviderConfigDao.findProviderConfigListByAppNameAndStatus(params.getAppName(), OcrChannelConfigStatus.START);
 
         // 该APP是否有可用聚道
-        if (CollectionUtils.isNotEmpty(thirdConfigList)) {
-            LoanOcrProviderConfig thirdConfig = chooseByWeight(thirdConfigList);
-
-            // 有可用聚道
-            if (ObjectUtils.isNotEmpty(thirdConfig)) {
-
-                // 封装结果
-                result.setReturnCode(ResultEnum.SUCCESS.code());
-                result.setMessage(ResultEnum.SUCCESS.message());
-                result.setData(new ChannelTypeResult(thirdConfig.getChannelCode()));
-            }
+        if (CollectionUtils.isEmpty(thirdConfigList)) {
+            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
+            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
+            return result;
         }
 
-        // 无可用渠道配置
-        LogUtil.sysInfo("根据权重策略选择OCR渠道:{}", "空=====");
-        result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
-        result.setMessage(ResultEnum.SYSTEM_ERROR.message());
+        LoanOcrProviderConfig thirdConfig = chooseByWeight(thirdConfigList);
+        // 有可用聚道
+        if (ObjectUtils.isEmpty(thirdConfig)) {
+            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
+            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
+            return result;
+        }
+
+        // 封装结果
+        result.setReturnCode(ResultEnum.SUCCESS.code());
+        result.setMessage(ResultEnum.SUCCESS.message());
+        result.setData(new ChannelTypeResult(thirdConfig.getChannelCode()));
         return result;
     }
 
@@ -81,48 +82,73 @@ public class OcrServiceImpl extends BaseService implements OcrService {
     public Result<LicenseResult> advanceLicense(BaseParams params) throws Exception {
         // 结果集
         Result<LicenseResult> result = new Result<>();
+        String userId = params.getUser().getId();
 
         // 先查询 redis中 license是否过期
         String licenseExpireTimeCache = getLicenseExpireTimeCache();
-
-        // license过期或者为空时,请求advance
-        if (StringUtils.isBlank(licenseExpireTimeCache)) {
-            String appName = params.getAppName();
-            String appPackageName = getAdvanceConfig(appName, OcrField.ADVANCE_APP_PACKAGE_NAME);
-            String licenseUrl = getAdvanceConfig(appName, OcrField.ADVANCE_LICENSE_URL);
-
-            // 封装请求头 和 请求参数
-            Map<String, String> headers = getAdvanceHeard(params.getAppName());
-            HashMap<String, String> param = Maps.newHashMap();
-            param.put(OcrField.ADVANCE_APP_ID_KEY, appPackageName);
-            param.put(OcrField.ADVANCE_LICENSE_EFFECTIVE_SECONDS, OcrField.ADVANCE_LICENSE_SECONDS);
-
-            // 发送请求
-            String response = HttpUtils.POST_WITH_HEADER(licenseUrl, param, headers);
-
-            // 处理响应信息
-            if (StringUtils.isNotBlank(response)) {
-                AdvanceLicenseResult licenseResult = JSONObject.parseObject(response, AdvanceLicenseResult.class);
-                String code = licenseResult.getCode();
-                if (OcrField.ADVANCE_SUCCESS_CODE.equalsIgnoreCase(code)) {
-                    AdvanceLicenseResponse licenseResponse = licenseResult.getData();
-                    if (ObjectUtils.isNotEmpty(licenseResponse)) {
-                        Long expireTimestamp = licenseResponse.getExpireTimestamp();
-                        licenseExpireTimeCache = licenseResponse.getLicense();
-                        if (ObjectUtils.isNotEmpty(expireTimestamp) && StringUtils.isNotBlank(licenseExpireTimeCache)) {
-                            setLicenseExpireTimeStore(expireTimestamp, licenseExpireTimeCache);
-                        }
-                    }
-                }
-            }
+        if (StringUtils.isNotBlank(licenseExpireTimeCache)) {
+            result.setReturnCode(ResultEnum.SUCCESS.code());
+            result.setMessage(ResultEnum.SUCCESS.message());
+            result.setData(new LicenseResult(licenseExpireTimeCache));
+            return result;
         }
 
-        // 再次判断 license 是否为空
-        if (StringUtils.isBlank(licenseExpireTimeCache)) {
+        // license过期或者为空时,请求advance
+        String appName = params.getAppName();
+        String appPackageName = getAdvanceConfig(appName, OcrField.ADVANCE_APP_PACKAGE_NAME);
+        String licenseUrl = getAdvanceConfig(appName, OcrField.ADVANCE_LICENSE_URL);
+
+        // 封装请求头 和 请求参数
+        Map<String, String> headers = getAdvanceHeard(params.getAppName());
+        HashMap<String, String> param = Maps.newHashMap();
+        param.put(OcrField.ADVANCE_APP_ID_KEY, appPackageName);
+        param.put(OcrField.ADVANCE_LICENSE_EFFECTIVE_SECONDS, OcrField.ADVANCE_LICENSE_SECONDS);
+
+        // 发送请求
+        String response = HttpUtils.POST_WITH_HEADER(licenseUrl, param, headers);
+        if (StringUtils.isBlank(response)) {
             result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
             result.setMessage(ResultEnum.SYSTEM_ERROR.message());
             return result;
         }
+        AdvanceLicenseResult licenseResult = JSONObject.parseObject(response, AdvanceLicenseResult.class);
+
+        // 日志写入Elastic
+        OcrLivingDetectionLogElasticEntity livingDetectionLog = new OcrLivingDetectionLogElasticEntity();
+        BeanUtils.copyProperties(licenseResult, livingDetectionLog);
+        livingDetectionLog.setRequestUrl(licenseUrl);
+        livingDetectionLog.setRequestParam(param);
+        livingDetectionLog.setRequestHeard(headers);
+        livingDetectionLog.setResponse(response);
+        livingDetectionLog.setUserId(userId);
+        livingDetectionLog.setCreateTime(new Date());
+        ocrLivingDetectionLogElasticDao.save(livingDetectionLog);
+
+        // 判断是否请求成功
+        String code = licenseResult.getCode();
+        if (!OcrField.ADVANCE_SUCCESS_CODE.equalsIgnoreCase(code)) {
+            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
+            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
+            return result;
+        }
+
+        // 判断响应信息
+        AdvanceLicenseResponse licenseResponse = licenseResult.getData();
+        if (ObjectUtils.isEmpty(licenseResponse)) {
+            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
+            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
+            return result;
+        }
+
+        // 判断授权码和过期时间
+        Long expireTimestamp = licenseResponse.getExpireTimestamp();
+        licenseExpireTimeCache = licenseResponse.getLicense();
+        if (ObjectUtils.isEmpty(expireTimestamp) || StringUtils.isBlank(licenseExpireTimeCache)) {
+            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
+            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
+            return result;
+        }
+        setLicenseExpireTimeStore(expireTimestamp, licenseExpireTimeCache);
 
         // 封装结果
         result.setReturnCode(ResultEnum.SUCCESS.code());
@@ -144,7 +170,6 @@ public class OcrServiceImpl extends BaseService implements OcrService {
         Result<UserLivenessScoreResult> result = new Result<>();
         String scoreUrl = getAdvanceConfig(params.getAppName(), OcrField.ADVANCE_LIVENESS_SCORE_URL);
         String livenessThreshold = getAdvanceConfig(params.getAppName(), OcrField.LIVENESS_THRESHOLD);
-        UserLivenessScoreResult data = null;
         String userId = params.getUser().getId();
 
         // 封装请求参数
@@ -159,43 +184,49 @@ public class OcrServiceImpl extends BaseService implements OcrService {
         String responseStr = HttpUtils.POST_WITH_HEADER(scoreUrl, param, headers);
 
         // 处理响应结果
-        if (StringUtils.isNotBlank(responseStr)) {
-            AdvanceScoreResult scoreResult = JSONObject.parseObject(responseStr, AdvanceScoreResult.class);
-            String code = scoreResult.getCode();
-
-            // 检测日志写入Elastic
-            OcrLivingDetectionLogElasticEntity livingDetectionLog = new OcrLivingDetectionLogElasticEntity();
-
-            if (OcrField.ADVANCE_SUCCESS_CODE.equals(code)) {
-                data = result.getData();
-                String livenessScore = data.getLivenessScore();
-
-                // 赋值，保存数据
-                livingDetectionLog.setLivenessScore(data.getLivenessScore());
-                livingDetectionLog.setDetectionResult(data.getDetectionResult());
-                if (ObjectUtils.isNotEmpty(livenessScore)) {
-
-                    //活体分小于推荐阀值认为是恶意攻击
-                    if (new BigDecimal(livenessScore).compareTo(new BigDecimal(livenessThreshold)) > 0) {
-                        result.setData(data);
-                    }
-                }
-            }
-
-            // 保存检测日志
-            BeanUtils.copyProperties(result, livingDetectionLog);
-            livingDetectionLog.setId(userId);
-            livingDetectionLog.setCreateTime(new Date());
-            ocrLivingDetectionLogElasticDao.save(livingDetectionLog);
+        if (StringUtils.isBlank(responseStr)) {
+            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
+            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
+            return result;
         }
+        AdvanceScoreResult scoreResult = JSONObject.parseObject(responseStr, AdvanceScoreResult.class);
 
-        // 封装结果
-        if (ObjectUtils.isEmpty(data)) {
+        // 日志写入Elastic
+        OcrLivingDetectionLogElasticEntity livingDetectionLog = new OcrLivingDetectionLogElasticEntity();
+        BeanUtils.copyProperties(scoreResult, livingDetectionLog);
+        livingDetectionLog.setRequestUrl(scoreUrl);
+        livingDetectionLog.setRequestParam(param);
+        livingDetectionLog.setRequestHeard(headers);
+        livingDetectionLog.setResponse(responseStr);
+        livingDetectionLog.setUserId(userId);
+        livingDetectionLog.setCreateTime(new Date());
+        ocrLivingDetectionLogElasticDao.save(livingDetectionLog);
+
+        // 判断是否响应成功
+        String code = scoreResult.getCode();
+        if (!OcrField.ADVANCE_SUCCESS_CODE.equalsIgnoreCase(code)) {
             result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
             result.setMessage(ResultEnum.SYSTEM_ERROR.message());
             return result;
         }
 
+        // 获取响应分数
+        UserLivenessScoreResult data = result.getData();
+        String livenessScore = data.getLivenessScore();
+        if (ObjectUtils.isEmpty(livenessScore)) {
+            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
+            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
+            return result;
+        }
+
+        // 判断响应分数是否大于建议阀值
+        if (new BigDecimal(livenessScore).compareTo(new BigDecimal(livenessThreshold)) <= 0) {
+            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
+            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
+            return result;
+        }
+
+        // 封装结果
         result.setReturnCode(ResultEnum.SUCCESS.code());
         result.setMessage(ResultEnum.SUCCESS.message());
         result.setData(data);
@@ -262,7 +293,7 @@ public class OcrServiceImpl extends BaseService implements OcrService {
      */
     public String getLicenseExpireTimeCache() {
         String license = null;
-        Boolean hasKey = redisClient.hasKey(RedisKeyField.ADVANCE_LICENSE);
+        boolean hasKey = redisClient.hasKey(RedisKeyField.ADVANCE_LICENSE);
 
         if (hasKey) {
             Map<Object, Object> values = redisClient.hmget(RedisKeyField.ADVANCE_LICENSE);
@@ -293,7 +324,7 @@ public class OcrServiceImpl extends BaseService implements OcrService {
     public void setLicenseExpireTimeStore(Long expireTime, String license) {
         try {
             if (expireTime != null && StringUtils.isNotBlank(license)) {
-                Boolean hasKey = redisClient.hasKey(RedisKeyField.ADVANCE_LICENSE);
+                boolean hasKey = redisClient.hasKey(RedisKeyField.ADVANCE_LICENSE);
                 if (hasKey) {
                     redisClient.del(RedisKeyField.ADVANCE_LICENSE);
                 }

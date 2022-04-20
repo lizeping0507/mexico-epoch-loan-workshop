@@ -20,8 +20,8 @@ public class UserOcrResult implements Serializable {
     private String info;
 
     /**
-     * 识别类型1 aadhar正面 2 aadhar背面 3 pan卡正面
+     * 识别类型 INE_OR_IFE_FRONT or INE_OR_IFE_BACK
      */
-    private Integer type;
+    private String type;
 
 }

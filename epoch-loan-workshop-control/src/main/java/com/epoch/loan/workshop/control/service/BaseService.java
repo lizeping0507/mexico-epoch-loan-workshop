@@ -41,7 +41,7 @@ public class BaseService {
     public RedisClient redisClient;
 
     /**
-     * advance 活体检测日志
+     * advance日志
      */
     @Autowired
     public OcrLivingDetectionLogElasticDao ocrLivingDetectionLogElasticDao;

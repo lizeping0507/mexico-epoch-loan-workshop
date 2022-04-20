@@ -104,6 +104,7 @@ public class OcrController extends BaseController {
      * @param params advance获取活体分封装类
      * @return 查询活体分结果
      */
+    @Authentication
     @PostMapping(URL.OCR_ADVANCE_LIVENESS_SCORE)
     public Result<UserLivenessScoreResult> advanceLivenessScore(UserLivenessScoreParams params) {
         // 结果集
@@ -287,6 +288,7 @@ public class OcrController extends BaseController {
      * @param request 请求
      * @return 证件信息
      */
+    @Authentication
     @PostMapping(URL.USER_OCR_INFO)
     public Result<UserOcrResult> userOcrInfo(UserOcrFullInfoParams params, HttpServletRequest request) {
         // 结果集

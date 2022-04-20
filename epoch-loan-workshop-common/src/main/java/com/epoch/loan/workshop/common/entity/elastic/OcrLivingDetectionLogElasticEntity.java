@@ -26,6 +26,12 @@ public class OcrLivingDetectionLogElasticEntity {
     private String id;
 
     /**
+     * 映射地址
+     */
+    @Field(type = FieldType.Keyword)
+    private String requestUrl;
+
+    /**
      *  用户id
      */
     @Field(type = FieldType.Keyword)
@@ -44,16 +50,22 @@ public class OcrLivingDetectionLogElasticEntity {
     private String message;
 
     /**
-     * advance 检测结果
+     * 请求参数
      */
-    @Field(type = FieldType.Keyword)
-    private String detectionResult;
+    @Field(type = FieldType.Object)
+    private Object requestParam;
 
     /**
-     * avacne 活体检测分数
+     * 请求头
      */
-    @Field(type = FieldType.Keyword)
-    private String livenessScore;
+    @Field(type = FieldType.Object)
+    private Object requestHeard;
+
+    /**
+     * 响应原始数据
+     */
+    @Field(type = FieldType.Object)
+    private Object response;
 
     /**
      * advacen 额外信息

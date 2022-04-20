@@ -30,6 +30,16 @@ public class OcrField {
     public static final String ADVANCE_CARD_TYPE = "cardType";
 
     /**
+     * advance curp ocr认证正面标识
+     */
+    public static final String ADVANCE_USER_OCR_ID_FRONT = "INE_OR_IFE_FRONT";
+
+    /**
+     * advance curp ocr认证背面标识
+     */
+    public static final String ADVANCE_USER_OCR_ID_BACK = "INE_OR_IFE_BACK";
+
+    /**
      * advance 发送文件图像key
      */
     public static final String ADVANCE_card_IMAGE = "image";
