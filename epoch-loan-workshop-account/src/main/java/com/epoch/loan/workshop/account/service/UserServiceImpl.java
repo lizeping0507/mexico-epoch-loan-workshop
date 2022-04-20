@@ -319,7 +319,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         }
 
         // 密码匹配
-        if (params.getPassword().equals(user.getPassword())) {
+        if (!params.getPassword().equals(user.getPassword())) {
             result.setReturnCode(ResultEnum.PASSWORD_INVALID.code());
             result.setMessage(ResultEnum.PASSWORD_INVALID.message());
             return result;
