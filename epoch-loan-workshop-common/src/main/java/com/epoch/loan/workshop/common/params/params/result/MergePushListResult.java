@@ -1,5 +1,6 @@
 package com.epoch.loan.workshop.common.params.params.result;
 
+import com.epoch.loan.workshop.common.params.params.result.model.MergePushProduct;
 import lombok.Data;
 
 import java.io.Serializable;

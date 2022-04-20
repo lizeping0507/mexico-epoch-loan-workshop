@@ -1,7 +1,7 @@
 package com.epoch.loan.workshop.common.params.params.request;
 
 import com.epoch.loan.workshop.common.params.params.BaseParams;
-import com.epoch.loan.workshop.common.params.params.result.MergePushProduct;
+import com.epoch.loan.workshop.common.params.params.result.model.MergePushProduct;
 import lombok.Data;
 
 import java.util.List;

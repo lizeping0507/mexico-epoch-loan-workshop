@@ -1,4 +1,4 @@
-package com.epoch.loan.workshop.common.params.params.result;
+package com.epoch.loan.workshop.common.params.params.result.model;
 
 import lombok.Data;
 
