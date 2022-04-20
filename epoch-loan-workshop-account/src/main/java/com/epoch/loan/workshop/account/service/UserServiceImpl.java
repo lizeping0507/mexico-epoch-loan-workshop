@@ -16,6 +16,7 @@ import com.epoch.loan.workshop.common.util.*;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.apache.http.protocol.HTTP;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.io.File;
