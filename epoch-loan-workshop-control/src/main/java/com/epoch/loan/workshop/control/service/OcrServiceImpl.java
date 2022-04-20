@@ -14,7 +14,6 @@ import com.epoch.loan.workshop.common.params.params.result.model.AdvanceLicenseR
 import com.epoch.loan.workshop.common.params.params.result.AdvanceLicenseResult;
 import com.epoch.loan.workshop.common.service.OcrService;
 import com.epoch.loan.workshop.common.util.HttpUtils;
-import com.epoch.loan.workshop.common.util.JsonUtils;
 import com.epoch.loan.workshop.common.util.LogUtil;
 import com.google.common.collect.Maps;
 import org.apache.commons.collections.CollectionUtils;
@@ -103,7 +102,7 @@ public class OcrServiceImpl extends BaseService implements OcrService {
 
             // 处理响应信息
             if (StringUtils.isNotBlank(response)) {
-                AdvanceLicenseResult licenseResult = JsonUtils.fromJson(response, AdvanceLicenseResult.class);
+                AdvanceLicenseResult licenseResult = JSONObject.parseObject(response, AdvanceLicenseResult.class);
                 String code = licenseResult.getCode();
                 if (OcrField.ADVANCE_SUCCESS_CODE.equalsIgnoreCase(code)) {
                     AdvanceLicenseResponse licenseResponse = licenseResult.getData();

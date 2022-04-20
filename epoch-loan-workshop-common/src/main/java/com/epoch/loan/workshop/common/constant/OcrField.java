@@ -25,6 +25,16 @@ public class OcrField {
     public static final String ADVANCE_ACCESS_KEY_KEY = "X-ADVAI-KEY";
 
     /**
+     * advance 身份证的类型key： INE_OR_IFE_FRONT or INE_OR_IFE_BACK
+     */
+    public static final String ADVANCE_CARD_TYPE = "cardType";
+
+    /**
+     * advance 发送文件图像key
+     */
+    public static final String ADVANCE_card_IMAGE = "image";
+
+    /**
      * advance 发送带图请求头CONTENT_TYPE的值
      */
     public static final String ADVANCE_MULTIPART_VALUE= "multipart/form-data; boundary=----------ThIs_Is_tHe_bouNdaRY_$";
@@ -82,17 +92,24 @@ public class OcrField {
     public static final String ADVANCE_APP_PACKAGE_NAME = "appPackageName";
 
     /**
-     * advance 获取license请求地址
+     * advance 获取license请求地址key
      */
     public static final String ADVANCE_LICENSE_URL = "licenseUrl";
 
     /**
-     * advance 获取活体检测结果请求地址
+     * advance 获取活体检测结果请求地址key
      */
     public static final String ADVANCE_LIVENESS_SCORE_URL="livenessScoreUrl";
+
+    /**
+     * advance 获取身份证信息请求地址key
+     */
+    public static final String ADVANCE_CARD_INFO_URL = "advanceOcrCardInfoUrl";
 
     /**
      * advance 活体检测分建议阀值
      */
     public static final String LIVENESS_THRESHOLD = "livenessThreshold";
+
+
 }

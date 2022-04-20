@@ -2,6 +2,7 @@ package com.epoch.loan.workshop.common.util;
 
 
 import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.*;
 import org.apache.http.client.ClientProtocolException;
@@ -564,6 +565,21 @@ public class HttpUtils {
         return paramsFilesPostInvoke(url, params, files, CONTENT_CHARSET);
     }
 
+    /**
+     * 以HTTP方式POST发送键值对及二进制文件
+     *
+     * @param url
+     * @param params
+     * @param heardMap
+     * @return
+     * @throws URISyntaxException
+     * @throws ClientProtocolException
+     * @throws IOException
+     */
+    public static String POST_WITH_HEADER_FORM_FILE(String url, Map<String, String> params, Map<String, String> heardMap, Map<String, File> files) throws Exception {
+        return paramsWithHeaderFilesPostInvoke(url, params, heardMap, files, CONTENT_CHARSET);
+    }
+
 
     /**
      * 以HTTP方式POST发送键值对字符串(类似表单提交)
@@ -751,6 +767,61 @@ public class HttpUtils {
 
         // 设置头
         post.setHeader(HTTP.CONTENT_TYPE, "multipart/form-data;boundary=" + boundary);
+        post.setHeader(HTTP.USER_AGENT, USER_AGENT);
+
+        // 创建一个多参数的builder
+        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+
+        // 设置基本参数
+        builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
+        builder.setBoundary(boundary);
+        builder.setContentType(ContentType.MULTIPART_FORM_DATA);
+        builder.setCharset(UTF_8);
+
+        // 设置form表单参数
+        for (Entry<String, String> entry : params.entrySet()) {
+            builder.addPart(entry.getKey(), new StringBody(entry.getValue(), ContentType.TEXT_PLAIN.withCharset(UTF_8)));
+        }
+
+        // 设置文件参数
+        for (Entry<String, File> entry : files.entrySet()) {
+            File temp = entry.getValue();
+            builder.addPart(entry.getKey(), new FileBody(temp, ContentType.APPLICATION_OCTET_STREAM, temp.getName()));
+        }
+
+        // 设置参数
+        post.setEntity(builder.build());
+
+        return post;
+    }
+
+    /**
+     * 构建http form表单参数及文件共同提交 post请求
+     *
+     * @param url
+     * @param params
+     * @param heardMap
+     * @param files
+     * @return
+     * @throws Exception
+     */
+    public static HttpPost buildHttpWithHeaderParamFilePost(String url, Map<String, String> params,Map<String, String> heardMap, Map<String, File> files)
+            throws Exception {
+        HttpPost post = new HttpPost(url);
+
+        // Httpbody体 boundary分隔符
+        String boundary = "----" + System.currentTimeMillis() + "----";
+
+        // 设置超时时间
+        post.setConfig(buildRequestConfig());
+
+        // 设置头
+        // 设置请求头参数
+        if (ObjectUtils.isNotEmpty(heardMap)) {
+            for (String key : heardMap.keySet()) {
+                post.setHeader(key, heardMap.get(key));
+            }
+        }
         post.setHeader(HTTP.USER_AGENT, USER_AGENT);
 
         // 创建一个多参数的builder
@@ -1033,6 +1104,42 @@ public class HttpUtils {
      * 使用POST 发送键值对字符串及二进制文件，并指定返回内容字符集
      *
      * @param url
+     * @param params   表单普通参数
+     * @param heardMap 请求头
+     * @param files    文件参数
+     * @param charset  编码格式
+     * @return
+     * @throws Exception
+     */
+    public static String paramsWithHeaderFilesPostInvoke(String url, Map<String, String> params, Map<String, String> heardMap, Map<String, File> files, String charset) throws Exception {
+        CloseableHttpResponse response = null;
+        HttpPost post = buildHttpWithHeaderParamFilePost(url, params, heardMap, files);
+        try {
+            response = client.execute(post);
+            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                HttpEntity entity = response.getEntity();
+                if (entity != null) {
+                    // 输入流关闭，同时会自动触发http连接的release
+                    String returnStr = EntityUtils.toString(entity, charset);
+                    return returnStr;
+                }
+            } else {
+                post.abort();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception(e);
+        } finally {
+            HttpClientUtils.closeQuietly(response);
+            post.releaseConnection();
+        }
+        return null;
+    }
+
+    /**
+     * 使用POST 发送键值对字符串及二进制文件，并指定返回内容字符集
+     *
+     * @param url
      * @param params  表单普通参数
      * @param files   文件参数
      * @param charset 编码格式
@@ -1063,7 +1170,6 @@ public class HttpUtils {
         }
         return null;
     }
-
 
     /**
      * 使用POST 发送键值对字符串，并指定返回内容字符集
