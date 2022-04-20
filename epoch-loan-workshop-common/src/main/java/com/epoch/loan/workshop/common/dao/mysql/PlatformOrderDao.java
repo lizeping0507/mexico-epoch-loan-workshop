@@ -145,4 +145,27 @@ public interface PlatformOrderDao {
      * @return PlatformOrderEntity
      */
     PlatformOrderEntity findByOrderNo(String orderNo);
+
+    /**
+     * 查询用户小于指定状态的订单
+     * @param userId
+     * @param status
+     * @return
+     */
+    Integer findUserLessThanSpecificStatusOrderNum(String userId, int status);
+
+    /**
+     * 查询代还款状态订单
+     * @param userId
+     * @return
+     */
+    Integer findUserWaitRepaymentOrderNum(String userId);
+
+    /**
+     * 查询用户所有订单数量
+     *
+     * @param userId
+     * @return
+     */
+    Integer findUserAllOrderNum(String userId);
 }

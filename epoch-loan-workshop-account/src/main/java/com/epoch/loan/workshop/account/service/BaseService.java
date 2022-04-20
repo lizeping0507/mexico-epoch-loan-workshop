@@ -59,6 +59,11 @@ public class BaseService {
     @Autowired
     public PlatformUserDao platformUserDao;
     /**
+     * 用户
+     */
+    @Autowired
+    public PlatformOrderDao platformOrderDao;
+    /**
      * 银行卡
      */
     @Autowired

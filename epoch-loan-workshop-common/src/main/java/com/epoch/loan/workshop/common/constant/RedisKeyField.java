@@ -40,6 +40,11 @@ public class RedisKeyField {
     public final static String REGISTER_SMS_CODE = "registerSmsCode" + SPLIT;
 
     /**
+     * 注册验证码
+     */
+    public final static String FORGOTPWD_SMS_CODE = "forgotPwd" + SPLIT;
+
+    /**
      * advance License记录
      */
     public final static String ADVANCE_LICENSE = "advanceLicenseCacheKey";
