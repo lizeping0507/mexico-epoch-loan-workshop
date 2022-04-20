@@ -1,5 +1,6 @@
 package com.epoch.loan.workshop.api.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.api.annotated.Authentication;
 import com.epoch.loan.workshop.common.config.URL;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
@@ -56,6 +57,7 @@ public class UserController extends BaseController {
     @Authentication(auth = false)
     @PostMapping(URL.REGISTER)
     public Result<RegisterResult> register(RegisterParams registerParams) {
+        LogUtil.sysInfo("用户注册 : {}", JSONObject.toJSONString(registerParams));
         // 结果集
         Result<RegisterResult> result = new Result<>();
 
@@ -207,18 +209,19 @@ public class UserController extends BaseController {
      */
     @PostMapping(URL.LOGIN)
     public Result<LoginResult> login(LoginParams loginParams) {
+        LogUtil.sysInfo("密码登录 : {}", JSONObject.toJSONString(loginParams));
         // 结果集
         Result<LoginResult> result = new Result<>();
 
         try {
             // 参数校验
-            if (loginParams.isLoginNameLegal()) {
+            if (!loginParams.isLoginNameLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
                 result.setMessage(ResultEnum.PARAM_ERROR.message() + ":loginName");
                 return result;
             }
-            if (loginParams.isPasswordNameLegal()) {
+            if (!loginParams.isPasswordNameLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
                 result.setMessage(ResultEnum.PARAM_ERROR.message() + ":password");
