@@ -8,6 +8,7 @@ import com.epoch.loan.workshop.common.entity.mysql.LoanRemittancePaymentRecordEn
 import com.epoch.loan.workshop.common.mq.remittance.RemittanceMQManager;
 import com.epoch.loan.workshop.common.mq.remittance.params.RemittanceParams;
 import com.epoch.loan.workshop.common.mq.repayment.RepaymentMQManager;
+import com.epoch.loan.workshop.common.redis.RedisClient;
 import com.epoch.loan.workshop.common.sms.SMSManager;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -22,7 +23,12 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class BaseService {
     /**
-     * token工具
+     * Redis工具类
+     */
+    @Autowired
+    public RedisClient redisClient;
+    /**
+     * 短信
      */
     @Autowired
     public SMSManager smsManager;
