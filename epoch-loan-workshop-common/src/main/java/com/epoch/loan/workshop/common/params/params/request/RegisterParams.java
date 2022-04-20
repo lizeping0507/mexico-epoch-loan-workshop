@@ -64,7 +64,6 @@ public class RegisterParams extends BaseParams {
         if (StringUtils.isEmpty(this.imei)) {
             return false;
         }
-
         return true;
     }
 
@@ -77,7 +76,6 @@ public class RegisterParams extends BaseParams {
         if (StringUtils.isEmpty(this.gaId)) {
             return false;
         }
-
         return true;
     }
 
@@ -90,7 +88,6 @@ public class RegisterParams extends BaseParams {
         if (StringUtils.isEmpty(this.androidId)) {
             return false;
         }
-
         return true;
     }
 
@@ -103,7 +100,6 @@ public class RegisterParams extends BaseParams {
         if (StringUtils.isEmpty(this.platform)) {
             return false;
         }
-
         return true;
     }
 
@@ -116,7 +112,6 @@ public class RegisterParams extends BaseParams {
         if (StringUtils.isEmpty(this.smsCode)) {
             return false;
         }
-
         return true;
     }
 
@@ -129,7 +124,6 @@ public class RegisterParams extends BaseParams {
         if (StringUtils.isEmpty(this.password)) {
             return false;
         }
-
         return true;
     }
 
@@ -142,7 +136,6 @@ public class RegisterParams extends BaseParams {
         if (StringUtils.isEmpty(this.mobile)) {
             return false;
         }
-
         return true;
     }
 }

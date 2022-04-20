@@ -61,14 +61,14 @@ public class UserController extends BaseController {
 
         try {
             // 验证请求参数是否合法
-            if (registerParams.isMobileLegal()) {
+            if (!registerParams.isMobileLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
                 result.setMessage(ResultEnum.PARAM_ERROR.message() + ":mobile");
                 return result;
             }
 
-            if (registerParams.isPasswordLegal()) {
+            if (!registerParams.isPasswordLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
                 result.setMessage(ResultEnum.PARAM_ERROR.message() + ":password");
@@ -76,35 +76,35 @@ public class UserController extends BaseController {
 
             }
 
-            if (registerParams.isSmsCodeLegal()) {
+            if (!registerParams.isSmsCodeLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
                 result.setMessage(ResultEnum.PARAM_ERROR.message() + ":smsCode");
                 return result;
             }
 
-            if (registerParams.isAndroidIdLegal()) {
+            if (!registerParams.isAndroidIdLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
                 result.setMessage(ResultEnum.PARAM_ERROR.message() + ":androidId");
                 return result;
             }
 
-            if (registerParams.isPlatformLegal()) {
+            if (!registerParams.isPlatformLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
                 result.setMessage(ResultEnum.PARAM_ERROR.message() + ":platform");
                 return result;
             }
 
-            if (registerParams.isGaIdLegal()) {
+            if (!registerParams.isGaIdLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
                 result.setMessage(ResultEnum.PARAM_ERROR.message() + ":gaId");
                 return result;
             }
 
-            if (registerParams.isImeiLegal()) {
+            if (!registerParams.isImeiLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
                 result.setMessage(ResultEnum.PARAM_ERROR.message() + ":imei");
