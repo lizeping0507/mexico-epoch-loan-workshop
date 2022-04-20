@@ -263,9 +263,8 @@ public class OcrServiceImpl extends BaseService implements OcrService {
             if (randomNum > start && randomNum <= (start + proportion)) {
                 res = entity;
                 break;
-            } else {
-                start += proportion;
             }
+            start += proportion;
         }
         LogUtil.sysInfo("providerConfig res:{}", res);
 
@@ -295,22 +294,32 @@ public class OcrServiceImpl extends BaseService implements OcrService {
         String license = null;
         boolean hasKey = redisClient.hasKey(RedisKeyField.ADVANCE_LICENSE);
 
-        if (hasKey) {
-            Map<Object, Object> values = redisClient.hmget(RedisKeyField.ADVANCE_LICENSE);
-            if (MapUtils.isNotEmpty(values)) {
-                Object object = values.get(OcrField.ADVANCE_LICENSE_EXPIRE_TIME);
-                if (object != null) {
-                    long expireTime = Long.parseLong(String.valueOf(object));
-                    if (expireTime > System.currentTimeMillis()) {
-                        Object object2 = values.get(OcrField.ADVANCE_LICENSE_NAME);
-                        if (object2 != null) {
-                            license = String.valueOf(object2);
-                        }
-                    } else {
-                        redisClient.del(RedisKeyField.ADVANCE_LICENSE);
-                    }
-                }
+        // 是否存在key
+        if (!hasKey) {
+            return license;
+        }
+
+        // 是否存在value
+        Map<Object, Object> values = redisClient.hmget(RedisKeyField.ADVANCE_LICENSE);
+        if (MapUtils.isEmpty(values)) {
+            return license;
+        }
+
+        // 获取时间
+        Object object = values.get(OcrField.ADVANCE_LICENSE_EXPIRE_TIME);
+        if (object == null) {
+            return license;
+        }
+
+        // 不过期 生成license
+        long expireTime = Long.parseLong(String.valueOf(object));
+        if (expireTime > System.currentTimeMillis()) {
+            Object object2 = values.get(OcrField.ADVANCE_LICENSE_NAME);
+            if (object2 != null) {
+                license = String.valueOf(object2);
             }
+        } else {
+            redisClient.del(RedisKeyField.ADVANCE_LICENSE);
         }
         return license;
     }
@@ -322,18 +331,20 @@ public class OcrServiceImpl extends BaseService implements OcrService {
      * @param license    advance授权码
      */
     public void setLicenseExpireTimeStore(Long expireTime, String license) {
-        try {
-            if (expireTime != null && StringUtils.isNotBlank(license)) {
-                boolean hasKey = redisClient.hasKey(RedisKeyField.ADVANCE_LICENSE);
-                if (hasKey) {
-                    redisClient.del(RedisKeyField.ADVANCE_LICENSE);
-                }
+        if (expireTime == null || StringUtils.isBlank(license)) {
+            return;
+        }
 
-                HashMap<Object, Object> map = Maps.newHashMap();
-                map.put(OcrField.ADVANCE_LICENSE_NAME, license);
-                map.put(OcrField.ADVANCE_LICENSE_EXPIRE_TIME, expireTime);
-                redisClient.hmset(RedisKeyField.ADVANCE_LICENSE, map);
+        try {
+            boolean hasKey = redisClient.hasKey(RedisKeyField.ADVANCE_LICENSE);
+            if (hasKey) {
+                redisClient.del(RedisKeyField.ADVANCE_LICENSE);
             }
+
+            HashMap<Object, Object> map = Maps.newHashMap();
+            map.put(OcrField.ADVANCE_LICENSE_NAME, license);
+            map.put(OcrField.ADVANCE_LICENSE_EXPIRE_TIME, expireTime);
+            redisClient.hmset(RedisKeyField.ADVANCE_LICENSE, map);
         } catch (Exception e) {
             e.printStackTrace();
         }
