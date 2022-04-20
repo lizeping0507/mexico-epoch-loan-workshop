@@ -77,6 +77,7 @@ public class UserServiceImpl extends BaseService implements UserService {
 
         // 手机号是否已经注册
         Integer isExit = loanUserDao.exitByAppNameAndLoginName(params.getAppName(), params.getMobile());
+        LogUtil.sysInfo("用户注册 : isExit {}", JSONObject.toJSONString(isExit));
         if (isExit != 0){
             result.setReturnCode(ResultEnum.PHONE_EXIT.code());
             result.setMessage(ResultEnum.PHONE_EXIT.message());

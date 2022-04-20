@@ -1,5 +1,6 @@
 package com.epoch.loan.workshop.api.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.api.annotated.Authentication;
 import com.epoch.loan.workshop.common.config.URL;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
@@ -56,6 +57,7 @@ public class UserController extends BaseController {
     @Authentication(auth = false)
     @PostMapping(URL.REGISTER)
     public Result<RegisterResult> register(RegisterParams registerParams) {
+        LogUtil.sysInfo("用户注册 : {}", JSONObject.toJSONString(registerParams));
         // 结果集
         Result<RegisterResult> result = new Result<>();
 
