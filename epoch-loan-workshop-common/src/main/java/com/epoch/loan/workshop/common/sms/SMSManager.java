@@ -49,7 +49,6 @@ public class SMSManager {
         return code;
     }
 
-
     /**
      * 短信渠道
      *

@@ -69,7 +69,7 @@ public class RbplSMSChannelImpl implements SMSChannel {
         String callbackUrl = configJSon.getString("callbackUrl");
 
         // 请求地址
-        String url = configJSon.getString("url");
+        String url = configJSon.getString("optUrl");
 
         // 封装请求参数
         Map<String, String> params = new HashMap<>();
