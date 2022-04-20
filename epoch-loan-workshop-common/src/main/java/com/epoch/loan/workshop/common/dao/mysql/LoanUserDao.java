@@ -38,4 +38,12 @@ public interface LoanUserDao {
      * @param loanUserEntity
      */
     void insert(@Param("loanUserEntity") LoanUserEntity loanUserEntity);
+
+    /**
+     * 更新密码
+     * @param id
+     * @param newPassword
+     */
+    void updatePassword(String id, String newPassword);
+
 }

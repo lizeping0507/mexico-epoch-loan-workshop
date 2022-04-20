@@ -127,6 +127,71 @@ public class UserController extends BaseController {
     }
 
     /**
+     * 密码登录
+     *
+     * @param loginParams 入参
+     * @return 登陆结果
+     */
+    @PostMapping(URL.LOGIN)
+    public Result<LoginResult> login(LoginParams loginParams) {
+        LogUtil.sysInfo("密码登录 : {}", JSONObject.toJSONString(loginParams));
+        // 结果集
+        Result<LoginResult> result = new Result<>();
+
+        try {
+            // 参数校验
+            if (!loginParams.isLoginNameLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":loginName");
+                return result;
+            }
+            if (!loginParams.isPasswordNameLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":password");
+                return result;
+            }
+
+            // 密码登录
+            return userService.login(loginParams);
+        } catch (Exception e) {
+            LogUtil.sysError("[UserController login]", e);
+
+            // 异常返回结果
+            result.setEx(ThrowableUtils.throwableToString(e));
+            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
+            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
+            return result;
+        }
+    }
+
+    /**
+     * 更新密码
+     *
+     * @param modifyPasswordParams 更新密码参数
+     * @return 新token和用户id
+     */
+    @PostMapping(URL.MODIFY_PASSWORD)
+    public Result<ChangePasswordResult> modifyPassword(ModifyPasswordParams modifyPasswordParams) {
+        // 结果集
+        Result<ChangePasswordResult> result = new Result<>();
+
+        try {
+            // 更新密码
+            return userService.modifyPassword(modifyPasswordParams);
+        } catch (Exception e) {
+            LogUtil.sysError("[UserController modifyPassword]", e);
+
+            // 异常返回结果
+            result.setEx(ThrowableUtils.throwableToString(e));
+            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
+            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
+            return result;
+        }
+    }
+
+    /**
      * 忘记密码
      *
      * @param forgotPwdParams 忘记密码参数
@@ -167,71 +232,6 @@ public class UserController extends BaseController {
             return userService.editPassword(params);
         } catch (Exception e) {
             LogUtil.sysError("[UserController editPassword]", e);
-
-            // 异常返回结果
-            result.setEx(ThrowableUtils.throwableToString(e));
-            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
-            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
-            return result;
-        }
-    }
-
-    /**
-     * 更新密码
-     *
-     * @param modifyPasswordParams 更新密码参数
-     * @return 新token和用户id
-     */
-    @PostMapping(URL.MODIFY_PASSWORD)
-    public Result<ChangePasswordResult> modifyPassword(ModifyPasswordParams modifyPasswordParams) {
-        // 结果集
-        Result<ChangePasswordResult> result = new Result<>();
-
-        try {
-            // 更新密码
-            return userService.modifyPassword(modifyPasswordParams);
-        } catch (Exception e) {
-            LogUtil.sysError("[UserController modifyPassword]", e);
-
-            // 异常返回结果
-            result.setEx(ThrowableUtils.throwableToString(e));
-            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
-            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
-            return result;
-        }
-    }
-
-    /**
-     * 密码登录
-     *
-     * @param loginParams 入参
-     * @return 登陆结果
-     */
-    @PostMapping(URL.LOGIN)
-    public Result<LoginResult> login(LoginParams loginParams) {
-        LogUtil.sysInfo("密码登录 : {}", JSONObject.toJSONString(loginParams));
-        // 结果集
-        Result<LoginResult> result = new Result<>();
-
-        try {
-            // 参数校验
-            if (!loginParams.isLoginNameLegal()) {
-                // 异常返回结果
-                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":loginName");
-                return result;
-            }
-            if (!loginParams.isPasswordNameLegal()) {
-                // 异常返回结果
-                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":password");
-                return result;
-            }
-
-            // 密码登录
-            return userService.login(loginParams);
-        } catch (Exception e) {
-            LogUtil.sysError("[UserController login]", e);
 
             // 异常返回结果
             result.setEx(ThrowableUtils.throwableToString(e));

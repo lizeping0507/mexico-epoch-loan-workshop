@@ -14,12 +14,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class ModifyPasswordParams extends BaseParams {
-
-    /**
-     * 用户id
-     */
-    private String userId;
-
     /**
      * 手机号
      */

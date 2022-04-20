@@ -9,6 +9,7 @@ import com.epoch.loan.workshop.common.constant.RedisKeyField;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
 import com.epoch.loan.workshop.common.entity.mysql.LoanUserEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanUserInfoEntity;
+import com.epoch.loan.workshop.common.params.User;
 import com.epoch.loan.workshop.common.params.params.request.*;
 import com.epoch.loan.workshop.common.params.params.result.*;
 import com.epoch.loan.workshop.common.service.UserService;
@@ -255,44 +256,46 @@ public class UserServiceImpl extends BaseService implements UserService {
         // 结果结果集
         Result<ChangePasswordResult> result = new Result<>();
 
-        // 拼接请求路径
-        String url = platformConfig.getPlatformDomain() + PlatformUrl.PLATFORM_MODIFYPASSWWORD;
-
-        // 封装请求参数
-        JSONObject requestParam = new JSONObject();
-        requestParam.put("phoneNumber", params.getPhoneNumber());
-        requestParam.put("userId", params.getUserId());
-        requestParam.put("oldPassword", params.getOldPassword());
-        requestParam.put("newPassword", params.getNewPassword());
-        requestParam.put("enterPassword", params.getEnterPassword());
-        requestParam.put("versionNumber", params.getAppVersion());
-        requestParam.put("mobileType", params.getMobileType());
-        requestParam.put("appFlag", params.getAppName());
-
-        // 封装请求头
-        Map<String, String> headers = new HashMap<>(1);
-        headers.put("token", params.getToken());
-
-        // 请求
-        String responseStr = HttpUtils.POST_WITH_HEADER(url, requestParam.toJSONString(), headers);
-
-        // 解析响应结果
-        JSONObject responseJson = JSONObject.parseObject(responseStr);
-
-        // 判断接口响应是否正常
-        if (!PlatformUtil.checkResponseCode(result, ChangePasswordResult.class, responseJson)) {
+        // 查询用户
+        String token = params.getToken();
+        User userCache = tokenManager.getUserCache(token);
+        if (null == userCache) {
+            result.setReturnCode(ResultEnum.NO_LOGIN.code());
+            result.setMessage(ResultEnum.NO_LOGIN.message());
             return result;
         }
 
-        // 获取结果集
-        JSONObject data = responseJson.getJSONObject("data");
+        // 对比手机号
+        if (!userCache.getLoginName().equals(params.getPhoneNumber())) {
+            result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+            result.setMessage(ResultEnum.PARAM_ERROR.message());
+            return result;
+        }
 
-        // 封装结果就
-        ChangePasswordResult changePasswordResult = new ChangePasswordResult();
-        changePasswordResult.setToken(data.getString("token"));
-        changePasswordResult.setUserId(data.getString("userId"));
+        // 对比旧密码
+        if (!userCache.getPassword().equals(params.getOldPassword())) {
+            result.setReturnCode(ResultEnum.PASSWORD_INVALID.code());
+            result.setMessage("The original password entered is incorrect");
+            return result;
+        }
+
+        // 对比新密码和新密码确认
+        if (!params.getNewPassword().equals(params.getEnterPassword())) {
+            result.setReturnCode(ResultEnum.PASSWORD_INVALID.code());
+            result.setMessage("The original password entered is incorrect");
+            return result;
+        }
+
+        // 更新密码
+        loanUserDao.updatePassword(userCache.getId(), params.getNewPassword());
+
+        // 生成Token
+        String token1 = tokenManager.updateUserToken(userCache.getId());
 
         // 封装结果
+        ChangePasswordResult changePasswordResult = new ChangePasswordResult();
+        changePasswordResult.setToken(token1);
+        changePasswordResult.setUserId(userCache.getId());
         result.setReturnCode(ResultEnum.SUCCESS.code());
         result.setMessage(ResultEnum.SUCCESS.message());
         result.setData(changePasswordResult);
@@ -907,6 +910,10 @@ public class UserServiceImpl extends BaseService implements UserService {
         String appName = params.getAppName();
         String cardInfoUrl = getAdvanceConfig(appName, OcrField.ADVANCE_CARD_INFO_URL);
 
+        // 封装结果
+        result.setReturnCode(ResultEnum.SUCCESS.code());
+        result.setMessage(ResultEnum.SUCCESS.message());
+        //result.setData();
         // 请求头
         Map<String, String> heardMap = getAdvanceHeard(appName);
 
