@@ -15,7 +15,7 @@ import org.springframework.util.StringUtils;
  * @packageName : com.epoch.loan.workshop.common.util
  * @className : TokenUtil
  * @createTime : 2021/11/3 16:03
- * @description : Token工具类
+ * @description : Token管理器
  */
 @Component
 public class TokenManager {
