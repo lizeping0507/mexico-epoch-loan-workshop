@@ -1,6 +1,9 @@
 package com.epoch.loan.workshop.account.service;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.epoch.loan.workshop.common.constant.OcrChannelConfigStatus;
+import com.epoch.loan.workshop.common.constant.OcrField;
 import com.epoch.loan.workshop.common.constant.PlatformUrl;
 import com.epoch.loan.workshop.common.constant.RedisKeyField;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
@@ -10,6 +13,7 @@ import com.epoch.loan.workshop.common.params.params.request.*;
 import com.epoch.loan.workshop.common.params.params.result.*;
 import com.epoch.loan.workshop.common.service.UserService;
 import com.epoch.loan.workshop.common.util.*;
+import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Value;
@@ -897,31 +901,25 @@ public class UserServiceImpl extends BaseService implements UserService {
      */
     @Override
     public Result<UserOcrResult> userOcrInfo(UserOcrFullInfoParams params) throws Exception {
-
         // 结果集
         Result<UserOcrResult> result = new Result<>();
+        String appName = params.getAppName();
+        String cardInfoUrl = getAdvanceConfig(appName, OcrField.ADVANCE_CARD_INFO_URL);
 
-        // 拼接请求路径
-        String url = platformConfig.getPlatformDomain() + PlatformUrl.PLATFORM_OCR_ADVANCE_CARD_INFO;
+        // 请求头
+        Map<String, String> heardMap = getAdvanceHeard(appName);
 
-        // 封装请求参数
-        Map<String, String> requestParam = new HashMap(5);
-        requestParam.put("appFlag", params.getAppName());
-        requestParam.put("versionNumber", params.getAppVersion());
-        requestParam.put("mobileType", params.getMobileType());
-        requestParam.put("userId", params.getUserId());
-        requestParam.put("imageType", params.getImageType());
+        // 请求参数
+        HashMap<String, String> paramMap = Maps.newHashMap();
+        paramMap.put(OcrField.ADVANCE_CARD_TYPE, params.getImageType());
 
         // 文件列表
         Map<String, File> fileMap = new HashMap(1);
         fileMap.put("image", convertToFile(params.getImageData()));
 
-        // 封装请求头
-        Map<String, String> headers = new HashMap<>(1);
-        headers.put("token", params.getToken());
-
-        // 请求
-        String responseStr = HttpUtils.POST_FORM_FILE(url, requestParam, fileMap);
+        // 发送请求
+        String resultStr = HttpUtils.POST_WITH_HEADER_FORM_FILE(cardInfoUrl, paramMap, heardMap, fileMap);
+        LogUtil.sysInfo("advance获取证件信息,url {} , result: {}", cardInfoUrl,resultStr );
 
         // 释放文件
         for (Map.Entry<String, File> entry : fileMap.entrySet()) {
@@ -930,23 +928,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         }
 
         // 解析响应结果
-        JSONObject responseJson = JSONObject.parseObject(responseStr);
 
-        // 判断接口响应是否正常
-        if (!PlatformUtil.checkResponseCode(result, UserOcrResult.class, responseJson)) {
-            return result;
-        }
-
-        // 获取结果集
-        JSONObject data = responseJson.getJSONObject("data");
-
-        // 封装结果就
-        UserOcrResult res = JSONObject.parseObject(data.toJSONString(), UserOcrResult.class);
-
-        // 封装结果
-        result.setReturnCode(ResultEnum.SUCCESS.code());
-        result.setMessage(ResultEnum.SUCCESS.message());
-        result.setData(res);
         return result;
     }
 
@@ -966,5 +948,37 @@ public class UserServiceImpl extends BaseService implements UserService {
             e.printStackTrace();
             return null;
         }
+    }
+
+    /**
+     * 获取advance 请求头
+     *
+     * @param appName app标识
+     * @return 封装的请求头
+     */
+    public Map<String, String> getAdvanceHeard(String appName) {
+        HashMap<String, String> headers = Maps.newHashMap();
+        String advanceConfig = getAdvanceConfig(appName, OcrField.ADVANCE_ACCESS_KEY);
+        headers.put(OcrField.ADVANCE_ACCESS_KEY_KEY, advanceConfig);
+        headers.put(HTTP.CONTENT_TYPE, OcrField.ADVANCE_MULTIPART_VALUE);
+        return headers;
+    }
+
+    /**
+     * 获取advance 指定配置
+     *
+     * @param appName   app标识
+     * @param configKey 指定配置名称
+     * @return 指定配置值
+     */
+    private String getAdvanceConfig(String appName, String configKey) {
+        // 获取advance相关配置
+        String advanceConfig = loanOcrProviderConfigDao.selectAdvanceConfigByAppNameAndStatus(appName, OcrChannelConfigStatus.START);
+        String result = null;
+        if (StringUtils.isNotBlank(advanceConfig)) {
+            JSONObject config = JSONObject.parseObject(advanceConfig);
+            result = config.getString(configKey);
+        }
+        return result;
     }
 }
