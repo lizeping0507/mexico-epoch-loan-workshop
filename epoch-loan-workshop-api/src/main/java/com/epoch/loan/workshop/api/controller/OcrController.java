@@ -256,9 +256,9 @@ public class OcrController extends BaseController {
      */
     @Authentication
     @PostMapping(URL.FACE_COMPARISON)
-    public Result<Object> faceComparison(UserFaceComparisonParams params, HttpServletRequest request) {
+    public Result<UserFaceComparisonResult> faceComparison(UserFaceComparisonParams params, HttpServletRequest request) {
         // 结果集
-        Result<Object> result = new Result<>();
+        Result<UserFaceComparisonResult> result = new Result<>();
 
         try {
             // 验证请求参数是否合法

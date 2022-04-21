@@ -843,9 +843,9 @@ public class UserServiceImpl extends BaseService implements UserService {
      * @throws Exception 请求异常
      */
     @Override
-    public Result<Object> faceComparison(UserFaceComparisonParams params) throws Exception {
+    public Result<UserFaceComparisonResult> faceComparison(UserFaceComparisonParams params) throws Exception {
         // 结果集
-        Result<Object> result = new Result<>();
+        Result<UserFaceComparisonResult> result = new Result<>();
         result.setReturnCode(ResultEnum.KYC_FACE_COMPARISON_ERROR.code());
         result.setMessage(ResultEnum.KYC_FACE_COMPARISON_ERROR.message());
 
@@ -876,7 +876,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         if (StringUtils.isBlank(resultStr)) {
             return result;
         }
-        UserFaceComparisonResult comparisonResult = JSONObject.parseObject(resultStr, UserFaceComparisonResult.class);
+        AdvanceFaceComparisonResult comparisonResult = JSONObject.parseObject(resultStr, AdvanceFaceComparisonResult.class);
 
         // 日志写入Elastic
         OcrLivingDetectionLogElasticEntity livingDetectionLog = new OcrLivingDetectionLogElasticEntity();
@@ -912,6 +912,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         // 封装结果
         result.setReturnCode(ResultEnum.SUCCESS.code());
         result.setMessage(ResultEnum.SUCCESS.message());
+        result.setData(new UserFaceComparisonResult(similarity));
         return result;
     }
 
