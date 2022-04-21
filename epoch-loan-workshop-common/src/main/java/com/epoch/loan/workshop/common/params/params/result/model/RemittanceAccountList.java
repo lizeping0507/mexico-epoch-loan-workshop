@@ -20,11 +20,6 @@ public class RemittanceAccountList implements Serializable {
     private String id;
 
     /**
-     * 用户id
-     */
-    private String userId;
-
-    /**
      * 账户账户
      */
     private String accountNumber;
