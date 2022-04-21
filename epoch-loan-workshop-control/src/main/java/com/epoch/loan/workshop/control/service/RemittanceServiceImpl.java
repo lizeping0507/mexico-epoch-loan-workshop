@@ -1,5 +1,7 @@
 package com.epoch.loan.workshop.control.service;
 
+import com.alibaba.fastjson.JSONObject;
+import com.epoch.loan.workshop.common.constant.Field;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
 import com.epoch.loan.workshop.common.entity.mysql.LoanOrderEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanRemittanceAccountEntity;
@@ -11,10 +13,15 @@ import com.epoch.loan.workshop.common.params.params.result.RemittanceBankListRes
 import com.epoch.loan.workshop.common.params.params.result.Result;
 import com.epoch.loan.workshop.common.params.params.result.model.RemittanceAccountList;
 import com.epoch.loan.workshop.common.service.RemittanceService;
+import com.epoch.loan.workshop.common.util.HttpUtils;
+import com.epoch.loan.workshop.common.util.RSAUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author : Duke
@@ -75,9 +82,13 @@ public class RemittanceServiceImpl extends BaseService implements RemittanceServ
      *
      * @param addRemittanceAccountParams
      * @return
+     * @throws Exception
      */
     @Override
-    public Result addRemittanceAccount(AddRemittanceAccountParams addRemittanceAccountParams) {
+    public Result addRemittanceAccount(AddRemittanceAccountParams addRemittanceAccountParams) throws Exception {
+        // 响应结果
+        Result result = new Result();
+
         // 账户账号
         String accountNumber = addRemittanceAccountParams.getAccountNumber();
 
@@ -90,10 +101,68 @@ public class RemittanceServiceImpl extends BaseService implements RemittanceServ
         // 账户类型
         Integer type = addRemittanceAccountParams.getType();
 
+        // 用户id
+        String userId = addRemittanceAccountParams.getUser().getId();
+
+        // 手机号
+        String mobile = addRemittanceAccountParams.getUser().getMobile();
+
         // 请求风控验卡
+        JSONObject verifyRemittanceAccountJson = verifyRemittanceAccount(userId, mobile, accountNumber);
+
+        // 验证状态
+        String status = verifyRemittanceAccountJson.getString("status");
+        if (!status.equals("VERIFIED")) {
+            result.setReturnCode(ResultEnum.REMITTANCE_ACCOUNT_ERROR.code());
+            result.setMessage(ResultEnum.REMITTANCE_ACCOUNT_ERROR.message());
+            return result;
+        }
+
 
         return null;
     }
+
+    /**
+     * 验证银行卡号
+     *
+     * @param userId
+     * @param mobile
+     * @param accountNumber
+     * @return
+     */
+    public JSONObject verifyRemittanceAccount(String userId, String mobile, String accountNumber) throws Exception {
+        // 封装请求参数
+        Map<String, String> params = new HashMap<>();
+        params.put(Field.METHOD, "riskmanagement.mexico.bank.account.auth");
+        params.put(Field.APP_ID, riskConfig.getAppId());
+        params.put(Field.VERSION, "1.0");
+        params.put(Field.SIGN_TYPE, "RSA");
+        params.put(Field.FORMAT, "json");
+        params.put(Field.TIMESTAMP, String.valueOf(System.currentTimeMillis() / 1000));
+
+        JSONObject bizData = new JSONObject();
+        bizData.put("transactionId", userId);
+        bizData.put("clabeNumber", accountNumber);
+        bizData.put("mobile", mobile);
+        params.put(Field.BIZ_DATA, bizData.toJSONString());
+
+        // 生成签名
+        String paramsStr = RSAUtils.getSortParams(params);
+        String sign = RSAUtils.addSign(riskConfig.getPrivateKey(), paramsStr);
+        params.put(Field.SIGN, sign);
+
+        // 请求参数
+        String requestParams = JSONObject.toJSONString(params);
+
+        // 发送请求
+        String result = HttpUtils.POST_FORM(riskConfig.getRiskUrl(), requestParams);
+        if (StringUtils.isEmpty(result)) {
+            return null;
+        }
+
+        return JSONObject.parseObject(result).getJSONObject("biz_data");
+    }
+
 
     /**
      * 银行账户列表

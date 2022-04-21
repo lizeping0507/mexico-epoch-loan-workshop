@@ -69,6 +69,11 @@ public enum ResultEnum {
      */
     SMSCODE_ERROR(4011, "OTP error, please try again"),
 
+    /**
+     *
+     */
+    REMITTANCE_ACCOUNT_ERROR(4012, "Param error"),
+
     // ======= 服务端错误 ========
     /**
      * 服务端错误
