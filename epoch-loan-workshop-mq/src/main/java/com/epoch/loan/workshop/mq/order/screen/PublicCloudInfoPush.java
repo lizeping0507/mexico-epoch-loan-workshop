@@ -176,7 +176,7 @@ public class PublicCloudInfoPush extends BaseOrderMQListener implements MessageL
         PlatformProductEntity platformProductEntity = platformProductDao.findProduct(productId);
 
         // 查询用户银行卡
-        PlatformUserBankCardEntity platformUserBankCardEntity = platformUserBankCardDao.findUserBankCardById(loanOrderEntity.getBankCardId());
+        PlatformUserBankCardEntity platformUserBankCardEntity = null; // TODO platformUserBankCardDao.findUserBankCardById(loanOrderEntity.getBankCardId());
 
         // 封装数据
         JSONObject params = new JSONObject();

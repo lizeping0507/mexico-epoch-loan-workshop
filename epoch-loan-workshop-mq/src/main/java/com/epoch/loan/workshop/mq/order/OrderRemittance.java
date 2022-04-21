@@ -92,7 +92,7 @@ public class OrderRemittance extends BaseOrderMQListener implements MessageListe
                     PlatformUserOcrBasicInfoEntity platformUserOcrBasicInfoEntity = platformUserOcrBasicInfoDao.findUserOcrBasicInfo(userId);
 
                     // 查询用户银行卡
-                    PlatformUserBankCardEntity platformUserBankCardEntity = platformUserBankCardDao.findUserBankCardById(loanOrderEntity.getBankCardId());
+                    PlatformUserBankCardEntity platformUserBankCardEntity = null;//TODO platformUserBankCardDao.findUserBankCardById(loanOrderEntity.getBankCardId());
 
                     // 查询用户信息 FIXME 老表需表合并
                     PlatformUserEntity platformUserEntity = platformUserDao.findUser(userId);

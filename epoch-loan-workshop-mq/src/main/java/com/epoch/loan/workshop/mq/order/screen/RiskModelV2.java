@@ -245,7 +245,7 @@ public class RiskModelV2 extends BaseOrderMQListener implements MessageListenerC
             PlatformUserPanDistinguishInfoEntity platformUserPanDistinguishInfoEntity = platformUserPanDistinguishInfoDao.findUserPanDistinguishInfo(userId);
 
             // 查询用户银行卡
-            PlatformUserBankCardEntity platformUserBankCardEntity = platformUserBankCardDao.findUserBankCardById(loanOrderEntity.getBankCardId());
+            PlatformUserBankCardEntity platformUserBankCardEntity = null;//TODO  = platformUserBankCardDao.findUserBankCardById(loanOrderEntity.getBankCardId());
 
             // 封装请求参数
             Map<String, String> params = new HashMap<>();

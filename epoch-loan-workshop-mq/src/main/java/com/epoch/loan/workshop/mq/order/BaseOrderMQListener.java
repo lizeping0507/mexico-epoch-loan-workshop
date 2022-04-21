@@ -116,10 +116,10 @@ public abstract class BaseOrderMQListener {
     public PlatformUserPanDistinguishInfoDao platformUserPanDistinguishInfoDao;
 
     /**
-     * 银行卡
+     * 银行卡 TODO
      */
-    @Autowired
-    public PlatformUserBankCardDao platformUserBankCardDao;
+//    @Autowired
+//    public PlatformUserBankCardDao platformUserBankCardDao;
 
     /**
      * 订单模型审核
@@ -475,7 +475,7 @@ public abstract class BaseOrderMQListener {
         PlatformOrderPushRepaymentEntity orderPushRepayment = new PlatformOrderPushRepaymentEntity();
         orderPushRepayment.setId(platformOrderPushRepaymentDao.getMaxId() + 1);
         orderPushRepayment.setOrderNo(orderId);
-        PlatformUserBankCardEntity userBankCard = platformUserBankCardDao.findUserBankCardById(loanOrderEntity.getBankCardId());
+        PlatformUserBankCardEntity userBankCard = null;// TODO platformUserBankCardDao.findUserBankCardById(loanOrderEntity.getBankCardId());
         orderPushRepayment.setBankCard(userBankCard.getBankCard());
         orderPushRepayment.setOpenBank(userBankCard.getOpenBank());
         // orderPushRepayment.setCanPrepay("1");
