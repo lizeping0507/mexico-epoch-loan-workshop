@@ -15,6 +15,14 @@ import java.util.List;
  */
 @Mapper
 public interface LoanOrderDao {
+    /**
+     * 查询用户最后一条放款成功的订单
+     *
+     * @param userId
+     * @return
+     */
+    LoanOrderEntity findLastUserRemittanceSuccessOrder(String userId);
+
 
     /**
      * 根据状态查询账单

@@ -44,6 +44,11 @@ public class URL {
     public static final String PRODUCT = API + "/product";
 
     /**
+     * 放款
+     */
+    public static final String REMITTANCE = API + "/remittance";
+
+    /**
      * 手机短信
      */
     public static final String SHORT_MESSAGE = API + "/shortMessage";
@@ -169,6 +174,11 @@ public class URL {
      * 是否已注册
      */
     public static final String APP_MODEL = "/appModel";
+
+    /**
+     * 放款账户列表
+     */
+    public static final String REMITTANCE_ACCOUNT_LIST = "/remittanceAccountList";
 
     /**
      * 多推-贷超模式-首页

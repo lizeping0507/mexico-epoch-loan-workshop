@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.epoch.loan.workshop.common.dao.mysql.LoanRemittanceAccountDao">
+
+    <select id="findUserRemittanceAccountList"
+            resultType="com.epoch.loan.workshop.common.entity.mysql.LoanRemittanceAccountEntity">
+        SELECT * FROM loan_remittance_account WHERE user_id=#{userId}
+    </select>
+    <select id="findRemittanceAccount"
+            resultType="com.epoch.loan.workshop.common.entity.mysql.LoanRemittanceAccountEntity">
+        SELECT * FROM loan_remittance_account WHERE id=#{id}
+    </select>
+</mapper>

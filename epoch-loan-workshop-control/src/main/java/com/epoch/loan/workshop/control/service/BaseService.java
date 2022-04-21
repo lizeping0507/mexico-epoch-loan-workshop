@@ -4,6 +4,8 @@ import com.epoch.loan.workshop.common.config.PlatformConfig;
 import com.epoch.loan.workshop.common.dao.elastic.OcrLivingDetectionLogElasticDao;
 import com.epoch.loan.workshop.common.dao.mysql.LoanDynamicRequestDao;
 import com.epoch.loan.workshop.common.dao.mysql.LoanOcrProviderConfigDao;
+import com.epoch.loan.workshop.common.dao.mysql.LoanOrderDao;
+import com.epoch.loan.workshop.common.dao.mysql.LoanRemittanceAccountDao;
 import com.epoch.loan.workshop.common.redis.RedisClient;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -26,7 +28,7 @@ public class BaseService {
      * 贷超相关配置
      */
     @Autowired
-    PlatformConfig platformConfig;
+    public PlatformConfig platformConfig;
 
     /**
      * 三方OCR相关配置
@@ -45,4 +47,16 @@ public class BaseService {
      */
     @Autowired
     public OcrLivingDetectionLogElasticDao ocrLivingDetectionLogElasticDao;
+
+    /**
+     * 订单
+     */
+    @Autowired
+    public LoanOrderDao loanOrderDao;
+
+    /**
+     * 放款账户
+     */
+    @Autowired
+    public LoanRemittanceAccountDao loanRemittanceAccountDao;
 }
