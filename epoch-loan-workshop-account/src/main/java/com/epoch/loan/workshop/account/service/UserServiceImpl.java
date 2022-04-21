@@ -348,13 +348,16 @@ public class UserServiceImpl extends BaseService implements UserService {
             return result;
         }
 
+        String loginName = userCache.getLoginName();
+        data.setPhoneNumber(loginName.substring(0,3) + "****" +loginName.substring(7));
+
         // 未完成的订单
         Integer uncompletedOrder = platformOrderDao.findUserLessThanSpecificStatusOrderNum(userCache.getId(), 110);
         data.setUncompletedOrder(uncompletedOrder);
 
         // 待还款订单数量-
         Integer noCompleteNum = platformOrderDao.findUserWaitRepaymentOrderNum(userCache.getId());
-        data.setUncompletedOrder(noCompleteNum - uncompletedOrder);
+        data.setPenRepaymentOrder(noCompleteNum - uncompletedOrder);
 
         // 用户所有状态的订单数量
         Integer allOrderNum = platformOrderDao.findUserAllOrderNum(userCache.getId());
