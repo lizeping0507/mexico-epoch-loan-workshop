@@ -58,4 +58,16 @@
     <select id="findOrderByStatus" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanOrderEntity">
         SELECT * FROM loan_order status=#{status}
     </select>
+    <select id="findLastUserRemittanceSuccessOrder"
+            resultType="com.epoch.loan.workshop.common.entity.mysql.LoanOrderEntity">
+        SELECT
+        *
+        FROM
+        loan_order
+        WHERE
+        `status` >= 80
+        AND user_id = #{userId}
+        ORDER BY
+        create_time DESC
+    </select>
 </mapper>

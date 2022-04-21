@@ -52,10 +52,10 @@ public class BaseController {
     @DubboReference(check = false)
     public OcrService ocrService;
     /**
-     * 银行卡
+     * 放款账户
      */
     @DubboReference(check = false)
-    public BankCardService bankCardService;
+    public RemittanceService remittanceService;
     /**
      * SDK
      */
