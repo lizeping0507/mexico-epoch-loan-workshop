@@ -254,16 +254,24 @@ public class OcrController extends BaseController {
      * @param params 获取人脸相似度信息请求参数封装类
      * @return 人脸相似度信息
      */
+    @Authentication
     @PostMapping(URL.FACE_COMPARISON)
-    public Result<UserFaceComparisonResult> faceComparison(UserFaceComparisonParams params, HttpServletRequest request) {
+    public Result<Object> faceComparison(UserFaceComparisonParams params, HttpServletRequest request) {
         // 结果集
-        Result<UserFaceComparisonResult> result = new Result<>();
+        Result<Object> result = new Result<>();
 
         try {
+            // 验证请求参数是否合法
+            if (params.isAppNameLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":appName");
+                return result;
+            }
+
             MultipartResolver resolver = new StandardServletMultipartResolver();
             MultipartHttpServletRequest mRequest = resolver.resolveMultipart(request);
             Map<String, MultipartFile> fileMap = mRequest.getFileMap();
-
             params.setIdImageData(fileMap.get("idImage").getBytes());
             params.setFaceImageData(fileMap.get("faceImage").getBytes());
 

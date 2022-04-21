@@ -1,4 +1,4 @@
-package com.epoch.loan.workshop.common.params.advance.face;
+package com.epoch.loan.workshop.common.params.params.result.model;
 
 import lombok.Data;
 
@@ -12,7 +12,7 @@ import java.io.Serializable;
  * @Description: advance 响应的人脸对比信息
  */
 @Data
-public class UserFaceComparisonResponse implements Serializable {
+public class AdvanceFaceComparisonResponse implements Serializable {
 
     /**
      * 2张上传图片的人脸相似度，比率值始终在0-100之间，越接近100表示​​两张人脸相似度越高
@@ -22,10 +22,10 @@ public class UserFaceComparisonResponse implements Serializable {
     /**
      * 第一张图片中的人脸对比信息
      */
-    private UserFaceDetailInfo firstFace;
+    private AdvanceFaceDetailInfoResult firstFace;
 
     /**
      * 第二张图片中的人脸对比信息
      */
-    private UserFaceDetailInfo secondFace;
+    private AdvanceFaceDetailInfoResult secondFace;
 }

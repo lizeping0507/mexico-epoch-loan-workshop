@@ -20,7 +20,7 @@ public class UserOcrResult implements Serializable {
     private String info;
 
     /**
-     * 识别类型 INE_OR_IFE_FRONT or INE_OR_IFE_BACK
+     * 卡类型 INE_OR_IFE_FRONT or INE_OR_IFE_BACK
      */
     private String type;
 

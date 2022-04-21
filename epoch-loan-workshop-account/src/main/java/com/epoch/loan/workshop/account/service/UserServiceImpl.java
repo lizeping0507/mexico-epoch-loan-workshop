@@ -14,12 +14,14 @@ import com.epoch.loan.workshop.common.entity.mysql.LoanUserInfoEntity;
 import com.epoch.loan.workshop.common.params.User;
 import com.epoch.loan.workshop.common.params.params.request.*;
 import com.epoch.loan.workshop.common.params.params.result.*;
+import com.epoch.loan.workshop.common.params.params.result.model.AdvanceFaceComparisonResponse;
 import com.epoch.loan.workshop.common.params.params.result.model.AdvanceOcrBackInfoResult;
 import com.epoch.loan.workshop.common.params.params.result.model.AdvanceOcrFrontInfoResult;
 import com.epoch.loan.workshop.common.params.params.result.model.AdvanceOcrInfoResponse;
 import com.epoch.loan.workshop.common.service.UserService;
 import com.epoch.loan.workshop.common.util.*;
 import com.google.common.collect.Maps;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.http.protocol.HTTP;
@@ -30,6 +32,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -181,7 +184,7 @@ public class UserServiceImpl extends BaseService implements UserService {
 
         // 查询用户
         LoanUserEntity user = loanUserDao.findByLoginNameAndAppName(params.getPhoneNumber(), params.appName);
-        if (null == user){
+        if (null == user) {
             result.setReturnCode(ResultEnum.PHONE_NO_EXIT.code());
             result.setMessage(ResultEnum.PHONE_NO_EXIT.message());
             return result;
@@ -384,11 +387,11 @@ public class UserServiceImpl extends BaseService implements UserService {
         }
 
         // 未完成的订单
-        Integer uncompletedOrder =  platformOrderDao.findUserLessThanSpecificStatusOrderNum(userCache.getId(), 110);
+        Integer uncompletedOrder = platformOrderDao.findUserLessThanSpecificStatusOrderNum(userCache.getId(), 110);
         data.setUncompletedOrder(uncompletedOrder);
 
         // 待还款订单数量-
-        Integer noCompleteNum =  platformOrderDao.findUserWaitRepaymentOrderNum(userCache.getId());
+        Integer noCompleteNum = platformOrderDao.findUserWaitRepaymentOrderNum(userCache.getId());
         data.setUncompletedOrder(noCompleteNum - uncompletedOrder);
 
         // 用户所有状态的订单数量
@@ -836,35 +839,32 @@ public class UserServiceImpl extends BaseService implements UserService {
      * 获取证件和人脸相似度
      *
      * @param params 获取人脸相似度信息请求参数封装类
-     * @return 人脸相似度信息
+     * @return 相似度是否通过
      * @throws Exception 请求异常
      */
     @Override
-    public Result<UserFaceComparisonResult> faceComparison(UserFaceComparisonParams params) throws Exception {
+    public Result<Object> faceComparison(UserFaceComparisonParams params) throws Exception {
         // 结果集
-        Result<UserFaceComparisonResult> result = new Result<>();
+        Result<Object> result = new Result<>();
+        result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
+        result.setMessage(ResultEnum.SYSTEM_ERROR.message());
 
-        // 拼接请求路径
-        String url = platformConfig.getPlatformDomain() + PlatformUrl.PLATFORM_OCR_ADVANCE_FACE_COMPARISON;
+        // 获取参数
+        String appName = params.getAppName();
+        String userId = params.getUser().getId();
+        String faceComparisonUrl = getAdvanceConfig(appName, OcrField.ADVANCE_FACE_COMPARISON_URL);
+        String threshold = getAdvanceConfig(appName, OcrField.ADVANCE_FACE_COMPARISON_THRESHOLD);
 
-        // 封装请求参数
-        Map<String, String> requestParam = new HashMap(4);
-        requestParam.put("appFlag", params.getAppName());
-        requestParam.put("versionNumber", params.getAppVersion());
-        requestParam.put("mobileType", params.getMobileType());
-        requestParam.put("userId", params.getUserId());
+        // 请求头
+        Map<String, String> heardMap = getAdvanceHeard(appName);
 
         // 文件列表
-        Map<String, File> fileMap = new HashMap(2);
-        fileMap.put("idImage", convertToFile(params.getIdImageData()));
-        fileMap.put("faceImage", convertToFile(params.getFaceImageData()));
+        HashMap<String, File> fileMap = Maps.newHashMap();
+        fileMap.put("firstImage", convertToFile(params.getIdImageData()));
+        fileMap.put("secondImage", convertToFile(params.getFaceImageData()));
 
-        // 封装请求头
-        Map<String, String> headers = new HashMap<>(1);
-        headers.put("token", params.getToken());
-
-        // 请求
-        String responseStr = HttpUtils.POST_FORM_FILE(url, requestParam, fileMap);
+        // 发送请求
+        String resultStr = HttpUtils.POST_WITH_HEADER_FORM_FILE(faceComparisonUrl, null, heardMap, fileMap);
 
         // 释放文件
         for (Map.Entry<String, File> entry : fileMap.entrySet()) {
@@ -873,23 +873,45 @@ public class UserServiceImpl extends BaseService implements UserService {
         }
 
         // 解析响应结果
-        JSONObject responseJson = JSONObject.parseObject(responseStr);
+        if (StringUtils.isBlank(resultStr)) {
+            return result;
+        }
+        UserFaceComparisonResult comparisonResult = JSONObject.parseObject(resultStr, UserFaceComparisonResult.class);
 
-        // 判断接口响应是否正常
-        if (!PlatformUtil.checkResponseCode(result, UserFaceComparisonResult.class, responseJson)) {
+        // 日志写入Elastic
+        OcrLivingDetectionLogElasticEntity livingDetectionLog = new OcrLivingDetectionLogElasticEntity();
+        BeanUtils.copyProperties(comparisonResult, livingDetectionLog);
+        livingDetectionLog.setRequestUrl(faceComparisonUrl);
+        livingDetectionLog.setRequestHeard(heardMap);
+        livingDetectionLog.setResponse(resultStr);
+        livingDetectionLog.setUserId(userId);
+        livingDetectionLog.setCreateTime(new Date());
+        ocrLivingDetectionLogElasticDao.save(livingDetectionLog);
+
+        // 根据code值进行判定
+        String code = comparisonResult.getCode();
+        if (!OcrField.ADVANCE_SUCCESS_CODE.equalsIgnoreCase(code)) {
+            return result;
+        }
+        AdvanceFaceComparisonResponse resultData = comparisonResult.getData();
+        if (ObjectUtils.isEmpty(resultData)) {
             return result;
         }
 
-        // 获取结果集
-        JSONObject data = responseJson.getJSONObject("data");
-
-        // 封装结果就
-        UserFaceComparisonResult res = JSONObject.parseObject(data.toJSONString(), UserFaceComparisonResult.class);
+        // 判断相似分数与阀值大小
+        String similarity = resultData.getSimilarity();
+        if (StringUtils.isBlank(similarity)) {
+            return result;
+        }
+        BigDecimal similarityDouble = new BigDecimal(similarity);
+        BigDecimal thresholdDouble = new BigDecimal(threshold);
+        if (similarityDouble.compareTo(thresholdDouble) < 1) {
+            return result;
+        }
 
         // 封装结果
         result.setReturnCode(ResultEnum.SUCCESS.code());
         result.setMessage(ResultEnum.SUCCESS.message());
-        result.setData(res);
         return result;
     }
 
@@ -921,7 +943,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         paramMap.put(OcrField.ADVANCE_CARD_TYPE, imageType);
 
         // 文件列表
-        Map<String, File> fileMap = new HashMap(1);
+        HashMap<String, File> fileMap = Maps.newHashMap();
         fileMap.put("image", convertToFile(params.getImageData()));
 
         // 发送请求
@@ -954,7 +976,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         // 根据code值进行判定
         String code = ocrInfoResult.getCode();
         if (!OcrField.ADVANCE_SUCCESS_CODE.equalsIgnoreCase(code)) {
-           return result;
+            return result;
         }
         UserOcrResult ocrResult = new UserOcrResult();
 

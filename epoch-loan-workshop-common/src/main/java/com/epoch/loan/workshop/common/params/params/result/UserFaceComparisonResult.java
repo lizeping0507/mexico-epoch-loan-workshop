@@ -1,5 +1,6 @@
 package com.epoch.loan.workshop.common.params.params.result;
 
+import com.epoch.loan.workshop.common.params.params.result.model.AdvanceFaceComparisonResponse;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -9,7 +10,7 @@ import java.io.Serializable;
  * @packagename : com.epoch.loan.workshop.common.params.result
  * @className : UserFaceComparisonResult
  * @createTime : 2022/04/01 18:52
- * @Description: 获取证件和人脸相似度响应参数
+ * @Description: advance获取证件和人脸相似度响应参数
  */
 @Data
 public class UserFaceComparisonResult implements Serializable {
@@ -35,13 +36,12 @@ public class UserFaceComparisonResult implements Serializable {
     private String pricingStrategy;
 
     /**
+     * 人脸对比信息
+     */
+    private AdvanceFaceComparisonResponse data;
+
+    /**
      * advance响应的扩展信息
      */
     private String extra;
-
-    /**
-     * 2张上传图片的人脸相似率，比率值始终在0-100之间，比率越接近100，表示两张人脸越相似
-     */
-    private String similarity;
-
 }

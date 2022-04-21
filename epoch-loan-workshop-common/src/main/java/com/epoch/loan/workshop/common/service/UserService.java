@@ -153,7 +153,7 @@ public interface UserService {
      * @return 人脸相似度信息
      * @throws Exception 请求异常
      */
-    Result<UserFaceComparisonResult> faceComparison(UserFaceComparisonParams params) throws Exception;
+    Result<Object> faceComparison(UserFaceComparisonParams params) throws Exception;
 
     /**
      * advance获取证件信息

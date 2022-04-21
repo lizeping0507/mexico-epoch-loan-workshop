@@ -22,10 +22,4 @@ public class UserFaceComparisonParams extends BaseParams {
      * 人脸图片
      */
     private byte[] faceImageData;
-
-    /**
-     * 用户id
-     */
-    private String userId;
-
 }

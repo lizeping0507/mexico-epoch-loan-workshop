@@ -112,14 +112,25 @@ public class OcrField {
     public static final String ADVANCE_LIVENESS_SCORE_URL="livenessScoreUrl";
 
     /**
-     * advance 获取身份证信息请求地址key
-     */
-    public static final String ADVANCE_CARD_INFO_URL = "advanceOcrCardInfoUrl";
-
-    /**
-     * advance 活体检测分建议阀值
+     * advance 活体检测分建议阀值key
      */
     public static final String LIVENESS_THRESHOLD = "livenessThreshold";
+
+
+    /**
+     * advance 获取身份证信息请求地址key
+     */
+    public static final String ADVANCE_CARD_INFO_URL = "cardInfoUrl";
+
+    /**
+     * advance 获取人脸相似度请求地址key
+     */
+    public static final String ADVANCE_FACE_COMPARISON_URL = "faceComparisonUrl";
+
+    /**
+     * advance 获取人脸相似度建议阈值key
+     */
+    public static final String ADVANCE_FACE_COMPARISON_THRESHOLD = "faceComparisonThreshold";
 
 
 }

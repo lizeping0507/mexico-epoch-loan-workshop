@@ -1,4 +1,4 @@
-package com.epoch.loan.workshop.common.params.advance.face;
+package com.epoch.loan.workshop.common.params.params.result.model;
 
 import lombok.Data;
 
@@ -12,7 +12,7 @@ import java.io.Serializable;
  * @Description: advance 人脸对比信息
  */
 @Data
-public class UserFaceDetailInfo implements Serializable {
+public class AdvanceFaceDetailInfoResult implements Serializable {
 
     /**
      * 图片中人脸的标识符
