@@ -1,9 +1,7 @@
 package com.epoch.loan.workshop.account.service;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.epoch.loan.workshop.common.constant.*;
 import com.alibaba.fastjson.TypeReference;
 import com.epoch.loan.workshop.common.constant.OcrChannelConfigStatus;
 import com.epoch.loan.workshop.common.constant.OcrField;
@@ -843,7 +841,6 @@ public class UserServiceImpl extends BaseService implements UserService {
      */
     @Override
     public Result<UserFaceComparisonResult> faceComparison(UserFaceComparisonParams params) throws Exception {
-
         // 结果集
         Result<UserFaceComparisonResult> result = new Result<>();
 
@@ -907,6 +904,10 @@ public class UserServiceImpl extends BaseService implements UserService {
     public Result<UserOcrResult> userOcrInfo(UserOcrFullInfoParams params) throws Exception {
         // 结果集
         Result<UserOcrResult> result = new Result<>();
+        result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
+        result.setMessage(ResultEnum.SYSTEM_ERROR.message());
+
+        // 获取请求参数
         String appName = params.getAppName();
         String imageType = params.getImageType();
         String cardInfoUrl = getAdvanceConfig(appName, OcrField.ADVANCE_CARD_INFO_URL);
@@ -915,7 +916,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         // 请求头
         Map<String, String> heardMap = getAdvanceHeard(appName);
 
-        // 请求参数
+        // 封装请求参数
         HashMap<String, String> paramMap = Maps.newHashMap();
         paramMap.put(OcrField.ADVANCE_CARD_TYPE, imageType);
 
@@ -935,8 +936,6 @@ public class UserServiceImpl extends BaseService implements UserService {
 
         // 解析响应结果
         if (StringUtils.isBlank(resultStr)) {
-            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
-            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
             return result;
         }
         AdvanceOcrInfoResult ocrInfoResult = JSONObject.parseObject(resultStr, AdvanceOcrInfoResult.class);
@@ -955,8 +954,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         // 根据code值进行判定
         String code = ocrInfoResult.getCode();
         if (!OcrField.ADVANCE_SUCCESS_CODE.equalsIgnoreCase(code)) {
-            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
-            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
+           return result;
         }
         UserOcrResult ocrResult = new UserOcrResult();
 
@@ -991,7 +989,10 @@ public class UserServiceImpl extends BaseService implements UserService {
 
         File file = new File(newFilePath);
         try {
-            file.createNewFile();
+            boolean newFile = file.createNewFile();
+            if (!newFile) {
+                return null;
+            }
             OutputStream os = new FileOutputStream(file);
             // 输出流
             os.write(byteFile);

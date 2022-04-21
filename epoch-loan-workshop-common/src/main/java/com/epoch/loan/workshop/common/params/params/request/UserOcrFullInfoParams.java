@@ -15,7 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 public class UserOcrFullInfoParams extends BaseParams {
 
     /**
-     * 识别类型 AADHAAR_FRON: ad卡正面; AADHAAR_BACK: ad卡背面; PAN_FRONT :pan卡
+     * 卡片类型 INE_OR_IFE_FRONT正面 INE_OR_IFE_BACK背面
      */
     private String imageType;
 

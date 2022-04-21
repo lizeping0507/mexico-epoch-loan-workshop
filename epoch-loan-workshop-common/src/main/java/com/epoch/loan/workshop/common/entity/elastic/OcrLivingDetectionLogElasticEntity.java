@@ -26,7 +26,7 @@ public class OcrLivingDetectionLogElasticEntity {
     private String id;
 
     /**
-     * 映射地址
+     * 请求地址
      */
     @Field(type = FieldType.Keyword)
     private String requestUrl;
@@ -80,7 +80,7 @@ public class OcrLivingDetectionLogElasticEntity {
     private String transactionId;
 
     /**
-     * advance 付费标识
+     * advance 付费标识:  FREE, PAY
      */
     @Field(type = FieldType.Keyword)
     private String pricingStrategy;

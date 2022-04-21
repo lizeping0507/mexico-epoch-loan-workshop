@@ -15,7 +15,7 @@ import java.io.Serializable;
  * @Description: advance证件识别请求响应结果
  */
 @Data
-public class AdvanceOcrInfoResult<T> implements Serializable {
+public class AdvanceOcrInfoResult implements Serializable {
 
     /**
      * 授权状态码
