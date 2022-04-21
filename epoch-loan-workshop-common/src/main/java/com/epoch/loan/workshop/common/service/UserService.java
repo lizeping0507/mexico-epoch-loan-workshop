@@ -75,15 +75,6 @@ public interface UserService {
     Result<MineResult> mine(MineParams params) throws Exception;
 
     /**
-     * 判断并保存用户OCR识别记录
-     *
-     * @param params OCR识别结果信息
-     * @return 识别是否通过
-     * @throws Exception 请求异常
-     */
-    Result<Object> userFaceMatch(UserFaceMatchParams params) throws Exception;
-
-    /**
      * 用户OCR识别信息保存
      *
      * @param params 保存用户OCR识别信息请求参数封装类

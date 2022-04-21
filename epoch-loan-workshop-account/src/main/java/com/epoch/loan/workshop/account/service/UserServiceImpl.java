@@ -408,52 +408,6 @@ public class UserServiceImpl extends BaseService implements UserService {
     }
 
     /**
-     * 判断并保存用户OCR识别记录
-     *
-     * @param params OCR识别结果信息
-     * @return 识别是否通过
-     * @throws Exception 请求异常
-     */
-    @Override
-    public Result<Object> userFaceMatch(UserFaceMatchParams params) throws Exception {
-        // 结果集
-        Result<Object> result = new Result<>();
-
-        // 拼接请求路径
-        String url = platformConfig.getPlatformDomain() + PlatformUrl.PLATFORM_OCR_USER_FACE_MATCH;
-
-        // 封装请求参数
-        JSONObject requestParam = new JSONObject();
-        requestParam.put("appFlag", params.getAppName());
-        requestParam.put("versionNumber", params.getAppVersion());
-        requestParam.put("mobileType", params.getMobileType());
-        requestParam.put("userId", params.getUserId());
-        requestParam.put("aadharFaceMatch", params.getAadharFaceMatch());
-        requestParam.put("panFaceMatch", params.getPanFaceMatch());
-        requestParam.put("ocrChannelType", params.getOcrChannelType());
-
-        // 封装请求头
-        Map<String, String> headers = new HashMap<>();
-        headers.put("token", params.getToken());
-
-        // 请求
-        String responseStr = HttpUtils.POST_WITH_HEADER(url, requestParam.toJSONString(), headers);
-
-        // 解析响应结果
-        JSONObject responseJson = JSONObject.parseObject(responseStr);
-
-        // 判断接口响应是否正常
-        if (!PlatformUtil.checkResponseCode(result, Object.class, responseJson)) {
-            return result;
-        }
-
-        // 封装结果
-        result.setReturnCode(ResultEnum.SUCCESS.code());
-        result.setMessage(ResultEnum.SUCCESS.message());
-        return result;
-    }
-
-    /**
      * 用户OCR识别信息保存
      *
      * @param params 保存用户OCR识别信息请求参数封装类

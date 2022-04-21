@@ -140,31 +140,6 @@ public class OcrController extends BaseController {
     }
 
     /**
-     * 判断并保存用户OCR识别记录
-     *
-     * @param params OCR识别结果信息
-     * @return 识别是否通过
-     */
-    @PostMapping(URL.OCR_USER_FACE_MATCH)
-    public Result<Object> userFaceMatch(UserFaceMatchParams params) {
-        // 结果集
-        Result<Object> result = new Result<>();
-
-        try {
-            // 获取用户OCR认证提供商
-            return userService.userFaceMatch(params);
-        } catch (Exception e) {
-            LogUtil.sysError("[OcrController userFaceMatch]", e);
-
-            // 异常返回结果
-            result.setEx(ThrowableUtils.throwableToString(e));
-            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
-            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
-            return result;
-        }
-    }
-
-    /**
      * 用户OCR识别信息保存
      *
      * @param params 保存用户OCR识别信息请求参数封装类

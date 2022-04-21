@@ -281,11 +281,6 @@ public class URL {
     public static final String OCR_ADVANCE_LIVENESS_SCORE = "/advanceLivenessScore";
 
     /**
-     * 判断并保存 用户OCR识别记录
-     */
-    public static final String OCR_USER_FACE_MATCH = "/userFaceMatch";
-
-    /**
      * 用户OCR识别信息保存
      */
     public static final String SAVE_USER_OCR_INFO = "/saveOcrInfo";
