@@ -846,8 +846,8 @@ public class UserServiceImpl extends BaseService implements UserService {
     public Result<Object> faceComparison(UserFaceComparisonParams params) throws Exception {
         // 结果集
         Result<Object> result = new Result<>();
-        result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
-        result.setMessage(ResultEnum.SYSTEM_ERROR.message());
+        result.setReturnCode(ResultEnum.KYC_FACE_COMPARISON_ERROR.code());
+        result.setMessage(ResultEnum.KYC_FACE_COMPARISON_ERROR.message());
 
         // 获取参数
         String appName = params.getAppName();
@@ -926,8 +926,8 @@ public class UserServiceImpl extends BaseService implements UserService {
     public Result<UserOcrResult> userOcrInfo(UserOcrFullInfoParams params) throws Exception {
         // 结果集
         Result<UserOcrResult> result = new Result<>();
-        result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
-        result.setMessage(ResultEnum.SYSTEM_ERROR.message());
+        result.setReturnCode(ResultEnum.KYC_SCAN_CARD_ERROR.code());
+        result.setMessage(ResultEnum.KYC_SCAN_CARD_ERROR.message());
 
         // 获取请求参数
         String appName = params.getAppName();
