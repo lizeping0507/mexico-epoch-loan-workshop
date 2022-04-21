@@ -28,8 +28,9 @@ public interface RemittanceService {
      *
      * @param addRemittanceAccountParams
      * @return
+     * @throws Exception
      */
-    Result addRemittanceAccount(AddRemittanceAccountParams addRemittanceAccountParams);
+    Result addRemittanceAccount(AddRemittanceAccountParams addRemittanceAccountParams) throws Exception;
 
     /**
      * 银行账户列表
