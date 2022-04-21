@@ -44,6 +44,6 @@
         UPDATE `loan_user` set app_version = #{appVersion} WHERE id = #{id}
     </update>
     <update id="updatePassword">
-        UPDATE `loan_user` set pass_word = #{newPassword} WHERE id = #{id}
+        UPDATE `loan_user` set password = #{newPassword} WHERE id = #{id}
     </update>
 </mapper>
