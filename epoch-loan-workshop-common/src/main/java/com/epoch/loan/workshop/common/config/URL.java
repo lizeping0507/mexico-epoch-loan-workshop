@@ -181,6 +181,16 @@ public class URL {
     public static final String REMITTANCE_ACCOUNT_LIST = "/remittanceAccountList";
 
     /**
+     * 放款账户列表
+     */
+    public static final String ADD_REMITTANCE_ACCOUNT = "/addAccountList";
+
+    /**
+     * 放款银行列表
+     */
+    public static final String REMITTANCE_BANK_LIST = "/remittanceBankList";
+
+    /**
      * 多推-贷超模式-首页
      */
     public static final String MERGE_PUSH_HOME = "/mergePush/home";
@@ -314,31 +324,6 @@ public class URL {
      * 产品 - 推荐列表
      */
     public static final String PRODUCT_RECOMMEND_LIST = "/recommendList";
-
-    /**
-     * 银行卡 - 银行卡列表
-     */
-    public static final String BANK_CARD_LIST = "/getBankCardList";
-
-    /**
-     * 银行卡 - 绑新卡
-     */
-    public static final String BIND_NEW_BANK_CARD = "/bindNewBankCard";
-
-    /**
-     * 新增银行卡
-     */
-    public static final String BIND_ADD_BANK_CARD = "/addBankcard";
-
-    /**
-     * 银行卡 - 绑旧卡
-     */
-    public static final String CONFIRM_OLD_BANK_CARD = "/confirmOldBankCard";
-
-    /**
-     * 银行卡 - 确认旧卡并领款
-     */
-    public static final String CONFIRM_OLD_BANK_CARD_LOAN = "/comfirmBankcardAndLoanAmount";
 
     /**
      * 订单 - 订单列表

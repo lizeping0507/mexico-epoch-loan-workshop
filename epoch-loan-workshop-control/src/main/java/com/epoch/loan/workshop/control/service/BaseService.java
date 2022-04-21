@@ -1,11 +1,9 @@
 package com.epoch.loan.workshop.control.service;
 
 import com.epoch.loan.workshop.common.config.PlatformConfig;
+import com.epoch.loan.workshop.common.config.RiskConfig;
 import com.epoch.loan.workshop.common.dao.elastic.OcrLivingDetectionLogElasticDao;
-import com.epoch.loan.workshop.common.dao.mysql.LoanDynamicRequestDao;
-import com.epoch.loan.workshop.common.dao.mysql.LoanOcrProviderConfigDao;
-import com.epoch.loan.workshop.common.dao.mysql.LoanOrderDao;
-import com.epoch.loan.workshop.common.dao.mysql.LoanRemittanceAccountDao;
+import com.epoch.loan.workshop.common.dao.mysql.*;
 import com.epoch.loan.workshop.common.redis.RedisClient;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -59,4 +57,16 @@ public class BaseService {
      */
     @Autowired
     public LoanRemittanceAccountDao loanRemittanceAccountDao;
+
+    /**
+     * 风控配置
+     */
+    @Autowired
+    public RiskConfig riskConfig;
+
+    /**
+     * 放款银行
+     */
+    @Autowired
+    public LoanRemittanceBankDao loanRemittanceBankDao;
 }

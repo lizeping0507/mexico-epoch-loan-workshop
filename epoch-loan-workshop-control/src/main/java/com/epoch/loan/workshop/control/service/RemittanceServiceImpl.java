@@ -3,8 +3,11 @@ package com.epoch.loan.workshop.control.service;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
 import com.epoch.loan.workshop.common.entity.mysql.LoanOrderEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanRemittanceAccountEntity;
+import com.epoch.loan.workshop.common.entity.mysql.LoanRemittanceBankEntity;
 import com.epoch.loan.workshop.common.params.params.BaseParams;
+import com.epoch.loan.workshop.common.params.params.request.AddRemittanceAccountParams;
 import com.epoch.loan.workshop.common.params.params.result.RemittanceAccountListResult;
+import com.epoch.loan.workshop.common.params.params.result.RemittanceBankListResult;
 import com.epoch.loan.workshop.common.params.params.result.Result;
 import com.epoch.loan.workshop.common.params.params.result.model.RemittanceAccountList;
 import com.epoch.loan.workshop.common.service.RemittanceService;
@@ -66,4 +69,58 @@ public class RemittanceServiceImpl extends BaseService implements RemittanceServ
         result.setMessage(ResultEnum.SUCCESS.message());
         return result;
     }
+
+    /**
+     * 新增放款账户
+     *
+     * @param addRemittanceAccountParams
+     * @return
+     */
+    @Override
+    public Result addRemittanceAccount(AddRemittanceAccountParams addRemittanceAccountParams) {
+        // 账户账号
+        String accountNumber = addRemittanceAccountParams.getAccountNumber();
+
+        // 银行
+        String bank = addRemittanceAccountParams.getBank();
+
+        // 姓名
+        String name = addRemittanceAccountParams.getName();
+
+        // 账户类型
+        Integer type = addRemittanceAccountParams.getType();
+
+        // 请求风控验卡
+
+        return null;
+    }
+
+    /**
+     * 银行账户列表
+     *
+     * @param baseParams
+     * @return
+     */
+    @Override
+    public Result<RemittanceBankListResult> remittanceBankList(BaseParams baseParams) {
+        // 查询放款银行列表
+        List<LoanRemittanceBankEntity> loanRemittanceBankList = loanRemittanceBankDao.findLoanRemittanceBankList();
+
+        // 封装参数
+        List<String> bankList = new ArrayList<>();
+        loanRemittanceBankList.parallelStream().forEach(loanRemittanceBankEntity -> {
+            bankList.add(loanRemittanceBankEntity.getName());
+        });
+
+        // 封装结果集
+        Result<RemittanceBankListResult> result = new Result<>();
+        RemittanceBankListResult remittanceBankListResult = new RemittanceBankListResult();
+        remittanceBankListResult.setList(bankList);
+        result.setData(remittanceBankListResult);
+        result.setReturnCode(ResultEnum.SUCCESS.code());
+        result.setMessage(ResultEnum.SUCCESS.message());
+        return result;
+    }
+
+
 }
