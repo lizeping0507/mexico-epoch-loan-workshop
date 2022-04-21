@@ -14,14 +14,12 @@ import com.epoch.loan.workshop.common.params.params.result.Result;
 import com.epoch.loan.workshop.common.params.params.result.model.RemittanceAccountList;
 import com.epoch.loan.workshop.common.service.RemittanceService;
 import com.epoch.loan.workshop.common.util.HttpUtils;
+import com.epoch.loan.workshop.common.util.ObjectIdUtil;
 import com.epoch.loan.workshop.common.util.RSAUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author : Duke
@@ -118,8 +116,22 @@ public class RemittanceServiceImpl extends BaseService implements RemittanceServ
             return result;
         }
 
+        // 新增银行卡
+        LoanRemittanceAccountEntity loanRemittanceAccountEntity = new LoanRemittanceAccountEntity();
+        loanRemittanceAccountEntity.setId(ObjectIdUtil.getObjectId());
+        loanRemittanceAccountEntity.setAccountNumber(accountNumber);
+        loanRemittanceAccountEntity.setBank(bank);
+        loanRemittanceAccountEntity.setUserId(userId);
+        loanRemittanceAccountEntity.setName(name);
+        loanRemittanceAccountEntity.setType(type);
+        loanRemittanceAccountEntity.setUpdateTime(new Date());
+        loanRemittanceAccountEntity.setCreateTime(new Date());
+        loanRemittanceAccountDao.addRemittanceAccount(loanRemittanceAccountEntity);
 
-        return null;
+        // 封装结果
+        result.setReturnCode(ResultEnum.SUCCESS.code());
+        result.setMessage(ResultEnum.SUCCESS.message());
+        return result;
     }
 
     /**
