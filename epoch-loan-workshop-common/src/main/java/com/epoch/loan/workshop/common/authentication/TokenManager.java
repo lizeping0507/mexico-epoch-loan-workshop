@@ -69,7 +69,7 @@ public class TokenManager {
      * @param user
      */
     public void updateUserCache(User user) {
-
+        redisClient.set(RedisKeyField.USER_CACHE + user.getId(), user);
     }
 
     /**
