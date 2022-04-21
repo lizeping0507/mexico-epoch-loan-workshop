@@ -14,7 +14,7 @@ import java.util.List;
  * @description : 基本信息响应参数封装
  */
 @Data
-public class UserInfoResult implements Serializable {
+public class SaveUserInfoResult implements Serializable {
     /**
      * 用户id
      */

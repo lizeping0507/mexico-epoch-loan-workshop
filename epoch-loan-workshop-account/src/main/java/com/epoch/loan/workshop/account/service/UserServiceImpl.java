@@ -12,6 +12,7 @@ import com.epoch.loan.workshop.common.entity.elastic.OcrLivingDetectionLogElasti
 import com.epoch.loan.workshop.common.entity.mysql.LoanUserEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanUserInfoEntity;
 import com.epoch.loan.workshop.common.params.User;
+import com.epoch.loan.workshop.common.params.params.BaseParams;
 import com.epoch.loan.workshop.common.params.params.request.*;
 import com.epoch.loan.workshop.common.params.params.result.*;
 import com.epoch.loan.workshop.common.params.params.result.model.AdvanceFaceComparisonResponse;
@@ -203,55 +204,6 @@ public class UserServiceImpl extends BaseService implements UserService {
         result.setReturnCode(ResultEnum.SUCCESS.code());
         result.setMessage(ResultEnum.SUCCESS.message());
         result.setData(changePasswordResult);
-        return result;
-    }
-
-    /**
-     * 修改密码
-     *
-     * @param params 请求参数封装
-     * @return Result<EditPasswordResult>
-     * @throws Exception 请求异常
-     */
-    @Override
-    public Result<EditPasswordResult> editPassword(MineParams params) throws Exception {
-        // 结果结果集
-        Result<EditPasswordResult> result = new Result<>();
-
-        // 拼接请求路径
-        String url = platformConfig.getPlatformDomain() + PlatformUrl.PLATFORM_EDITPASSWWORD + params.getUserId();
-
-        // 封装请求参数
-        JSONObject requestParam = new JSONObject();
-        requestParam.put("userId", params.getUserId());
-        requestParam.put("appFlag", params.getAppName());
-        requestParam.put("versionNumber", params.getAppVersion());
-        requestParam.put("mobileType", params.getMobileType());
-
-        // 请求
-        String responseStr = HttpUtils.POST(url, requestParam.toJSONString());
-
-        // 解析响应结果
-        JSONObject responseJson = JSONObject.parseObject(responseStr);
-
-        // 判断接口响应是否正常
-        if (!PlatformUtil.checkResponseCode(result, EditPasswordResult.class, responseJson)) {
-            return result;
-        }
-
-        // 获取结果集
-        JSONObject data = responseJson.getJSONObject("data");
-
-        // 封装结果就
-        EditPasswordResult editPasswordResult = new EditPasswordResult();
-        editPasswordResult.setUserId(data.getString("userId"));
-        editPasswordResult.setPhoneNumber(data.getString("phoneNumber"));
-        editPasswordResult.setSavePhoneNumber(data.getString("savePhoneNumber"));
-
-        // 封装结果
-        result.setReturnCode(ResultEnum.SUCCESS.code());
-        result.setMessage(ResultEnum.SUCCESS.message());
-        result.setData(editPasswordResult);
         return result;
     }
 
@@ -464,259 +416,16 @@ public class UserServiceImpl extends BaseService implements UserService {
         // 结果集
         Result<UserOcrBasicInfoResult> result = new Result<>();
 
-        // 拼接请求路径
-        String url = platformConfig.getPlatformDomain() + PlatformUrl.PLATFORM_GET_OCR_INFO;
-
-        // 封装请求参数
-        JSONObject requestParam = new JSONObject();
-        requestParam.put("appFlag", params.getAppName());
-        requestParam.put("versionNumber", params.getAppVersion());
-        requestParam.put("mobileType", params.getMobileType());
-        requestParam.put("userId", params.getUserId());
-
-        // 封装请求头
-        Map<String, String> headers = new HashMap<>();
-        headers.put("token", params.getToken());
-
-        // 请求
-        String responseStr = HttpUtils.POST_WITH_HEADER(url, requestParam.toJSONString(), headers);
-
-        // 解析响应结果
-        JSONObject responseJson = JSONObject.parseObject(responseStr);
-
-        // 判断接口响应是否正常
-        if (!PlatformUtil.checkResponseCode(result, UserOcrBasicInfoResult.class, responseJson)) {
-            return result;
-        }
-
-        // 获取结果集
-        JSONObject data = responseJson.getJSONObject("data");
-
-        // 封装结果就
-        UserOcrBasicInfoResult basicInfoResult = JSONObject.parseObject(data.toJSONString(), UserOcrBasicInfoResult.class);
 
         // 封装结果
         result.setReturnCode(ResultEnum.SUCCESS.code());
         result.setMessage(ResultEnum.SUCCESS.message());
-        result.setData(basicInfoResult);
+        // result.setData(basicInfoResult);
         return result;
     }
 
     /**
-     * 新增基本信息
-     *
-     * @param params 请求参数封装
-     * @return Result<UserInfoSaveResult>
-     * @throws Exception 请求异常
-     */
-    @Override
-    public Result<UserInfoSaveResult> addUserInfo(UserInfoParams params) throws Exception {
-
-        // 结果集
-        Result<UserInfoSaveResult> result = new Result<>();
-
-        // 拼接请求路径
-        String url = platformConfig.getPlatformDomain() + PlatformUrl.PLATFORM_USER_INFO_ADD;
-
-        // 封装请求参数
-        JSONObject requestParam = new JSONObject();
-        requestParam.put("appFlag", params.getAppName());
-        requestParam.put("versionNumber", params.getAppVersion());
-        requestParam.put("mobileType", params.getMobileType());
-
-        requestParam.put("userId", params.getUserId());
-        requestParam.put("firstName", params.getFirstName());
-        requestParam.put("middleName", params.getMiddleName());
-        requestParam.put("lastName", params.getLastName());
-        requestParam.put("email", params.getEmail());
-        requestParam.put("occupation", params.getOccupation());
-        requestParam.put("salary", params.getSalary());
-        requestParam.put("marital", params.getMarital());
-        requestParam.put("education", params.getEducation());
-        requestParam.put("loanPurpose", params.getLoanPurpose());
-
-        // 封装请求头
-        Map<String, String> headers = new HashMap<>();
-        headers.put("token", params.getToken());
-
-        // 请求
-        String responseStr = HttpUtils.POST_WITH_HEADER(url, requestParam.toJSONString(), headers);
-
-        // 解析响应结果
-        JSONObject responseJson = JSONObject.parseObject(responseStr);
-
-        // 判断接口响应是否正常
-        if (!PlatformUtil.checkResponseCode(result, UserInfoSaveResult.class, responseJson)) {
-            return result;
-        }
-
-        // 封装结果
-        result.setReturnCode(ResultEnum.SUCCESS.code());
-        result.setMessage(responseJson.getString("msg"));
-        return result;
-    }
-
-    /**
-     * 获取基本信息
-     *
-     * @param params 请求参数封装
-     * @return Result<UserInfoResult>
-     * @throws Exception 请求异常
-     */
-    @Override
-    public Result<UserInfoResult> getUserInfo(UserInfoParams params) throws Exception {
-
-        // 结果集
-        Result<UserInfoResult> result = new Result<>();
-
-        // 拼接请求路径
-        String url = platformConfig.getPlatformDomain() + PlatformUrl.PLATFORM_USER_INFO_GET;
-
-        // 封装请求参数
-        JSONObject requestParam = new JSONObject();
-        requestParam.put("appFlag", params.getAppName());
-        requestParam.put("versionNumber", params.getAppVersion());
-        requestParam.put("mobileType", params.getMobileType());
-
-        requestParam.put("userId", params.getUserId());
-
-        // 封装请求头
-        Map<String, String> headers = new HashMap<>();
-        headers.put("token", params.getToken());
-
-        // 请求
-        String responseStr = HttpUtils.POST_WITH_HEADER(url, requestParam.toJSONString(), headers);
-
-        // 解析响应结果
-        JSONObject responseJson = JSONObject.parseObject(responseStr);
-
-        // 判断接口响应是否正常
-        if (!PlatformUtil.checkResponseCode(result, UserInfoResult.class, responseJson)) {
-            return result;
-        }
-
-        // 获取结果集
-        JSONObject data = responseJson.getJSONObject("data");
-
-        // 封装结果就
-        UserInfoResult res = JSONObject.parseObject(data.toJSONString(), UserInfoResult.class);
-
-        // 封装结果
-        result.setReturnCode(ResultEnum.SUCCESS.code());
-        result.setMessage(ResultEnum.SUCCESS.message());
-        result.setData(res);
-        return result;
-    }
-
-    /**
-     * 新增/更新个人信息
-     *
-     * @param params 请求参数封装
-     * @return Result<PersonInfoUpdateResult>
-     * @throws Exception 请求异常
-     */
-    @Override
-    public Result<PersonInfoUpdateResult> savePersonInfo(PersonInfoParams params) throws Exception {
-
-        // 结果集
-        Result<PersonInfoUpdateResult> result = new Result<>();
-
-        // 拼接请求路径
-        String url = platformConfig.getPlatformDomain() + PlatformUrl.PLATFORM_PERSON_INFO_SAVE;
-
-        // 封装请求参数
-        JSONObject requestParam = new JSONObject();
-        requestParam.put("appFlag", params.getAppName());
-        requestParam.put("versionNumber", params.getAppVersion());
-        requestParam.put("mobileType", params.getMobileType());
-
-        requestParam.put("userId", params.getUserId());
-        requestParam.put("houseType", params.getHouseType());
-        requestParam.put("childNum", params.getChildNum());
-        requestParam.put("designation", params.getDesignation());
-        requestParam.put("incomeWay", params.getIncomeWay());
-        requestParam.put("familyRelationship", params.getFamilyRelationship());
-        requestParam.put("familyName", params.getFamilyName());
-        requestParam.put("familyPhone", params.getFamilyPhone());
-        requestParam.put("friendName", params.getFriendName());
-        requestParam.put("friendPhone", params.getFriendPhone());
-
-        // 封装请求头
-        Map<String, String> headers = new HashMap<>();
-        headers.put("token", params.getToken());
-
-        // 请求
-        String responseStr = HttpUtils.POST_WITH_HEADER(url, requestParam.toJSONString(), headers);
-
-        // 解析响应结果
-        JSONObject responseJson = JSONObject.parseObject(responseStr);
-
-        // 判断接口响应是否正常
-        if (!PlatformUtil.checkResponseCode(result, PersonInfoUpdateResult.class, responseJson)) {
-            return result;
-        }
-
-        // 封装结果
-        result.setReturnCode(ResultEnum.SUCCESS.code());
-        result.setMessage(responseJson.getString("msg"));
-        return result;
-    }
-
-    /**
-     * 获取个人信息
-     *
-     * @param params 请求参数封装
-     * @return Result<PersonInfoResult>
-     * @throws Exception 请求异常
-     */
-    @Override
-    public Result<PersonInfoResult> getPersonInfo(PersonInfoParams params) throws Exception {
-
-        // 结果集
-        Result<PersonInfoResult> result = new Result<>();
-
-        // 拼接请求路径
-        String url = platformConfig.getPlatformDomain() + PlatformUrl.PLATFORM_PERSON_INFO;
-
-        // 封装请求参数
-        JSONObject requestParam = new JSONObject();
-        requestParam.put("appFlag", params.getAppName());
-        requestParam.put("versionNumber", params.getAppVersion());
-        requestParam.put("mobileType", params.getMobileType());
-
-        requestParam.put("userId", params.getUserId());
-        requestParam.put("productId", params.getProductId());
-
-        // 封装请求头
-        Map<String, String> headers = new HashMap<>();
-        headers.put("token", params.getToken());
-
-        // 请求
-        String responseStr = HttpUtils.POST_WITH_HEADER(url, requestParam.toJSONString(), headers);
-
-        // 解析响应结果
-        JSONObject responseJson = JSONObject.parseObject(responseStr);
-
-        // 判断接口响应是否正常
-        if (!PlatformUtil.checkResponseCode(result, PersonInfoResult.class, responseJson)) {
-            return result;
-        }
-
-        // 获取结果集
-        JSONObject data = responseJson.getJSONObject("data");
-
-        // 封装结果就
-        PersonInfoResult res = JSONObject.parseObject(data.toJSONString(), PersonInfoResult.class);
-
-        // 封装结果
-        result.setReturnCode(ResultEnum.SUCCESS.code());
-        result.setMessage(ResultEnum.SUCCESS.message());
-        result.setData(res);
-        return result;
-    }
-
-    /**
-     * 获取个人信息
+     * 上传文件
      *
      * @param params 请求参数封装
      * @return Result<PersonInfoResult>
@@ -959,6 +668,123 @@ public class UserServiceImpl extends BaseService implements UserService {
 
         return result;
     }
+
+    @Override
+    public Result<SaveUserInfoResult> saveUserInfo(UserInfoParams params) {
+        // 结果集
+        Result<SaveUserInfoResult> result = new Result<>();
+
+        // 查询用户
+        String token = params.getToken();
+        User user = tokenManager.getUserCache(token);
+        if (null == user) {
+            result.setReturnCode(ResultEnum.NO_LOGIN.code());
+            result.setMessage(ResultEnum.NO_LOGIN.message());
+            return result;
+        }
+
+        // 查询用户详细信息
+        LoanUserInfoEntity userInfo = loanUserInfoDao.getByUserId(user.getId());
+
+        // 注入数据
+        if (null != params.getContacts()) {
+            userInfo.setContacts(params.getContacts());
+        }
+
+        if (null != params.getMonthlyIncome()) {
+            userInfo.setMonthlyIncome(params.getMonthlyIncome());
+        }
+
+        if (null != params.getPayPeriod()) {
+            userInfo.setPayPeriod(params.getPayPeriod());
+        }
+
+        if (null != params.getOccupation()) {
+            userInfo.setOccupation(params.getOccupation());
+        }
+
+        if (null != params.getPayMethod()) {
+            userInfo.setPayMethod(params.getPayMethod());
+        }
+
+        if (null != params.getEmail()) {
+            userInfo.setEmail(params.getEmail());
+        }
+
+        if (null != params.getEducation()) {
+            userInfo.setEducation(params.getEducation());
+        }
+
+        if (null != params.getMarital()) {
+            userInfo.setMarital(params.getMarital());
+        }
+
+        if (null != params.getChildrenNumber()) {
+            userInfo.setChildrenNumber(params.getChildrenNumber());
+        }
+
+        if (null != params.getLoanPurpose()) {
+            userInfo.setLoanPurpose(params.getLoanPurpose());
+        }
+
+        if (null != params.getLiveType()) {
+            userInfo.setLiveType(params.getLiveType());
+        }
+
+        if (null != params.getPapersAddress()) {
+            userInfo.setPapersAddress(params.getPapersAddress());
+        }
+
+        if (null != params.getPapersFatherName()) {
+            userInfo.setPapersFatherName(params.getPapersFatherName());
+        }
+
+        if (null != params.getPapersFullName()) {
+            userInfo.setPapersFullName(params.getPapersFullName());
+        }
+
+        if (null != params.getPapersMotherName()) {
+            userInfo.setPapersMotherName(params.getPapersMotherName());
+        }
+
+        if (null != params.getPapersId()) {
+            userInfo.setPapersId(params.getPapersId());
+        }
+
+        if (null != params.getPapersName()) {
+            userInfo.setPapersName(params.getPapersName());
+        }
+
+        if (null != params.getPapersVoterId()) {
+            userInfo.setPapersVoterId(params.getPapersVoterId());
+        }
+
+        // 更新
+        loanUserInfoDao.update(userInfo);
+
+
+        // TODO 更新用户缓存
+        tokenManager.updateUserCache(null);
+
+        result.setReturnCode(ResultEnum.SUCCESS.code());
+        result.setMessage(ResultEnum.SUCCESS.message());
+        return result;
+    }
+
+    /**
+     * 获取用户信息
+     * @param params
+     * @return
+     */
+    @Override
+    public Result<User> getUserInfo(BaseParams params){
+        Result<User> result= new Result<>();
+        result.setData(params.getUser());
+        result.setReturnCode(ResultEnum.SUCCESS.code());
+        result.setMessage(ResultEnum.SUCCESS.message());
+        return result;
+    }
+
 
     private File convertToFile(byte[] byteFile) {
         String objectId = ObjectIdUtil.getObjectId();

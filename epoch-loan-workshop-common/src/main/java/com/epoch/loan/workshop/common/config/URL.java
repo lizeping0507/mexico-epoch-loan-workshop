@@ -400,4 +400,14 @@ public class URL {
      * 发起
      */
     public static final String PREPAY = "/prepay";
+
+    /**
+     * 保存用户信息
+     */
+    public static final String SAVE_INFO = "/info/save";
+
+    /**
+     * 保存用户信息
+     */
+    public static final String GET_INFO = "/info";
 }
