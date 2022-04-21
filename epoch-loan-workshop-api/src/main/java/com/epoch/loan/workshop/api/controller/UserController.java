@@ -176,6 +176,7 @@ public class UserController extends BaseController {
      */
     @PostMapping(URL.MODIFY_PASSWORD)
     public Result<ChangePasswordResult> modifyPassword(ModifyPasswordParams modifyPasswordParams) {
+        LogUtil.sysInfo("更新密码 : {}", JSONObject.toJSONString(modifyPasswordParams));
         // 结果集
         Result<ChangePasswordResult> result = new Result<>();
 

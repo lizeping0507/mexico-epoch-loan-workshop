@@ -159,6 +159,58 @@ public class UserServiceImpl extends BaseService implements UserService {
     }
 
     /**
+     * 密码登录
+     *
+     * @param params 请求参数封装
+     * @return Result<LoginResult>
+     * @throws Exception 请求异常
+     */
+    @Override
+    public Result<LoginResult> login(LoginParams params) throws Exception {
+        // 结果结果集
+        Result<LoginResult> result = new Result<>();
+
+        // 查询用户
+        LoanUserEntity user = loanUserDao.findByLoginNameAndAppName(params.getLoginName(), params.getAppName());
+
+        // 用户是否存在
+        if (null == user) {
+            result.setReturnCode(ResultEnum.PHONE_NO_EXIT.code());
+            result.setMessage(ResultEnum.PHONE_NO_EXIT.message());
+            return result;
+        }
+
+        // 密码匹配
+        if (!params.getPassword().equals(user.getPassword())) {
+            result.setReturnCode(ResultEnum.PASSWORD_INVALID.code());
+            result.setMessage(ResultEnum.PASSWORD_INVALID.message());
+            return result;
+        }
+
+        // 生成并更新token
+        String token = this.tokenManager.updateUserToken(user.getId());
+
+        // 更新缓存
+        updateUserCache(user.getId());
+
+        // TODO 新增或更新afid
+
+        // 更新版本号,方便指定版本控制
+        loanUserDao.updateAppVersion(user.getId(), params.getAppVersion());
+
+        // 封装结果集
+        LoginResult loginResult = new LoginResult();
+        loginResult.setUserId(user.getId());
+        loginResult.setToken(token);
+
+        // 封装结果
+        result.setReturnCode(ResultEnum.SUCCESS.code());
+        result.setMessage(ResultEnum.SUCCESS.message());
+        result.setData(loginResult);
+        return result;
+    }
+
+    /**
      * 忘记密码
      *
      * @param params 请求参数封装
@@ -271,60 +323,6 @@ public class UserServiceImpl extends BaseService implements UserService {
         result.setReturnCode(ResultEnum.SUCCESS.code());
         result.setMessage(ResultEnum.SUCCESS.message());
         result.setData(changePasswordResult);
-        return result;
-    }
-
-    /**
-     * 密码登录
-     *
-     * @param params 请求参数封装
-     * @return Result<LoginResult>
-     * @throws Exception 请求异常
-     */
-    @Override
-    public Result<LoginResult> login(LoginParams params) throws Exception {
-        // 结果结果集
-        Result<LoginResult> result = new Result<>();
-
-        // 查询用户
-        LogUtil.sysInfo("密码登录  params: {}", JSONObject.toJSONString(params));
-        LoanUserEntity user = loanUserDao.findByLoginNameAndAppName(params.getLoginName(), params.getAppName());
-        LogUtil.sysInfo("密码登录  user: {}", JSONObject.toJSONString(user));
-
-        // 用户是否存在
-        if (null == user) {
-            result.setReturnCode(ResultEnum.PHONE_NO_EXIT.code());
-            result.setMessage(ResultEnum.PHONE_NO_EXIT.message());
-            return result;
-        }
-
-        // 密码匹配
-        if (!params.getPassword().equals(user.getPassword())) {
-            result.setReturnCode(ResultEnum.PASSWORD_INVALID.code());
-            result.setMessage(ResultEnum.PASSWORD_INVALID.message());
-            return result;
-        }
-
-        // 生成并更新token
-        String token = this.tokenManager.updateUserToken(user.getId());
-
-        // 更新缓存
-        updateUserCache(user.getId());
-
-        // TODO 新增或更新afid
-
-        // 更新版本号,方便指定版本控制
-        loanUserDao.updateAppVersion(user.getId(), params.getAppVersion());
-
-        // 封装结果集
-        LoginResult loginResult = new LoginResult();
-        loginResult.setUserId(user.getId());
-        loginResult.setToken(token);
-
-        // 封装结果
-        result.setReturnCode(ResultEnum.SUCCESS.code());
-        result.setMessage(ResultEnum.SUCCESS.message());
-        result.setData(loginResult);
         return result;
     }
 
