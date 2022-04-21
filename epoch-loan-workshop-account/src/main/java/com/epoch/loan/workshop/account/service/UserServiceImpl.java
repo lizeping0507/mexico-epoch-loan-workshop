@@ -446,68 +446,35 @@ public class UserServiceImpl extends BaseService implements UserService {
      */
     @Override
     public Result<Object> uploadS3Images(UploadS3Params params) throws Exception {
-
         // 结果集
         Result<Object> result = new Result<>();
 
-        // 拼接请求路径
-        String url = platformConfig.getPlatformDomain() + PlatformUrl.PLATFORM_UPLOAD_S3_IMAGES;
+        // 获取请求参数
+        String rfc = params.getRfc();
+        String backJson = params.getBackJson();
+        String userId = params.getUser().getId();
+        AdvanceOcrFrontInfoResult frontInfo = JSON.parseObject(params.getFrontJson(),AdvanceOcrFrontInfoResult.class);
+        AdvanceOcrBackInfoResult backInfo = JSON.parseObject(params.getBackJson(),AdvanceOcrBackInfoResult.class);
+        String idNo = frontInfo.getIdNumber();
 
-        // 封装请求参数
-        Map<String, String> requestParam = new HashMap(15);
-        requestParam.put("appFlag", params.getAppName());
-        requestParam.put("versionNumber", params.getAppVersion());
-        requestParam.put("mobileType", params.getMobileType());
-
-        requestParam.put("realName", params.getRealName());
-        requestParam.put("idNo", params.getIdNo());
-        requestParam.put("panCode", params.getPanCode());
-        requestParam.put("dateOfBirth", params.getDateOfBirth());
-        requestParam.put("adBackJson", params.getAdBackJson());
-        requestParam.put("gender", params.getGender());
-        requestParam.put("pinCode", params.getPinCode());
-        requestParam.put("idAddr", params.getIdAddr());
-        requestParam.put("userId", params.getUserId());
-        requestParam.put("adFrontJson", params.getAdFrontJson());
-        requestParam.put("panJson", params.getPanJson());
-        if (StringUtils.isNotBlank(params.getProductId())) {
-            requestParam.put("productId", params.getProductId());
+        // curp校验
+        String textIdNo= "(?=.*[A-Z])(?=.*\\d)[A-Z\\d]{18}";
+        String textRfc = "(?=.*[A-Z])(?=.*\\d)[A-Z\\d]{13}";
+        if (StringUtils.isBlank(rfc) || StringUtils.isBlank(idNo)
+                || !rfc.matches(textRfc) || !idNo.matches(textIdNo)) {
+            result.setReturnCode(ResultEnum.RFC_CURP_ERROR.code());
+            result.setMessage(ResultEnum.RFC_CURP_ERROR.message());
         }
 
-        // 文件列表
-        Map<String, File> fileMap = new HashMap(4);
-        fileMap.put("panImg", convertToFile(params.getPanImgData()));
-        fileMap.put("livingImg", convertToFile(params.getLivingImgData()));
-        fileMap.put("frontImg", convertToFile(params.getFrontImgData()));
-        fileMap.put("backImg", convertToFile(params.getBackImgData()));
+        // 卡号 和 rfc 单包唯一性验证
 
-        // 封装请求头
-        Map<String, String> headers = new HashMap<>(1);
-        headers.put("token", params.getToken());
+        // 卡号 和 rfc 手机号校验
 
-        // 请求
-        String responseStr = HttpUtils.POST_FORM_FILE(url, requestParam, fileMap);
+        //
 
-        // 释放文件
-        for (Map.Entry<String, File> entry : fileMap.entrySet()) {
-            File value = entry.getValue();
-            value.deleteOnExit();
-        }
-
-        // 解析响应结果
-        JSONObject responseJson = JSONObject.parseObject(responseStr);
-
-        // 判断接口响应是否正常
-        if (!PlatformUtil.checkResponseCode(result, Object.class, responseJson)) {
-            return result;
-        }
-
-        // 获取结果集
-        String data = responseJson.getString("msg");
 
         // 封装结果
         result.setReturnCode(ResultEnum.SUCCESS.code());
-        result.setMessage(data);
         return result;
     }
 

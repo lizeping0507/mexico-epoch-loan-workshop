@@ -100,17 +100,23 @@ public enum ResultEnum {
     /**
      * 证件扫描失败，请重新扫描证件
      */
-    KYC_SCAN_CARD_ERROR(6001,"The ID scan failed, please scan the ID again."),
+    KYC_SCAN_CARD_ERROR(6000,"The ID scan failed, please scan the ID again."),
 
     /**
      * 活体检测失败，请重新上传
      */
-    KYC_Liveness_ERROR(6011,"Liveness detection failed, please upload again."),
+    KYC_Liveness_ERROR(6001,"Liveness detection failed, please upload again."),
 
     /**
      * 人脸匹配失败，请重新上传图片
      */
-    KYC_FACE_COMPARISON_ERROR(6021,"Face matching failed, please upload the image again."),
+    KYC_FACE_COMPARISON_ERROR(6002,"Face matching failed, please upload the image again."),
+
+    /**
+     * 	Rfc或者Curp格式错误
+     */
+    RFC_CURP_ERROR(6010,"Error de formato RFC o CURP."),
+
     ;
 
 

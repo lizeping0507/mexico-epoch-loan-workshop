@@ -201,14 +201,20 @@ public class OcrController extends BaseController {
         Result<Object> result = new Result<>();
 
         try {
+            // 验证请求参数是否合法
+            if (params.isAppNameLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":appName");
+                return result;
+            }
+
             MultipartResolver resolver = new StandardServletMultipartResolver();
             MultipartHttpServletRequest mRequest = resolver.resolveMultipart(request);
             Map<String, MultipartFile> fileMap = mRequest.getFileMap();
-
-            params.setPanImgData(fileMap.get("panImg").getBytes());
-            params.setLivingImgData(fileMap.get("livingImg").getBytes());
-            params.setFrontImgData(fileMap.get("frontImg").getBytes());
-            params.setBackImgData(fileMap.get("backImg").getBytes());
+            params.setIdFrontImgData(fileMap.get("idFrontImage").getBytes());
+            params.setIdBackImgData(fileMap.get("idBackImage").getBytes());
+            params.setFaceImgData(fileMap.get("faceImage").getBytes());
 
             // 证件上传
             return userService.uploadS3Images(params);
@@ -262,7 +268,6 @@ public class OcrController extends BaseController {
             return result;
         }
     }
-
 
     /**
      * advance获取证件信息
