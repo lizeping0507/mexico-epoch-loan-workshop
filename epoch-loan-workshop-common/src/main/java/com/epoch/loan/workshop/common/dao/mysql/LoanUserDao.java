@@ -46,4 +46,10 @@ public interface LoanUserDao {
      */
     void updatePassword(String id, String newPassword);
 
+    /**
+     * 通过Id查询
+     * @param id
+     * @return
+     */
+    LoanUserEntity findById(String id);
 }

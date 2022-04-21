@@ -146,6 +146,9 @@ public class UserServiceImpl extends BaseService implements UserService {
         // 生成token
         String token = this.tokenManager.updateUserToken(user.getId());
 
+        // 更新缓存
+        updateUserCache(user.getId());
+
         // 封装结果
         RegisterResult registerResult = new RegisterResult();
         registerResult.setToken(token);
@@ -193,6 +196,9 @@ public class UserServiceImpl extends BaseService implements UserService {
 
         // 更新密码
         loanUserDao.updatePassword(user.getId(), params.getPasswd());
+
+        // 更新缓存
+        updateUserCache(user.getId());
 
         // 生成Token
         String token1 = tokenManager.updateUserToken(user.getId());
@@ -252,6 +258,9 @@ public class UserServiceImpl extends BaseService implements UserService {
         // 更新密码
         loanUserDao.updatePassword(userCache.getId(), params.getNewPassword());
 
+        // 更新缓存
+        updateUserCache(userCache.getId());
+
         // 生成Token
         String token1 = tokenManager.updateUserToken(userCache.getId());
 
@@ -298,6 +307,9 @@ public class UserServiceImpl extends BaseService implements UserService {
 
         // 生成并更新token
         String token = this.tokenManager.updateUserToken(user.getId());
+
+        // 更新缓存
+        updateUserCache(user.getId());
 
         // TODO 新增或更新afid
 

@@ -6,9 +6,12 @@ import com.epoch.loan.workshop.common.config.PlatformConfig;
 import com.epoch.loan.workshop.common.dao.elastic.OcrLivingDetectionLogElasticDao;
 import com.epoch.loan.workshop.common.dao.mysql.*;
 import com.epoch.loan.workshop.common.entity.mysql.LoanRemittancePaymentRecordEntity;
+import com.epoch.loan.workshop.common.entity.mysql.LoanUserEntity;
+import com.epoch.loan.workshop.common.entity.mysql.LoanUserInfoEntity;
 import com.epoch.loan.workshop.common.mq.remittance.RemittanceMQManager;
 import com.epoch.loan.workshop.common.mq.remittance.params.RemittanceParams;
 import com.epoch.loan.workshop.common.mq.repayment.RepaymentMQManager;
+import com.epoch.loan.workshop.common.params.User;
 import com.epoch.loan.workshop.common.redis.RedisClient;
 import com.epoch.loan.workshop.common.sms.SMSManager;
 import org.apache.commons.lang3.ObjectUtils;
@@ -66,8 +69,8 @@ public class BaseService {
     /**
      * 银行卡
      */
-    @Autowired
-    public PlatformUserBankCardDao platformUserBankCardDao;
+//    @Autowired
+//    public PlatformUserBankCardDao platformUserBankCardDao;
     /**
      * 基础信息
      */
@@ -162,5 +165,54 @@ public class BaseService {
         }
 
         return Boolean.TRUE;
+    }
+
+    /**
+     * 更新用户信息缓存
+     *
+     * @return boolean
+     */
+    public void updateUserCache(String userId) {
+        User user = new User();
+        LoanUserEntity userEntity = loanUserDao.findById(userId);
+        LoanUserInfoEntity userInfoEntity = loanUserInfoDao.getByUserId(userId);
+
+        user.setId(userEntity.getId());
+        user.setAndroidId(userEntity.getAndroidId());
+        user.setChannelId(userEntity.getChannelId());
+        user.setGaId(userEntity.getGaId());
+        user.setImei(userEntity.getImei());
+        user.setPlatform(userEntity.getPlatform());
+        user.setLoginName(userEntity.getLoginName());
+        user.setPassword(userEntity.getPassword());
+        user.setAppName(userEntity.getAppName());
+        user.setAppVersion(userEntity.getAppVersion());
+        user.setUserInfoId(userInfoEntity.getId());
+        user.setMobile(userInfoEntity.getMobile());
+        user.setGps(userInfoEntity.getGps());
+        user.setGpsAddress(userInfoEntity.getGpsAddress());
+        user.setRegisterGps(userInfoEntity.getRegisterGps());
+        user.setRegisterAddress(userInfoEntity.getRegisterAddress());
+        user.setIp(userInfoEntity.getIp());
+        user.setIpAddress(userInfoEntity.getIpAddress());
+        user.setContacts(userInfoEntity.getContacts());
+        user.setMonthlyIncome(userInfoEntity.getMonthlyIncome());
+        user.setPayPeriod(userInfoEntity.getPayPeriod());
+        user.setOccupation(userInfoEntity.getOccupation());
+        user.setPayMethod(userInfoEntity.getPayMethod());
+        user.setEmail(userInfoEntity.getEmail());
+        user.setEducation(userInfoEntity.getEducation());
+        user.setMarital(userInfoEntity.getMarital());
+        user.setChildrenNumber(userInfoEntity.getChildrenNumber());
+        user.setLoanPurpose(userInfoEntity.getLoanPurpose());
+        user.setLiveType(userInfoEntity.getLiveType());
+        user.setPapersAddress(userInfoEntity.getPapersAddress());
+        user.setPapersFatherName(userInfoEntity.getPapersFatherName());
+        user.setPapersFullName(userInfoEntity.getPapersFullName());
+        user.setPapersMotherName(userInfoEntity.getPapersMotherName());
+        user.setPapersId(userInfoEntity.getPapersId());
+        user.setPapersName(userInfoEntity.getPapersName());
+        user.setPapersVoterId(userInfoEntity.getPapersVoterId());
+        tokenManager.updateUserCache(user);
     }
 }

@@ -37,6 +37,9 @@
             resultType="com.epoch.loan.workshop.common.entity.mysql.LoanUserEntity">
         SELECT * FROM `loan_user` WHERE login_name = #{loginName} AND app_name = #{appName}
     </select>
+    <select id="findById" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanUserEntity">
+        SELECT * FROM `loan_user` WHERE id = #{id}
+    </select>
     <update id="updateAppVersion">
         UPDATE `loan_user` set app_version = #{appVersion} WHERE id = #{id}
     </update>

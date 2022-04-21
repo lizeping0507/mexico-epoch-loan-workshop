@@ -117,7 +117,7 @@ public class RepaymentServiceImpl extends BaseService implements RepaymentServic
             LogUtil.sysInfo("userBasicInfo:{}", userBasicInfo);
 
             // 查询用户银行卡
-            PlatformUserBankCardEntity platformUserBankCardEntity = platformUserBankCardDao.findUserBankCardById(order.getBankCardId());
+            PlatformUserBankCardEntity platformUserBankCardEntity = null;// TODO = platformUserBankCardDao.findUserBankCardById(order.getBankCardId());
             LogUtil.sysInfo("platformUserBankCardEntity:{}", platformUserBankCardEntity);
 
             // 创建订单详情记录
