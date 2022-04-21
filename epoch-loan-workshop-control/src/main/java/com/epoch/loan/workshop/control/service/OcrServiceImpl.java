@@ -185,8 +185,8 @@ public class OcrServiceImpl extends BaseService implements OcrService {
 
         // 处理响应结果
         if (StringUtils.isBlank(responseStr)) {
-            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
-            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
+            result.setReturnCode(ResultEnum.KYC_Liveness_ERROR.code());
+            result.setMessage(ResultEnum.KYC_Liveness_ERROR.message());
             return result;
         }
         AdvanceScoreResult scoreResult = JSONObject.parseObject(responseStr, AdvanceScoreResult.class);

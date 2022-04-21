@@ -9,12 +9,12 @@ import java.util.List;
 /**
  * @author : Shangkunfeng
  * @packageName : com.epoch.loan.workshop.common.params.result;
- * @className : PersonInfoResult
+ * @className : GetUserInfoResult
  * @createTime : 2022/3/29 16:04
- * @description : 个人信息结果封装
+ * @description : 获取用户信息结果封装
  */
 @Data
-public class PersonInfoResult implements Serializable {
+public class GetUserInfoResult implements Serializable {
 
     /**
      * 用户id

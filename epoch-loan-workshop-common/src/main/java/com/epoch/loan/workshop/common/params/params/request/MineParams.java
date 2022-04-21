@@ -13,9 +13,4 @@ import lombok.Data;
 @Data
 public class MineParams extends BaseParams {
 
-    /**
-     * 用户Id
-     */
-    private String userId;
-
 }

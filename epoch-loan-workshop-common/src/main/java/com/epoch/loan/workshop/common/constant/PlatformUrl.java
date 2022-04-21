@@ -173,36 +173,6 @@ public class PlatformUrl {
     // ================ OCR相关 ===================
 
     /**
-     * OCR--获取使用服务提供商
-     */
-    public final static String PLATFORM_OCR_CHANNEL_TYPE = "/api/v1/userInfo/ocrChannelType";
-
-    /**
-     * 获取advance license
-     */
-    public static final String PLATFORM_OCR_ADVANCE_LICENSE = "/api/v1/userInfo/getAdvanceLicense";
-
-    /**
-     * 获取advance 活体识别分
-     */
-    public static final String PLATFORM_OCR_ADVANCE_LIVENESS_SCORE = "/api/v1/userInfo/getLivenessScore";
-
-    /**
-     * 判断并保存 用户OCR识别记录
-     */
-    public static final String PLATFORM_OCR_USER_FACE_MATCH = "/api/v1/userInfo/userFaceMatch.htm";
-
-    /**
-     * 调用advance 获取证件信息接口
-     */
-    public static final String PLATFORM_OCR_ADVANCE_CARD_INFO = "/api/v1/userInfo/userCurpInfo";
-
-    /**
-     * 获取证件信息和人脸相似度
-     */
-    public static final String PLATFORM_OCR_ADVANCE_FACE_COMPARISON = "/api/v1/userInfo/faceComparison";
-
-    /**
      * 用户OCR保存
      */
     public static final String PLATFORM_SAVE_OCR_INFO = "/api/v1/userInfo/userOcr";

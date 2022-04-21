@@ -1,5 +1,7 @@
 package com.epoch.loan.workshop.common.service;
 
+import com.epoch.loan.workshop.common.params.User;
+import com.epoch.loan.workshop.common.params.params.BaseParams;
 import com.epoch.loan.workshop.common.params.params.request.*;
 import com.epoch.loan.workshop.common.params.params.result.*;
 
@@ -39,15 +41,6 @@ public interface UserService {
     Result<ChangePasswordResult> forgotPwd(ForgotPwdParams params) throws Exception;
 
     /**
-     * 修改密码
-     *
-     * @param params 请求参数封装
-     * @return Result<EditPasswordResult>
-     * @throws Exception 请求异常
-     */
-    Result<EditPasswordResult> editPassword(MineParams params) throws Exception;
-
-    /**
      * 更新密码
      *
      * @param params 请求参数封装
@@ -75,15 +68,6 @@ public interface UserService {
     Result<MineResult> mine(MineParams params) throws Exception;
 
     /**
-     * 判断并保存用户OCR识别记录
-     *
-     * @param params OCR识别结果信息
-     * @return 识别是否通过
-     * @throws Exception 请求异常
-     */
-    Result<Object> userFaceMatch(UserFaceMatchParams params) throws Exception;
-
-    /**
      * 用户OCR识别信息保存
      *
      * @param params 保存用户OCR识别信息请求参数封装类
@@ -102,42 +86,6 @@ public interface UserService {
     Result<UserOcrBasicInfoResult> getOcrInfo(MineParams params) throws Exception;
 
     /**
-     * 新增基本信息
-     *
-     * @param params 请求参数封装
-     * @return Result<UserInfoSaveResult>
-     * @throws Exception 请求异常
-     */
-    Result<UserInfoSaveResult> addUserInfo(UserInfoParams params) throws Exception;
-
-    /**
-     * 获取基本信息
-     *
-     * @param params 请求参数封装
-     * @return Result<UserInfoResult>
-     * @throws Exception 请求异常
-     */
-    Result<UserInfoResult> getUserInfo(UserInfoParams params) throws Exception;
-
-    /**
-     * 新增/更新个人信息
-     *
-     * @param params 请求参数封装
-     * @return Result<PersonInfoUpdateResult>
-     * @throws Exception 请求异常
-     */
-    Result<PersonInfoUpdateResult> savePersonInfo(PersonInfoParams params) throws Exception;
-
-    /**
-     * 获取个人信息
-     *
-     * @param params 请求参数封装
-     * @return Result<PersonInfoResult>
-     * @throws Exception 请求异常
-     */
-    Result<PersonInfoResult> getPersonInfo(PersonInfoParams params) throws Exception;
-
-    /**
      * ocr识别信息保存接口
      *
      * @param params 请求参数封装
@@ -153,7 +101,7 @@ public interface UserService {
      * @return 人脸相似度信息
      * @throws Exception 请求异常
      */
-    Result<Object> faceComparison(UserFaceComparisonParams params) throws Exception;
+    Result<UserFaceComparisonResult> faceComparison(UserFaceComparisonParams params) throws Exception;
 
     /**
      * advance获取证件信息
@@ -163,4 +111,20 @@ public interface UserService {
      * @throws Exception 请求异常
      */
     Result<UserOcrResult> userOcrInfo(UserOcrFullInfoParams params) throws Exception;
+
+
+    /**
+     * 保存用户信息
+     *
+     * @param params
+     * @return
+     */
+    Result<SaveUserInfoResult> saveUserInfo(UserInfoParams params);
+
+    /**
+     * 获取用户信息
+     * @param params
+     * @return
+     */
+    Result<User> getUserInfo(BaseParams params);
 }

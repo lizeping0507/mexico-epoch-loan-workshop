@@ -1,47 +1,23 @@
 package com.epoch.loan.workshop.common.params.params.result;
 
-import com.epoch.loan.workshop.common.params.params.result.model.AdvanceFaceComparisonResponse;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-
-import java.io.Serializable;
+import lombok.NoArgsConstructor;
 
 /**
  * @author 魏玉强
- * @packagename : com.epoch.loan.workshop.common.params.result
+ * @packagename : com.epoch.loan.workshop.common.params.params.result
  * @className : UserFaceComparisonResult
- * @createTime : 2022/04/01 18:52
- * @Description: advance获取证件和人脸相似度响应参数
+ * @createTime : 2022/04/21 16:04
+ * @Description: 证件和人脸相似度响应前端结果封装
  */
 @Data
-public class UserFaceComparisonResult implements Serializable {
+@NoArgsConstructor
+@AllArgsConstructor
+public class UserFaceComparisonResult {
 
     /**
-     * advance响应码
+     * 相似度值
      */
-    private String code;
-
-    /**
-     * advance响应信息
-     */
-    private String message;
-
-    /**
-     * 本次请求唯一标识
-     */
-    private String transactionId;
-
-    /**
-     * 请求是否收费，枚举类型：FREE、PAY
-     */
-    private String pricingStrategy;
-
-    /**
-     * 人脸对比信息
-     */
-    private AdvanceFaceComparisonResponse data;
-
-    /**
-     * advance响应的扩展信息
-     */
-    private String extra;
+    private String similarity;
 }
