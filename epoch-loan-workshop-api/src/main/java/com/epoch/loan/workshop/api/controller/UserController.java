@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.api.annotated.Authentication;
 import com.epoch.loan.workshop.common.config.URL;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
+import com.epoch.loan.workshop.common.params.User;
+import com.epoch.loan.workshop.common.params.params.BaseParams;
 import com.epoch.loan.workshop.common.params.params.request.*;
 import com.epoch.loan.workshop.common.params.params.result.*;
 import com.epoch.loan.workshop.common.util.LogUtil;
@@ -264,31 +266,6 @@ public class UserController extends BaseController {
     }
 
     /**
-     * 修改密码（实际将手机中间四位隐藏）
-     *
-     * @param params 修改密码参数
-     * @return 新token和用户id
-     */
-    @PostMapping(URL.EDIT_PASSWORD)
-    public Result<EditPasswordResult> editPassword(MineParams params) {
-        // 结果集
-        Result<EditPasswordResult> result = new Result<>();
-
-        try {
-            // 更新密码
-            return userService.editPassword(params);
-        } catch (Exception e) {
-            LogUtil.sysError("[UserController editPassword]", e);
-
-            // 异常返回结果
-            result.setEx(ThrowableUtils.throwableToString(e));
-            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
-            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
-            return result;
-        }
-    }
-
-    /**
      * 我的个人中心
      *
      * @param mineParams 入参
@@ -301,7 +278,7 @@ public class UserController extends BaseController {
 
         try {
 
-            // 密码登录
+            // 我的个人中心
             return userService.mine(mineParams);
         } catch (Exception e) {
             LogUtil.sysError("[UserController mine]", e);
@@ -315,94 +292,19 @@ public class UserController extends BaseController {
     }
 
     /**
-     * 新增基本信息
-     *
-     * @param params 入参
-     * @return 基本信息
-     */
-    @PostMapping(URL.USER_INFO_ADD)
-    public Result<UserInfoSaveResult> addUserInfo(UserInfoParams params) {
-        // 结果集
-        Result<UserInfoSaveResult> result = new Result<>();
-
-        try {
-            // 新增基本信息
-            return userService.addUserInfo(params);
-        } catch (Exception e) {
-            LogUtil.sysError("[UserController addUserInfo]", e);
-
-            // 异常返回结果
-            result.setEx(ThrowableUtils.throwableToString(e));
-            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
-            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
-            return result;
-        }
-    }
-
-    /**
-     * 获取基本信息
-     *
-     * @param params 入参
-     * @return 基本信息
-     */
-    @PostMapping(URL.USER_INFO_GET)
-    public Result<UserInfoResult> getUserInfo(UserInfoParams params) {
-        // 结果集
-        Result<UserInfoResult> result = new Result<>();
-
-        try {
-            // 获取基本信息
-            return userService.getUserInfo(params);
-        } catch (Exception e) {
-            LogUtil.sysError("[UserController getUserInfo]", e);
-
-            // 异常返回结果
-            result.setEx(ThrowableUtils.throwableToString(e));
-            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
-            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
-            return result;
-        }
-    }
-
-    /**
-     * 新增/更新个人信息
-     *
-     * @param params 入参
-     * @return 新增/更新结果
-     */
-    @PostMapping(URL.PERSON_INFO_SAVE)
-    public Result<PersonInfoUpdateResult> savePersonInfo(PersonInfoParams params) {
-        // 结果集
-        Result<PersonInfoUpdateResult> result = new Result<>();
-
-        try {
-            // 新增/更新个人信息
-            return userService.savePersonInfo(params);
-        } catch (Exception e) {
-            LogUtil.sysError("[UserController savePersonInfo]", e);
-
-            // 异常返回结果
-            result.setEx(ThrowableUtils.throwableToString(e));
-            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
-            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
-            return result;
-        }
-    }
-
-    /**
-     * 获取个人信息
+     * 保存用户信息
      *
      * @param params 入参
      * @return 个人信息
      */
-    @PostMapping(URL.PERSON_INFO_GET)
-    public Result<PersonInfoResult> getPersonInfo(PersonInfoParams params) {
+    @PostMapping(URL.SAVE_INFO)
+    public Result<SaveUserInfoResult> saveUserInfo(UserInfoParams params) {
         // 结果集
-        Result<PersonInfoResult> result = new Result<>();
+        Result<SaveUserInfoResult> result = new Result<>();
 
         try {
             // 获取个人信息
-            return userService.getPersonInfo(params);
+            return userService.saveUserInfo(params);
         } catch (Exception e) {
             LogUtil.sysError("[UserController getPersonInfo]", e);
 
@@ -413,5 +315,31 @@ public class UserController extends BaseController {
             return result;
         }
     }
+
+    /**
+     * 获取用户信息
+     *
+     * @param params 入参
+     * @return 个人信息
+     */
+    @PostMapping(URL.GET_INFO)
+    public Result<User> getUserInfo(BaseParams params) {
+        // 结果集
+        Result<User> result = new Result<>();
+
+        try {
+            // 获取个人信息
+            return userService.getUserInfo(params);
+        } catch (Exception e) {
+            LogUtil.sysError("[UserController getPersonInfo]", e);
+
+            // 异常返回结果
+            result.setEx(ThrowableUtils.throwableToString(e));
+            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
+            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
+            return result;
+        }
+    }
+
 
 }
