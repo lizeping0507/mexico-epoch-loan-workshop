@@ -175,6 +175,7 @@ public class UserController extends BaseController {
      * @return 新token和用户id
      */
     @PostMapping(URL.MODIFY_PASSWORD)
+    @Authentication(auth = true)
     public Result<ChangePasswordResult> modifyPassword(ModifyPasswordParams modifyPasswordParams) {
         LogUtil.sysInfo("更新密码 : {}", JSONObject.toJSONString(modifyPasswordParams));
         // 结果集
@@ -272,6 +273,7 @@ public class UserController extends BaseController {
      * @param mineParams 入参
      * @return 个人中心响应参数
      */
+    @Authentication(auth = true)
     @PostMapping(URL.MINE)
     public Result<MineResult> mine(MineParams mineParams) {
         // 结果集
@@ -298,6 +300,7 @@ public class UserController extends BaseController {
      * @param params 入参
      * @return 个人信息
      */
+    @Authentication(auth = true)
     @PostMapping(URL.SAVE_BASIC_INFO)
     public Result<SaveUserInfoResult> saveUserBasicInfo(UserBasicInfoParams params) {
         // 结果集
@@ -394,6 +397,7 @@ public class UserController extends BaseController {
      * @param params 入参
      * @return 个人信息
      */
+    @Authentication(auth = true)
     @PostMapping(URL.SAVE_PERSON_INFO)
     public Result<SaveUserInfoResult> saveUserPersonInfo(UserPersonInfoParams params) {
         // 结果集
@@ -440,6 +444,7 @@ public class UserController extends BaseController {
      * @param params 入参
      * @return 个人信息
      */
+    @Authentication(auth = true)
     @PostMapping(URL.GET_INFO)
     public Result<User> getUserInfo(BaseParams params) {
         // 结果集

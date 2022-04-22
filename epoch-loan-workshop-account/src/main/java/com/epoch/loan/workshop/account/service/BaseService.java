@@ -14,6 +14,7 @@ import com.epoch.loan.workshop.common.mq.repayment.RepaymentMQManager;
 import com.epoch.loan.workshop.common.params.User;
 import com.epoch.loan.workshop.common.redis.RedisClient;
 import com.epoch.loan.workshop.common.sms.SMSManager;
+import com.epoch.loan.workshop.common.util.LogUtil;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -211,6 +212,8 @@ public class BaseService {
         user.setPapersId(userInfoEntity.getPapersId());
         user.setPapersName(userInfoEntity.getPapersName());
         user.setPapersVoterId(userInfoEntity.getPapersVoterId());
+
+        LogUtil.sysInfo("用户信息缓存更新: {}", JSONObject.toJSONString(user));
         tokenManager.updateUserCache(user);
     }
 }
