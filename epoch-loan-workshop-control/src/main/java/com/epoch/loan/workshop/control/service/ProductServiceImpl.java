@@ -542,7 +542,6 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         requestParam.put("appFlag", params.getAppName());
         requestParam.put("versionNumber", params.getAppVersion());
         requestParam.put("mobileType", params.getMobileType());
-        requestParam.put("userId", params.getUserId());
 
         // 封装请求头
         Map<String, String> headers = new HashMap<>();
