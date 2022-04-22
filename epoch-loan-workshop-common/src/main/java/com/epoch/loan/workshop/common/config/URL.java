@@ -205,6 +205,12 @@ public class URL {
      */
     public static final String LIST = "/list";
 
+
+    /**
+     * 产品详情
+     */
+    public static final String PRODUCT_DETAIL = "/productDetail";
+
     /**
      * 产品详情
      */
