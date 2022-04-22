@@ -168,4 +168,14 @@ public interface PlatformOrderDao {
      * @return
      */
     Integer findUserAllOrderNum(String userId);
+
+    /**
+     * 更新放款账户id
+     *
+     * @param orderId
+     * @param remittanceAccountId
+     * @param date
+     * @return
+     */
+    void updateCardId(String orderId, String remittanceAccountId, Date date);
 }

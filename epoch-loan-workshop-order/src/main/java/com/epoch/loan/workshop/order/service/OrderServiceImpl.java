@@ -1,6 +1,7 @@
 package com.epoch.loan.workshop.order.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.epoch.loan.workshop.common.constant.OrderStatus;
 import com.epoch.loan.workshop.common.constant.PlatformUrl;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
 import com.epoch.loan.workshop.common.entity.mysql.*;
@@ -37,11 +38,46 @@ public class OrderServiceImpl extends BaseService implements OrderService {
      */
     @Override
     public Result bindRemittanceAccount(BindRemittanceAccountParams bindRemittanceAccountParams) {
+        // 结果集
+        Result result = new Result();
 
+        // 订单id
+        String orderId = bindRemittanceAccountParams.getOrderId();
 
+        // 账户id
+        String remittanceAccountId = bindRemittanceAccountParams.getRemittanceAccountId();
 
+        // 查询订单是否存在
+        LoanOrderEntity loanOrderEntity = loanOrderDao.findOrder(orderId);
+        if (ObjectUtils.isEmpty(loanOrderEntity)) {
+            result.setReturnCode(ResultEnum.NO_EXITS.code());
+            result.setMessage(ResultEnum.NO_EXITS.message());
+            return result;
+        }
 
-        return null;
+        // 判断订单状态是否在可以绑卡的阶段
+        if (loanOrderEntity.getStatus() != OrderStatus.CREATE) {
+            result.setReturnCode(ResultEnum.ORDER_ERROR.code());
+            result.setMessage(ResultEnum.ORDER_ERROR.message());
+            return result;
+        }
+
+        // 判断账户是否存在
+        LoanRemittanceAccountEntity loanRemittanceAccountEntity = loanRemittanceAccountDao.findRemittanceAccount(remittanceAccountId);
+        if (ObjectUtils.isEmpty(loanRemittanceAccountEntity)) {
+            result.setReturnCode(ResultEnum.REMITTANCE_ACCOUNT_ERROR.code());
+            result.setMessage(ResultEnum.REMITTANCE_ACCOUNT_ERROR.message());
+            return result;
+        }
+
+        // 进行绑定放款账户 TODO 新老表
+        platformOrderDao.updateCardId(orderId, remittanceAccountId, new Date());
+        loanOrderDao.updateBankCardId(orderId, remittanceAccountId, new Date());
+
+        // 返回结果集
+        result.setReturnCode(ResultEnum.SUCCESS.code());
+        result.setMessage(ResultEnum.SUCCESS.message());
+        return result;
     }
 
     /**

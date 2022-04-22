@@ -48,4 +48,10 @@ public class BaseService {
      */
     @Autowired
     PlatformConfig platformConfig;
+
+    /**
+     * 放款账户
+     */
+    @Autowired
+    public LoanRemittanceAccountDao loanRemittanceAccountDao;
 }

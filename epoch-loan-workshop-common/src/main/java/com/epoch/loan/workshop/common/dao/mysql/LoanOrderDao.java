@@ -195,4 +195,13 @@ public interface LoanOrderDao {
      * @param updateTime
      */
     void updateOrderRepaymentDistributionGroup(String orderId, String repaymentDistributionGroup, Date updateTime);
+
+    /**
+     * 更新放款账户id
+     *
+     * @param orderId
+     * @param remittanceAccountId
+     * @param updateTime
+     */
+    void updateBankCardId(String orderId, String remittanceAccountId, Date updateTime);
 }

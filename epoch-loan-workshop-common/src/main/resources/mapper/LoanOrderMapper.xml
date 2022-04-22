@@ -46,6 +46,10 @@
         UPDATE loan_order SET repayment_distribution_group=#{repaymentDistributionGroup},update_time=#{updateTime} WHERE
         id=#{orderId}
     </update>
+    <update id="updateBankCardId">
+        UPDATE loan_order SET bank_card_id=#{remittanceAccountId},update_time=#{updateTime} WHERE id=#{orderId}
+    </update>
+
     <select id="findOrder" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanOrderEntity">
         SELECT * FROM loan_order WHERE id=#{orderId}
     </select>

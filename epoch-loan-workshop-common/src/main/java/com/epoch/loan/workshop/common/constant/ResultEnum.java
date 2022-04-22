@@ -37,7 +37,7 @@ public enum ResultEnum {
      */
     MISSING_REQUIRED_PARAMS(4003, "Missing required parameters"),
     /**
-     *
+     * 数据不存在
      */
     NO_EXITS(4004, "The data does not exist"),
     /**
@@ -70,9 +70,14 @@ public enum ResultEnum {
     SMSCODE_ERROR(4011, "OTP error, please try again"),
 
     /**
-     *
+     * 还款账户异常
      */
-    REMITTANCE_ACCOUNT_ERROR(4012, "Param error"),
+    REMITTANCE_ACCOUNT_ERROR(4012, "Account error"),
+
+    /**
+     * 订单异常
+     */
+    ORDER_ERROR(4013, "Order error"),
 
     // ======= 服务端错误 ========
     /**

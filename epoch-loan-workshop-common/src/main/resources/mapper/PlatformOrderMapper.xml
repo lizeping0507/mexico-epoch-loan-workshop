@@ -29,6 +29,9 @@
     <update id="updateOrderMerchantId">
         UPDATE platform_order SET merchant_id=#{merchantId},update_time=#{updateTime} WHERE order_no=#{orderNo}
     </update>
+    <update id="updateCardId">
+        UPDATE platform_order SET card_id=#{remittanceAccountId},update_time=#{date} WHERE order_no=#{orderId}
+    </update>
     <select id="findWayOrderCountByUserId" resultType="java.lang.Integer">
         SELECT COUNT(1) FROM platform_order WHERE order_status IN (115,170,171,175,180) AND user_id=#{userId}
     </select>
