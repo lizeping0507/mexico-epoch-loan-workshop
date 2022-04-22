@@ -156,6 +156,14 @@ public class OrderServiceImpl extends BaseService implements OrderService {
             }
         });
 
+        // 判断是否提交失败
+        if (status.equals("FAIL")) {
+            // 返回结果集
+            result.setReturnCode(ResultEnum.ORDER_ERROR.code());
+            result.setMessage(ResultEnum.ORDER_ERROR.message());
+            return result;
+        }
+
         // 返回结果集
         result.setReturnCode(ResultEnum.SUCCESS.code());
         result.setMessage(ResultEnum.SUCCESS.message());
