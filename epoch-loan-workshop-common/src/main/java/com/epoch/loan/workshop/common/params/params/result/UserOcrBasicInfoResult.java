@@ -20,14 +20,14 @@ public class UserOcrBasicInfoResult implements Serializable {
     private String realName;
 
     /**
-     * aadar卡号
+     * 证件编号
      */
-    private String idNo;
+    private String idNumber;
 
     /**
      * 税卡卡号
      */
-    private String panCode;
+    private String rfc;
 
     /**
      * 出生年月日
@@ -42,12 +42,12 @@ public class UserOcrBasicInfoResult implements Serializable {
     /**
      * 年龄
      */
-    private Integer age;
+    private String age;
 
     /**
-     * ocr识别证件邮政编码
+     * 邮政编码
      */
-    private String pinCode;
+    private String postalCode;
 
     /**
      * ocr识别证件地址
@@ -55,22 +55,18 @@ public class UserOcrBasicInfoResult implements Serializable {
     private String idAddr;
 
     /**
-     * pan卡访问地址
-     */
-    private String panImg;
-
-    /**
      * ad卡正面访问地址
      */
-    private String frontImg;
-
-    /**
-     * 人脸照片访问地址
-     */
-    private String livingImg;
+    private String frontImgUrl;
 
     /**
      * ad卡背面访问地址
      */
-    private String backImg;
+    private String backImgUrl;
+
+    /**
+     * 人脸照片访问地址
+     */
+    private String livingImgUrl;
+
 }

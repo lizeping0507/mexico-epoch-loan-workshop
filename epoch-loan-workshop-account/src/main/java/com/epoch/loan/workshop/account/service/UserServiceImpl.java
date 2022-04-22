@@ -484,12 +484,37 @@ public class UserServiceImpl extends BaseService implements UserService {
     public Result<UserOcrBasicInfoResult> getOcrInfo(BaseParams params) throws Exception {
         // 结果集
         Result<UserOcrBasicInfoResult> result = new Result<>();
+        UserOcrBasicInfoResult basicInfo = new UserOcrBasicInfoResult();
 
+        String userId = params.getUser().getId();
+        LoanUserInfoEntity info = loanUserInfoDao.findUserInfoById(userId);
+        if (ObjectUtils.isNotEmpty(info)) {
+            basicInfo.setRealName(info.getPapersName());
+            basicInfo.setDateOfBirth(info.getPapersDateOfBirth());
+            basicInfo.setGender(info.getPapersGender());
+            basicInfo.setAge(info.getPapersAge());
+            basicInfo.setIdAddr(info.getPapersAddress());
+            basicInfo.setIdNumber(info.getPapersId());
+            basicInfo.setRfc(info.getRfc());
+            basicInfo.setPostalCode(info.getPostalCode());
+            if (StringUtils.isNotBlank(info.getFrontPath())) {
+                String fileUrl = OssFileUtils.getFileUrl(userFileBucketName, info.getFrontPath(), null);
+                basicInfo.setFrontImgUrl(fileUrl);
+            }
+            if (StringUtils.isNotBlank(info.getBackPath())) {
+                String fileUrl = OssFileUtils.getFileUrl(userFileBucketName, info.getBackPath(), null);
+                basicInfo.setFrontImgUrl(fileUrl);
+            }
+            if (StringUtils.isNotBlank(info.getFacePath())) {
+                String fileUrl = OssFileUtils.getFileUrl(userFileBucketName, info.getFacePath(), null);
+                basicInfo.setFrontImgUrl(fileUrl);
+            }
+        }
 
         // 封装结果
         result.setReturnCode(ResultEnum.SUCCESS.code());
         result.setMessage(ResultEnum.SUCCESS.message());
-        // result.setData(basicInfoResult);
+        result.setData(basicInfo);
         return result;
     }
 
