@@ -94,7 +94,14 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         return null;
     }
 
-
+    /**
+     * 多投限制
+     *
+     * @param loanOrderEntity
+     * @param user
+     * @return
+     * @throws Exception
+     */
     protected boolean rejectionRule(LoanOrderEntity loanOrderEntity, User user) throws Exception {
         // 模型名称
         String subExpression = "rejectionRule";
