@@ -46,15 +46,6 @@ public interface OrderService {
     Result<OrderListResult> list(OrderListParams params) throws Exception;
 
     /**
-     * 申请确认
-     *
-     * @param params 请求参数
-     * @return Result
-     * @throws Exception 请求异常
-     */
-    Result<ComfirmApplyResult> comfirmApply(ComfirmApplyParams params) throws Exception;
-
-    /**
      * 订单详情
      *
      * @param params 请求参数

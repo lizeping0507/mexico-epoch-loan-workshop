@@ -73,8 +73,7 @@ public class OrderServiceImpl extends BaseService implements OrderService {
             return result;
         }
 
-        // 进行绑定放款账户 TODO 新老表
-        platformOrderDao.updateCardId(orderId, remittanceAccountId, new Date());
+        // 进行绑定放款账户
         loanOrderDao.updateBankCardId(orderId, remittanceAccountId, new Date());
 
         // 返回结果集
@@ -140,7 +139,7 @@ public class OrderServiceImpl extends BaseService implements OrderService {
                     // 查询审核模型列表
                     List<String> orderModelList = orderModelDao.findNamesByGroup(orderModelGroup);
 
-                    // 订单队列参数
+                    // 发送订单审核队列
                     OrderParams orderParams = new OrderParams();
                     orderParams.setOrderId(orderId);
                     orderParams.setGroupName(orderModelGroup);
@@ -367,58 +366,6 @@ public class OrderServiceImpl extends BaseService implements OrderService {
 
         // 封装结果就
         OrderListResult res = JSONObject.parseObject(data.toJSONString(), OrderListResult.class);
-
-        // 封装结果
-        result.setReturnCode(ResultEnum.SUCCESS.code());
-        result.setMessage(ResultEnum.SUCCESS.message());
-        result.setData(res);
-        return result;
-    }
-
-    /**
-     * 申请确认
-     *
-     * @param params 请求参数
-     * @return Result
-     * @throws Exception 请求异常
-     */
-    @Override
-    public Result<ComfirmApplyResult> comfirmApply(ComfirmApplyParams params) throws Exception {
-        // 结果集
-        Result<ComfirmApplyResult> result = new Result<>();
-
-        // 拼接请求路径
-        String url = platformConfig.getPlatformDomain() + PlatformUrl.PLATFORM_COMFIRM_APPLY;
-
-        // 封装请求参数
-        JSONObject requestParam = new JSONObject();
-        requestParam.put("appFlag", params.getAppName());
-        requestParam.put("versionNumber", params.getAppVersion());
-        requestParam.put("mobileType", params.getMobileType());
-
-        requestParam.put("userId", params.getUserId());
-        requestParam.put("orderNo", params.getOrderNo());
-
-        // 封装请求头
-        Map<String, String> headers = new HashMap<>();
-        headers.put("token", params.getToken());
-
-        // 请求
-        String responseStr = HttpUtils.POST_WITH_HEADER(url, requestParam.toJSONString(), headers);
-
-        // 解析响应结果
-        JSONObject responseJson = JSONObject.parseObject(responseStr);
-
-        // 判断接口响应是否正常
-        if (!PlatformUtil.checkResponseCode(result, ComfirmApplyResult.class, responseJson)) {
-            return result;
-        }
-
-        // 获取结果集
-        JSONObject data = responseJson.getJSONObject("data");
-
-        // 封装结果就
-        ComfirmApplyResult res = JSONObject.parseObject(data.toJSONString(), ComfirmApplyResult.class);
 
         // 封装结果
         result.setReturnCode(ResultEnum.SUCCESS.code());
