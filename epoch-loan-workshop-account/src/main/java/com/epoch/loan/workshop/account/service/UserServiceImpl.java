@@ -629,6 +629,8 @@ public class UserServiceImpl extends BaseService implements UserService {
             }
         }
 
+        // TODO 与风控交互，获取 证件编号与用户的 curp是否 通过
+
         // 上传证件正面图片
         String frontPath = BusinessNameUtils.createUserIdTypeFileName(NameField.USR_ID, user.getUserInfoId(), NameField.FRONT_IMAGE_TYPE);
         String frontImageUrl = OssFileUtils.uploadFileAndGetUrl(userFileBucketName, frontPath, convertToFile(params.getIdFrontImgData()), null);
@@ -655,9 +657,6 @@ public class UserServiceImpl extends BaseService implements UserService {
             result.setMessage(ResultEnum.KYC_UPLOAD_FILE_ERROR.message());
             return result;
         }
-
-        // TODO 与风控交互，获取 证件编号与用户的 curp是否 通过
-
 
         // 保存 图片信息
         userInfoById.setUserFileBucketName(userFileBucketName);
