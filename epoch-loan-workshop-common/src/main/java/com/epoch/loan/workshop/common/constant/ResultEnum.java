@@ -100,7 +100,7 @@ public enum ResultEnum {
      */
     TIMEOUT_ERROR(5003, "Request is timeout"),
 
-    // ======= KYC错误 需要进一步操作完成请求 ========
+    // ======= KYC错误========
 
     /**
      * 证件扫描失败，请重新扫描证件
@@ -118,10 +118,49 @@ public enum ResultEnum {
     KYC_FACE_COMPARISON_ERROR(6002, "Face matching failed, please upload the image again."),
 
     /**
-     * Rfc或者Curp格式错误
+     * 上传文件失败
      */
-    RFC_CURP_ERROR(6010, "Error de formato RFC o CURP."),
+    KYC_UPLOAD_FILE_ERROR(6040, "Failed to upload file, please upload the image again."),
 
+    /**
+     * Rfc或者INE/IFE格式错误
+     */
+    RFC_INF_ERROR(6010, "Error de format RFC o INE/IFE."),
+
+    /**
+     * INE/IFE证件id 已经被认证了
+     */
+    INF_CERTIFIED_ERROR(6020, "INE/IFE ha sido certificado."),
+
+    /**
+     * INE/IFE证件id 已经被其他用户认证了
+     */
+    INF_CERTIFIED_OTHER_ERROR(6021, "The INE/IFE has been authenticated by other users"),
+
+    /**
+     * RFC 已经被认证了
+     */
+    RFC_CERTIFIED_ERROR(6030, "RFC ha sido certificado."),
+
+    /**
+     * RFC 已经被其他用户认证了
+     */
+    RFC_CERTIFIED_OTHER_ERROR(6031, "The RFC has been authenticated by other users"),
+
+    /**
+     * 根据手机号查询 当前账号认证信息与主账户不匹配
+     */
+    RFC_INF_CERTIFIED_ERROR(6040, "La información de certificación de la cuenta principal no satisfacen los requisitos que exigen la cuenta principal"),
+
+    /**
+     * 根据INE/IFE证件id查询 当前账号认证信息与主账户不匹配
+     */
+    RFC_MOBILE_CERTIFIED_ERROR(6041, "La información de certificación de la cuenta principal no satisfacen los requisitos que exigen la cuenta principal"),
+
+    /**
+     * 根据RFC查询 当前账号认证信息与主账户不匹配
+     */
+    INF_MOBILE_CERTIFIED_OTHER_ERROR(6032, "La información de certificación de la cuenta principal no satisfacen los requisitos que exigen la cuenta principal"),
     ;
 
 

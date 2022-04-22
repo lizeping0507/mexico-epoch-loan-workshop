@@ -178,7 +178,7 @@ public class BaseService {
 
         user.setId(userEntity.getId());
         user.setAndroidId(userEntity.getAndroidId());
-        user.setChannelId(userEntity.getChannelId());
+        user.setChannelId("0");
         user.setGaId(userEntity.getGaId());
         user.setImei(userEntity.getImei());
         user.setPlatform(userEntity.getPlatform());

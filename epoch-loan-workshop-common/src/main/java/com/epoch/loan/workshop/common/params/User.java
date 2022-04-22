@@ -161,37 +161,42 @@ public class User implements Serializable {
     private String liveType;
 
     /**
-     * 地址
+     * INE/IFE地址
      */
     private String papersAddress;
 
     /**
-     * 父亲名字
+     * INE/IFE父亲姓氏
      */
     private String papersFatherName;
 
     /**
-     * 全名
-     */
-    private String papersFullName;
-
-    /**
-     * 母亲名字
-     */
-    private String papersMotherName;
-
-    /**
-     * 证件iid
-     */
-    private String papersId;
-
-    /**
-     * 姓名
+     * INE/IFE姓名
      */
     private String papersName;
 
     /**
-     * 选民id
+     * INE/IFE母亲姓氏
+     */
+    private String papersMotherName;
+
+    /**
+     * INE/IFE全名
+     */
+    private String papersFullName;
+
+    /**
+     * INE/IFE证件id
+     */
+    private String papersId;
+
+    /**
+     * INE/IFE选民id
      */
     private String papersVoterId;
+
+    /**
+     * rfc
+     */
+    private String rfc;
 }

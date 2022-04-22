@@ -16,10 +16,7 @@ import com.epoch.loan.workshop.common.params.params.result.model.AdvanceOcrBackI
 import com.epoch.loan.workshop.common.params.params.result.model.AdvanceOcrFrontInfoResult;
 import com.epoch.loan.workshop.common.params.params.result.model.AdvanceOcrInfoResponse;
 import com.epoch.loan.workshop.common.service.UserService;
-import com.epoch.loan.workshop.common.util.HttpUtils;
-import com.epoch.loan.workshop.common.util.LogUtil;
-import com.epoch.loan.workshop.common.util.ObjectIdUtil;
-import com.epoch.loan.workshop.common.util.PlatformUtil;
+import com.epoch.loan.workshop.common.util.*;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -49,6 +46,18 @@ public class UserServiceImpl extends BaseService implements UserService {
 
     @Value("${spring.cloud.nacos.discovery.namespace}")
     private String namespace;
+
+    /**
+     * 存储用户 照片桶名
+     */
+    @Value("${oss.user.file.bucketName}")
+    private String userFileBucketName;
+
+    /**
+     * 临时获取存储用户照片链接过期时间
+     */
+    @Value("${oss.user.file.expiration}")
+    private String expiration;
 
     /**
      * 判断手机号是否已经注册
@@ -416,14 +425,16 @@ public class UserServiceImpl extends BaseService implements UserService {
         result.setMessage(ResultEnum.SUCCESS.message());
         return result;
     }
+
     /**
      * 保存用户个人信息
+     *
      * @param params
      * @return
      */
     @Override
-    public Result<SaveUserInfoResult> saveUserPersonInfo(UserPersonInfoParams params){
-        Result<SaveUserInfoResult> result= new Result<>();
+    public Result<SaveUserInfoResult> saveUserPersonInfo(UserPersonInfoParams params) {
+        Result<SaveUserInfoResult> result = new Result<>();
 
         // 查询用户
         String token = params.getToken();
@@ -452,6 +463,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         result.setMessage(ResultEnum.SUCCESS.message());
         return result;
     }
+
     /**
      * 获取用户信息
      *
@@ -546,27 +558,111 @@ public class UserServiceImpl extends BaseService implements UserService {
 
         // 获取请求参数
         String rfc = params.getRfc();
+        String appName = params.getAppName();
         String backJson = params.getBackJson();
-        String userId = params.getUser().getId();
+        User user = params.getUser();
         AdvanceOcrFrontInfoResult frontInfo = JSON.parseObject(params.getFrontJson(), AdvanceOcrFrontInfoResult.class);
         AdvanceOcrBackInfoResult backInfo = JSON.parseObject(params.getBackJson(), AdvanceOcrBackInfoResult.class);
-        String idNo = frontInfo.getIdNumber();
+        String idNumber = frontInfo.getIdNumber();
 
         // curp校验
-        String textIdNo = "(?=.*[A-Z])(?=.*\\d)[A-Z\\d]{18}";
+        String textIdNumber = "(?=.*[A-Z])(?=.*\\d)[A-Z\\d]{18}";
         String textRfc = "(?=.*[A-Z])(?=.*\\d)[A-Z\\d]{13}";
-        if (StringUtils.isBlank(rfc) || StringUtils.isBlank(idNo)
-                || !rfc.matches(textRfc) || !idNo.matches(textIdNo)) {
-            result.setReturnCode(ResultEnum.RFC_CURP_ERROR.code());
-            result.setMessage(ResultEnum.RFC_CURP_ERROR.message());
+        if (StringUtils.isBlank(rfc) || StringUtils.isBlank(idNumber)
+                || !rfc.matches(textRfc) || !idNumber.matches(textIdNumber)) {
+            result.setReturnCode(ResultEnum.RFC_INF_ERROR.code());
+            result.setMessage(ResultEnum.RFC_INF_ERROR.message());
+            return result;
         }
 
-        // 卡号 和 rfc 单包唯一性验证
+        // INE/IFE证件id 单包唯一性验证
+        LoanUserInfoEntity userInfoEntity = loanUserInfoDao.getByPapersIdAndAppName(idNumber, appName);
+        if (ObjectUtils.isNotEmpty(userInfoEntity)) {
+            // 该 INE/IFE证件id 已经认证过了
+            if (userInfoEntity.getUserId().equals(user.getId())) {
+                result.setReturnCode(ResultEnum.INF_CERTIFIED_ERROR.code());
+                result.setMessage(ResultEnum.INF_CERTIFIED_ERROR.message());
+                return result;
+            } else {
+                result.setReturnCode(ResultEnum.INF_CERTIFIED_OTHER_ERROR.code());
+                result.setMessage(ResultEnum.INF_CERTIFIED_OTHER_ERROR.message());
+                return result;
+            }
+        }
 
-        // 卡号 和 rfc 手机号校验
+        // rfc 单包唯一性验证
+        LoanUserInfoEntity userInfoRfc = loanUserInfoDao.getByRfcAndAppName(rfc, appName);
+        if (ObjectUtils.isNotEmpty(userInfoRfc)) {
+            // 该 INE/IFE证件id 已经认证过了
+            if (userInfoRfc.getUserId().equals(user.getId())) {
+                result.setReturnCode(ResultEnum.RFC_CERTIFIED_ERROR.code());
+                result.setMessage(ResultEnum.RFC_CERTIFIED_ERROR.message());
+                return result;
+            } else {
+                result.setReturnCode(ResultEnum.RFC_CERTIFIED_OTHER_ERROR.code());
+                result.setMessage(ResultEnum.RFC_CERTIFIED_OTHER_ERROR.message());
+                return result;
+            }
+        }
 
-        //
+        // 根据INE/IFE证件id 全包校验 rfc 与 手机号
+        LoanUserInfoEntity lastByPapersId = loanUserInfoDao.getLastByPapersId(idNumber);
+        if (ObjectUtils.isNotEmpty(lastByPapersId)) {
+            if (!rfc.equals(lastByPapersId.getRfc()) || !user.getLoginName().equals(lastByPapersId.getMobile())) {
+                result.setReturnCode(ResultEnum.RFC_MOBILE_CERTIFIED_ERROR.code());
+                result.setMessage(ResultEnum.RFC_MOBILE_CERTIFIED_ERROR.message());
+                return result;
+            }
+        }
 
+        // 根据RFC 全包校验 手机号 与 INE/IFE证件id
+        LoanUserInfoEntity lastByRfc = loanUserInfoDao.getLastByRfc(rfc);
+        if (ObjectUtils.isNotEmpty(lastByRfc)) {
+            if (!idNumber.equals(lastByRfc.getPapersId()) || !user.getLoginName().equals(lastByRfc.getMobile())) {
+                result.setReturnCode(ResultEnum.INF_MOBILE_CERTIFIED_OTHER_ERROR.code());
+                result.setMessage(ResultEnum.INF_MOBILE_CERTIFIED_OTHER_ERROR.message());
+                return result;
+            }
+        }
+
+        // 根据手机号 全包校验 rfc 与 INE/IFE证件id
+        LoanUserInfoEntity lastByMobile = loanUserInfoDao.getLastByMobile(user.getMobile());
+        if (ObjectUtils.isNotEmpty(lastByMobile)) {
+            if (!idNumber.equals(lastByRfc.getPapersId()) || !rfc.equals(lastByPapersId.getRfc())) {
+                result.setReturnCode(ResultEnum.RFC_INF_CERTIFIED_ERROR.code());
+                result.setMessage(ResultEnum.RFC_INF_CERTIFIED_ERROR.message());
+                return result;
+            }
+        }
+
+        // 上传证件正面图片
+        String frontPath = BusinessNameUtils.createUserIdTypeFileName(NameField.USR_ID, user.getUserInfoId(), NameField.FRONT_IMAGE_TYPE);
+        String frontImageUrl = OssFileUtils.uploadFileAndGetUrl(userFileBucketName, frontPath, convertToFile(params.getIdFrontImgData()), null);
+        if (StringUtils.isBlank(frontImageUrl)) {
+            result.setReturnCode(ResultEnum.RFC_INF_CERTIFIED_ERROR.code());
+            result.setMessage(ResultEnum.RFC_INF_CERTIFIED_ERROR.message());
+            return result;
+        }
+
+        //上传证件背面图片 并获取链接
+        String backPath = BusinessNameUtils.createUserIdTypeFileName(NameField.USR_ID, user.getUserInfoId(), NameField.BACK_IMAGE_TYPE);
+        String backImageUrl = OssFileUtils.uploadFileAndGetUrl(userFileBucketName, backPath, convertToFile(params.getIdBackImgData()), null);
+        if (StringUtils.isBlank(backImageUrl)) {
+            result.setReturnCode(ResultEnum.KYC_UPLOAD_FILE_ERROR.code());
+            result.setMessage(ResultEnum.KYC_UPLOAD_FILE_ERROR.message());
+            return result;
+        }
+
+        //上传人脸照片
+        String facePath = BusinessNameUtils.createUserIdTypeFileName(NameField.USR_ID, user.getUserInfoId(), NameField.FACE_IMAGE_TYPE);
+        String faceImageUrl = OssFileUtils.uploadFileAndGetUrl(userFileBucketName, facePath, convertToFile(params.getFaceImgData()),null);
+        if (StringUtils.isBlank(faceImageUrl)) {
+            result.setReturnCode(ResultEnum.KYC_UPLOAD_FILE_ERROR.code());
+            result.setMessage(ResultEnum.KYC_UPLOAD_FILE_ERROR.message());
+            return result;
+        }
+
+        // 保存 图片
 
         // 封装结果
         result.setReturnCode(ResultEnum.SUCCESS.code());
