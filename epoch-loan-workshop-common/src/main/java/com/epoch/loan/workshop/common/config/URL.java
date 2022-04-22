@@ -188,7 +188,7 @@ public class URL {
     /**
      * 放款账户列表
      */
-    public static final String ADD_REMITTANCE_ACCOUNT = "/addAccountList";
+    public static final String ADD_REMITTANCE_ACCOUNT = "/addRemittanceAccount";
 
     /**
      * 放款银行列表
