@@ -3,7 +3,10 @@ package com.epoch.loan.workshop.control.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.constant.*;
-import com.epoch.loan.workshop.common.entity.mysql.*;
+import com.epoch.loan.workshop.common.entity.mysql.LoanOrderEntity;
+import com.epoch.loan.workshop.common.entity.mysql.LoanOrderExamineEntity;
+import com.epoch.loan.workshop.common.entity.mysql.LoanProductEntity;
+import com.epoch.loan.workshop.common.entity.mysql.PlatformChannelEntity;
 import com.epoch.loan.workshop.common.params.User;
 import com.epoch.loan.workshop.common.params.params.BaseParams;
 import com.epoch.loan.workshop.common.params.params.request.*;
@@ -15,7 +18,6 @@ import com.epoch.loan.workshop.common.util.ObjectIdUtil;
 import com.epoch.loan.workshop.common.util.PlatformUtil;
 import com.epoch.loan.workshop.common.util.RSAUtils;
 import com.epoch.loan.workshop.common.zookeeper.UserProductDetailLock;
-import com.sun.org.apache.regexp.internal.RE;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -51,9 +53,6 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         // 产品id
         String productId = params.getProductId();
 
-        // 用户id
-        String userId = params.getUser().getId();
-
         // app版本
         String appVersion = params.getAppVersion();
 
@@ -72,16 +71,22 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         // 订单审核模型
         String orderModelGroup = loanProductEntity.getOrderModelGroup();
 
-        // 更新GPS信息(userInfo实时) TODO
+        // 更新GPS信息(userInfo实时) TODO 更新到表里，然后更新缓存
 
         // 初始化订单
-        LoanOrderEntity loanOrderEntity = initOrder(userId, OrderType.LOAN, appVersion, appName, orderModelGroup, loanProductEntity);
+        LoanOrderEntity loanOrderEntity = initOrder(params.getUser(), OrderType.LOAN, appVersion, appName, orderModelGroup, loanProductEntity);
 
         // 订单状态
         Integer orderStatus = loanOrderEntity.getStatus();
         if (orderStatus == OrderStatus.CREATE) {
             // 如果订单状态处于创建状态，进行多投判断
+            boolean rejectionRule = rejectionRule(loanOrderEntity, params.getUser());
 
+            // 多投被拒返回
+            if (!rejectionRule) {
+                // 封装结果 TODO 看看V1是返回啥
+                return result;
+            }
 
         }
 
@@ -120,7 +125,6 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
         // 渠道名称
         String channelName = platformChannelEntity.getChannelName();
-
 
         // 封装请求参数
         Map<String, String> params = new HashMap<>();
@@ -194,7 +198,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
     /**
      * 初始化订单
      *
-     * @param userId
+     * @param user
      * @param type
      * @param appVersion
      * @param appName
@@ -203,7 +207,10 @@ public class ProductServiceImpl extends BaseService implements ProductService {
      * @return
      * @throws Exception
      */
-    protected LoanOrderEntity initOrder(String userId, Integer type, String appVersion, String appName, String orderModelGroup, LoanProductEntity productEntity) throws Exception {
+    protected LoanOrderEntity initOrder(User user, Integer type, String appVersion, String appName, String orderModelGroup, LoanProductEntity productEntity) throws Exception {
+        // 用户id
+        String userId = user.getId();
+
         // 使用分布式锁，防止同时创建多条订单
         String orderId = zookeeperClient.lock(new UserProductDetailLock<String>(userId) {
             @Override
@@ -218,8 +225,6 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                     return loanOrderEntityList.get(0).getId();
                 }
 
-                // 查询用户信息
-                LoanUserEntity loanUserEntity = loanUserDao.findById(userId);
 
                 // 查询用户指定状态订单
                 status = new Integer[]{OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE};
@@ -243,7 +248,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 loanOrderEntity.setId(orderId);
                 loanOrderEntity.setUserId(userId);
                 loanOrderEntity.setProductId(productId);
-                loanOrderEntity.setUserChannelId(loanUserEntity.getChannelId());
+                loanOrderEntity.setUserChannelId(user.getChannelId());
                 loanOrderEntity.setBankCardId("");
                 loanOrderEntity.setReloan(reloan);
                 loanOrderEntity.setOrderModelGroup(orderModelGroup);

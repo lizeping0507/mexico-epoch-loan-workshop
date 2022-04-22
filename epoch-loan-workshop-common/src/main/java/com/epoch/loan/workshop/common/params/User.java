@@ -28,7 +28,7 @@ public class User implements Serializable {
     /**
      * 渠道ID
      */
-    private String channelId;
+    private Integer channelId;
 
     /**
      * 推广ID
