@@ -20,7 +20,7 @@ public class AdvanceOcrBackInfoResult implements Serializable {
     private String line1All;
 
     /**
-     *  第二行 详细信息
+     * 第二行 详细信息
      */
     private String line2All;
 
@@ -60,7 +60,7 @@ public class AdvanceOcrBackInfoResult implements Serializable {
     private String expiryDate;
 
     /**
-     *  有效期验证码
+     * 有效期验证码
      */
     private String expiryDateVerificationCode;
 

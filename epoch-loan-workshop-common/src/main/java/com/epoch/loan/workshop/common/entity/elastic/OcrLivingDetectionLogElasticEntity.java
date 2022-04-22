@@ -32,7 +32,7 @@ public class OcrLivingDetectionLogElasticEntity {
     private String requestUrl;
 
     /**
-     *  用户id
+     * 用户id
      */
     @Field(type = FieldType.Keyword)
     private String userId;
@@ -88,6 +88,6 @@ public class OcrLivingDetectionLogElasticEntity {
     /**
      * 创建时间
      */
-    @Field(type= FieldType.Date)
+    @Field(type = FieldType.Date)
     private Date createTime;
 }

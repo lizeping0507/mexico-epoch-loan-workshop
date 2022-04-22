@@ -2,6 +2,7 @@ package com.epoch.loan.workshop.account.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.account.SpringContext;
+import com.epoch.loan.workshop.account.repayment.BaseRepayment;
 import com.epoch.loan.workshop.common.constant.LoanRepaymentPaymentRecordStatus;
 import com.epoch.loan.workshop.common.constant.PayStrategy;
 import com.epoch.loan.workshop.common.constant.PlatformUrl;
@@ -11,7 +12,6 @@ import com.epoch.loan.workshop.common.params.params.request.RepaymentParams;
 import com.epoch.loan.workshop.common.params.params.request.UtrParams;
 import com.epoch.loan.workshop.common.params.params.request.YeahPayRepamentCallbackParam;
 import com.epoch.loan.workshop.common.params.params.result.Result;
-import com.epoch.loan.workshop.account.repayment.BaseRepayment;
 import com.epoch.loan.workshop.common.service.RepaymentService;
 import com.epoch.loan.workshop.common.util.HttpUtils;
 import com.epoch.loan.workshop.common.util.LogUtil;
@@ -50,7 +50,7 @@ public class RepaymentServiceImpl extends BaseService implements RepaymentServic
 
         // 查询挑选策略
         LoanProductRepaymentConfigEntity config = loanProductRepaymentConfigDao.findByGroupName(order.getRepaymentDistributionGroup());
-        if (config==null){
+        if (config == null) {
             return errorPageUrl;
         }
         LogUtil.sysInfo("config:{}", config);
@@ -60,7 +60,7 @@ public class RepaymentServiceImpl extends BaseService implements RepaymentServic
         LogUtil.sysInfo("loanRepaymentDistributions:{}", loanRepaymentDistributions);
 
         // 挑选渠道放款
-        return repayment(loanRepaymentDistributions, config, orderBill,params);
+        return repayment(loanRepaymentDistributions, config, orderBill, params);
     }
 
     /**
@@ -163,7 +163,7 @@ public class RepaymentServiceImpl extends BaseService implements RepaymentServic
             // 放款失败 递归:重新挑选渠道放款
             LogUtil.sysInfo("payUrl:{} 放款失败 递归重新挑选渠道放款", payUrl);
             loanRepaymentDistributions.remove(selectedRepaymentDistribution);
-            payUrl = repayment(loanRepaymentDistributions, config, orderBill,params);
+            payUrl = repayment(loanRepaymentDistributions, config, orderBill, params);
         }
 
         return payUrl;
@@ -197,7 +197,8 @@ public class RepaymentServiceImpl extends BaseService implements RepaymentServic
 
         // 取随机数
         Random random = new Random();
-        int randomNum = random.nextInt(range) + 1;;
+        int randomNum = random.nextInt(range) + 1;
+        ;
         LogUtil.sysInfo("randomNum:{}", randomNum);
 
         // 选择渠道

@@ -4,46 +4,46 @@
 
     <insert id="insert">
         INSERT INTO loan_repayment_payment_record (
-            id,
-            order_id,
-            order_bill_id,
-            payment_id,
-            business_id,
-            amount,
-            actual_amount,
-            phone,
-            email,
-            `name`,
-            utr,
-            event,
-            request,
-            response,
-            search_request,
-            search_response,
-            status,
-            update_time,
-            create_time
+        id,
+        order_id,
+        order_bill_id,
+        payment_id,
+        business_id,
+        amount,
+        actual_amount,
+        phone,
+        email,
+        `name`,
+        utr,
+        event,
+        request,
+        response,
+        search_request,
+        search_response,
+        status,
+        update_time,
+        create_time
         )
         VALUES (
-           #{paymentRecord.id},
-           #{paymentRecord.orderId},
-           #{paymentRecord.orderBillId},
-           #{paymentRecord.paymentId},
-           #{paymentRecord.businessId},
-           #{paymentRecord.amount},
-           #{paymentRecord.actualAmount},
-           #{paymentRecord.phone},
-           #{paymentRecord.email},
-           #{paymentRecord.name},
-           #{paymentRecord.utr},
-           #{paymentRecord.event},
-           #{paymentRecord.request},
-           #{paymentRecord.response},
-           #{paymentRecord.searchRequest},
-           #{paymentRecord.searchResponse},
-           #{paymentRecord.status},
-           #{paymentRecord.createTime},
-           #{paymentRecord.updateTime}
+        #{paymentRecord.id},
+        #{paymentRecord.orderId},
+        #{paymentRecord.orderBillId},
+        #{paymentRecord.paymentId},
+        #{paymentRecord.businessId},
+        #{paymentRecord.amount},
+        #{paymentRecord.actualAmount},
+        #{paymentRecord.phone},
+        #{paymentRecord.email},
+        #{paymentRecord.name},
+        #{paymentRecord.utr},
+        #{paymentRecord.event},
+        #{paymentRecord.request},
+        #{paymentRecord.response},
+        #{paymentRecord.searchRequest},
+        #{paymentRecord.searchResponse},
+        #{paymentRecord.status},
+        #{paymentRecord.createTime},
+        #{paymentRecord.updateTime}
         )
     </insert>
     <update id="updateRequestAndResponse">
@@ -58,10 +58,12 @@
         #{updateTime} WHERE id = #{id}
     </update>
     <update id="updateBussinesId">
-        update loan_repayment_payment_record set business_id = #{businessId},update_time = #{updateTime} WHERE id = #{id}
+        update loan_repayment_payment_record set business_id = #{businessId},update_time = #{updateTime} WHERE id =
+        #{id}
     </update>
     <update id="updateRepaymentPaymentRecordActualAmount">
-        update loan_repayment_payment_record set actual_amount = #{actualAmount},update_time = #{updateTime} WHERE id = #{id}
+        update loan_repayment_payment_record set actual_amount = #{actualAmount},update_time = #{updateTime} WHERE id =
+        #{id}
     </update>
     <select id="findRepaymentPaymentRecordById"
             resultType="com.epoch.loan.workshop.common.entity.mysql.LoanRepaymentPaymentRecordEntity">

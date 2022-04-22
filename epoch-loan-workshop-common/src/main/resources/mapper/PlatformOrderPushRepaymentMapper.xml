@@ -4,19 +4,19 @@
 
     <insert id="insert">
         INSERT INTO `platform_receive_order_push_repayment` (`id`,
-                                                             `order_no`,
-                                                             `open_bank`,
-                                                             `bank_card`,
-                                                             `can_prepay`,
-                                                             `can_prepay_time`,
-                                                             `create_time`)
+        `order_no`,
+        `open_bank`,
+        `bank_card`,
+        `can_prepay`,
+        `can_prepay_time`,
+        `create_time`)
         VALUES (#{orderPushRepayment.id},
-                #{orderPushRepayment.orderNo},
-                #{orderPushRepayment.openBank},
-                #{orderPushRepayment.bankCard},
-                #{orderPushRepayment.canPrepay},
-                #{orderPushRepayment.canPrepayTime},
-                #{orderPushRepayment.createTime})
+        #{orderPushRepayment.orderNo},
+        #{orderPushRepayment.openBank},
+        #{orderPushRepayment.bankCard},
+        #{orderPushRepayment.canPrepay},
+        #{orderPushRepayment.canPrepayTime},
+        #{orderPushRepayment.createTime})
 
     </insert>
     <select id="getMaxId" resultType="java.lang.Long">

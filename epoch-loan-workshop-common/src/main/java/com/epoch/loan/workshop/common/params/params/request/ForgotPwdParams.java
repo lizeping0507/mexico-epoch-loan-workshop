@@ -32,6 +32,7 @@ public class ForgotPwdParams extends BaseParams {
 
     /**
      * 手机号
+     *
      * @return
      */
     public boolean isPhoneNumberLegal() {
@@ -40,8 +41,10 @@ public class ForgotPwdParams extends BaseParams {
         }
         return true;
     }
+
     /**
      * 手机号
+     *
      * @return
      */
     public boolean isPasswdLegal() {
@@ -50,8 +53,10 @@ public class ForgotPwdParams extends BaseParams {
         }
         return true;
     }
+
     /**
      * 手机号
+     *
      * @return
      */
     public boolean isSmsCodeLegal() {

@@ -41,6 +41,7 @@ public interface LoanUserDao {
 
     /**
      * 更新密码
+     *
      * @param id
      * @param newPassword
      */
@@ -48,6 +49,7 @@ public interface LoanUserDao {
 
     /**
      * 通过Id查询
+     *
      * @param id
      * @return
      */

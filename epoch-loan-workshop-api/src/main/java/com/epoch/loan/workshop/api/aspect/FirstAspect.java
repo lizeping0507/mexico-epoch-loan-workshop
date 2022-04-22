@@ -282,7 +282,7 @@ public class FirstAspect {
             boolean isJson = !isPrimitive && !isString && !isCollection;
 
             // 添加混淆参数
-            if (isJson){
+            if (isJson) {
                 List<String> list = DynamicRequest.RESPONSE_MAPPING_VIRTUAL_PARAMS_CACHE.get(mappingUrl);
                 if (CollectionUtil.isNotEmpty(list)) {
                     JSONObject jsonData = (JSONObject) JSONObject.toJSON(data);
@@ -314,7 +314,7 @@ public class FirstAspect {
      *
      * @return
      */
-    private String getRandomStr(){
+    private String getRandomStr() {
         String res = "";
 
         // 65～90为26个大写英文字母，97～122号为26个小写英文字母
@@ -325,10 +325,10 @@ public class FirstAspect {
 
         for (int i = 0; i < length; i++) {
             char c;
-            if (i % 2 == 0){
-                c = (char) (random.nextInt(25 ) + 65);
-            }else{
-                c = (char) (random.nextInt(25 ) + 97);
+            if (i % 2 == 0) {
+                c = (char) (random.nextInt(25) + 65);
+            } else {
+                c = (char) (random.nextInt(25) + 97);
             }
             res += c;
         }

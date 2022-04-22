@@ -58,7 +58,7 @@ public interface LoanRepaymentPaymentRecordDao {
      * @param response   响应
      * @param updateTime 更新时间
      */
-    void updateSearchRequestAndResponse(@Param("id")String id, @Param("request")String request, @Param("response")String response, @Param("updateTime")Date updateTime);
+    void updateSearchRequestAndResponse(@Param("id") String id, @Param("request") String request, @Param("response") String response, @Param("updateTime") Date updateTime);
 
     /**
      * 存储业务所需id

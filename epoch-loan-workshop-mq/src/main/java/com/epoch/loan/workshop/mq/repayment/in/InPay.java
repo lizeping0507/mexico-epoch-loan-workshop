@@ -1,8 +1,6 @@
 package com.epoch.loan.workshop.mq.repayment.in;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.codec.Base64Encoder;
-import cn.hutool.core.util.NumberUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.constant.LoanRepaymentPaymentRecordStatus;
@@ -14,7 +12,6 @@ import com.epoch.loan.workshop.common.mq.repayment.params.RepaymentParams;
 import com.epoch.loan.workshop.common.util.DateUtil;
 import com.epoch.loan.workshop.common.util.HttpUtils;
 import com.epoch.loan.workshop.common.util.LogUtil;
-import com.epoch.loan.workshop.mq.remittance.payment.yeah.YeahPayToken;
 import com.epoch.loan.workshop.mq.repayment.BaseRepaymentMQListener;
 import lombok.Data;
 import org.apache.commons.lang3.ObjectUtils;
@@ -44,6 +41,40 @@ public class InPay extends BaseRepaymentMQListener implements MessageListenerCon
      * 消息监听器
      */
     private MessageListenerConcurrently messageListener = this;
+
+    /**
+     * 参数签名
+     * 非空参数值的参数按照参数名ASCII码从小到大排序
+     * 使用URL键值对的格式（即key1=value1&key2=value2…）拼接成字符串
+     * 在上述字符串最后拼接上key(即stringA&key=value)并进行MD5运算，再将得到的字符串所有字符转换为小写
+     *
+     * @param param 请求参数
+     * @return 签名字符串
+     */
+    public static String sign(Object param, String key) {
+        StringBuilder tempSign = new StringBuilder();
+
+        // Bean转Map
+        Map<String, Object> map = BeanUtil.beanToMap(param);
+
+        // 取所有字段名并排序
+        List<String> filedList = new ArrayList<>(map.keySet());
+        Collections.sort(filedList);
+
+        // 拼接kv
+        for (String filed : filedList) {
+            Object value = map.get(filed);
+            if (value != null) {
+                tempSign.append(filed).append("=").append(value).append("&");
+            }
+        }
+
+        // 拼接key
+        tempSign.append("key=").append(key);
+
+        // md5并转小写
+        return SecureUtil.md5(tempSign.toString()).toLowerCase();
+    }
 
     /**
      * 消费任务
@@ -86,7 +117,7 @@ public class InPay extends BaseRepaymentMQListener implements MessageListenerCon
                 if (paymentRecord.getStatus().equals(LoanRepaymentPaymentRecordStatus.PROCESS)) {
                     // 进行中状态表示发起成功 需要查询支付状态
                     Integer queryRes = queryOrder(paymentRecord, loanPayment);
-                    LogUtil.sysInfo("queryRes : {}",JSONObject.toJSONString(queryRes));
+                    LogUtil.sysInfo("queryRes : {}", JSONObject.toJSONString(queryRes));
 
                     // TODO 模拟成功
                     queryRes = 1;
@@ -130,7 +161,6 @@ public class InPay extends BaseRepaymentMQListener implements MessageListenerCon
         return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
     }
 
-
     /**
      * 查询代收结果
      *
@@ -153,7 +183,7 @@ public class InPay extends BaseRepaymentMQListener implements MessageListenerCon
         params.setMerchantid(merchantId);
         params.setOut_trade_no(paymentRecord.getId());
         params.setTimestamp(String.valueOf(System.currentTimeMillis()));
-        params.setSign(sign(params,key));
+        params.setSign(sign(params, key));
         // 发起请求
         String result;
         try {
@@ -195,40 +225,5 @@ public class InPay extends BaseRepaymentMQListener implements MessageListenerCon
             return PaymentField.PAY_QUERY_ERROR;
         }
 
-    }
-
-
-    /**
-     * 参数签名
-     * 非空参数值的参数按照参数名ASCII码从小到大排序
-     * 使用URL键值对的格式（即key1=value1&key2=value2…）拼接成字符串
-     * 在上述字符串最后拼接上key(即stringA&key=value)并进行MD5运算，再将得到的字符串所有字符转换为小写
-     *
-     * @param param 请求参数
-     * @return 签名字符串
-     */
-    public static String sign(Object param, String key) {
-        StringBuilder tempSign = new StringBuilder();
-
-        // Bean转Map
-        Map<String, Object> map = BeanUtil.beanToMap(param);
-
-        // 取所有字段名并排序
-        List<String> filedList = new ArrayList<>(map.keySet());
-        Collections.sort(filedList);
-
-        // 拼接kv
-        for (String filed : filedList) {
-            Object value = map.get(filed);
-            if (value != null) {
-                tempSign.append(filed).append("=").append(value).append("&");
-            }
-        }
-
-        // 拼接key
-        tempSign.append("key=").append(key);
-
-        // md5并转小写
-        return SecureUtil.md5(tempSign.toString()).toLowerCase();
     }
 }

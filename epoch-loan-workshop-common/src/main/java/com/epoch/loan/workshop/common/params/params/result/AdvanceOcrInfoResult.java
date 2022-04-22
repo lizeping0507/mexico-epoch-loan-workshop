@@ -1,8 +1,6 @@
 package com.epoch.loan.workshop.common.params.params.result;
 
 import com.alibaba.fastjson.JSONObject;
-import com.epoch.loan.workshop.common.params.params.result.model.AdvanceLicenseResponse;
-import com.epoch.loan.workshop.common.params.params.result.model.AdvanceOcrInfoResponse;
 import lombok.Data;
 
 import java.io.Serializable;

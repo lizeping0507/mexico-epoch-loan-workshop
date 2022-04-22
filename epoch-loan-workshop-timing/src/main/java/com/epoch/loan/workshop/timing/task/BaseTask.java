@@ -68,22 +68,20 @@ public class BaseTask {
     @Autowired
     public LoanRemittancePaymentRecordDao loanRemittancePaymentRecordDao;
     /**
-     * 支付分配队列
-     */
-    @Autowired
-    protected RemittanceMQManager remittanceMqManagerProduct;
-
-    /**
      * Redis工具类
      */
     @Autowired
     public RedisClient redisClient;
-
     /**
      * 还款队列生产
      */
     @Autowired
     public RepaymentMQManager repaymentMQManager;
+    /**
+     * 支付分配队列
+     */
+    @Autowired
+    protected RemittanceMQManager remittanceMqManagerProduct;
 
     /**
      * 获取定时任务参数（直接从数据库加载，获取最新的参数）

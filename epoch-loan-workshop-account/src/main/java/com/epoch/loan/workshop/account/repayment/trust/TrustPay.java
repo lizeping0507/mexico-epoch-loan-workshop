@@ -31,6 +31,41 @@ import java.util.Map;
 public class TrustPay extends BaseRepayment {
 
     /**
+     * 参数签名
+     * 非空参数值的参数按照参数名ASCII码从小到大排序
+     * 使用URL键值对的格式（即key1=value1&key2=value2…）拼接成字符串
+     * 在上述字符串最后拼接上key(即stringA&key=value)并进行MD5运算，再将得到的字符串所有字符转换为小写
+     *
+     * @param param
+     * @param key
+     * @return
+     */
+    public static String sign(Object param, String key) {
+        StringBuilder tempSign = new StringBuilder();
+
+        // Bean转Map
+        Map<String, Object> map = BeanUtil.beanToMap(param);
+
+        // 取所有字段名并排序
+        List<String> filedList = new ArrayList<>(map.keySet());
+        Collections.sort(filedList);
+
+        // 拼接kv
+        for (String filed : filedList) {
+            Object value = map.get(filed);
+            if (value != null) {
+                tempSign.append(filed).append("=").append(value).append("&");
+            }
+        }
+
+        // 拼接key
+        tempSign.append("key=").append(key);
+
+        // md5并转小写
+        return SecureUtil.md5(tempSign.toString()).toLowerCase();
+    }
+
+    /**
      * 发起代收
      *
      * @param loanRepaymentPaymentRecordEntity 支付详情
@@ -57,7 +92,7 @@ public class TrustPay extends BaseRepayment {
         params.setCustomEmail(loanRepaymentPaymentRecordEntity.getEmail());
         params.setNotifyUrl(notifyUrl);
         params.setCallbackUrl(callbackUrl);
-        params.setSign(sign(params,key));
+        params.setSign(sign(params, key));
         // 发起请求
         String result;
         try {
@@ -112,40 +147,5 @@ public class TrustPay extends BaseRepayment {
         }
 
         return payUrl;
-    }
-
-    /**
-     * 参数签名
-     * 非空参数值的参数按照参数名ASCII码从小到大排序
-     * 使用URL键值对的格式（即key1=value1&key2=value2…）拼接成字符串
-     * 在上述字符串最后拼接上key(即stringA&key=value)并进行MD5运算，再将得到的字符串所有字符转换为小写
-     *
-     * @param param
-     * @param key
-     * @return
-     */
-    public static String sign(Object param, String key) {
-        StringBuilder tempSign = new StringBuilder();
-
-        // Bean转Map
-        Map<String, Object> map = BeanUtil.beanToMap(param);
-
-        // 取所有字段名并排序
-        List<String> filedList = new ArrayList<>(map.keySet());
-        Collections.sort(filedList);
-
-        // 拼接kv
-        for (String filed : filedList) {
-            Object value = map.get(filed);
-            if (value != null) {
-                tempSign.append(filed).append("=").append(value).append("&");
-            }
-        }
-
-        // 拼接key
-        tempSign.append("key=").append(key);
-
-        // md5并转小写
-        return SecureUtil.md5(tempSign.toString()).toLowerCase();
     }
 }

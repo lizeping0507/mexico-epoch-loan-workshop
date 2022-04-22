@@ -3,11 +3,7 @@ package com.epoch.loan.workshop.account.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
-import com.epoch.loan.workshop.common.constant.OcrChannelConfigStatus;
-import com.epoch.loan.workshop.common.constant.OcrField;
-import com.epoch.loan.workshop.common.constant.PlatformUrl;
-import com.epoch.loan.workshop.common.constant.RedisKeyField;
-import com.epoch.loan.workshop.common.constant.ResultEnum;
+import com.epoch.loan.workshop.common.constant.*;
 import com.epoch.loan.workshop.common.entity.elastic.OcrLivingDetectionLogElasticEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanUserEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanUserInfoEntity;
@@ -20,7 +16,10 @@ import com.epoch.loan.workshop.common.params.params.result.model.AdvanceOcrBackI
 import com.epoch.loan.workshop.common.params.params.result.model.AdvanceOcrFrontInfoResult;
 import com.epoch.loan.workshop.common.params.params.result.model.AdvanceOcrInfoResponse;
 import com.epoch.loan.workshop.common.service.UserService;
-import com.epoch.loan.workshop.common.util.*;
+import com.epoch.loan.workshop.common.util.HttpUtils;
+import com.epoch.loan.workshop.common.util.LogUtil;
+import com.epoch.loan.workshop.common.util.ObjectIdUtil;
+import com.epoch.loan.workshop.common.util.PlatformUtil;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -347,7 +346,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         }
 
         String loginName = userCache.getLoginName();
-        data.setPhoneNumber(loginName.substring(0,3) + "****" +loginName.substring(7));
+        data.setPhoneNumber(loginName.substring(0, 3) + "****" + loginName.substring(7));
 
         // 未完成的订单
         Integer uncompletedOrder = platformOrderDao.findUserLessThanSpecificStatusOrderNum(userCache.getId(), 110);
@@ -474,12 +473,13 @@ public class UserServiceImpl extends BaseService implements UserService {
 
     /**
      * 获取用户信息
+     *
      * @param params
      * @return
      */
     @Override
-    public Result<User> getUserInfo(BaseParams params){
-        Result<User> result= new Result<>();
+    public Result<User> getUserInfo(BaseParams params) {
+        Result<User> result = new Result<>();
         result.setData(params.getUser());
         result.setReturnCode(ResultEnum.SUCCESS.code());
         result.setMessage(ResultEnum.SUCCESS.message());
@@ -567,12 +567,12 @@ public class UserServiceImpl extends BaseService implements UserService {
         String rfc = params.getRfc();
         String backJson = params.getBackJson();
         String userId = params.getUser().getId();
-        AdvanceOcrFrontInfoResult frontInfo = JSON.parseObject(params.getFrontJson(),AdvanceOcrFrontInfoResult.class);
-        AdvanceOcrBackInfoResult backInfo = JSON.parseObject(params.getBackJson(),AdvanceOcrBackInfoResult.class);
+        AdvanceOcrFrontInfoResult frontInfo = JSON.parseObject(params.getFrontJson(), AdvanceOcrFrontInfoResult.class);
+        AdvanceOcrBackInfoResult backInfo = JSON.parseObject(params.getBackJson(), AdvanceOcrBackInfoResult.class);
         String idNo = frontInfo.getIdNumber();
 
         // curp校验
-        String textIdNo= "(?=.*[A-Z])(?=.*\\d)[A-Z\\d]{18}";
+        String textIdNo = "(?=.*[A-Z])(?=.*\\d)[A-Z\\d]{18}";
         String textRfc = "(?=.*[A-Z])(?=.*\\d)[A-Z\\d]{13}";
         if (StringUtils.isBlank(rfc) || StringUtils.isBlank(idNo)
                 || !rfc.matches(textRfc) || !idNo.matches(textIdNo)) {

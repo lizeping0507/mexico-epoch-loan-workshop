@@ -44,7 +44,7 @@ public class ForwardFilter implements Filter {
         // 判断是否有对应的真实地址
         if (StringUtils.isEmpty(url)) {
             // 未命中 , 正常请求
-            chain.doFilter(servletRequest,servletResponse);
+            chain.doFilter(servletRequest, servletResponse);
             return;
         }
 

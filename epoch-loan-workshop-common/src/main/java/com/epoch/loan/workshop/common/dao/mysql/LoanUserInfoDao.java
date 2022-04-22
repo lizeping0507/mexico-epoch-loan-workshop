@@ -18,7 +18,7 @@ public interface LoanUserInfoDao {
      *
      * @param loanUserInfoEntity
      */
-    void insert(@Param("loanUserInfoEntity")LoanUserInfoEntity loanUserInfoEntity);
+    void insert(@Param("loanUserInfoEntity") LoanUserInfoEntity loanUserInfoEntity);
 
     /**
      * 查询用户详细信息
@@ -30,6 +30,7 @@ public interface LoanUserInfoDao {
 
     /**
      * 更新
+     *
      * @param loanUserInfoEntity
      */
     void update(@Param("loanUserInfoEntity") LoanUserInfoEntity loanUserInfoEntity);

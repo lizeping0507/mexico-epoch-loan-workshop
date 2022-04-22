@@ -91,7 +91,7 @@ public class YeahPay1 extends BaseRepaymentMQListener implements MessageListener
                 if (paymentRecord.getStatus().equals(LoanRepaymentPaymentRecordStatus.PROCESS)) {
                     // 进行中状态表示发起成功 需要查询支付状态
                     Integer queryRes = queryOrder(paymentRecord, loanPayment);
-                    LogUtil.sysInfo("queryRes : {}",JSONObject.toJSONString(queryRes));
+                    LogUtil.sysInfo("queryRes : {}", JSONObject.toJSONString(queryRes));
 
                     // TODO 模拟成功
                     queryRes = 1;

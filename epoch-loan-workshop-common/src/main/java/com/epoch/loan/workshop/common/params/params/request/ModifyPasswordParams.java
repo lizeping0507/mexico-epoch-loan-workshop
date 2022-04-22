@@ -37,6 +37,7 @@ public class ModifyPasswordParams extends BaseParams {
 
     /**
      * 手机号
+     *
      * @return
      */
     public boolean isPhoneNumberLegal() {
@@ -48,6 +49,7 @@ public class ModifyPasswordParams extends BaseParams {
 
     /**
      * 验证旧密码是否合法
+     *
      * @return
      */
     public boolean isOldPasswordLegal() {
@@ -59,6 +61,7 @@ public class ModifyPasswordParams extends BaseParams {
 
     /**
      * 验证新密码是否合法
+     *
      * @return
      */
     public boolean isNewPasswordLegal() {
@@ -70,6 +73,7 @@ public class ModifyPasswordParams extends BaseParams {
 
     /**
      * 验证确认密码是否合法
+     *
      * @return
      */
     public boolean isEnterPasswordLegal() {

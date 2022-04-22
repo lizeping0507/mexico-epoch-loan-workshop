@@ -3,7 +3,8 @@ package com.epoch.loan.workshop.mq.order;
 import com.epoch.loan.workshop.common.constant.OrderBillStatus;
 import com.epoch.loan.workshop.common.constant.OrderExamineStatus;
 import com.epoch.loan.workshop.common.constant.OrderStatus;
-import com.epoch.loan.workshop.common.entity.mysql.*;
+import com.epoch.loan.workshop.common.entity.mysql.LoanOrderBillEntity;
+import com.epoch.loan.workshop.common.entity.mysql.LoanOrderEntity;
 import com.epoch.loan.workshop.common.mq.order.params.OrderParams;
 import com.epoch.loan.workshop.common.mq.repayment.params.DistributionRepaymentParams;
 import com.epoch.loan.workshop.common.util.DateUtil;
@@ -18,7 +19,6 @@ import org.apache.rocketmq.common.message.MessageExt;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -105,7 +105,7 @@ public class OrderWay extends BaseOrderMQListener implements MessageListenerConc
                 LoanOrderBillEntity orderBillEntity = null;
                 for (LoanOrderBillEntity loanOrderBillEntity : loanOrderBillEntityList) {
                     // 取期数为1的账单id
-                    if (loanOrderBillEntity.getStages().equals(1)){
+                    if (loanOrderBillEntity.getStages().equals(1)) {
                         orderBillEntity = loanOrderBillEntity;
                     }
 

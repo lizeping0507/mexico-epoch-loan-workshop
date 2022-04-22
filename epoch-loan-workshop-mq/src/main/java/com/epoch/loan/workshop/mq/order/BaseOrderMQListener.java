@@ -11,8 +11,8 @@ import com.epoch.loan.workshop.common.mq.remittance.RemittanceMQManager;
 import com.epoch.loan.workshop.common.mq.remittance.params.DistributionRemittanceParams;
 import com.epoch.loan.workshop.common.mq.repayment.RepaymentMQManager;
 import com.epoch.loan.workshop.common.mq.repayment.params.DistributionRepaymentParams;
-import com.epoch.loan.workshop.common.util.DateUtil;
 import com.epoch.loan.workshop.common.redis.RedisClient;
+import com.epoch.loan.workshop.common.util.DateUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -425,6 +425,7 @@ public abstract class BaseOrderMQListener {
     public void sendDistribution(DistributionRemittanceParams params) throws Exception {
         remittanceMQManagerProduct.sendMessage(params, remittanceMQManagerProduct.getDistributionSubExpression());
     }
+
     /**
      * 发送订单放款分配队列
      *
@@ -448,9 +449,9 @@ public abstract class BaseOrderMQListener {
     /**
      * 新增还款计划
      *
-     * @param loanOrderEntity 订单
+     * @param loanOrderEntity     订单
      * @param loanOrderBillEntity 账单
-     * @param punishmentAmount 罚息 没有填0
+     * @param punishmentAmount    罚息 没有填0
      */
     protected void addrepaymentPlan(LoanOrderEntity loanOrderEntity, LoanOrderBillEntity loanOrderBillEntity, double punishmentAmount) {
         String orderId = loanOrderEntity.getId();
@@ -496,9 +497,9 @@ public abstract class BaseOrderMQListener {
         orderPushRepaymentPlanEntity.setIsAbleDefer(0);
         orderPushRepaymentPlanEntity.setPeriodNo(1);
         orderPushRepaymentPlanEntity.setPayType(1);
-        if (intervalDays > 0){
+        if (intervalDays > 0) {
             orderPushRepaymentPlanEntity.setRemark("amount:₹" + nonArrivalAmount + ",fee&interest:₹" + loanOrderBillEntity.getInterestAmount() + ",overdue:₹" + punishmentAmount);
-        }else {
+        } else {
             orderPushRepaymentPlanEntity.setRemark("amount:₹" + nonArrivalAmount + ",fee&interest:₹" + loanOrderBillEntity.getInterestAmount());
         }
         orderPushRepaymentPlanEntity.setCanRepayTime(System.currentTimeMillis() / 1000);

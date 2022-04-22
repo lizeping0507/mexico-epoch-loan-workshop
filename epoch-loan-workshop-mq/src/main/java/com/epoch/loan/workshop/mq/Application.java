@@ -50,101 +50,100 @@ import javax.annotation.PostConstruct;
 @EnableAspectJAutoProxy(exposeProxy = true)
 public class Application {
     /**
+     * 还款队列生产
+     */
+    @Autowired
+    public RepaymentMQManager repaymentMQManager;
+    /**
+     * 还款队列生产
+     */
+    @Autowired
+    public DistributionRepayment distributionRepayment;
+    /**
+     * Zookeeper工具类
+     */
+    @Autowired
+    public ZookeeperClient zookeeperClient;
+    /**
      * 订单队列
      */
     @Autowired
     private OrderMQManager orderMQManager;
-
     /**
      * 风控V3策略队列
      */
     @Autowired
     private RiskModelV1 riskModelV1;
-
     /**
      * 审批通过
      */
     @Autowired
     private OrderExaminePass orderExaminePass;
-
     /**
      * 订单在途
      */
     @Autowired
     private OrderWay orderWay;
-
     /**
      * 订单完成
      */
     @Autowired
     private OrderComplete orderComplete;
-
     /**
      * 订单逾期
      */
     @Autowired
     private OrderDue orderDue;
-
     /**
      * 汇款分配队列
      */
     @Autowired
     private RemittanceMQManager remittanceMQManagerProduct;
-
     /**
      * 汇款分配队列
      */
     @Autowired
     private DistributionRemittance distributionRemittance;
-
     /**
      * yeahPay放款队列
      */
     @Autowired
     private YeahPay yeahPay;
-
     /**
      * yeahPay2放款队列
      */
     @Autowired
     private YeahPay2 yeahPay2;
-
     /**
      * yeahPa1放款队列
      */
     @Autowired
     private YeahPay1 yeahPay1;
-
     /**
      * fastPay放款队列
      */
     @Autowired
     private FastPay fastPay;
-
     /**
      * inPay放款队列
      */
     @Autowired
     private InPay inPay;
-
     /**
      * subFlowerPay放款队列
      */
     @Autowired
     private SunFlowerPay sunFlowerPay;
-
     /**
      * oceanPay放款队列
      */
     @Autowired
     private OceanPay oceanPay;
-
     /**
      * acPay放款队列
      */
     @Autowired
     private AcPay acPay;
-
     /**
      * IncashPay放款队列
      */
@@ -175,40 +174,21 @@ public class Application {
      */
     @Autowired
     private GlobPay globPay;
-
     /**
      * yeahPay还款队列
      */
     @Autowired
     private com.epoch.loan.workshop.mq.repayment.yeah.YeahPay1 repaymentYeahPay1;
-
     /**
      * 订单放款
      */
     @Autowired
     private OrderRemittance orderRemittance;
-
     /**
      * 响应日志
      */
     @Autowired
     private AccessLogStorage accessLogStorage;
-    /**
-     * 还款队列生产
-     */
-    @Autowired
-    public RepaymentMQManager repaymentMQManager;
-    /**
-     * 还款队列生产
-     */
-    @Autowired
-    public DistributionRepayment distributionRepayment;
-
-    /**
-     * Zookeeper工具类
-     */
-    @Autowired
-    public ZookeeperClient zookeeperClient;
 
     /**
      * 启动类

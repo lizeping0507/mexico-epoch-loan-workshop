@@ -17,7 +17,7 @@ public class TrustPayParams {
     private String merchant;
 
     /**
-     * 	商户订单号（唯一），字符长度40以内
+     * 商户订单号（唯一），字符长度40以内
      */
     private String orderId;
 
@@ -42,7 +42,7 @@ public class TrustPayParams {
     private String customEmail;
 
     /**
-     * 	异步通知回调地址
+     * 异步通知回调地址
      */
     private String notifyUrl;
 

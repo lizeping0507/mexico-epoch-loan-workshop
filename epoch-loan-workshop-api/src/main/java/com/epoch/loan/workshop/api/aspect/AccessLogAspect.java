@@ -25,6 +25,7 @@ public class AccessLogAspect {
      */
     @Autowired
     private LogMQManager logMQManager;
+
     /**
      * 定义切入点
      */

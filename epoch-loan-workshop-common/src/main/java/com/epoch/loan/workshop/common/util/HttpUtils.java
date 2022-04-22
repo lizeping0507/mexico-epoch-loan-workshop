@@ -805,7 +805,7 @@ public class HttpUtils {
      * @return
      * @throws Exception
      */
-    public static HttpPost buildHttpWithHeaderParamFilePost(String url, Map<String, String> params,Map<String, String> heardMap, Map<String, File> files)
+    public static HttpPost buildHttpWithHeaderParamFilePost(String url, Map<String, String> params, Map<String, String> heardMap, Map<String, File> files)
             throws Exception {
         HttpPost post = new HttpPost(url);
 

@@ -3,7 +3,8 @@
 <mapper namespace="com.epoch.loan.workshop.common.dao.mysql.LoanProductRepaymentConfigDao">
 
 
-    <select id="findByGroupName" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanProductRepaymentConfigEntity">
+    <select id="findByGroupName"
+            resultType="com.epoch.loan.workshop.common.entity.mysql.LoanProductRepaymentConfigEntity">
         SELECT * FROM loan_product_repayment_config WHERE group_name = #{groupName} LIMIT 0,1
     </select>
 </mapper>

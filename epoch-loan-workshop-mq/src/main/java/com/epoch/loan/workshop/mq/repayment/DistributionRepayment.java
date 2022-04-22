@@ -36,6 +36,13 @@ public class DistributionRepayment extends BaseRepaymentMQListener implements Me
      */
     private MessageListenerConcurrently messageListener = this;
 
+    public static void main(String[] args) {
+
+        System.out.println();
+
+
+    }
+
     /**
      * 消费任务
      *
@@ -123,14 +130,6 @@ public class DistributionRepayment extends BaseRepaymentMQListener implements Me
 
         }
         return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
-    }
-
-
-    public static void main(String[] args) {
-
-        System.out.println();
-
-
     }
 
 }

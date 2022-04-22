@@ -148,6 +148,7 @@ public interface PlatformOrderDao {
 
     /**
      * 查询用户小于指定状态的订单
+     *
      * @param userId
      * @param status
      * @return
@@ -156,6 +157,7 @@ public interface PlatformOrderDao {
 
     /**
      * 查询代还款状态订单
+     *
      * @param userId
      * @return
      */

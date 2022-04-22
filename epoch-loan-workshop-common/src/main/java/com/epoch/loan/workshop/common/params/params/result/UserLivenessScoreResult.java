@@ -14,14 +14,14 @@ import java.io.Serializable;
 @Data
 public class UserLivenessScoreResult implements Serializable {
 
-	/**
-	 * 图片 url 或图片 base64
-	 */
-	private String detectionResult;
+    /**
+     * 图片 url 或图片 base64
+     */
+    private String detectionResult;
 
-	/**
-	 * 反欺骗的分数，范围从 [0,100]，小于 50 意味着它可能是一次攻击
-	 */
-	private String livenessScore;
+    /**
+     * 反欺骗的分数，范围从 [0,100]，小于 50 意味着它可能是一次攻击
+     */
+    private String livenessScore;
 
 }

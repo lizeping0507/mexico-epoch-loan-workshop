@@ -15,6 +15,7 @@ import org.apache.ibatis.annotations.Param;
 public interface PlatformOrderPushRepaymentDao {
     /**
      * 新增
+     *
      * @param orderPushRepayment
      */
     void insert(@Param("orderPushRepayment") PlatformOrderPushRepaymentEntity orderPushRepayment);

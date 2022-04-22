@@ -9,7 +9,6 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 
 import javax.servlet.Filter;
-import java.util.HashSet;
 
 /**
  * @author : Duke

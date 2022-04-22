@@ -113,6 +113,16 @@ public class BaseService {
     @Autowired
     public LoanPaymentDao loanPaymentDao;
     /**
+     * 三方OCR相关配置
+     */
+    @Autowired
+    public LoanOcrProviderConfigDao loanOcrProviderConfigDao;
+    /**
+     * advance日志
+     */
+    @Autowired
+    public OcrLivingDetectionLogElasticDao ocrLivingDetectionLogElasticDao;
+    /**
      * 订单放款记录
      */
     @Autowired
@@ -127,18 +137,6 @@ public class BaseService {
      */
     @Autowired
     LoanRemittancePaymentRecordDao paymentRecordDao;
-
-    /**
-     * 三方OCR相关配置
-     */
-    @Autowired
-    public LoanOcrProviderConfigDao loanOcrProviderConfigDao;
-
-    /**
-     * advance日志
-     */
-    @Autowired
-    public OcrLivingDetectionLogElasticDao ocrLivingDetectionLogElasticDao;
 
     /**
      * 发送队列

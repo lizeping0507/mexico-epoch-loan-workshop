@@ -22,6 +22,10 @@ public abstract class DistributionRemittanceLock<String> extends AbstractZookeep
      */
     private String lockId;
 
+    public DistributionRemittanceLock(String lockId) {
+        this.lockId = lockId;
+    }
+
     /**
      * 锁路径
      *
@@ -30,11 +34,6 @@ public abstract class DistributionRemittanceLock<String> extends AbstractZookeep
     @Override
     public java.lang.String getLockPath() {
         return LOCK_PATH + this.lockId;
-    }
-
-
-    public DistributionRemittanceLock(String lockId) {
-        this.lockId = lockId;
     }
 
 }

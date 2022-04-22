@@ -21,27 +21,23 @@ import org.springframework.stereotype.Component;
 @Data
 public class ZookeeperClient {
     /**
+     * 等待时间
+     */
+    private static final int SLEEP_TIME = 1000;
+    /**
+     * 最大次数
+     */
+    private static final int MAX_RETRIES = 3;
+    /**
      * 服务地址
      */
     @Value("${zookeeper.server}")
     private String SERVER;
-
     /**
      * 锁地址
      */
     @Value("${zookeeper.path}")
     private String PATH;
-
-    /**
-     * 等待时间
-     */
-    private static final int SLEEP_TIME = 1000;
-
-    /**
-     * 最大次数
-     */
-    private static final int MAX_RETRIES = 3;
-
     /**
      * 连接
      */

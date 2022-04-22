@@ -2,8 +2,6 @@ package com.epoch.loan.workshop.timing.task;
 
 import com.epoch.loan.workshop.common.entity.mysql.LoanOrderBillEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanOrderEntity;
-import com.epoch.loan.workshop.common.entity.mysql.LoanOrderExamineEntity;
-import com.epoch.loan.workshop.common.mq.order.params.OrderParams;
 import com.epoch.loan.workshop.common.util.DateUtil;
 import com.epoch.loan.workshop.common.util.LogUtil;
 import lombok.SneakyThrows;
@@ -44,20 +42,20 @@ public class TempTask extends BaseTask implements Job {
         Date now = new Date();
 
 
-        while(date.getTime() <=now.getTime()){
+        while (date.getTime() <= now.getTime()) {
             String format = simpleDateFormat.format(date);
             List<LoanOrderBillEntity> loanOrderBills = loanOrderBillDao.findByDay(format);
             LogUtil.sysInfo(" {}  数据量: {} 开始处理 ... ", format, loanOrderBills.size());
 
             for (LoanOrderBillEntity loanOrderBill : loanOrderBills) {
-                try{
-                    if (loanOrderBill.getType() == null){
+                try {
+                    if (loanOrderBill.getType() == null) {
                         loanOrderBillDao.updateType(loanOrderBill.getId(), 0, new Date());
                     }
-                    if (loanOrderBill.getReceivedAmount() == null){
+                    if (loanOrderBill.getReceivedAmount() == null) {
                         loanOrderBillDao.updateOrderBillReceivedAmount(loanOrderBill.getId(), 0.00, new Date());
                     }
-                    if (loanOrderBill.getPrincipalAmount() == null){
+                    if (loanOrderBill.getPrincipalAmount() == null) {
 
                         LoanOrderEntity loanOrderEntity = loanOrderDao.findOrder(loanOrderBill.getOrderId());
                         double approvalAmount = loanOrderEntity.getApprovalAmount();
@@ -65,7 +63,7 @@ public class TempTask extends BaseTask implements Job {
                         // 更新已付金额
                         loanOrderBillDao.updateOrderBillPrincipalAmount(loanOrderBill.getId(), stagesPrincipalAmount, new Date());
                     }
-                    if (loanOrderBill.getPunishmentAmount() == null){
+                    if (loanOrderBill.getPunishmentAmount() == null) {
                         loanOrderBillDao.updateOrderBillPunishmentAmount(loanOrderBill.getId(), 0.00, new Date());
                     }
 
@@ -76,15 +74,15 @@ public class TempTask extends BaseTask implements Job {
                     Double stagesInterestAmount = interestAmount / order.getStages();
                     loanOrderBillDao.updateInterestAmount(loanOrderBill.getId(), stagesInterestAmount, new Date());
 
-                    if (loanOrderBill.getIncidentalAmount() == null){
+                    if (loanOrderBill.getIncidentalAmount() == null) {
                         loanOrderBillDao.updateOrderBillIncidentalAmount(loanOrderBill.getId(), 0.00, new Date());
                     }
-                    if (loanOrderBill.getReductionAmount() == null){
+                    if (loanOrderBill.getReductionAmount() == null) {
                         loanOrderBillDao.updateOrderBillReductionAmount(loanOrderBill.getId(), 0.00, new Date());
                     }
                     LogUtil.sysInfo(" {}  Id: {} 处理完成 ", format, loanOrderBill.getId());
-                }catch (Exception e){
-                    LogUtil.sysError(format + "  Id: " +  loanOrderBill.getId() + "处理失败", e);
+                } catch (Exception e) {
+                    LogUtil.sysError(format + "  Id: " + loanOrderBill.getId() + "处理失败", e);
                 }
             }
 

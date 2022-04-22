@@ -3,32 +3,32 @@
 <mapper namespace="com.epoch.loan.workshop.common.dao.mysql.LoanUserDao">
     <insert id="insert">
         INSERT INTO `loan_user` (
-                                 `id`,
-                                 `android_id`,
-                                 `channel_id`,
-                                 `ga_id`,
-                                 `imei`,
-                                 `platform`,
-                                 `login_name`,
-                                 `password`,
-                                 `app_name`,
-                                 `app_version`,
-                                 `update_time`,
-                                 `create_time`)
+        `id`,
+        `android_id`,
+        `channel_id`,
+        `ga_id`,
+        `imei`,
+        `platform`,
+        `login_name`,
+        `password`,
+        `app_name`,
+        `app_version`,
+        `update_time`,
+        `create_time`)
         VALUES (
-                    #{loanUserEntity.id},
-                    #{loanUserEntity.androidId},
-                    #{loanUserEntity.channelId},
-                    #{loanUserEntity.gaId},
-                    #{loanUserEntity.imei},
-                    #{loanUserEntity.platform},
-                    #{loanUserEntity.loginName},
-                    #{loanUserEntity.password},
-                    #{loanUserEntity.appName},
-                    #{loanUserEntity.appVersion},
-                    #{loanUserEntity.updateTime},
-                    #{loanUserEntity.createTime}
-               )
+        #{loanUserEntity.id},
+        #{loanUserEntity.androidId},
+        #{loanUserEntity.channelId},
+        #{loanUserEntity.gaId},
+        #{loanUserEntity.imei},
+        #{loanUserEntity.platform},
+        #{loanUserEntity.loginName},
+        #{loanUserEntity.password},
+        #{loanUserEntity.appName},
+        #{loanUserEntity.appVersion},
+        #{loanUserEntity.updateTime},
+        #{loanUserEntity.createTime}
+        )
     </insert>
     <select id="exitByAppNameAndLoginName" resultType="java.lang.Integer">
         SELECT COUNT(1) FROM `loan_user` WHERE login_name = #{loginName} AND app_name = #{appName}

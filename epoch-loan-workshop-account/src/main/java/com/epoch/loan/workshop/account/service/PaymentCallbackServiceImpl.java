@@ -6,7 +6,6 @@ import com.epoch.loan.workshop.common.entity.mysql.LoanRemittancePaymentRecordEn
 import com.epoch.loan.workshop.common.mq.remittance.params.RemittanceParams;
 import com.epoch.loan.workshop.common.params.params.request.*;
 import com.epoch.loan.workshop.common.service.PaymentCallbackService;
-import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 
@@ -38,10 +37,9 @@ public class PaymentCallbackServiceImpl extends BaseService implements PaymentCa
         // 发送到yeahPay队列
         String queueParam = paymentRecord.getQueueParam();
         RemittanceParams remittanceParams;
-        if (StringUtils.isNotEmpty(queueParam)){
+        if (StringUtils.isNotEmpty(queueParam)) {
             remittanceParams = JSONObject.parseObject(queueParam, RemittanceParams.class);
-        }
-        else {
+        } else {
             remittanceParams = new RemittanceParams();
             remittanceParams.setGroupName("Weight");
             remittanceParams.setId(paymentRecord.getId());
@@ -69,10 +67,9 @@ public class PaymentCallbackServiceImpl extends BaseService implements PaymentCa
 
         String queueParam = paymentRecord.getQueueParam();
         RemittanceParams remittanceParams;
-        if (StringUtils.isNotEmpty(queueParam)){
+        if (StringUtils.isNotEmpty(queueParam)) {
             remittanceParams = JSONObject.parseObject(queueParam, RemittanceParams.class);
-        }
-        else {
+        } else {
             remittanceParams = new RemittanceParams();
             remittanceParams.setGroupName("Weight");
             remittanceParams.setId(paymentRecord.getId());
@@ -99,10 +96,9 @@ public class PaymentCallbackServiceImpl extends BaseService implements PaymentCa
         // 发送到sunFlowerPay队列
         String queueParam = paymentRecord.getQueueParam();
         RemittanceParams remittanceParams;
-        if (StringUtils.isNotEmpty(queueParam)){
+        if (StringUtils.isNotEmpty(queueParam)) {
             remittanceParams = JSONObject.parseObject(queueParam, RemittanceParams.class);
-        }
-        else {
+        } else {
             remittanceParams = new RemittanceParams();
             remittanceParams.setGroupName("Weight");
             remittanceParams.setId(paymentRecord.getId());
@@ -129,10 +125,9 @@ public class PaymentCallbackServiceImpl extends BaseService implements PaymentCa
         // 发送到oceanPay队列
         String queueParam = paymentRecord.getQueueParam();
         RemittanceParams remittanceParams;
-        if (StringUtils.isNotEmpty(queueParam)){
+        if (StringUtils.isNotEmpty(queueParam)) {
             remittanceParams = JSONObject.parseObject(queueParam, RemittanceParams.class);
-        }
-        else {
+        } else {
             remittanceParams = new RemittanceParams();
             remittanceParams.setGroupName("Weight");
             remittanceParams.setId(paymentRecord.getId());
@@ -160,10 +155,9 @@ public class PaymentCallbackServiceImpl extends BaseService implements PaymentCa
         // 发送到acPay队列
         String queueParam = paymentRecord.getQueueParam();
         RemittanceParams remittanceParams;
-        if (StringUtils.isNotEmpty(queueParam)){
+        if (StringUtils.isNotEmpty(queueParam)) {
             remittanceParams = JSONObject.parseObject(queueParam, RemittanceParams.class);
-        }
-        else {
+        } else {
             remittanceParams = new RemittanceParams();
             remittanceParams.setGroupName("Weight");
             remittanceParams.setId(paymentRecord.getId());
@@ -188,10 +182,9 @@ public class PaymentCallbackServiceImpl extends BaseService implements PaymentCa
         // 发送到incashPay队列
         String queueParam = paymentRecord.getQueueParam();
         RemittanceParams remittanceParams;
-        if (StringUtils.isNotEmpty(queueParam)){
+        if (StringUtils.isNotEmpty(queueParam)) {
             remittanceParams = JSONObject.parseObject(queueParam, RemittanceParams.class);
-        }
-        else {
+        } else {
             remittanceParams = new RemittanceParams();
             remittanceParams.setGroupName("Weight");
             remittanceParams.setId(paymentRecord.getId());
@@ -215,10 +208,9 @@ public class PaymentCallbackServiceImpl extends BaseService implements PaymentCa
         // 发送到incashXjdPay队列
         String queueParam = paymentRecord.getQueueParam();
         RemittanceParams remittanceParams;
-        if (StringUtils.isNotEmpty(queueParam)){
+        if (StringUtils.isNotEmpty(queueParam)) {
             remittanceParams = JSONObject.parseObject(queueParam, RemittanceParams.class);
-        }
-        else {
+        } else {
             remittanceParams = new RemittanceParams();
             remittanceParams.setGroupName("Weight");
             remittanceParams.setId(paymentRecord.getId());
@@ -242,10 +234,9 @@ public class PaymentCallbackServiceImpl extends BaseService implements PaymentCa
         // 发送到trustPay队列
         String queueParam = paymentRecord.getQueueParam();
         RemittanceParams remittanceParams;
-        if (StringUtils.isNotEmpty(queueParam)){
+        if (StringUtils.isNotEmpty(queueParam)) {
             remittanceParams = JSONObject.parseObject(queueParam, RemittanceParams.class);
-        }
-        else {
+        } else {
             remittanceParams = new RemittanceParams();
             remittanceParams.setGroupName("Weight");
             remittanceParams.setId(paymentRecord.getId());
@@ -272,10 +263,9 @@ public class PaymentCallbackServiceImpl extends BaseService implements PaymentCa
         // 发送到qePay队列
         String queueParam = paymentRecord.getQueueParam();
         RemittanceParams remittanceParams;
-        if (StringUtils.isNotEmpty(queueParam)){
+        if (StringUtils.isNotEmpty(queueParam)) {
             remittanceParams = JSONObject.parseObject(queueParam, RemittanceParams.class);
-        }
-        else {
+        } else {
             remittanceParams = new RemittanceParams();
             remittanceParams.setGroupName("Weight");
             remittanceParams.setId(paymentRecord.getId());
@@ -299,10 +289,9 @@ public class PaymentCallbackServiceImpl extends BaseService implements PaymentCa
         // 发送到hrPay队列
         String queueParam = paymentRecord.getQueueParam();
         RemittanceParams remittanceParams;
-        if (StringUtils.isNotEmpty(queueParam)){
+        if (StringUtils.isNotEmpty(queueParam)) {
             remittanceParams = JSONObject.parseObject(queueParam, RemittanceParams.class);
-        }
-        else {
+        } else {
             remittanceParams = new RemittanceParams();
             remittanceParams.setGroupName("Weight");
             remittanceParams.setId(paymentRecord.getId());
@@ -326,10 +315,9 @@ public class PaymentCallbackServiceImpl extends BaseService implements PaymentCa
         // 发送到hrPay队列
         String queueParam = paymentRecord.getQueueParam();
         RemittanceParams remittanceParams;
-        if (StringUtils.isNotEmpty(queueParam)){
+        if (StringUtils.isNotEmpty(queueParam)) {
             remittanceParams = JSONObject.parseObject(queueParam, RemittanceParams.class);
-        }
-        else {
+        } else {
             remittanceParams = new RemittanceParams();
             remittanceParams.setGroupName("Weight");
             remittanceParams.setId(paymentRecord.getId());

@@ -44,14 +44,13 @@ public class BaseService {
     @Autowired
     public PlatformUserOcrBasicInfoDao platformUserOcrBasicInfoDao;
     /**
-     * 贷超相关配置
-     */
-    @Autowired
-    PlatformConfig platformConfig;
-
-    /**
      * 放款账户
      */
     @Autowired
     public LoanRemittanceAccountDao loanRemittanceAccountDao;
+    /**
+     * 贷超相关配置
+     */
+    @Autowired
+    PlatformConfig platformConfig;
 }

@@ -42,6 +42,21 @@ public abstract class BaseRepaymentMQListener {
     @Autowired
     public OrderMQManager orderMQManager;
     /**
+     * 订单
+     */
+    @Autowired
+    public LoanOrderDao loanOrderDao;
+    /**
+     * 订单账单
+     */
+    @Autowired
+    public LoanOrderBillDao loanOrderBillDao;
+    /**
+     * redis工具类
+     */
+    @Autowired
+    public RedisClient redisClient;
+    /**
      * 订单放款记录
      */
     @Autowired
@@ -51,24 +66,6 @@ public abstract class BaseRepaymentMQListener {
      */
     @Autowired
     protected LoanPaymentDao loanPaymentDao;
-
-    /**
-     * 订单
-     */
-    @Autowired
-    public LoanOrderDao loanOrderDao;
-
-    /**
-     * 订单账单
-     */
-    @Autowired
-    public LoanOrderBillDao loanOrderBillDao;
-
-    /**
-     * redis工具类
-     */
-    @Autowired
-    public RedisClient redisClient;
 
     /**
      * 获取子类消息监听
@@ -110,7 +107,7 @@ public abstract class BaseRepaymentMQListener {
      * 重回队列
      *
      * @param distributionRepaymentParams 还款参数
-     * @param subExpression   标签
+     * @param subExpression               标签
      */
     protected void retryDistributionRepayment(DistributionRepaymentParams distributionRepaymentParams, String subExpression) throws Exception {
         repaymentMQManager.sendMessage(distributionRepaymentParams, subExpression, 4);
@@ -146,11 +143,12 @@ public abstract class BaseRepaymentMQListener {
     protected void updateSearchRequestAndResponse(String id, String request, String response) {
         loanRepaymentPaymentRecordDao.updateSearchRequestAndResponse(id, request, response, new Date());
     }
+
     /**
      * 更新实际支付金额
      *
-     * @param id            id
-     * @param actualAmount  实际支付金额
+     * @param id           id
+     * @param actualAmount 实际支付金额
      */
     protected void updateRepaymentPaymentRecordActualAmount(String id, double actualAmount) {
         loanRepaymentPaymentRecordDao.updateRepaymentPaymentRecordActualAmount(id, actualAmount, new Date());

@@ -26,7 +26,6 @@ public class LoginParams extends BaseParams {
     private String password;
 
 
-
     /**
      * 验证手机号是否合法
      *

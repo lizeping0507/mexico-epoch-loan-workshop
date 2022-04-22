@@ -1,13 +1,13 @@
 package com.epoch.loan.workshop.api.aspect;
 
 import com.epoch.loan.workshop.api.annotated.Authentication;
+import com.epoch.loan.workshop.common.authentication.TokenManager;
 import com.epoch.loan.workshop.common.constant.Field;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
 import com.epoch.loan.workshop.common.params.User;
 import com.epoch.loan.workshop.common.params.params.result.Result;
 import com.epoch.loan.workshop.common.util.LogUtil;
 import com.epoch.loan.workshop.common.util.ThrowableUtils;
-import com.epoch.loan.workshop.common.authentication.TokenManager;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;

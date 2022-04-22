@@ -1,14 +1,13 @@
 package com.epoch.loan.workshop.account.repayment.yeah;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.codec.Base64Encoder;
 import com.alibaba.fastjson.JSONObject;
+import com.epoch.loan.workshop.account.repayment.BaseRepayment;
 import com.epoch.loan.workshop.common.constant.LoanRepaymentPaymentRecordStatus;
 import com.epoch.loan.workshop.common.constant.PaymentField;
 import com.epoch.loan.workshop.common.entity.mysql.LoanPaymentEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanRepaymentPaymentRecordEntity;
 import com.epoch.loan.workshop.common.mq.repayment.params.RepaymentParams;
-import com.epoch.loan.workshop.account.repayment.BaseRepayment;
 import com.epoch.loan.workshop.common.util.HttpUtils;
 import com.epoch.loan.workshop.common.util.LogUtil;
 import org.apache.commons.lang3.ObjectUtils;
@@ -35,6 +34,56 @@ import java.util.Map;
 public class YeahPay1 extends BaseRepayment {
 
     private YeahPayToken token;
+
+    /**
+     * 数据签名
+     *
+     * @param yeahPayParams JSONObject
+     * @param signKey       apiKey
+     */
+    public static String sign(YeahPayParams yeahPayParams, String signKey) {
+        String JSONString = JSONObject.toJSONString(yeahPayParams);
+        JSONObject params = JSONObject.parseObject(JSONString);
+
+
+        LinkedList<String> paramNameList = new LinkedList<>();
+        for (String key : params.keySet()) {
+            if (!"sign".equals(key) && !"ext".equals(key)) {
+                paramNameList.add(key);
+            }
+        }
+        Collections.sort(paramNameList);
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < paramNameList.size(); i++) {
+            String name = paramNameList.get(i);
+            stringBuilder.append(params.get(name));
+        }
+        try {
+            return HMACSHA256(stringBuilder.toString() + signKey, signKey, true);
+        } catch (Exception e) {
+            LogUtil.sysError("", e);
+            return null;
+        }
+    }
+
+    /**
+     * HMACSHA256算法生成校验信息
+     */
+    public static String HMACSHA256(String data, String key, Boolean toUpperCase) throws Exception {
+        Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
+        SecretKeySpec secret_key = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
+        sha256_HMAC.init(secret_key);
+        byte[] array = sha256_HMAC.doFinal(data.getBytes(StandardCharsets.UTF_8));
+        StringBuilder sb = new StringBuilder();
+        for (byte item : array) {
+            sb.append(Integer.toHexString((item & 0xFF) | 0x100).substring(1, 3));
+        }
+        if (toUpperCase) {
+            return sb.toString().toUpperCase();
+        } else {
+            return sb.toString().toLowerCase();
+        }
+    }
 
     /**
      * 发起代收
@@ -185,55 +234,5 @@ public class YeahPay1 extends BaseRepayment {
         }
 
         return token.getAccessToken();
-    }
-
-    /**
-     * 数据签名
-     *
-     * @param yeahPayParams JSONObject
-     * @param signKey       apiKey
-     */
-    public static String sign(YeahPayParams yeahPayParams, String signKey) {
-        String JSONString = JSONObject.toJSONString(yeahPayParams);
-        JSONObject params = JSONObject.parseObject(JSONString);
-
-
-        LinkedList<String> paramNameList = new LinkedList<>();
-        for (String key : params.keySet()) {
-            if (!"sign".equals(key) && !"ext".equals(key)) {
-                paramNameList.add(key);
-            }
-        }
-        Collections.sort(paramNameList);
-        StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < paramNameList.size(); i++) {
-            String name = paramNameList.get(i);
-            stringBuilder.append(params.get(name));
-        }
-        try {
-            return HMACSHA256(stringBuilder.toString() + signKey, signKey, true);
-        } catch (Exception e) {
-            LogUtil.sysError("", e);
-            return null;
-        }
-    }
-
-    /**
-     * HMACSHA256算法生成校验信息
-     */
-    public static String HMACSHA256(String data, String key, Boolean toUpperCase) throws Exception {
-        Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
-        SecretKeySpec secret_key = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
-        sha256_HMAC.init(secret_key);
-        byte[] array = sha256_HMAC.doFinal(data.getBytes(StandardCharsets.UTF_8));
-        StringBuilder sb = new StringBuilder();
-        for (byte item : array) {
-            sb.append(Integer.toHexString((item & 0xFF) | 0x100).substring(1, 3));
-        }
-        if (toUpperCase) {
-            return sb.toString().toUpperCase();
-        } else {
-            return sb.toString().toLowerCase();
-        }
     }
 }

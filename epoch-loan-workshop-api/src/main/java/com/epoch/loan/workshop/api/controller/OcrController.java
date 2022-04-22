@@ -233,7 +233,7 @@ public class OcrController extends BaseController {
     /**
      * advance获取证件信息
      *
-     * @param params 获取证件信息请求参数封装类
+     * @param params  获取证件信息请求参数封装类
      * @param request 请求
      * @return 证件信息
      */

@@ -17,7 +17,7 @@ import java.util.List;
  * @packagename: com.epoch.loan.workshop.common.params.result
  */
 @Data
-public class ConfirmMergePushApplyResult  implements Serializable {
+public class ConfirmMergePushApplyResult implements Serializable {
 
     /**
      * 用户id

@@ -19,8 +19,6 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 
 import javax.annotation.PostConstruct;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -90,7 +88,7 @@ public class Application {
                         JSON.parseObject(dynamicRequest.getMappingVirtualParams(), new TypeReference<List<String>>() {
                         }));
             } catch (Exception e) {
-                LogUtil.sysError("[Application loadDynamicRequestConfig]" , e);
+                LogUtil.sysError("[Application loadDynamicRequestConfig]", e);
             }
         });
     }

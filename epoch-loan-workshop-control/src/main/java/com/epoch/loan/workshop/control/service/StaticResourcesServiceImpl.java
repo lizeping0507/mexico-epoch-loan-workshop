@@ -3,7 +3,6 @@ package com.epoch.loan.workshop.control.service;
 import com.epoch.loan.workshop.common.params.params.request.StaticResourcesParam;
 import com.epoch.loan.workshop.common.service.StaticResourcesService;
 import org.apache.dubbo.config.annotation.DubboService;
-import org.springframework.beans.factory.annotation.Value;
 
 /**
  * @author : Shangkunfeng

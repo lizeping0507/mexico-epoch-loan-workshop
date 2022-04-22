@@ -24,6 +24,15 @@ public class RbplSMSChannel implements SMSChannel {
     private LoanSMSChannelConfigEntity loanSMSChannelConfigEntity;
 
     /**
+     * 有参构造函数
+     *
+     * @param loanSMSChannelConfigEntity
+     */
+    public RbplSMSChannel(LoanSMSChannelConfigEntity loanSMSChannelConfigEntity) {
+        this.loanSMSChannelConfigEntity = loanSMSChannelConfigEntity;
+    }
+
+    /**
      * 发送短信验证码
      *
      * @param code
@@ -92,14 +101,5 @@ public class RbplSMSChannel implements SMSChannel {
         // 发送成功
         situation.setResult(true);
         return situation;
-    }
-
-    /**
-     * 有参构造函数
-     *
-     * @param loanSMSChannelConfigEntity
-     */
-    public RbplSMSChannel(LoanSMSChannelConfigEntity loanSMSChannelConfigEntity) {
-        this.loanSMSChannelConfigEntity = loanSMSChannelConfigEntity;
     }
 }

@@ -47,7 +47,7 @@ public class OcrField {
     /**
      * advance 发送带图请求头CONTENT_TYPE的值
      */
-    public static final String ADVANCE_MULTIPART_VALUE= "multipart/form-data; boundary=----------ThIs_Is_tHe_bouNdaRY_$";
+    public static final String ADVANCE_MULTIPART_VALUE = "multipart/form-data; boundary=----------ThIs_Is_tHe_bouNdaRY_$";
 
     /**
      * advance后台配置的 app包路径
@@ -55,7 +55,7 @@ public class OcrField {
     public static final String ADVANCE_APP_ID_KEY = "applicationId";
 
     /**
-     *  redis中存储的advance授权码key
+     * redis中存储的advance授权码key
      */
     public static final String ADVANCE_LICENSE_NAME = "license";
 
@@ -109,7 +109,7 @@ public class OcrField {
     /**
      * advance 获取活体检测结果请求地址key
      */
-    public static final String ADVANCE_LIVENESS_SCORE_URL="livenessScoreUrl";
+    public static final String ADVANCE_LIVENESS_SCORE_URL = "livenessScoreUrl";
 
     /**
      * advance 活体检测分建议阀值key

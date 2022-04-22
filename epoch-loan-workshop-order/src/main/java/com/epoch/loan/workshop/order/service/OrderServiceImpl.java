@@ -503,7 +503,7 @@ public class OrderServiceImpl extends BaseService implements OrderService {
      * @throws Exception 请求异常
      */
     @Override
-    public Result<ConfirmMergePushApplyResult> confirmMergePushApply(ConfirmMergePushApplyParams params) throws Exception{
+    public Result<ConfirmMergePushApplyResult> confirmMergePushApply(ConfirmMergePushApplyParams params) throws Exception {
         // 结果集
         Result<ConfirmMergePushApplyResult> result = new Result<>();
 
