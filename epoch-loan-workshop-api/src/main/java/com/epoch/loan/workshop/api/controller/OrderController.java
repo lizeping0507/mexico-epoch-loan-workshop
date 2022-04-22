@@ -34,6 +34,21 @@ public class OrderController extends BaseController {
         Result result = new Result();
 
         try {
+            // 验证请求参数是否合法
+            if (!bindRemittanceAccountParams.isOrderIdLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":orderId");
+                return result;
+            }
+
+            if (!bindRemittanceAccountParams.isRemittanceAccountIdLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":remittanceAccountId");
+                return result;
+            }
+
             // 订单绑定放款账户
             return orderService.bindRemittanceAccount(bindRemittanceAccountParams);
         } catch (Exception e) {

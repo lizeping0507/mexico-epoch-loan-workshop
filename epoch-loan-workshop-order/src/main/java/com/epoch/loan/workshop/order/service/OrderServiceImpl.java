@@ -37,6 +37,10 @@ public class OrderServiceImpl extends BaseService implements OrderService {
      */
     @Override
     public Result bindRemittanceAccount(BindRemittanceAccountParams bindRemittanceAccountParams) {
+
+
+
+
         return null;
     }
 
