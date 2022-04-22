@@ -23,6 +23,33 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProductController extends BaseController {
 
     /**
+     * 产品详情
+     *
+     * @param params
+     * @return
+     */
+    @PostMapping(URL.PRODUCT_DETAIL)
+    public Result<ProductDetailResult> productDetail(ProductDetailParams params) {
+        // 结果集
+        Result<ProductDetailResult> result = new Result<>();
+
+        try {
+
+
+            return null;
+        } catch (Exception e) {
+            LogUtil.sysError("[ProductController productDetail]", e);
+
+            // 异常返回结果
+            result.setEx(ThrowableUtils.throwableToString(e));
+            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
+            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
+            return result;
+        }
+    }
+
+
+    /**
      * 获取App模式
      *
      * @param params 入参
@@ -138,31 +165,6 @@ public class ProductController extends BaseController {
             return productService.list(params);
         } catch (Exception e) {
             LogUtil.sysError("[ProductController list]", e);
-
-            // 异常返回结果
-            result.setEx(ThrowableUtils.throwableToString(e));
-            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
-            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
-            return result;
-        }
-    }
-
-    /**
-     * 产品详情
-     *
-     * @param params 入参
-     * @return 产品信息
-     */
-    @PostMapping(URL.DETAIL)
-    public Result<ProductDetailResult> detail(ProductDetailParams params) {
-        // 结果集
-        Result<ProductDetailResult> result = new Result<>();
-
-        try {
-            // 产品详情
-            return productService.detail(params);
-        } catch (Exception e) {
-            LogUtil.sysError("[ProductController detail]", e);
 
             // 异常返回结果
             result.setEx(ThrowableUtils.throwableToString(e));
