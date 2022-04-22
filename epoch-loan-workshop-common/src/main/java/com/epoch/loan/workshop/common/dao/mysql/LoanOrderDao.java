@@ -204,4 +204,14 @@ public interface LoanOrderDao {
      * @param updateTime
      */
     void updateBankCardId(String orderId, String remittanceAccountId, Date updateTime);
+
+    /**
+     * 根据用户id查询指定状态的订单
+     *
+     * @param userId
+     * @param productId
+     * @param status
+     * @return
+     */
+    List<LoanOrderEntity> findOrderByUserAndProductIdAndStatus(String userId, String productId, Integer[] status);
 }

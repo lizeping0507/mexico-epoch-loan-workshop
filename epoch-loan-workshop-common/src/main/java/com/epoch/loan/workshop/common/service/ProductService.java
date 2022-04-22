@@ -12,6 +12,13 @@ import com.epoch.loan.workshop.common.params.params.result.*;
  * @description : 产品业务接口
  */
 public interface ProductService {
+    /**
+     * 产品详情
+     *
+     * @param params
+     * @return
+     */
+    Result<ProductDetailResult> productDetail(ProductDetailParams params);
 
     /**
      * 获取用户app模式
@@ -57,15 +64,6 @@ public interface ProductService {
      * @throws Exception 请求异常
      */
     Result<ProductListResult> list(ProductListParams params) throws Exception;
-
-    /**
-     * 产品详情
-     *
-     * @param params 入参
-     * @return Result
-     * @throws Exception 请求异常
-     */
-    Result<ProductDetailResult> detail(ProductDetailParams params) throws Exception;
 
     /**
      * 产品详情页

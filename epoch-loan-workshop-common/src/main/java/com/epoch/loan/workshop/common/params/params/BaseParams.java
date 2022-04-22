@@ -40,11 +40,6 @@ public class BaseParams implements Serializable {
     public String appVersion;
 
     /**
-     * 渠道标识
-     */
-    public String channelCode;
-
-    /**
      * 设备类型
      */
     public String mobileType;

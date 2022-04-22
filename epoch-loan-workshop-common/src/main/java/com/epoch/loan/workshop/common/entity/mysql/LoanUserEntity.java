@@ -26,7 +26,7 @@ public class LoanUserEntity {
     /**
      * 渠道ID
      */
-    private String channelId;
+    private Integer channelId;
 
     /**
      * 推广ID

@@ -2,20 +2,27 @@ package com.epoch.loan.workshop.control.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.epoch.loan.workshop.common.constant.OrderStatus;
 import com.epoch.loan.workshop.common.constant.PlatformUrl;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
+import com.epoch.loan.workshop.common.entity.mysql.LoanOrderEntity;
+import com.epoch.loan.workshop.common.entity.mysql.LoanUserEntity;
 import com.epoch.loan.workshop.common.params.params.BaseParams;
 import com.epoch.loan.workshop.common.params.params.request.*;
 import com.epoch.loan.workshop.common.params.params.result.*;
 import com.epoch.loan.workshop.common.params.params.result.model.PayH5Result;
 import com.epoch.loan.workshop.common.service.ProductService;
 import com.epoch.loan.workshop.common.util.HttpUtils;
+import com.epoch.loan.workshop.common.util.ObjectIdUtil;
 import com.epoch.loan.workshop.common.util.PlatformUtil;
+import com.epoch.loan.workshop.common.zookeeper.UserProductDetailLock;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -27,6 +34,78 @@ import java.util.Map;
  */
 @DubboService(timeout = 5000)
 public class ProductServiceImpl extends BaseService implements ProductService {
+
+    /**
+     * 产品详情
+     *
+     * @param params
+     * @return
+     */
+    @Override
+    public Result<ProductDetailResult> productDetail(ProductDetailParams params) {
+        return null;
+    }
+
+    /**
+     * 初始化订单
+     *
+     * @param userId
+     * @param productId
+     * @param appName
+     * @return
+     */
+    protected String initOrder(String userId, String productId, String appName) {
+        // 锁id
+        String lockId = userId + ":" + productId;
+
+        // 使用分布式锁，防止同时创建多条订单
+        zookeeperClient.lock(new UserProductDetailLock<String>(lockId) {
+            @Override
+            public String execute() {
+                // 查询用户是否有已经创建且未完结的订单
+                Integer[] status = new Integer[]{OrderStatus.CREATE, OrderStatus.EXAMINE_WAIT, OrderStatus.EXAMINE_PASS, OrderStatus.WAIT_PAY, OrderStatus.WAY, OrderStatus.DUE};
+                List<LoanOrderEntity> loanOrderEntityList = loanOrderDao.findOrderByUserAndProductIdAndStatus(userId, productId, status);
+                if (CollectionUtils.isNotEmpty(loanOrderEntityList)) {
+                    return loanOrderEntityList.get(0).getId();
+                }
+
+                // 查询用户信息
+                LoanUserEntity loanUserEntity = loanUserDao.findById(userId);
+
+                // 查询用户指定状态订单
+                status = new Integer[]{OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE};
+                loanOrderEntityList = loanOrderDao.findOrderByUserAndProductIdAndStatus(userId, productId, status);
+
+                // 是否复贷
+                Integer reloan = 0;
+                if (CollectionUtils.isNotEmpty(loanOrderEntityList)) {
+                    reloan = 1;
+                }
+
+                // 订单id
+                String orderId = ObjectIdUtil.getObjectId();
+
+                // 新增订单
+                LoanOrderEntity loanOrderEntity = new LoanOrderEntity();
+                loanOrderEntity = new LoanOrderEntity();
+                loanOrderEntity.setId(orderId);
+                loanOrderEntity.setUserId(userId);
+                loanOrderEntity.setProductId(productId);
+                loanOrderEntity.setUserChannelId(loanUserEntity.getChannelId());
+                loanOrderEntity.setBankCardId("");
+                loanOrderEntity.setReloan(reloan);
+
+                return orderId;
+            }
+        });
+        return null;
+
+    }
+
+    protected Integer userType(String userId, String productId, String appName) {
+        return 0;
+    }
+
 
     /**
      * 获取用户app模式
@@ -293,62 +372,6 @@ public class ProductServiceImpl extends BaseService implements ProductService {
     }
 
     /**
-     * 产品详情
-     *
-     * @param params 入参
-     * @return Result
-     * @throws Exception 请求异常
-     */
-    @Override
-    public Result<ProductDetailResult> detail(ProductDetailParams params) throws Exception {
-        // 结果集
-        Result<ProductDetailResult> result = new Result<>();
-
-        // 拼接请求路径
-        String url = platformConfig.getPlatformDomain() + PlatformUrl.PLATFORM_PRODUCT_DETAIL;
-
-        // 封装请求参数
-        JSONObject requestParam = new JSONObject();
-        requestParam.put("appFlag", params.getAppName());
-        requestParam.put("versionNumber", params.getAppVersion());
-        requestParam.put("mobileType", params.getMobileType());
-        requestParam.put("userId", params.getUserId());
-        requestParam.put("productId", params.getProductId());
-        requestParam.put("approvalGps", params.getApprovalGps());
-        requestParam.put("approvalAddr", params.getApprovalAddr());
-        requestParam.put("orderNo", params.getOrderNo());
-        requestParam.put("appsflyerId", params.getAppsflyerId());
-
-
-        // 封装请求头
-        Map<String, String> headers = new HashMap<>();
-        headers.put("token", params.getToken());
-
-        // 请求
-        String responseStr = HttpUtils.POST_WITH_HEADER(url, requestParam.toJSONString(), headers);
-
-        // 解析响应结果
-        JSONObject responseJson = JSONObject.parseObject(responseStr);
-
-        // 判断接口响应是否正常
-        if (!PlatformUtil.checkResponseCode(result, ProductDetailResult.class, responseJson)) {
-            return result;
-        }
-
-        // 获取结果集
-        JSONObject data = responseJson.getJSONObject("data");
-
-        // 封装结果就
-        ProductDetailResult res = JSONObject.parseObject(data.toJSONString(), ProductDetailResult.class);
-
-        // 封装结果
-        result.setReturnCode(ResultEnum.SUCCESS.code());
-        result.setMessage(ResultEnum.SUCCESS.message());
-        result.setData(res);
-        return result;
-    }
-
-    /**
      * 产品详情页
      *
      * @param params 入参
@@ -578,7 +601,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         requestParam.put("appFlag", params.getAppName());
         requestParam.put("versionNumber", params.getAppVersion());
         requestParam.put("mobileType", params.getMobileType());
-        requestParam.put("userId", params.getUserId());
+
 
         // 封装请求头
         Map<String, String> headers = new HashMap<>();

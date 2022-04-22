@@ -73,4 +73,21 @@
         ORDER BY
         create_time DESC
     </select>
+
+    <select id="findOrderByUserAndProductIdAndStatus"
+            resultType="com.epoch.loan.workshop.common.entity.mysql.LoanOrderEntity">
+        SELECT
+        *
+        FROM
+        loan_order
+        WHERE
+        user_id = #{userId}
+        AND
+        product_id=#{productId}
+        AND
+        status in
+        <foreach collection="status" item="sts" index="index" open="(" close=")" separator=",">
+            #{sts}
+        </foreach>
+    </select>
 </mapper>

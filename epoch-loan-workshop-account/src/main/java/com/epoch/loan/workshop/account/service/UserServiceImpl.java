@@ -120,7 +120,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         LoanUserEntity user = new LoanUserEntity();
         user.setId(ObjectIdUtil.getObjectId());
         user.setAndroidId(params.getAndroidId());
-        user.setChannelId(params.getChannelCode());
+        user.setChannelId(0);
         user.setGaId(params.getGaId());
         user.setImei(params.getImei());
         user.setPlatform(params.getPlatform());

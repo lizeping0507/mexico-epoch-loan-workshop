@@ -6,6 +6,7 @@ import com.epoch.loan.workshop.common.dao.elastic.OcrLivingDetectionLogElasticDa
 import com.epoch.loan.workshop.common.dao.mysql.*;
 import com.epoch.loan.workshop.common.redis.RedisClient;
 import com.epoch.loan.workshop.common.sms.SMSManager;
+import com.epoch.loan.workshop.common.zookeeper.ZookeeperClient;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -16,6 +17,11 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @description : control模块业务基类
  */
 public class BaseService {
+    /**
+     * Zookeeper工具类
+     */
+    @Autowired
+    public ZookeeperClient zookeeperClient;
 
     /**
      * 短信
@@ -76,4 +82,10 @@ public class BaseService {
      */
     @Autowired
     public LoanRemittanceBankDao loanRemittanceBankDao;
+
+    /**
+     * 用户
+     */
+    @Autowired
+    public LoanUserDao loanUserDao;
 }
