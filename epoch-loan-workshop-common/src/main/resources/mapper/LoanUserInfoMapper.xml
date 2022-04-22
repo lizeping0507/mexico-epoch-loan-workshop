@@ -41,7 +41,7 @@
         #{loanUserInfoEntity.createTime}
         )
     </insert>
-    <select id="getByUserId" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanUserInfoEntity">
+    <select id="findUserInfoById" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanUserInfoEntity">
         SELECT * FROM loan_user_info where user_id = #{userId}
     </select>
     <update id="update">

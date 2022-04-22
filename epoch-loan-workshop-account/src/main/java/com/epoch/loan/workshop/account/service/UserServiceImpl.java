@@ -390,7 +390,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         }
 
         // 查询用户详细信息
-        LoanUserInfoEntity userInfo = loanUserInfoDao.getByUserId(user.getId());
+        LoanUserInfoEntity userInfo = loanUserInfoDao.findUserInfoById(user.getId());
         userInfo.setMonthlyIncome(params.getMonthlyIncome());
         userInfo.setPayPeriod(params.getPayPeriod());
         userInfo.setOccupation(params.getOccupation());
@@ -435,7 +435,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         }
 
         // 查询用户详细信息
-        LoanUserInfoEntity userInfo = loanUserInfoDao.getByUserId(user.getId());
+        LoanUserInfoEntity userInfo = loanUserInfoDao.findUserInfoById(user.getId());
         userInfo.setContacts(params.getContacts());
         userInfo.setChildrenNumber(params.getChildrenNumber());
         userInfo.setLiveType(params.getLiveType());

@@ -91,6 +91,11 @@ public class LoanUserInfoEntity {
     private String email;
 
     /**
+     * 年龄
+     */
+    private Integer age;
+
+    /**
      * 学历
      */
     private String education;
