@@ -392,9 +392,14 @@ public class URL {
     public static final String PREPAY = "/prepay";
 
     /**
-     * 保存用户信息
+     * 保存用户基本信息
      */
-    public static final String SAVE_INFO = "/basicInfo/save";
+    public static final String SAVE_BASIC_INFO = "/basicInfo/save";
+
+    /**
+     * 保存用户个人信息
+     */
+    public static final String SAVE_PERSON_INFO = "/personInfo/save";
 
     /**
      * 保存用户信息

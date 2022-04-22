@@ -298,7 +298,7 @@ public class UserController extends BaseController {
      * @param params 入参
      * @return 个人信息
      */
-    @PostMapping(URL.SAVE_INFO)
+    @PostMapping(URL.SAVE_BASIC_INFO)
     public Result<SaveUserInfoResult> saveUserBasicInfo(UserBasicInfoParams params) {
         // 结果集
         Result<SaveUserInfoResult> result = new Result<>();
@@ -394,7 +394,7 @@ public class UserController extends BaseController {
      * @param params 入参
      * @return 个人信息
      */
-    @PostMapping(URL.SAVE_INFO)
+    @PostMapping(URL.SAVE_PERSON_INFO)
     public Result<SaveUserInfoResult> saveUserPersonInfo(UserPersonInfoParams params) {
         // 结果集
         Result<SaveUserInfoResult> result = new Result<>();
