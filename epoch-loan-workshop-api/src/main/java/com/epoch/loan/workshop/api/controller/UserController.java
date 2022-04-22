@@ -454,7 +454,7 @@ public class UserController extends BaseController {
             // 获取个人信息
             return userService.getUserInfo(params);
         } catch (Exception e) {
-            LogUtil.sysError("[UserController getPersonInfo]", e);
+            LogUtil.sysError("[UserController getUserInfo]", e);
 
             // 异常返回结果
             result.setEx(ThrowableUtils.throwableToString(e));
