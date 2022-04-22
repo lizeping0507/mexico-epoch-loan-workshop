@@ -107,8 +107,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         if (namespace.contains("dev") || namespace.contains("test")) {
             registerCode = "0000";
         } else {
-            registerCode = (String) redisClient.get(RedisKeyField.REGISTER_SMS_CODE + RedisKeyField.SPLIT + params.getAppName() + RedisKeyField.SPLIT + params.getMobile());
-            LogUtil.sysInfo("用户注册 : registerCode {}", JSONObject.toJSONString(registerCode));
+            registerCode = (String) redisClient.get(String.format(RedisKeyField.SMS_CODE_TEMPLATE, params.getAppName(), params.getMobile()));
             // TODO 测试用
             registerCode = "0000";
         }
@@ -227,8 +226,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         if (namespace.contains("dev") || namespace.contains("test")) {
             registerCode = "0000";
         } else {
-            registerCode = (String) redisClient.get(RedisKeyField.FORGOTPWD_SMS_CODE + RedisKeyField.SPLIT + params.getAppName() + RedisKeyField.SPLIT + params.getPhoneNumber());
-            LogUtil.sysInfo("忘记密码 : registerCode {}", JSONObject.toJSONString(registerCode));
+            registerCode = (String) redisClient.get(String.format(RedisKeyField.SMS_CODE_TEMPLATE, params.getAppName(), params.getPhoneNumber()));
             // TODO 测试用
             registerCode = "0000";
         }
@@ -369,6 +367,122 @@ public class UserServiceImpl extends BaseService implements UserService {
         result.setReturnCode(ResultEnum.SUCCESS.code());
         result.setMessage(ResultEnum.SUCCESS.message());
         result.setData(data);
+        return result;
+    }
+
+    @Override
+    public Result<SaveUserInfoResult> saveUserInfo(UserInfoParams params) {
+        // 结果集
+        Result<SaveUserInfoResult> result = new Result<>();
+
+        // 查询用户
+        String token = params.getToken();
+        User user = tokenManager.getUserCache(token);
+        if (null == user) {
+            result.setReturnCode(ResultEnum.NO_LOGIN.code());
+            result.setMessage(ResultEnum.NO_LOGIN.message());
+            return result;
+        }
+
+        // 查询用户详细信息
+        LoanUserInfoEntity userInfo = loanUserInfoDao.getByUserId(user.getId());
+
+        // 注入数据
+        if (null != params.getContacts()) {
+            userInfo.setContacts(params.getContacts());
+        }
+
+        if (null != params.getMonthlyIncome()) {
+            userInfo.setMonthlyIncome(params.getMonthlyIncome());
+        }
+
+        if (null != params.getPayPeriod()) {
+            userInfo.setPayPeriod(params.getPayPeriod());
+        }
+
+        if (null != params.getOccupation()) {
+            userInfo.setOccupation(params.getOccupation());
+        }
+
+        if (null != params.getPayMethod()) {
+            userInfo.setPayMethod(params.getPayMethod());
+        }
+
+        if (null != params.getEmail()) {
+            userInfo.setEmail(params.getEmail());
+        }
+
+        if (null != params.getEducation()) {
+            userInfo.setEducation(params.getEducation());
+        }
+
+        if (null != params.getMarital()) {
+            userInfo.setMarital(params.getMarital());
+        }
+
+        if (null != params.getChildrenNumber()) {
+            userInfo.setChildrenNumber(params.getChildrenNumber());
+        }
+
+        if (null != params.getLoanPurpose()) {
+            userInfo.setLoanPurpose(params.getLoanPurpose());
+        }
+
+        if (null != params.getLiveType()) {
+            userInfo.setLiveType(params.getLiveType());
+        }
+
+        if (null != params.getPapersAddress()) {
+            userInfo.setPapersAddress(params.getPapersAddress());
+        }
+
+        if (null != params.getPapersFatherName()) {
+            userInfo.setPapersFatherName(params.getPapersFatherName());
+        }
+
+        if (null != params.getPapersFullName()) {
+            userInfo.setPapersFullName(params.getPapersFullName());
+        }
+
+        if (null != params.getPapersMotherName()) {
+            userInfo.setPapersMotherName(params.getPapersMotherName());
+        }
+
+        if (null != params.getPapersId()) {
+            userInfo.setPapersId(params.getPapersId());
+        }
+
+        if (null != params.getPapersName()) {
+            userInfo.setPapersName(params.getPapersName());
+        }
+
+        if (null != params.getPapersVoterId()) {
+            userInfo.setPapersVoterId(params.getPapersVoterId());
+        }
+
+        // 更新
+        loanUserInfoDao.update(userInfo);
+
+
+        // TODO 更新用户缓存
+        tokenManager.updateUserCache(null);
+
+        result.setReturnCode(ResultEnum.SUCCESS.code());
+        result.setMessage(ResultEnum.SUCCESS.message());
+        return result;
+    }
+
+    /**
+     * 获取用户信息
+     * @param params
+     * @return
+     */
+    @Override
+    public Result<User> getUserInfo(BaseParams params){
+        Result<User> result= new Result<>();
+        result.setData(params.getUser());
+        result.setReturnCode(ResultEnum.SUCCESS.code());
+        result.setMessage(ResultEnum.SUCCESS.message());
         return result;
     }
 
@@ -646,122 +760,6 @@ public class UserServiceImpl extends BaseService implements UserService {
             result.setData(ocrResult);
         }
 
-        return result;
-    }
-
-    @Override
-    public Result<SaveUserInfoResult> saveUserInfo(UserInfoParams params) {
-        // 结果集
-        Result<SaveUserInfoResult> result = new Result<>();
-
-        // 查询用户
-        String token = params.getToken();
-        User user = tokenManager.getUserCache(token);
-        if (null == user) {
-            result.setReturnCode(ResultEnum.NO_LOGIN.code());
-            result.setMessage(ResultEnum.NO_LOGIN.message());
-            return result;
-        }
-
-        // 查询用户详细信息
-        LoanUserInfoEntity userInfo = loanUserInfoDao.getByUserId(user.getId());
-
-        // 注入数据
-        if (null != params.getContacts()) {
-            userInfo.setContacts(params.getContacts());
-        }
-
-        if (null != params.getMonthlyIncome()) {
-            userInfo.setMonthlyIncome(params.getMonthlyIncome());
-        }
-
-        if (null != params.getPayPeriod()) {
-            userInfo.setPayPeriod(params.getPayPeriod());
-        }
-
-        if (null != params.getOccupation()) {
-            userInfo.setOccupation(params.getOccupation());
-        }
-
-        if (null != params.getPayMethod()) {
-            userInfo.setPayMethod(params.getPayMethod());
-        }
-
-        if (null != params.getEmail()) {
-            userInfo.setEmail(params.getEmail());
-        }
-
-        if (null != params.getEducation()) {
-            userInfo.setEducation(params.getEducation());
-        }
-
-        if (null != params.getMarital()) {
-            userInfo.setMarital(params.getMarital());
-        }
-
-        if (null != params.getChildrenNumber()) {
-            userInfo.setChildrenNumber(params.getChildrenNumber());
-        }
-
-        if (null != params.getLoanPurpose()) {
-            userInfo.setLoanPurpose(params.getLoanPurpose());
-        }
-
-        if (null != params.getLiveType()) {
-            userInfo.setLiveType(params.getLiveType());
-        }
-
-        if (null != params.getPapersAddress()) {
-            userInfo.setPapersAddress(params.getPapersAddress());
-        }
-
-        if (null != params.getPapersFatherName()) {
-            userInfo.setPapersFatherName(params.getPapersFatherName());
-        }
-
-        if (null != params.getPapersFullName()) {
-            userInfo.setPapersFullName(params.getPapersFullName());
-        }
-
-        if (null != params.getPapersMotherName()) {
-            userInfo.setPapersMotherName(params.getPapersMotherName());
-        }
-
-        if (null != params.getPapersId()) {
-            userInfo.setPapersId(params.getPapersId());
-        }
-
-        if (null != params.getPapersName()) {
-            userInfo.setPapersName(params.getPapersName());
-        }
-
-        if (null != params.getPapersVoterId()) {
-            userInfo.setPapersVoterId(params.getPapersVoterId());
-        }
-
-        // 更新
-        loanUserInfoDao.update(userInfo);
-
-
-        // TODO 更新用户缓存
-        tokenManager.updateUserCache(null);
-
-        result.setReturnCode(ResultEnum.SUCCESS.code());
-        result.setMessage(ResultEnum.SUCCESS.message());
-        return result;
-    }
-
-    /**
-     * 获取用户信息
-     * @param params
-     * @return
-     */
-    @Override
-    public Result<User> getUserInfo(BaseParams params){
-        Result<User> result= new Result<>();
-        result.setData(params.getUser());
-        result.setReturnCode(ResultEnum.SUCCESS.code());
-        result.setMessage(ResultEnum.SUCCESS.message());
         return result;
     }
 

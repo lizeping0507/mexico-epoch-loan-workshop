@@ -5,6 +5,7 @@ import com.epoch.loan.workshop.common.config.RiskConfig;
 import com.epoch.loan.workshop.common.dao.elastic.OcrLivingDetectionLogElasticDao;
 import com.epoch.loan.workshop.common.dao.mysql.*;
 import com.epoch.loan.workshop.common.redis.RedisClient;
+import com.epoch.loan.workshop.common.sms.SMSManager;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -15,6 +16,12 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @description : control模块业务基类
  */
 public class BaseService {
+
+    /**
+     * 短信
+     */
+    @Autowired
+    public SMSManager smsManager;
 
     /**
      * 动态接口配置
