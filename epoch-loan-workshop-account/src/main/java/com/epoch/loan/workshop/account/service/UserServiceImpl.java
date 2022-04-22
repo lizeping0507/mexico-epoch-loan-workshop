@@ -369,8 +369,14 @@ public class UserServiceImpl extends BaseService implements UserService {
         return result;
     }
 
+    /**
+     * 保存用户基本信息
+     *
+     * @param params
+     * @return
+     */
     @Override
-    public Result<SaveUserInfoResult> saveUserInfo(UserInfoParams params) {
+    public Result<SaveUserInfoResult> saveUserBasicInfo(UserBasicInfoParams params) {
         // 结果集
         Result<SaveUserInfoResult> result = new Result<>();
 
@@ -385,92 +391,67 @@ public class UserServiceImpl extends BaseService implements UserService {
 
         // 查询用户详细信息
         LoanUserInfoEntity userInfo = loanUserInfoDao.getByUserId(user.getId());
-
-        // 注入数据
-        if (null != params.getContacts()) {
-            userInfo.setContacts(params.getContacts());
-        }
-
-        if (null != params.getMonthlyIncome()) {
-            userInfo.setMonthlyIncome(params.getMonthlyIncome());
-        }
-
-        if (null != params.getPayPeriod()) {
-            userInfo.setPayPeriod(params.getPayPeriod());
-        }
-
-        if (null != params.getOccupation()) {
-            userInfo.setOccupation(params.getOccupation());
-        }
-
-        if (null != params.getPayMethod()) {
-            userInfo.setPayMethod(params.getPayMethod());
-        }
-
-        if (null != params.getEmail()) {
-            userInfo.setEmail(params.getEmail());
-        }
-
-        if (null != params.getEducation()) {
-            userInfo.setEducation(params.getEducation());
-        }
-
-        if (null != params.getMarital()) {
-            userInfo.setMarital(params.getMarital());
-        }
-
-        if (null != params.getChildrenNumber()) {
-            userInfo.setChildrenNumber(params.getChildrenNumber());
-        }
-
-        if (null != params.getLoanPurpose()) {
-            userInfo.setLoanPurpose(params.getLoanPurpose());
-        }
-
-        if (null != params.getLiveType()) {
-            userInfo.setLiveType(params.getLiveType());
-        }
-
-        if (null != params.getPapersAddress()) {
-            userInfo.setPapersAddress(params.getPapersAddress());
-        }
-
-        if (null != params.getPapersFatherName()) {
-            userInfo.setPapersFatherName(params.getPapersFatherName());
-        }
-
-        if (null != params.getPapersFullName()) {
-            userInfo.setPapersFullName(params.getPapersFullName());
-        }
-
-        if (null != params.getPapersMotherName()) {
-            userInfo.setPapersMotherName(params.getPapersMotherName());
-        }
-
-        if (null != params.getPapersId()) {
-            userInfo.setPapersId(params.getPapersId());
-        }
-
-        if (null != params.getPapersName()) {
-            userInfo.setPapersName(params.getPapersName());
-        }
-
-        if (null != params.getPapersVoterId()) {
-            userInfo.setPapersVoterId(params.getPapersVoterId());
-        }
+        userInfo.setMonthlyIncome(params.getMonthlyIncome());
+        userInfo.setPayPeriod(params.getPayPeriod());
+        userInfo.setOccupation(params.getOccupation());
+        userInfo.setPayMethod(params.getPayMethod());
+        userInfo.setEmail(params.getEmail());
+        userInfo.setEducation(params.getEducation());
+        userInfo.setMarital(params.getMarital());
+        userInfo.setLoanPurpose(params.getLoanPurpose());
+        userInfo.setCustomFatherName(params.getCustomFatherName());
+        userInfo.setCustomFullName(params.getCustomFullName());
+        userInfo.setCustomMotherName(params.getCustomMotherName());
+        userInfo.setCustomName(params.getCustomName());
 
         // 更新
         loanUserInfoDao.update(userInfo);
 
-
         // TODO 更新用户缓存
-        tokenManager.updateUserCache(null);
+        updateUserCache(user.getId());
+
+        // TODO 更新用户认证信息
 
         result.setReturnCode(ResultEnum.SUCCESS.code());
         result.setMessage(ResultEnum.SUCCESS.message());
         return result;
     }
+    /**
+     * 保存用户个人信息
+     * @param params
+     * @return
+     */
+    @Override
+    public Result<SaveUserInfoResult> saveUserPersonInfo(UserPersonInfoParams params){
+        Result<SaveUserInfoResult> result= new Result<>();
 
+        // 查询用户
+        String token = params.getToken();
+        User user = tokenManager.getUserCache(token);
+        if (null == user) {
+            result.setReturnCode(ResultEnum.NO_LOGIN.code());
+            result.setMessage(ResultEnum.NO_LOGIN.message());
+            return result;
+        }
+
+        // 查询用户详细信息
+        LoanUserInfoEntity userInfo = loanUserInfoDao.getByUserId(user.getId());
+        userInfo.setContacts(params.getContacts());
+        userInfo.setChildrenNumber(params.getChildrenNumber());
+        userInfo.setLiveType(params.getLiveType());
+
+        // 更新
+        loanUserInfoDao.update(userInfo);
+
+        // TODO 更新用户缓存
+        updateUserCache(user.getId());
+
+        // TODO 更新用户认证信息
+
+        result.setReturnCode(ResultEnum.SUCCESS.code());
+        result.setMessage(ResultEnum.SUCCESS.message());
+        return result;
+    }
     /**
      * 获取用户信息
      *

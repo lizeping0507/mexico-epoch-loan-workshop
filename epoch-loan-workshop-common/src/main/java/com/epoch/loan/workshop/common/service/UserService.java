@@ -112,14 +112,13 @@ public interface UserService {
      */
     Result<UserOcrResult> userOcrInfo(UserOcrFullInfoParams params) throws Exception;
 
-
     /**
-     * 保存用户信息
+     * 保存用户基本信息
      *
      * @param params
      * @return
      */
-    Result<SaveUserInfoResult> saveUserInfo(UserInfoParams params);
+    Result<SaveUserInfoResult> saveUserBasicInfo(UserBasicInfoParams params);
 
     /**
      * 获取用户信息
@@ -128,4 +127,11 @@ public interface UserService {
      * @return
      */
     Result<User> getUserInfo(BaseParams params);
+
+    /**
+     * 保存用户个人信息
+     * @param params
+     * @return
+     */
+    Result<SaveUserInfoResult> saveUserPersonInfo(UserPersonInfoParams params);
 }

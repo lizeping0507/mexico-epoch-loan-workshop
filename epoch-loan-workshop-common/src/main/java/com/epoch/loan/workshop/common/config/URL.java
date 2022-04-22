@@ -394,7 +394,7 @@ public class URL {
     /**
      * 保存用户信息
      */
-    public static final String SAVE_INFO = "/info/save";
+    public static final String SAVE_INFO = "/basicInfo/save";
 
     /**
      * 保存用户信息

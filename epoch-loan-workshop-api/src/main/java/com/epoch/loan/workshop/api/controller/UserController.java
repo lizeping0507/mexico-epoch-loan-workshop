@@ -293,21 +293,138 @@ public class UserController extends BaseController {
     }
 
     /**
-     * 保存用户信息
+     * 保存用户基本信息
      *
      * @param params 入参
      * @return 个人信息
      */
     @PostMapping(URL.SAVE_INFO)
-    public Result<SaveUserInfoResult> saveUserInfo(UserInfoParams params) {
+    public Result<SaveUserInfoResult> saveUserBasicInfo(UserBasicInfoParams params) {
         // 结果集
         Result<SaveUserInfoResult> result = new Result<>();
 
         try {
+            if (!params.isMonthlyIncomeLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":MonthlyIncome");
+                return result;
+            }
+            if (!params.isPayPeriodLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":PayPeriod");
+                return result;
+            }
+            if (!params.isOccupationLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":Occupation");
+                return result;
+            }
+            if (!params.isPayMethodLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":PayMethod");
+                return result;
+            }
+            if (!params.isEmailLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":Email");
+                return result;
+            }
+            if (!params.isEducationLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":Education");
+                return result;
+            }
+            if (!params.isMaritalLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":Marital");
+                return result;
+            }
+            if (!params.isLoanPurposeLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":LoanPurpose");
+                return result;
+            }
+            if (!params.isCustomFatherNameLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":CustomFatherName");
+                return result;
+            }
+            if (!params.isCustomFullNameLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":CustomFullName");
+                return result;
+            }
+            if (!params.isCustomMotherNameLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":CustomMotherName");
+                return result;
+            }
+            if (!params.isCustomNameLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":CustomName");
+                return result;
+            }
             // 获取个人信息
-            return userService.saveUserInfo(params);
+            return userService.saveUserBasicInfo(params);
         } catch (Exception e) {
-            LogUtil.sysError("[UserController getPersonInfo]", e);
+            LogUtil.sysError("[UserController saveUserBasicInfo]", e);
+
+            // 异常返回结果
+            result.setEx(ThrowableUtils.throwableToString(e));
+            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
+            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
+            return result;
+        }
+    }
+    /**
+     * 保存用户个人信息
+     *
+     * @param params 入参
+     * @return 个人信息
+     */
+    @PostMapping(URL.SAVE_INFO)
+    public Result<SaveUserInfoResult> saveUserPersonInfo(UserPersonInfoParams params) {
+        // 结果集
+        Result<SaveUserInfoResult> result = new Result<>();
+
+        try {
+
+            if (!params.isContactsLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":Contacts");
+                return result;
+            }
+
+            if (!params.isChildrenNumberLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":ChildrenNumber");
+                return result;
+            }
+
+            if (!params.isLiveTypeLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":LiveType");
+                return result;
+            }
+            // 保存个人信息
+            return userService.saveUserPersonInfo(params);
+        } catch (Exception e) {
+            LogUtil.sysError("[UserController saveUserPersonInfo]", e);
 
             // 异常返回结果
             result.setEx(ThrowableUtils.throwableToString(e));
@@ -341,6 +458,4 @@ public class UserController extends BaseController {
             return result;
         }
     }
-
-
 }

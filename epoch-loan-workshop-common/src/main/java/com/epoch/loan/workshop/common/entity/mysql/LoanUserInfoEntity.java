@@ -151,6 +151,26 @@ public class LoanUserInfoEntity {
     private String papersVoterId;
 
     /**
+     * 父亲名字
+     */
+    private String customFatherName;
+
+    /**
+     * 全名
+     */
+    private String customFullName;
+
+    /**
+     * 母亲名字
+     */
+    private String customMotherName;
+
+    /**
+     * 姓名
+     */
+    private String customName;
+
+    /**
      * 更新时间
      */
     private Date updateTime;
