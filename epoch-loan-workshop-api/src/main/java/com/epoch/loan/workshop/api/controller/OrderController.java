@@ -23,6 +23,31 @@ import org.springframework.web.bind.annotation.RestController;
 public class OrderController extends BaseController {
 
     /**
+     * 订单绑定放款账户
+     *
+     * @param bindRemittanceAccountParams
+     * @return
+     */
+    @PostMapping(URL.BIND_REMITTANCE_ACCOUNT)
+    public Result bindRemittanceAccount(BindRemittanceAccountParams bindRemittanceAccountParams) {
+        // 结果集
+        Result result = new Result();
+
+        try {
+            // 订单绑定放款账户
+            return orderService.bindRemittanceAccount(bindRemittanceAccountParams);
+        } catch (Exception e) {
+            LogUtil.sysError("[OrderController bindRemittanceAccount]", e);
+
+            // 异常返回结果
+            result.setEx(ThrowableUtils.throwableToString(e));
+            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
+            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
+            return result;
+        }
+    }
+
+    /**
      * 获取订单合同参数
      *
      * @param contractParams 订单合同请求封装类

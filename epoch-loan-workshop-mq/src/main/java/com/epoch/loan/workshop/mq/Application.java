@@ -7,7 +7,7 @@ import com.epoch.loan.workshop.common.mq.repayment.RepaymentMQManager;
 import com.epoch.loan.workshop.common.zookeeper.ZookeeperClient;
 import com.epoch.loan.workshop.mq.log.AccessLogStorage;
 import com.epoch.loan.workshop.mq.order.*;
-import com.epoch.loan.workshop.mq.order.screen.*;
+import com.epoch.loan.workshop.mq.order.screen.RiskModelV1;
 import com.epoch.loan.workshop.mq.remittance.DistributionRemittance;
 import com.epoch.loan.workshop.mq.remittance.payment.ac.AcPay;
 import com.epoch.loan.workshop.mq.remittance.payment.fast.FastPay;
@@ -59,25 +59,7 @@ public class Application {
      * 风控V3策略队列
      */
     @Autowired
-    private RiskModelV3 riskModelV3;
-
-    /**
-     * 风控V2策略队列
-     */
-    @Autowired
-    private RiskModelV2 riskModelV2;
-
-    /**
-     * 公有云数据推送
-     */
-    @Autowired
-    private PublicCloudInfoPush publicCloudInfoPush;
-
-    /**
-     * 放款推送
-     */
-    @Autowired
-    private PublicCloudPayPush publicCloudPayPush;
+    private RiskModelV1 riskModelV1;
 
     /**
      * 审批通过
@@ -96,12 +78,6 @@ public class Application {
      */
     @Autowired
     private OrderComplete orderComplete;
-
-    /**
-     * 订单完成
-     */
-    @Autowired
-    private PublicCloudPaySuccessPush publicCloudPaySuccessPush;
 
     /**
      * 订单逾期
@@ -260,14 +236,10 @@ public class Application {
         remittanceMQManagerProduct.init();
         orderComplete.start();
         orderDue.start();
-        publicCloudPayPush.start();
-        publicCloudInfoPush.start();
-        publicCloudPaySuccessPush.start();
         orderRemittance.start();
-        riskModelV3.start();
+        riskModelV1.start();
         orderExaminePass.start();
         orderWay.start();
-        riskModelV2.start();
         distributionRemittance.start();
         yeahPay.start();
         fastPay.start();

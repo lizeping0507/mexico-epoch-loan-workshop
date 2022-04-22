@@ -29,6 +29,16 @@ import java.util.Map;
  */
 @DubboService(timeout = 5000)
 public class OrderServiceImpl extends BaseService implements OrderService {
+    /**
+     * 订单绑定放款账户
+     *
+     * @param bindRemittanceAccountParams
+     * @return
+     */
+    @Override
+    public Result bindRemittanceAccount(BindRemittanceAccountParams bindRemittanceAccountParams) {
+        return null;
+    }
 
     /**
      * 获取订单合同参数

@@ -8,6 +8,7 @@ import com.epoch.loan.workshop.common.entity.mysql.LoanRemittanceAccountEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanRemittanceBankEntity;
 import com.epoch.loan.workshop.common.params.params.BaseParams;
 import com.epoch.loan.workshop.common.params.params.request.AddRemittanceAccountParams;
+import com.epoch.loan.workshop.common.params.params.result.AddRemittanceAccountResult;
 import com.epoch.loan.workshop.common.params.params.result.RemittanceAccountListResult;
 import com.epoch.loan.workshop.common.params.params.result.RemittanceBankListResult;
 import com.epoch.loan.workshop.common.params.params.result.Result;
@@ -83,9 +84,9 @@ public class RemittanceServiceImpl extends BaseService implements RemittanceServ
      * @throws Exception
      */
     @Override
-    public Result addRemittanceAccount(AddRemittanceAccountParams addRemittanceAccountParams) throws Exception {
+    public Result<AddRemittanceAccountResult> addRemittanceAccount(AddRemittanceAccountParams addRemittanceAccountParams) throws Exception {
         // 响应结果
-        Result result = new Result();
+        Result<AddRemittanceAccountResult> result = new Result();
 
         // 账户账号
         String accountNumber = addRemittanceAccountParams.getAccountNumber();
@@ -117,8 +118,9 @@ public class RemittanceServiceImpl extends BaseService implements RemittanceServ
         }
 
         // 新增银行卡
+        String id = ObjectIdUtil.getObjectId();
         LoanRemittanceAccountEntity loanRemittanceAccountEntity = new LoanRemittanceAccountEntity();
-        loanRemittanceAccountEntity.setId(ObjectIdUtil.getObjectId());
+        loanRemittanceAccountEntity.setId(id);
         loanRemittanceAccountEntity.setAccountNumber(accountNumber);
         loanRemittanceAccountEntity.setBank(bank);
         loanRemittanceAccountEntity.setUserId(userId);
@@ -129,8 +131,11 @@ public class RemittanceServiceImpl extends BaseService implements RemittanceServ
         loanRemittanceAccountDao.addRemittanceAccount(loanRemittanceAccountEntity);
 
         // 封装结果
+        AddRemittanceAccountResult addRemittanceAccountResult = new AddRemittanceAccountResult();
+        addRemittanceAccountResult.setId(id);
         result.setReturnCode(ResultEnum.SUCCESS.code());
         result.setMessage(ResultEnum.SUCCESS.message());
+        result.setData(addRemittanceAccountResult);
         return result;
     }
 

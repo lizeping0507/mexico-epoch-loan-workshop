@@ -5,6 +5,7 @@ import com.epoch.loan.workshop.common.config.URL;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
 import com.epoch.loan.workshop.common.params.params.BaseParams;
 import com.epoch.loan.workshop.common.params.params.request.AddRemittanceAccountParams;
+import com.epoch.loan.workshop.common.params.params.result.AddRemittanceAccountResult;
 import com.epoch.loan.workshop.common.params.params.result.RemittanceAccountListResult;
 import com.epoch.loan.workshop.common.params.params.result.RemittanceBankListResult;
 import com.epoch.loan.workshop.common.params.params.result.Result;
@@ -59,9 +60,9 @@ public class RemittanceController extends BaseController {
      */
     @Authentication
     @PostMapping(URL.ADD_REMITTANCE_ACCOUNT)
-    public Result addRemittanceAccount(AddRemittanceAccountParams addRemittanceAccountParams) {
+    public Result<AddRemittanceAccountResult> addRemittanceAccount(AddRemittanceAccountParams addRemittanceAccountParams) {
         // 结果集
-        Result result = new Result();
+        Result<AddRemittanceAccountResult> result = new Result();
 
         try {
             // 验证请求参数是否合法

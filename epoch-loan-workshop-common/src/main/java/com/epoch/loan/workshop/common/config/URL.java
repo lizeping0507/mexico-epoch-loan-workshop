@@ -151,6 +151,11 @@ public class URL {
     public static final String CONTRACT = "/contract";
 
     /**
+     * 合同
+     */
+    public static final String BIND_REMITTANCE_ACCOUNT = "/bindRemittanceAccount";
+
+    /**
      * 发送注册验证码
      */
     public static final String SEND_REGISTER_MESSAGE = "/sendRegisterMessage";

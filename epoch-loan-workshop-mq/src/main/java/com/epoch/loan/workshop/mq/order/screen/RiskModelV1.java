@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.constant.Field;
 import com.epoch.loan.workshop.common.constant.OrderExamineStatus;
 import com.epoch.loan.workshop.common.constant.OrderStatus;
+import com.epoch.loan.workshop.common.constant.UserType;
 import com.epoch.loan.workshop.common.entity.mysql.*;
 import com.epoch.loan.workshop.common.mq.order.params.OrderParams;
 import com.epoch.loan.workshop.common.util.DateUtil;
@@ -30,14 +31,14 @@ import java.util.Map;
 /**
  * @author : Duke
  * @packageName : com.epoch.loan.workshop.mq.order
- * @className : RiskModelV2
+ * @className : RiskModelV3
  * @createTime : 2021/11/16 18:02
- * @description : 风控V2
+ * @description : 风控V3
  */
 @RefreshScope
 @Component
 @Data
-public class RiskModelV2 extends BaseOrderMQListener implements MessageListenerConcurrently {
+public class RiskModelV1 extends BaseOrderMQListener implements MessageListenerConcurrently {
     /**
      * 消息监听器
      */
@@ -86,7 +87,7 @@ public class RiskModelV2 extends BaseOrderMQListener implements MessageListenerC
                 }
 
                 // 请求风控获取结果
-                JSONObject result = sendRiskV2Request(loanOrderEntity);
+                JSONObject result = sendRiskV3Request(loanOrderEntity);
                 if (ObjectUtils.isEmpty(result)) {
                     // 更新对应模型审核状态
                     updateModeExamine(orderId, subExpression(), OrderExamineStatus.FAIL);
@@ -102,8 +103,6 @@ public class RiskModelV2 extends BaseOrderMQListener implements MessageListenerC
                 // 验证状态码
                 if (code == 4009) {
                     /* 查询失败-风控处理中*/
-                    // 更新对应模型审核状态
-                    updateModeExamine(orderId, subExpression(), OrderExamineStatus.WAIT);
                     // 如果超过创建时间3小时 不进队列 走拒绝逻辑
                     LoanOrderExamineEntity loanOrderExamine = loanOrderExamineDao.findByModelNameAndOrderId(orderId, subExpression());
                     if (DateUtil.getIntervalMinute(new Date(), loanOrderExamine.getCreateTime()) > 60 * 3) {
@@ -127,8 +126,14 @@ public class RiskModelV2 extends BaseOrderMQListener implements MessageListenerC
                     // 成功
                     JSONObject data = result.getJSONObject(Field.DATA);
 
+                    // 客群类型
+                    int type = data.getInteger(Field.TYPE);
+
                     // 是否通过
                     int pass = data.getInteger(Field.PASS);
+
+                    // 法制级别
+                    String level = data.getString(Field.LEVEL);
 
                     // 拒绝原因
                     String reason = data.getString(Field.REASON);
@@ -138,17 +143,10 @@ public class RiskModelV2 extends BaseOrderMQListener implements MessageListenerC
                     PlatformProductEntity platformProductEntity = platformProductDao.findProduct(loanOrderEntity.getProductId());
                     Long appId = platformOrderDao.findAppIdByOrderNo(orderId);
 
-
                     // 新增风控监控表 FIXME 新老表
                     PlatformRiskManagementRefuseReasonEntity platformRiskManagementRefuseReasonEntity = new PlatformRiskManagementRefuseReasonEntity();
                     platformRiskManagementRefuseReasonEntity.setOrderNo(orderId);
                     platformRiskManagementRefuseReasonEntity.setUserId(Long.valueOf(loanOrderEntity.getUserId()));
-                    platformRiskManagementRefuseReasonEntity.setUserType(loanOrderEntity.getUserType());
-                    platformRiskManagementRefuseReasonEntity.setLoginName(platformUserEntity.getLoginName());
-                    platformRiskManagementRefuseReasonEntity.setSource(3);
-                    if (pass == 0) {
-                        platformRiskManagementRefuseReasonEntity.setSource(2);
-                    }
                     platformRiskManagementRefuseReasonEntity.setMerchantId(Long.valueOf(platformProductEntity.getMerchantId()));
                     platformRiskManagementRefuseReasonEntity.setProductId(Long.valueOf(loanOrderEntity.getProductId()));
                     platformRiskManagementRefuseReasonEntity.setPass(pass);
@@ -157,58 +155,199 @@ public class RiskModelV2 extends BaseOrderMQListener implements MessageListenerC
                     platformRiskManagementRefuseReasonEntity.setChannelId(Integer.valueOf(loanOrderEntity.getUserChannelId()));
                     platformRiskManagementRefuseReasonEntity.setCreateTime(new Date());
                     platformRiskManagementRefuseReasonEntity.setMoudleTag(loanOrderEntity.getType());
-                    platformRiskManagementRefuseReasonDao.insert(platformRiskManagementRefuseReasonEntity);
+                    platformRiskManagementRefuseReasonEntity.setLoginName(platformUserEntity.getLoginName());
+                    platformRiskManagementRefuseReasonEntity.setSource(3);
 
-                    // 通过
-                    if (pass == 1) {
-                        // 额度
-                        double quota = data.getDouble(Field.QUOTA);
+                    // 真新客
+                    if (type == 21) {
+                        // 新增风控监控表 FIXME 新老表
+                        platformRiskManagementRefuseReasonEntity.setUserType(UserType.NEW);
+                        if (pass == 0) {
+                            platformRiskManagementRefuseReasonEntity.setSource(2);
+                        }
+                        platformRiskManagementRefuseReasonDao.insert(platformRiskManagementRefuseReasonEntity);
 
-                        // 更新订单批准额度 FIXME 新老表
-                        loanOrderDao.updateOrderApprovalAmount(orderId, quota, new Date());
-                        platformOrderDao.updateOrderApprovalAmount(orderId, quota, new Date());
 
-                        // 更新对应模型审核状态
-                        updateModeExamine(orderId, subExpression(), OrderExamineStatus.PASS);
+                        // 更新订单借贷时用户所属客群 FIXME 新老表
+                        loanOrderDao.updateOrderUserType(orderId, UserType.NEW, new Date());
+                        platformOrderDao.updateOrderUserType(orderId, UserType.NEW, new Date());
 
-                        // 发送下一模型
-                        sendNextModel(orderParams, subExpression());
-                        continue;
-                    } else {
-                        // 不通过
-                        // 更新对应模型审核状态
-                        updateModeExamine(orderId, subExpression(), OrderExamineStatus.REFUSE);
+                        // 通过
+                        if (pass == 1) {
+                            LoanMaskEntity loanMaskEntity = loanMaskDao.findLoanMaskByAppNameAndLevel(loanOrderEntity.getAppName(), level);
+                            if (ObjectUtils.isEmpty(loanMaskEntity)) {
+                                // 不通过
+                                // 更新对应模型审核状态
+                                this.updateModeExamine(orderId, subExpression(), OrderExamineStatus.REFUSE);
 
-                        // 更改订单状态 FIXME 新老表
-                        this.updateOrderStatus(orderId, OrderStatus.EXAMINE_FAIL);
-                        platformOrderDao.updateOrderStatus(orderId, 110, new Date());
-                        continue;
+                                // 更改订单状态 FIXME 新老表
+                                platformOrderDao.updateOrderStatus(orderId, 110, new Date());
+                                this.updateOrderStatus(orderId, OrderStatus.EXAMINE_FAIL);
+                                continue;
+                            }
+
+                            // 额度
+                            double quota = data.getDouble(Field.QUOTA);
+
+                            // 更新订单所借产品 FIXME 新老表
+                            loanOrderDao.updateOrderProductId(orderId, loanMaskEntity.getProductId(), new Date());
+                            platformOrderDao.updateOrderMerchantId(orderId, platformProductEntity.getMerchantId(), new Date());
+                            platformOrderDao.updateOrderProductId(orderId, loanMaskEntity.getProductId(), new Date());
+
+                            // 更新订单批准额度 FIXME 新老表
+                            loanOrderDao.updateOrderApprovalAmount(orderId, quota, new Date());
+                            platformOrderDao.updateOrderApprovalAmount(orderId, quota, new Date());
+
+                            // 更新对应模型审核状态
+                            updateModeExamine(orderId, subExpression(), OrderExamineStatus.PASS);
+
+                            // 发送下一模型
+                            sendNextModel(orderParams, subExpression());
+                            continue;
+                        } else {
+                            // 不通过
+                            // 更新对应模型审核状态
+                            updateModeExamine(orderId, subExpression(), OrderExamineStatus.REFUSE);
+
+                            // 更改订单状态 FIXME 新老表
+                            this.updateOrderStatus(orderId, OrderStatus.EXAMINE_FAIL);
+                            platformOrderDao.updateOrderStatus(orderId, 110, new Date());
+                            continue;
+                        }
+                    }
+
+                    // 假新客
+                    if (type == 20) {
+                        // 新增风控监控表 FIXME 新老表
+                        platformRiskManagementRefuseReasonEntity.setUserType(UserType.OLD);
+                        if (pass == 0) {
+                            platformRiskManagementRefuseReasonEntity.setSource(2);
+                        }
+                        platformRiskManagementRefuseReasonDao.insert(platformRiskManagementRefuseReasonEntity);
+
+                        // 更新订单借贷时用户所属客群 FIXME 新老表
+                        loanOrderDao.updateOrderUserType(orderId, UserType.OLD, new Date());
+                        platformOrderDao.updateOrderUserType(orderId, UserType.OLD, new Date());
+
+                        // 通过
+                        if (pass == 1) {
+                            LoanMaskEntity loanMaskEntity = loanMaskDao.findLoanMaskByAppNameAndLevel(loanOrderEntity.getAppName(), level);
+                            if (ObjectUtils.isEmpty(loanMaskEntity)) {
+                                // 不通过
+                                // 更新对应模型审核状态
+                                updateModeExamine(orderId, subExpression(), OrderExamineStatus.REFUSE);
+
+                                // 更改订单状态 FIXME 新老表
+                                platformOrderDao.updateOrderStatus(orderId, 110, new Date());
+                                this.updateOrderStatus(orderId, OrderStatus.EXAMINE_FAIL);
+                                continue;
+                            }
+
+                            // 额度
+                            double quota = data.getDouble(Field.QUOTA);
+
+                            // 更新订单所借产品 FIXME 新老表
+                            loanOrderDao.updateOrderProductId(orderId, loanMaskEntity.getProductId(), new Date());
+                            platformOrderDao.updateOrderMerchantId(orderId, platformProductEntity.getMerchantId(), new Date());
+                            platformOrderDao.updateOrderProductId(orderId, loanMaskEntity.getProductId(), new Date());
+
+                            // 更新订单批准额度 FIXME 新老表
+                            loanOrderDao.updateOrderApprovalAmount(orderId, quota, new Date());
+                            platformOrderDao.updateOrderApprovalAmount(orderId, quota, new Date());
+
+                            // 更新对应模型审核状态
+                            updateModeExamine(orderId, subExpression(), OrderExamineStatus.PASS);
+
+                            // 发送下一模型
+                            sendNextModel(orderParams, subExpression());
+                            continue;
+                        } else {
+                            // 拖住他成为老客
+                            updateModeExamine(orderId, subExpression(), OrderExamineStatus.WAIT);
+                            continue;
+                        }
+                    }
+
+                    // 老客
+                    if (type == 1) {
+                        // 新增风控监控表 FIXME 新老表
+                        platformRiskManagementRefuseReasonEntity.setUserType(UserType.OLD);
+                        if (pass == 0) {
+                            platformRiskManagementRefuseReasonEntity.setSource(2);
+                        }
+                        platformRiskManagementRefuseReasonDao.insert(platformRiskManagementRefuseReasonEntity);
+
+                        // 更新订单借贷时用户所属客群 FIXME 新老表
+                        loanOrderDao.updateOrderUserType(orderId, UserType.OLD, new Date());
+                        platformOrderDao.updateOrderUserType(orderId, UserType.OLD, new Date());
+
+                        // 通过
+                        if (pass == 1) {
+                            LoanMaskEntity loanMaskEntity = loanMaskDao.findLoanMaskByAppNameAndLevel(loanOrderEntity.getAppName(), level);
+                            if (ObjectUtils.isEmpty(loanMaskEntity)) {
+                                // 不通过
+                                // 更新对应模型审核状态
+                                updateModeExamine(orderId, subExpression(), OrderExamineStatus.REFUSE);
+
+                                // 更改订单状态 FIXME 新老表
+                                platformOrderDao.updateOrderStatus(orderId, 110, new Date());
+                                this.updateOrderStatus(orderId, OrderStatus.EXAMINE_FAIL);
+                                continue;
+                            }
+
+                            // 额度
+                            double quota = data.getDouble(Field.QUOTA);
+
+                            // 更新订单所借产品 FIXME 新老表
+                            loanOrderDao.updateOrderProductId(orderId, loanMaskEntity.getProductId(), new Date());
+                            platformOrderDao.updateOrderMerchantId(orderId, platformProductEntity.getMerchantId(), new Date());
+                            platformOrderDao.updateOrderProductId(orderId, loanMaskEntity.getProductId(), new Date());
+
+                            // 更新订单批准额度 FIXME 新老表
+                            loanOrderDao.updateOrderApprovalAmount(orderId, quota, new Date());
+                            platformOrderDao.updateOrderApprovalAmount(orderId, quota, new Date());
+
+                            // 更新对应模型审核状态
+                            updateModeExamine(orderId, subExpression(), OrderExamineStatus.PASS);
+
+                            // 发送下一模型
+                            sendNextModel(orderParams, subExpression());
+                            continue;
+                        } else {
+                            // 不通过
+                            // 更新对应模型审核状态
+                            updateModeExamine(orderId, subExpression(), OrderExamineStatus.REFUSE);
+
+                            // 更改订单状态 FIXME 新老表
+                            this.updateOrderStatus(orderId, OrderStatus.EXAMINE_FAIL);
+                            platformOrderDao.updateOrderStatus(orderId, 110, new Date());
+                            continue;
+                        }
                     }
                 } else {
                     /* 查询失败*/
-                    // 更新对应模型审核状态
-                    updateModeExamine(orderId, subExpression(), OrderExamineStatus.FAIL);
-
                     // 异常,重试
                     retry(orderParams, subExpression());
+
+                    // 更新对应模型审核状态
+                    updateModeExamine(orderId, subExpression(), OrderExamineStatus.FAIL);
                     continue;
                 }
             } catch (Exception e) {
                 try {
-                    // 更新对应模型审核状态
-                    updateModeExamine(orderParams.getOrderId(), subExpression(), OrderExamineStatus.FAIL);
-
                     // 异常,重试
                     retry(orderParams, subExpression());
+
+                    // 更新对应模型审核状态
+                    updateModeExamine(orderParams.getOrderId(), subExpression(), OrderExamineStatus.FAIL);
                 } catch (Exception exception) {
-                    LogUtil.sysError("[RiskModelV2]", exception);
+                    LogUtil.sysError("[RiskModelV3]", exception);
                 }
 
-                LogUtil.sysError("[RiskModelV2]", e);
+                LogUtil.sysError("[RiskModelV3]", e);
             }
         }
         return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
-
     }
 
 
@@ -218,7 +357,7 @@ public class RiskModelV2 extends BaseOrderMQListener implements MessageListenerC
      * @param loanOrderEntity
      * @return
      */
-    private JSONObject sendRiskV2Request(LoanOrderEntity loanOrderEntity) {
+    private JSONObject sendRiskV3Request(LoanOrderEntity loanOrderEntity) {
         try {
             // 用户Id
             String userId = loanOrderEntity.getUserId();
@@ -245,11 +384,11 @@ public class RiskModelV2 extends BaseOrderMQListener implements MessageListenerC
             PlatformUserPanDistinguishInfoEntity platformUserPanDistinguishInfoEntity = platformUserPanDistinguishInfoDao.findUserPanDistinguishInfo(userId);
 
             // 查询用户银行卡
-            PlatformUserBankCardEntity platformUserBankCardEntity = null;//TODO  = platformUserBankCardDao.findUserBankCardById(loanOrderEntity.getBankCardId());
+            PlatformUserBankCardEntity platformUserBankCardEntity  = null;//TODO = platformUserBankCardDao.findUserBankCardById(loanOrderEntity.getBankCardId());
 
             // 封装请求参数
             Map<String, String> params = new HashMap<>();
-            params.put(Field.METHOD, "riskmanagement.decision.model.dc.v2.0");
+            params.put(Field.METHOD, "riskmanagement.decision.model.dc.v3.0");
             params.put(Field.APP_ID, riskConfig.getAppId());
             params.put(Field.VERSION, "1.0");
             params.put(Field.SIGN_TYPE, "RSA");
@@ -315,7 +454,7 @@ public class RiskModelV2 extends BaseOrderMQListener implements MessageListenerC
             // 返回响应参数
             return JSONObject.parseObject(result);
         } catch (Exception e) {
-            LogUtil.sysError("[RiskModelV2 sendRiskV2Request]", e);
+            LogUtil.sysError("[RiskModelV3 sendRiskV3Request]", e);
             return null;
         }
     }

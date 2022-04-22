@@ -2,6 +2,7 @@ package com.epoch.loan.workshop.common.service;
 
 import com.epoch.loan.workshop.common.params.params.BaseParams;
 import com.epoch.loan.workshop.common.params.params.request.AddRemittanceAccountParams;
+import com.epoch.loan.workshop.common.params.params.result.AddRemittanceAccountResult;
 import com.epoch.loan.workshop.common.params.params.result.RemittanceAccountListResult;
 import com.epoch.loan.workshop.common.params.params.result.RemittanceBankListResult;
 import com.epoch.loan.workshop.common.params.params.result.Result;
@@ -30,7 +31,7 @@ public interface RemittanceService {
      * @return
      * @throws Exception
      */
-    Result addRemittanceAccount(AddRemittanceAccountParams addRemittanceAccountParams) throws Exception;
+    Result<AddRemittanceAccountResult> addRemittanceAccount(AddRemittanceAccountParams addRemittanceAccountParams) throws Exception;
 
     /**
      * 银行账户列表

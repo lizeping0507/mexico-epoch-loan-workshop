@@ -11,6 +11,13 @@ import com.epoch.loan.workshop.common.params.params.result.*;
  * @description : 订单
  */
 public interface OrderService {
+    /**
+     * 订单绑定放款账户
+     *
+     * @param bindRemittanceAccountParams
+     * @return
+     */
+    Result bindRemittanceAccount(BindRemittanceAccountParams bindRemittanceAccountParams);
 
     /**
      * 获取订单合同参数
