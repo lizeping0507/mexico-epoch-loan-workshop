@@ -43,14 +43,6 @@ public class OcrController extends BaseController {
         Result<ChannelTypeResult> result = new Result<>();
 
         try {
-            // 验证请求参数是否合法
-            if (params.isAppNameLegal()) {
-                // 异常返回结果
-                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":appName");
-                return result;
-            }
-
             // 获取用户OCR认证提供商
             return ocrService.getOcrChannelType(params);
         } catch (Exception e) {
@@ -77,14 +69,6 @@ public class OcrController extends BaseController {
         Result<LicenseResult> result = new Result<>();
 
         try {
-            // 验证请求参数是否合法
-            if (params.isAppNameLegal()) {
-                // 异常返回结果
-                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":appName");
-                return result;
-            }
-
             // 获取advance的license
             return ocrService.advanceLicense(params);
         } catch (Exception e) {
@@ -112,13 +96,6 @@ public class OcrController extends BaseController {
 
         try {
             // 验证请求参数是否合法
-            if (params.isAppNameLegal()) {
-                // 异常返回结果
-                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":appName");
-                return result;
-            }
-
             if (params.isLivenessIdLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
@@ -201,14 +178,6 @@ public class OcrController extends BaseController {
         Result<Object> result = new Result<>();
 
         try {
-            // 验证请求参数是否合法
-            if (params.isAppNameLegal()) {
-                // 异常返回结果
-                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":appName");
-                return result;
-            }
-
             MultipartResolver resolver = new StandardServletMultipartResolver();
             MultipartHttpServletRequest mRequest = resolver.resolveMultipart(request);
             Map<String, MultipartFile> fileMap = mRequest.getFileMap();
@@ -242,14 +211,6 @@ public class OcrController extends BaseController {
         Result<UserFaceComparisonResult> result = new Result<>();
 
         try {
-            // 验证请求参数是否合法
-            if (params.isAppNameLegal()) {
-                // 异常返回结果
-                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":appName");
-                return result;
-            }
-
             MultipartResolver resolver = new StandardServletMultipartResolver();
             MultipartHttpServletRequest mRequest = resolver.resolveMultipart(request);
             Map<String, MultipartFile> fileMap = mRequest.getFileMap();
@@ -284,13 +245,6 @@ public class OcrController extends BaseController {
 
         try {
             // 验证请求参数是否合法
-            if (params.isAppNameLegal()) {
-                // 异常返回结果
-                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":appName");
-                return result;
-            }
-
             if (params.isImageTypeLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
