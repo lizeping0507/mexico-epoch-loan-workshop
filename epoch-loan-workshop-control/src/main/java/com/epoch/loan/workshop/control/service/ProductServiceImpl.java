@@ -304,47 +304,11 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         // 结果集
         Result<ProductDetailResult> result = new Result<>();
 
-        // 拼接请求路径
-        String url = platformConfig.getPlatformDomain() + PlatformUrl.PLATFORM_PRODUCT_DETAIL;
-
-        // 封装请求参数
-        JSONObject requestParam = new JSONObject();
-        requestParam.put("appFlag", params.getAppName());
-        requestParam.put("versionNumber", params.getAppVersion());
-        requestParam.put("mobileType", params.getMobileType());
-        requestParam.put("userId", params.getUserId());
-        requestParam.put("productId", params.getProductId());
-        requestParam.put("approvalGps", params.getApprovalGps());
-        requestParam.put("approvalAddr", params.getApprovalAddr());
-        requestParam.put("orderNo", params.getOrderNo());
-        requestParam.put("appsflyerId", params.getAppsflyerId());
-
-
-        // 封装请求头
-        Map<String, String> headers = new HashMap<>();
-        headers.put("token", params.getToken());
-
-        // 请求
-        String responseStr = HttpUtils.POST_WITH_HEADER(url, requestParam.toJSONString(), headers);
-
-        // 解析响应结果
-        JSONObject responseJson = JSONObject.parseObject(responseStr);
-
-        // 判断接口响应是否正常
-        if (!PlatformUtil.checkResponseCode(result, ProductDetailResult.class, responseJson)) {
-            return result;
-        }
-
-        // 获取结果集
-        JSONObject data = responseJson.getJSONObject("data");
-
-        // 封装结果就
-        ProductDetailResult res = JSONObject.parseObject(data.toJSONString(), ProductDetailResult.class);
 
         // 封装结果
         result.setReturnCode(ResultEnum.SUCCESS.code());
         result.setMessage(ResultEnum.SUCCESS.message());
-        result.setData(res);
+        // result.setData(res);
         return result;
     }
 
