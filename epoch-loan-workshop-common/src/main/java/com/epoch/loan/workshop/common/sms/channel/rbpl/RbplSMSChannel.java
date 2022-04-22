@@ -40,7 +40,7 @@ public class RbplSMSChannel implements SMSChannel {
         JSONObject configJSon = JSONObject.parseObject(loanSMSChannelConfigEntity.getConfig());
 
         // 获取短信内容
-        String verificationCodeContent = configJSon.getString("verificationCodeContent");
+        String verificationCodeContent = configJSon.getString("verificationCodeContent").replace("{code}", code);
 
         // 访问Key
         String accessKey = configJSon.getString("accessKey");
