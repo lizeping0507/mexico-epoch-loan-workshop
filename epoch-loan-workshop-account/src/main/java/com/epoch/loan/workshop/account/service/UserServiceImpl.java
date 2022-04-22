@@ -474,51 +474,6 @@ public class UserServiceImpl extends BaseService implements UserService {
     }
 
     /**
-     * 用户OCR识别信息保存
-     *
-     * @param params 保存用户OCR识别信息请求参数封装类
-     * @return 保存成功与否
-     * @throws Exception 请求异常
-     */
-    @Override
-    public Result<Object> saveOcrInfo(UserOcrInfoParams params) throws Exception {
-        // 结果集
-        Result<Object> result = new Result<>();
-
-        // 拼接请求路径
-        String url = platformConfig.getPlatformDomain() + PlatformUrl.PLATFORM_SAVE_OCR_INFO;
-
-        // 封装请求参数
-        JSONObject requestParam = new JSONObject();
-        requestParam.put("appFlag", params.getAppName());
-        requestParam.put("versionNumber", params.getAppVersion());
-        requestParam.put("mobileType", params.getMobileType());
-        requestParam.put("userId", params.getUserId());
-        requestParam.put("type", params.getType());
-        requestParam.put("info", params.getInfo());
-
-        // 封装请求头
-        Map<String, String> headers = new HashMap<>();
-        headers.put("token", params.getToken());
-
-        // 请求
-        String responseStr = HttpUtils.POST_WITH_HEADER(url, requestParam.toJSONString(), headers);
-
-        // 解析响应结果
-        JSONObject responseJson = JSONObject.parseObject(responseStr);
-
-        // 判断接口响应是否正常
-        if (!PlatformUtil.checkResponseCode(result, Object.class, responseJson)) {
-            return result;
-        }
-
-        // 封装结果
-        result.setReturnCode(ResultEnum.SUCCESS.code());
-        result.setMessage(ResultEnum.SUCCESS.message());
-        return result;
-    }
-
-    /**
      * 获取用户OCR保存信息
      *
      * @param params 请求参数封装
@@ -526,7 +481,7 @@ public class UserServiceImpl extends BaseService implements UserService {
      * @throws Exception 请求异常
      */
     @Override
-    public Result<UserOcrBasicInfoResult> getOcrInfo(MineParams params) throws Exception {
+    public Result<UserOcrBasicInfoResult> getOcrInfo(BaseParams params) throws Exception {
         // 结果集
         Result<UserOcrBasicInfoResult> result = new Result<>();
 
@@ -635,8 +590,8 @@ public class UserServiceImpl extends BaseService implements UserService {
         String frontPath = BusinessNameUtils.createUserIdTypeFileName(NameField.USR_ID, user.getUserInfoId(), NameField.FRONT_IMAGE_TYPE);
         String frontImageUrl = OssFileUtils.uploadFileAndGetUrl(userFileBucketName, frontPath, convertToFile(params.getIdFrontImgData()), null);
         if (StringUtils.isBlank(frontImageUrl)) {
-            result.setReturnCode(ResultEnum.RFC_INF_CERTIFIED_ERROR.code());
-            result.setMessage(ResultEnum.RFC_INF_CERTIFIED_ERROR.message());
+            result.setReturnCode(ResultEnum.KYC_UPLOAD_FILE_ERROR.code());
+            result.setMessage(ResultEnum.KYC_UPLOAD_FILE_ERROR.message());
             return result;
         }
 
