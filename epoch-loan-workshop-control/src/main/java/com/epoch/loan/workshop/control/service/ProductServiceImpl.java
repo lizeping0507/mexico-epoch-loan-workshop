@@ -2,14 +2,9 @@ package com.epoch.loan.workshop.control.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.epoch.loan.workshop.common.constant.OrderExamineStatus;
-import com.epoch.loan.workshop.common.constant.OrderStatus;
-import com.epoch.loan.workshop.common.constant.PlatformUrl;
-import com.epoch.loan.workshop.common.constant.ResultEnum;
-import com.epoch.loan.workshop.common.entity.mysql.LoanOrderEntity;
-import com.epoch.loan.workshop.common.entity.mysql.LoanOrderExamineEntity;
-import com.epoch.loan.workshop.common.entity.mysql.LoanProductEntity;
-import com.epoch.loan.workshop.common.entity.mysql.LoanUserEntity;
+import com.epoch.loan.workshop.common.constant.*;
+import com.epoch.loan.workshop.common.entity.mysql.*;
+import com.epoch.loan.workshop.common.params.User;
 import com.epoch.loan.workshop.common.params.params.BaseParams;
 import com.epoch.loan.workshop.common.params.params.request.*;
 import com.epoch.loan.workshop.common.params.params.result.*;
@@ -18,7 +13,9 @@ import com.epoch.loan.workshop.common.service.ProductService;
 import com.epoch.loan.workshop.common.util.HttpUtils;
 import com.epoch.loan.workshop.common.util.ObjectIdUtil;
 import com.epoch.loan.workshop.common.util.PlatformUtil;
+import com.epoch.loan.workshop.common.util.RSAUtils;
 import com.epoch.loan.workshop.common.zookeeper.UserProductDetailLock;
+import com.sun.org.apache.regexp.internal.RE;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -44,22 +41,169 @@ public class ProductServiceImpl extends BaseService implements ProductService {
      *
      * @param params
      * @return
+     * @throws Exception
      */
     @Override
-    public Result<ProductDetailResult> productDetail(ProductDetailParams params) {
+    public Result<ProductDetailResult> productDetail(ProductDetailParams params) throws Exception {
+        // 结果集
+        Result<ProductDetailResult> result = new Result<>();
+
+        // 产品id
+        String productId = params.getProductId();
+
+        // 用户id
+        String userId = params.getUser().getId();
+
+        // app版本
+        String appVersion = params.getAppVersion();
+
+        // app名称
+        String appName = params.getAppName();
+
+        // 查询产品详情
+        LoanProductEntity loanProductEntity = loanProductDao.findProduct(productId);
+        if (ObjectUtils.isEmpty(loanProductEntity)) {
+            // 封装结果
+            result.setReturnCode(ResultEnum.NO_EXITS.code());
+            result.setMessage(ResultEnum.NO_EXITS.message());
+            return result;
+        }
+
+        // 订单审核模型
+        String orderModelGroup = loanProductEntity.getOrderModelGroup();
+
+        // 更新GPS信息(userInfo实时) TODO
+
+        // 初始化订单
+        LoanOrderEntity loanOrderEntity = initOrder(userId, OrderType.LOAN, appVersion, appName, orderModelGroup, loanProductEntity);
+
+        // 订单状态
+        Integer orderStatus = loanOrderEntity.getStatus();
+        if (orderStatus == OrderStatus.CREATE) {
+            // 如果订单状态处于创建状态，进行多投判断
+
+
+        }
+
+
         return null;
+    }
+
+
+    protected boolean rejectionRule(LoanOrderEntity loanOrderEntity, User user) throws Exception {
+        // 模型名称
+        String subExpression = "rejectionRule";
+
+        // 用户id
+        String userId = loanOrderEntity.getUserId();
+
+        // 注册地址
+        String registerAddress = user.getRegisterAddress();
+
+        // 订单id
+        String orderId = loanOrderEntity.getId();
+
+        // 用户客群
+        Integer userType = loanOrderEntity.getUserType();
+
+        // 手机哈
+        String mobile = user.getMobile();
+
+        // app名称
+        String appName = loanOrderEntity.getAppName();
+
+        // 渠道ID
+        Integer userChannelId = loanOrderEntity.getUserChannelId();
+
+        // 查询渠道信息
+        PlatformChannelEntity platformChannelEntity = platformChannelDao.findChannel(userChannelId);
+
+        // 渠道名称
+        String channelName = platformChannelEntity.getChannelName();
+
+
+        // 封装请求参数
+        Map<String, String> params = new HashMap<>();
+        params.put(Field.METHOD, "riskmanagement.mexico.rejection.rule");
+        params.put(Field.APP_ID, riskConfig.getAppId());
+        params.put(Field.VERSION, "1.0");
+        params.put(Field.SIGN_TYPE, "RSA");
+        params.put(Field.FORMAT, "json");
+        params.put(Field.TIMESTAMP, String.valueOf(System.currentTimeMillis() / 1000));
+        JSONObject bizData = new JSONObject();
+        bizData.put("transactionId", userId);
+        bizData.put("borrowId", orderId);
+        bizData.put("progress", 0);
+        bizData.put("registerAddr", registerAddress);
+        bizData.put("channelName", channelName);
+        bizData.put("singleQuantity", ""); // 单包在贷笔数
+        bizData.put("allQuantity", ""); // 多包在贷笔数
+        bizData.put("repaymentTime", ""); // 第一笔还款距今天数
+        bizData.put("userType", userType);
+        bizData.put("phone", mobile);
+        bizData.put("appName", appName);
+        params.put(Field.BIZ_DATA, bizData.toJSONString());
+
+        // 生成签名
+        String paramsStr = RSAUtils.getSortParams(params);
+        String sign = RSAUtils.addSign(riskConfig.getPrivateKey(), paramsStr);
+        params.put(Field.SIGN, sign);
+
+        // 请求参数
+        String requestParams = JSONObject.toJSONString(params);
+
+        // 更新节点请求数据
+        loanOrderExamineDao.updateOrderExamineRequest(loanOrderEntity.getId(), subExpression, requestParams, new Date());
+
+        // 发送请求
+        String result = HttpUtils.POST_FORM(riskConfig.getRiskUrl(), requestParams);
+        if (StringUtils.isEmpty(result)) {
+            return false;
+        }
+
+        // 更新节点响应数据
+        loanOrderExamineDao.updateOrderExamineResponse(loanOrderEntity.getId(), subExpression, result, new Date());
+
+        // 转换为JSON
+        JSONObject resultJson = JSONObject.parseObject(result);
+
+        // 返回码
+        Integer code = resultJson.getInteger(Field.ERROR);
+        if (code != 200) {
+            return false;
+        }
+
+        // 成功
+        JSONObject data = resultJson.getJSONObject(Field.DATA);
+
+        // 是否通过
+        int pass = data.getInteger(Field.PASS);
+
+        // 未通过
+        if (pass == 0) {
+            // 更新审核状态
+            loanOrderExamineDao.updateOrderExamineStatus(orderId, subExpression, OrderExamineStatus.REFUSE, new Date());
+            return false;
+        }
+
+        // 通过
+        loanOrderExamineDao.updateOrderExamineStatus(orderId, subExpression, OrderExamineStatus.PASS, new Date());
+        return true;
     }
 
     /**
      * 初始化订单
      *
      * @param userId
-     * @param productEntity
-     * @param orderModelGroup
+     * @param type
+     * @param appVersion
      * @param appName
+     * @param orderModelGroup
+     * @param productEntity
      * @return
+     * @throws Exception
      */
-    protected LoanOrderEntity initOrder(String userId, Integer type, String appVersion, String orderModelGroup, String appName, LoanProductEntity productEntity) throws Exception {
+    protected LoanOrderEntity initOrder(String userId, Integer type, String appVersion, String appName, String orderModelGroup, LoanProductEntity productEntity) throws Exception {
         // 使用分布式锁，防止同时创建多条订单
         String orderId = zookeeperClient.lock(new UserProductDetailLock<String>(userId) {
             @Override
@@ -145,6 +289,18 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                     loanOrderExamineEntity.setCreateTime(new Date());
                     loanOrderExamineDao.insertOrderExamine(loanOrderExamineEntity);
                 });
+
+                // 判断当前初始化订单是什么类型
+                if (OrderType.LOAN == type) {
+                    LoanOrderExamineEntity loanOrderExamineEntity = new LoanOrderExamineEntity();
+                    loanOrderExamineEntity.setOrderId(orderId);
+                    loanOrderExamineEntity.setId(ObjectIdUtil.getObjectId());
+                    loanOrderExamineEntity.setStatus(OrderExamineStatus.CREATE);
+                    loanOrderExamineEntity.setModelName("rejectionRule");
+                    loanOrderExamineEntity.setUpdateTime(new Date());
+                    loanOrderExamineEntity.setCreateTime(new Date());
+                    loanOrderExamineDao.insertOrderExamine(loanOrderExamineEntity);
+                }
 
                 return orderId;
             }

@@ -16,7 +16,7 @@ public class ProductDetailParams extends BaseParams {
     /**
      * 产品Id
      */
-    private Long productId;
+    private String productId;
 
     /**
      * 申请时的经纬度

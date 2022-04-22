@@ -17,8 +17,9 @@ public interface ProductService {
      *
      * @param params
      * @return
+     * @throws Exception
      */
-    Result<ProductDetailResult> productDetail(ProductDetailParams params);
+    Result<ProductDetailResult> productDetail(ProductDetailParams params) throws Exception;
 
     /**
      * 获取用户app模式

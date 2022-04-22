@@ -106,4 +106,10 @@ public class BaseService {
      */
     @Autowired
     public LoanOrderExamineDao loanOrderExamineDao;
+
+    /**
+     * 渠道
+     */
+    @Autowired
+    public PlatformChannelDao platformChannelDao;
 }

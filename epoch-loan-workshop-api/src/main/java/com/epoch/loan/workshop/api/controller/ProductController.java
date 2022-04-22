@@ -35,8 +35,7 @@ public class ProductController extends BaseController {
 
         try {
 
-
-            return null;
+            return productService.productDetail(params);
         } catch (Exception e) {
             LogUtil.sysError("[ProductController productDetail]", e);
 
