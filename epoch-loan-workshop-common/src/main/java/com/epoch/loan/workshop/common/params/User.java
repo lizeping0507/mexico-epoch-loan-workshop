@@ -3,6 +3,8 @@ package com.epoch.loan.workshop.common.params;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 /**
  * @author : Duke
  * @packageName : com.epoch.loan.workshop.common.params
@@ -12,7 +14,7 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
-public class User {
+public class User implements Serializable {
     /**
      * 用户ID
      */
