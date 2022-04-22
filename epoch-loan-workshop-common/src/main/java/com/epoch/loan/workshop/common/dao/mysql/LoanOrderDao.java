@@ -217,6 +217,26 @@ public interface LoanOrderDao {
     List<LoanOrderEntity> findOrderByUserAndProductIdAndStatus(String userId, String productId, Integer[] status);
 
     /**
+     *
+     *
+     * @param userId
+     * @param appName
+     * @param status
+     * @return
+     */
+    Integer countUserOrderByAppInStatus(String userId, String appName, int[] status);
+
+    /**
+     * 查询用户在指定包|指定状态|指定产品的订单数量
+     * @param userId
+     * @param productId
+     * @param appName
+     * @param status
+     * @return
+     */
+    Integer countUserOrderByProductAndAppInStatus(String userId, String productId, String appName, int[] status);
+
+    /**
      * 新增订单
      *
      * @param loanOrderEntity

@@ -145,7 +145,30 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
     }
 
+    /**
+     * 计算用户客群
+     *
+     * @param userId
+     * @param productId
+     * @param appName
+     * @return
+     */
     protected Integer userType(String userId, String productId, String appName) {
+        // 用户在本包是否有还款
+        int[] status = {OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE};
+        Integer count = loanOrderDao.countUserOrderByAppInStatus(userId, appName, status);
+        // 无:2客群
+        if (count == 0){
+            return 0;
+        }
+
+        // 本包本产品是否有还款
+        count = loanOrderDao.countUserOrderByProductAndAppInStatus(userId, productId, appName, status);
+        // 无:1客群
+        if (count == 0){
+            return 1;
+        }
+
         return 0;
     }
 
