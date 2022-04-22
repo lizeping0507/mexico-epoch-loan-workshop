@@ -117,43 +117,18 @@ public class OcrController extends BaseController {
     }
 
     /**
-     * 用户OCR识别信息保存
-     *
-     * @param params 保存用户OCR识别信息请求参数封装类
-     * @return 保存成功与否
-     */
-    @PostMapping(URL.SAVE_USER_OCR_INFO)
-    public Result<Object> saveOcrInfo(UserOcrInfoParams params) {
-        // 结果集
-        Result<Object> result = new Result<>();
-
-        try {
-            // 获取用户OCR认证提供商
-            return userService.saveOcrInfo(params);
-        } catch (Exception e) {
-            LogUtil.sysError("[OcrController saveOcrInfo]", e);
-
-            // 异常返回结果
-            result.setEx(ThrowableUtils.throwableToString(e));
-            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
-            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
-            return result;
-        }
-    }
-
-    /**
      * 获取用户OCR保存信息
      *
      * @param params 获取用户OCR保存信息请求参数封装类
      * @return 保存成功与否
      */
     @PostMapping(URL.GET_USER_OCR_INFO)
-    public Result<UserOcrBasicInfoResult> getOcrInfo(MineParams params) {
+    public Result<UserOcrBasicInfoResult> getOcrInfo(BaseParams params) {
         // 结果集
         Result<UserOcrBasicInfoResult> result = new Result<>();
 
         try {
-            // 获取用户OCR认证提供商
+            // 获取用户OCR保存信息
             return userService.getOcrInfo(params);
         } catch (Exception e) {
             LogUtil.sysError("[OcrController getOcrInfo]", e);

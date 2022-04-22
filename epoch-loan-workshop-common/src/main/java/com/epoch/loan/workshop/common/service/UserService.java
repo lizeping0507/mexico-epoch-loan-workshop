@@ -68,22 +68,13 @@ public interface UserService {
     Result<MineResult> mine(MineParams params) throws Exception;
 
     /**
-     * 用户OCR识别信息保存
-     *
-     * @param params 保存用户OCR识别信息请求参数封装类
-     * @return 保存成功与否
-     * @throws Exception 请求异常
-     */
-    Result<Object> saveOcrInfo(UserOcrInfoParams params) throws Exception;
-
-    /**
      * 获取用户OCR保存信息
      *
      * @param params 请求参数封装
      * @return Result<UserOcrBasicInfoResult>
      * @throws Exception 请求异常
      */
-    Result<UserOcrBasicInfoResult> getOcrInfo(MineParams params) throws Exception;
+    Result<UserOcrBasicInfoResult> getOcrInfo(BaseParams params) throws Exception;
 
     /**
      * ocr识别信息保存接口
