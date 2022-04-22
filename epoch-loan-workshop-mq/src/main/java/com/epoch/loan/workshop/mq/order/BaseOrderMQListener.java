@@ -92,82 +92,10 @@ public abstract class BaseOrderMQListener {
     public PlatformUserDao platformUserDao;
 
     /**
-     * 用户aadhar卡识别信息
-     */
-    @Autowired
-    public PlatformUserAadharDistinguishInfoDao platformUserAadharDistinguishInfoDao;
-
-    /**
-     * 用户aadhar卡正面识别日志
-     */
-    @Autowired
-    public PlatformUserOcrAadharFrontLogDao platformUserOcrAadharFrontLogDao;
-
-    /**
-     * 用户ocr识别pan卡日志
-     */
-    @Autowired
-    public PlatformUserOcrPanFrontLogDao platformUserOcrPanFrontLogDao;
-
-    /**
-     * Pan卡识别信息
-     */
-    @Autowired
-    public PlatformUserPanDistinguishInfoDao platformUserPanDistinguishInfoDao;
-
-    /**
-     * 银行卡 TODO
-     */
-//    @Autowired
-//    public PlatformUserBankCardDao platformUserBankCardDao;
-
-    /**
      * 订单模型审核
      */
     @Autowired
     public LoanOrderExamineDao loanOrderExamineDao;
-
-    /**
-     * 变身包产品配置
-     */
-    @Autowired
-    public LoanMaskDao loanMaskDao;
-
-    /**
-     * 产品
-     */
-    @Autowired
-    public PlatformProductDao platformProductDao;
-
-    /**
-     * 机构
-     */
-    @Autowired
-    public PlatformMerchantDao platformMerchantDao;
-
-    /**
-     * 查询机构Api信息
-     */
-    @Autowired
-    public PlatformMerchantApiUrlDao platformMerchantApiUrlDao;
-
-    /**
-     * 机构详情
-     */
-    @Autowired
-    public PlatformMerchantInfoDao platformMerchantInfoDao;
-
-    /**
-     * 用户照片
-     */
-    @Autowired
-    public PlatformUserIdImgDao platformUserIdImgDao;
-
-    /**
-     * 用户个人信息
-     */
-    @Autowired
-    public PlatformUserPersonalInfoDao platformUserPersonalInfoDao;
 
     /**
      * 订单账单
@@ -180,17 +108,6 @@ public abstract class BaseOrderMQListener {
      */
     @Autowired
     public PlatformOrderDao platformOrderDao;
-
-    /**
-     * 渠道
-     */
-    @Autowired
-    public PlatformChannelDao platformChannelDao;
-    /**
-     * 渠道
-     */
-    @Autowired
-    public PlatformRiskManagementRefuseReasonDao platformRiskManagementRefuseReasonDao;
 
     /**
      * 订单模型
@@ -211,12 +128,6 @@ public abstract class BaseOrderMQListener {
     public LoanRemittanceOrderRecordDao loanRemittanceOrderRecordDao;
 
     /**
-     * 产品
-     */
-    @Autowired
-    public LoanProductDao loanProductDao;
-
-    /**
      * 放款队列生产
      */
     @Autowired
@@ -233,6 +144,12 @@ public abstract class BaseOrderMQListener {
      */
     @Autowired
     public LoanRepaymentPaymentRecordDao loanRepaymentPaymentRecordDao;
+
+    /**
+     * 用户详细信息
+     */
+    @Autowired
+    public LoanUserInfoDao loanUserInfoDao;
 
     /**
      * 获取子类消息监听
@@ -476,7 +393,9 @@ public abstract class BaseOrderMQListener {
         PlatformOrderPushRepaymentEntity orderPushRepayment = new PlatformOrderPushRepaymentEntity();
         orderPushRepayment.setId(platformOrderPushRepaymentDao.getMaxId() + 1);
         orderPushRepayment.setOrderNo(orderId);
+
         PlatformUserBankCardEntity userBankCard = null;// TODO platformUserBankCardDao.findUserBankCardById(loanOrderEntity.getBankCardId());
+
         orderPushRepayment.setBankCard(userBankCard.getBankCard());
         orderPushRepayment.setOpenBank(userBankCard.getOpenBank());
         // orderPushRepayment.setCanPrepay("1");

@@ -26,7 +26,7 @@ public interface LoanUserInfoDao {
      * @param userId 用户id
      * @return
      */
-    LoanUserInfoEntity getByUserId(String userId);
+    LoanUserInfoEntity findUserInfoById(String userId);
 
     /**
      * 更新

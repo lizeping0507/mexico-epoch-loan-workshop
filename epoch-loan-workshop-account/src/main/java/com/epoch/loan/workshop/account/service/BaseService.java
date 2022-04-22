@@ -173,7 +173,7 @@ public class BaseService {
     public void updateUserCache(String userId) {
         User user = new User();
         LoanUserEntity userEntity = loanUserDao.findById(userId);
-        LoanUserInfoEntity userInfoEntity = loanUserInfoDao.getByUserId(userId);
+        LoanUserInfoEntity userInfoEntity = loanUserInfoDao.findUserInfoById(userId);
 
         user.setId(userEntity.getId());
         user.setAndroidId(userEntity.getAndroidId());
