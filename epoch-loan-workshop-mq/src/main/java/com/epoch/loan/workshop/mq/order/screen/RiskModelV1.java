@@ -216,7 +216,7 @@ public class RiskModelV1 extends BaseOrderMQListener implements MessageListenerC
 
             // 手机号
             String mobile = loanUserInfoEntity.getMobile();
-            
+
             // 封装请求参数
             Map<String, String> params = new HashMap<>();
             params.put(Field.METHOD, "riskmanagement.mexico.decision.model.dc");
@@ -233,7 +233,6 @@ public class RiskModelV1 extends BaseOrderMQListener implements MessageListenerC
             bizData.put("phone", mobile);
             bizData.put("appName", appName);
             bizData.put("channelCode", String.valueOf(userChannelId));
-
             params.put(Field.BIZ_DATA, bizData.toJSONString());
 
             // 生成签名
