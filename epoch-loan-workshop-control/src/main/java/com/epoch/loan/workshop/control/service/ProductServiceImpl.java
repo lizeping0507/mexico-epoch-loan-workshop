@@ -6,6 +6,7 @@ import com.epoch.loan.workshop.common.constant.OrderStatus;
 import com.epoch.loan.workshop.common.constant.PlatformUrl;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
 import com.epoch.loan.workshop.common.entity.mysql.LoanOrderEntity;
+import com.epoch.loan.workshop.common.entity.mysql.LoanProductEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanUserEntity;
 import com.epoch.loan.workshop.common.params.params.BaseParams;
 import com.epoch.loan.workshop.common.params.params.request.*;
@@ -21,6 +22,7 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,18 +52,19 @@ public class ProductServiceImpl extends BaseService implements ProductService {
      * 初始化订单
      *
      * @param userId
-     * @param productId
+     * @param productEntity
+     * @param orderModelGroup
      * @param appName
      * @return
      */
-    protected String initOrder(String userId, String productId, String appName) {
-        // 锁id
-        String lockId = userId + ":" + productId;
-
+    protected LoanOrderEntity initOrder(String userId, Integer type, String appVersion, String orderModelGroup, String appName, LoanProductEntity productEntity) throws Exception {
         // 使用分布式锁，防止同时创建多条订单
-        zookeeperClient.lock(new UserProductDetailLock<String>(lockId) {
+        String orderId = zookeeperClient.lock(new UserProductDetailLock<String>(userId) {
             @Override
             public String execute() {
+                // 产品id
+                String productId = productEntity.getId();
+
                 // 查询用户是否有已经创建且未完结的订单
                 Integer[] status = new Integer[]{OrderStatus.CREATE, OrderStatus.EXAMINE_WAIT, OrderStatus.EXAMINE_PASS, OrderStatus.WAIT_PAY, OrderStatus.WAY, OrderStatus.DUE};
                 List<LoanOrderEntity> loanOrderEntityList = loanOrderDao.findOrderByUserAndProductIdAndStatus(userId, productId, status);
@@ -82,6 +85,9 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                     reloan = 1;
                 }
 
+                // 用户客群
+                Integer userType = userType(userId, productId, appName);
+
                 // 订单id
                 String orderId = ObjectIdUtil.getObjectId();
 
@@ -94,11 +100,48 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 loanOrderEntity.setUserChannelId(loanUserEntity.getChannelId());
                 loanOrderEntity.setBankCardId("");
                 loanOrderEntity.setReloan(reloan);
+                loanOrderEntity.setOrderModelGroup(orderModelGroup);
+                loanOrderEntity.setRemittanceDistributionGroup(productEntity.getRemittanceDistributionGroup());
+                loanOrderEntity.setRepaymentDistributionGroup("H6");
+                loanOrderEntity.setUserType(userType);
+                loanOrderEntity.setStages(productEntity.getStages());
+                loanOrderEntity.setStagesDay(productEntity.getStagesDay());
+                loanOrderEntity.setProcessingFeeProportion(productEntity.getProcessingFeeProportion());
+                loanOrderEntity.setInterest(productEntity.getInterest());
+                loanOrderEntity.setPenaltyInterest(productEntity.getPenaltyInterest());
+                loanOrderEntity.setStatus(OrderStatus.CREATE);
+                loanOrderEntity.setType(type);
+                loanOrderEntity.setApprovalAmount(0.0);
+                loanOrderEntity.setActualAmount(0.0);
+                loanOrderEntity.setIncidentalAmount(0.0);
+                loanOrderEntity.setEstimatedRepaymentAmount(0.0);
+                loanOrderEntity.setActualAmount(0.0);
+                loanOrderEntity.setActualRepaymentAmount(0.0);
+                loanOrderEntity.setAppName(appName);
+                loanOrderEntity.setAppVersion(appVersion);
+                loanOrderEntity.setApplyTime(null);
+                loanOrderEntity.setLoanTime(null);
+                loanOrderEntity.setApplyTime(null);
+                loanOrderEntity.setUpdateTime(new Date());
+                loanOrderEntity.setCreateTime(new Date());
+                loanOrderDao.insertOrder(loanOrderEntity);
 
                 return orderId;
             }
         });
-        return null;
+
+        // 判断订单号是否为空
+        if (StringUtils.isEmpty(orderId)) {
+            throw new Exception();
+        }
+
+        // 查询订单
+        LoanOrderEntity loanOrderEntity = loanOrderDao.findOrder(orderId);
+        if (ObjectUtils.isEmpty(loanOrderEntity)) {
+            throw new Exception();
+        }
+
+        return loanOrderEntity;
 
     }
 

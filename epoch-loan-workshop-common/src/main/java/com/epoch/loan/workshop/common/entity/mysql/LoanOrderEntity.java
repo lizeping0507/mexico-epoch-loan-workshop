@@ -45,6 +45,12 @@ public class LoanOrderEntity {
      * 订单汇款组
      */
     private String remittanceDistributionGroup;
+
+    /**
+     * 订单还款组
+     */
+    private String repaymentDistributionGroup;
+
     /**
      * 用户类型(客群)
      */
@@ -54,6 +60,27 @@ public class LoanOrderEntity {
      * 订单期数
      */
     private Integer stages;
+
+    /**
+     * 分期天数
+     */
+    private Integer stagesDay;
+
+    /**
+     * 手续费
+     */
+    private Double processingFeeProportion;
+
+    /**
+     * 利息
+     */
+    private Double interest;
+
+    /**
+     * 罚息
+     */
+    private Double penaltyInterest;
+
 
     /**
      * 订单状态
@@ -106,6 +133,11 @@ public class LoanOrderEntity {
     private Date applyTime;
 
     /**
+     * 审核通过时间
+     */
+    private Date examinePassTime;
+
+    /**
      * 放款时间
      */
     private Date loanTime;
@@ -125,28 +157,4 @@ public class LoanOrderEntity {
      */
     private Date createTime;
 
-    /**
-     * 订单还款组
-     */
-    private String repaymentDistributionGroup;
-
-    /**
-     * 订单每期天数
-     */
-    private Integer stagesDay;
-
-    /**
-     * 手续费
-     */
-    private Double processingFeeProportion;
-
-    /**
-     * 利息
-     */
-    private Double interest;
-
-    /**
-     * 罚息
-     */
-    private Double penaltyInterest;
 }
