@@ -72,10 +72,19 @@
                                   `papers_full_name` = #{loanUserInfoEntity.papersFullName},
                                   `papers_id` = #{loanUserInfoEntity.papersId},
                                   `papers_voter_id` = #{loanUserInfoEntity.papersVoterId},
+                                  `papers_gender` = #{loanUserInfoEntity.papersGender},
+                                  `papers_age` = #{loanUserInfoEntity.papersAge},
+                                  `papers_date_of_birth` = #{loanUserInfoEntity.papersDateOfBirth},
+                                  `postal_code` = #{loanUserInfoEntity.postalCode},
+                                  `rfc` = #{loanUserInfoEntity.rfc},
                                   `custom_father_name` = #{loanUserInfoEntity.customFatherName},
                                   `custom_full_name` = #{loanUserInfoEntity.customFullName},
                                   `custom_mother_name` = #{loanUserInfoEntity.customMotherName},
                                   `custom_name` = #{loanUserInfoEntity.customName},
+                                  `user_file_bucket_name` = #{loanUserInfoEntity.userFileBucketName},
+                                  `front_path` = #{loanUserInfoEntity.frontPath},
+                                  `back_path` = #{loanUserInfoEntity.backPath},
+                                  `face_path` = #{loanUserInfoEntity.facePath},
                                   `update_time` = #{loanUserInfoEntity.updateTime}
         where id = #{loanUserInfoEntity.id}
     </update>

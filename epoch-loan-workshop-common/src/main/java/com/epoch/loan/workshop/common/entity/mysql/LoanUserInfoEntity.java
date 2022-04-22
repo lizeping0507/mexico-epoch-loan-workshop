@@ -170,6 +170,11 @@ public class LoanUserInfoEntity {
     private String papersDateOfBirth;
 
     /**
+     * 邮编
+     */
+    private String postalCode;
+
+    /**
      * rfc
      */
     private String rfc;
