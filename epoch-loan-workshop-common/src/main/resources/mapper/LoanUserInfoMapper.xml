@@ -72,6 +72,10 @@
         `papers_id` = #{loanUserInfoEntity.papersId},
         `papers_name` = #{loanUserInfoEntity.papersName},
         `papers_voter_id` = #{loanUserInfoEntity.papersVoterId},
+        `custom_father_name` = #{loanUserInfoEntity.customFatherName},
+        `custom_full_name` = #{loanUserInfoEntity.customFullName},
+        `custom_mother_name` = #{loanUserInfoEntity.customMotherName},
+        `custom_name` = #{loanUserInfoEntity.customName},
         `update_time` = #{loanUserInfoEntity.updateTime}
         where id = #{loanUserInfoEntity.id}
     </update>
