@@ -159,7 +159,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         Integer count = loanOrderDao.countUserOrderByAppInStatus(userId, appName, status);
         // 无:2客群
         if (count == 0){
-            return 0;
+            return 2;
         }
 
         // 本包本产品是否有还款
