@@ -43,7 +43,7 @@ public interface LoanUserInfoDao {
      * @param papersId INE证件id
      * @return 用户详细信息
      */
-    LoanUserInfoEntity getLastByPapersId(String papersId);
+    LoanUserInfoEntity findLastUserInfoByPapersId(String papersId);
 
     /**
      * 根据 INE证件id和 app标识 查询用户详细信息
@@ -52,7 +52,7 @@ public interface LoanUserInfoDao {
      * @param appName app标识
      * @return 用户详细信息
      */
-    LoanUserInfoEntity getByPapersIdAndAppName(String papersId,String appName);
+    LoanUserInfoEntity findUserInfoByPapersIdAndAppName(String papersId,String appName);
 
     /**
      * 根据 rfc 和 app标识 查询用户详细信息
@@ -60,7 +60,7 @@ public interface LoanUserInfoDao {
      * @param rfc rfc
      * @return 用户详细信息
      */
-    LoanUserInfoEntity getLastByRfc(String rfc);
+    LoanUserInfoEntity findLastUserInfoLastByRfc(String rfc);
 
     /**
      * 根据 rfc 查询用户最近的详细信息
@@ -69,7 +69,7 @@ public interface LoanUserInfoDao {
      * @param appName app标识
      * @return 用户详细信息
      */
-    LoanUserInfoEntity getByRfcAndAppName(String rfc,String appName);
+    LoanUserInfoEntity findUserInfoByRfcAndAppName(String rfc,String appName);
 
     /**
      * 根据 手机号 查询用户最近的详细信息
@@ -77,5 +77,5 @@ public interface LoanUserInfoDao {
      * @param mobile 手机号
      * @return 用户详细信息
      */
-    LoanUserInfoEntity getLastByMobile(String mobile);
+    LoanUserInfoEntity findLastUserInfoByMobile(String mobile);
 }

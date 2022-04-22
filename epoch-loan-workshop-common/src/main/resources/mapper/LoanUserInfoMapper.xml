@@ -72,31 +72,40 @@
                                   `papers_full_name` = #{loanUserInfoEntity.papersFullName},
                                   `papers_id` = #{loanUserInfoEntity.papersId},
                                   `papers_voter_id` = #{loanUserInfoEntity.papersVoterId},
+                                  `papers_gender` = #{loanUserInfoEntity.papersGender},
+                                  `papers_age` = #{loanUserInfoEntity.papersAge},
+                                  `papers_date_of_birth` = #{loanUserInfoEntity.papersDateOfBirth},
+                                  `postal_code` = #{loanUserInfoEntity.postalCode},
+                                  `rfc` = #{loanUserInfoEntity.rfc},
                                   `custom_father_name` = #{loanUserInfoEntity.customFatherName},
                                   `custom_full_name` = #{loanUserInfoEntity.customFullName},
                                   `custom_mother_name` = #{loanUserInfoEntity.customMotherName},
                                   `custom_name` = #{loanUserInfoEntity.customName},
+                                  `user_file_bucket_name` = #{loanUserInfoEntity.userFileBucketName},
+                                  `front_path` = #{loanUserInfoEntity.frontPath},
+                                  `back_path` = #{loanUserInfoEntity.backPath},
+                                  `face_path` = #{loanUserInfoEntity.facePath},
                                   `update_time` = #{loanUserInfoEntity.updateTime}
         where id = #{loanUserInfoEntity.id}
     </update>
 
-    <select id="getLastByPapersId" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanUserInfoEntity">
+    <select id="findLastUserInfoByPapersId" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanUserInfoEntity">
         SELECT * FROM loan_user_info where papers_id = #{papersId} order by update_time limit 1
     </select>
 
-    <select id="getByPapersIdAndAppName" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanUserInfoEntity">
+    <select id="findUserInfoByPapersIdAndAppName" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanUserInfoEntity">
         SELECT * FROM loan_user_info lui left join loan_user lu on lui.user_id = lu.id where lui.papers_id = #{papersId} and lu.app_name = #{appName}
     </select>
 
-    <select id="getLastByRfc" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanUserInfoEntity">
+    <select id="findLastUserInfoLastByRfc" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanUserInfoEntity">
         SELECT * FROM loan_user_info where rfc = #{rfc} order by update_time limit 1
     </select>
 
-    <select id="getByRfcAndAppName" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanUserInfoEntity">
+    <select id="findUserInfoByRfcAndAppName" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanUserInfoEntity">
         SELECT * FROM loan_user_info lui left join loan_user lu on lui.user_id = lu.id where lui.rfc = #{rfc} and lu.app_name = #{appName}
     </select>
 
-    <select id="getLastByMobile" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanUserInfoEntity">
+    <select id="findLastUserInfoByMobile" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanUserInfoEntity">
         SELECT * FROM loan_user_info where mobile = #{mobile} order by update_time limit 1
     </select>
 </mapper>

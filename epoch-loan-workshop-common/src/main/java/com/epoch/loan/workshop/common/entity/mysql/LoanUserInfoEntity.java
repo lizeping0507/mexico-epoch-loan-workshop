@@ -155,6 +155,26 @@ public class LoanUserInfoEntity {
     private String papersVoterId;
 
     /**
+     * INE/IFE 性别
+     */
+    private String papersGender;
+
+    /**
+     * INE/IFE 年龄
+     */
+    private String papersAge;
+
+    /**
+     * INE/IFE 出生日期
+     */
+    private String papersDateOfBirth;
+
+    /**
+     * 邮编
+     */
+    private String postalCode;
+
+    /**
      * rfc
      */
     private String rfc;
@@ -178,6 +198,26 @@ public class LoanUserInfoEntity {
      * 姓名
      */
     private String customName;
+
+    /**
+     * 用户图片文件保存桶名
+     */
+    private String userFileBucketName;
+
+    /**
+     * 上传证件的正面图片路径
+     */
+    private String frontPath;
+
+    /**
+     * 上传证件的背面图片路径
+     */
+    private String backPath;
+
+    /**
+     * 上传人脸的图片路径
+     */
+    private String facePath;
 
     /**
      * 更新时间
