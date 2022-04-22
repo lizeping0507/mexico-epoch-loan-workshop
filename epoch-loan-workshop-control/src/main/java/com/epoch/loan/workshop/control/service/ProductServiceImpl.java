@@ -2,27 +2,20 @@ package com.epoch.loan.workshop.control.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.epoch.loan.workshop.common.constant.OrderStatus;
 import com.epoch.loan.workshop.common.constant.PlatformUrl;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
-import com.epoch.loan.workshop.common.entity.mysql.LoanOrderEntity;
-import com.epoch.loan.workshop.common.entity.mysql.LoanUserEntity;
 import com.epoch.loan.workshop.common.params.params.BaseParams;
 import com.epoch.loan.workshop.common.params.params.request.*;
 import com.epoch.loan.workshop.common.params.params.result.*;
 import com.epoch.loan.workshop.common.params.params.result.model.PayH5Result;
 import com.epoch.loan.workshop.common.service.ProductService;
 import com.epoch.loan.workshop.common.util.HttpUtils;
-import com.epoch.loan.workshop.common.util.ObjectIdUtil;
 import com.epoch.loan.workshop.common.util.PlatformUtil;
-import com.epoch.loan.workshop.common.zookeeper.UserProductDetailLock;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
