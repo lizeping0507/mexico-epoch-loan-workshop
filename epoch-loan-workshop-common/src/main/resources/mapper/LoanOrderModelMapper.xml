@@ -4,7 +4,7 @@
 
 
     <select id="findNamesByGroup" resultType="java.lang.String">
-        SELECT model_name FROM loan_order_model WHERE group_name = #{groupName} ORDER BY sort
+        SELECT model_name FROM loan_order_model WHERE group_name = #{groupName} ORDER BY sort ASC
     </select>
     <select id="findModelByGroupAndModelName"
             resultType="com.epoch.loan.workshop.common.entity.mysql.LoanOrderModelEntity">

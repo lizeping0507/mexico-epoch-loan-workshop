@@ -5,6 +5,8 @@ import com.epoch.loan.workshop.common.constant.OrderStatus;
 import com.epoch.loan.workshop.common.constant.PlatformUrl;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
 import com.epoch.loan.workshop.common.entity.mysql.*;
+import com.epoch.loan.workshop.common.lock.UserApplyDetailLock;
+import com.epoch.loan.workshop.common.mq.order.params.OrderParams;
 import com.epoch.loan.workshop.common.params.params.request.*;
 import com.epoch.loan.workshop.common.params.params.result.*;
 import com.epoch.loan.workshop.common.service.OrderService;
@@ -19,6 +21,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -73,6 +76,85 @@ public class OrderServiceImpl extends BaseService implements OrderService {
         // 进行绑定放款账户 TODO 新老表
         platformOrderDao.updateCardId(orderId, remittanceAccountId, new Date());
         loanOrderDao.updateBankCardId(orderId, remittanceAccountId, new Date());
+
+        // 返回结果集
+        result.setReturnCode(ResultEnum.SUCCESS.code());
+        result.setMessage(ResultEnum.SUCCESS.message());
+        return result;
+    }
+
+    /**
+     * 申请
+     *
+     * @param applyParams
+     * @return
+     */
+    @Override
+    public Result apply(ApplyParams applyParams) {
+        // 结果集
+        Result result = new Result();
+
+        // 用户id
+        String userId = applyParams.getUser().getId();
+
+        // 订单id
+        String orderId = applyParams.getOrderId();
+
+        // 使用分布式锁进行申请，避免重复申请
+        String status = zookeeperClient.lock(new UserApplyDetailLock<String>(userId) {
+            @Override
+            public String execute() throws Exception {
+                // 查询订单
+                LoanOrderEntity loanOrderEntity = loanOrderDao.findOrder(orderId);
+
+                // 订单审核队列
+                String orderModelGroup = loanOrderEntity.getOrderModelGroup();
+
+                // 获取支付账户id
+                String bankCardId = loanOrderEntity.getBankCardId();
+
+                // 判断订单是否存在
+                if (ObjectUtils.isEmpty(loanOrderEntity)) {
+                    // 失败
+                    return "FAIL";
+                }
+
+                // 判断订单是否处于创建状态
+                if (loanOrderEntity.getStatus() != OrderStatus.CREATE) {
+                    // 失败
+                    return "FAIL";
+                }
+
+                // 判断是否没有绑卡
+                if (StringUtils.isEmpty(bankCardId)) {
+                    // 失败
+                    return "FAIL";
+                }
+
+                // 修改订单状态
+                int updateOrderStatus = loanOrderDao.updateOrderStatus(orderId, OrderStatus.EXAMINE_WAIT, new Date());
+                if (updateOrderStatus != 0) {
+                    // 更新申请时间
+                    loanOrderDao.updateOrderArrivalTime(orderId, new Date(), new Date());
+
+                    // 查询审核模型列表
+                    List<String> orderModelList = orderModelDao.findNamesByGroup(orderModelGroup);
+
+                    // 订单队列参数
+                    OrderParams orderParams = new OrderParams();
+                    orderParams.setOrderId(orderId);
+                    orderParams.setGroupName(orderModelGroup);
+                    orderParams.setModelList(orderModelList);
+                    orderMQManager.sendMessage(orderParams, orderModelList.get(0));
+
+                    // 成功
+                    return "SUCCESS";
+                }
+
+                // 失败
+                return "FAIL";
+            }
+        });
 
         // 返回结果集
         result.setReturnCode(ResultEnum.SUCCESS.code());
@@ -282,60 +364,6 @@ public class OrderServiceImpl extends BaseService implements OrderService {
         result.setReturnCode(ResultEnum.SUCCESS.code());
         result.setMessage(ResultEnum.SUCCESS.message());
         result.setData(res);
-        return result;
-    }
-
-    /**
-     * 申请借款
-     *
-     * @param params 请求参数
-     * @return Result
-     * @throws Exception 请求异常
-     */
-    @Override
-    public Result<ApplyLoanResult> applyLoan(ApplyLoanParams params) throws Exception {
-        // 结果集
-        Result<ApplyLoanResult> result = new Result<>();
-
-        // 拼接请求路径
-        String url = platformConfig.getPlatformDomain() + PlatformUrl.PLATFORM_APPLYLOAN;
-
-        // 封装请求参数
-        JSONObject requestParam = new JSONObject();
-        requestParam.put("appFlag", params.getAppName());
-        requestParam.put("versionNumber", params.getAppVersion());
-        requestParam.put("mobileType", params.getMobileType());
-
-        requestParam.put("productSort", params.getProductSort());
-        requestParam.put("approvalGps", params.getApprovalGps());
-        requestParam.put("approvalAddr", params.getApprovalAddr());
-        requestParam.put("orderNo", params.getOrderNo());
-        requestParam.put("productId", params.getProductId());
-        if (ObjectUtils.isNotEmpty(params.getUserId())) {
-            requestParam.put("userId", params.getUserId());
-        }
-        if (ObjectUtils.isNotEmpty(params.getAppType())) {
-            requestParam.put("appType", params.getAppType());
-        }
-
-        // 封装请求头
-        Map<String, String> headers = new HashMap<>();
-        headers.put("token", params.getToken());
-
-        // 请求
-        String responseStr = HttpUtils.POST_WITH_HEADER(url, requestParam.toJSONString(), headers);
-
-        // 解析响应结果
-        JSONObject responseJson = JSONObject.parseObject(responseStr);
-
-        // 判断接口响应是否正常
-        if (!PlatformUtil.checkResponseCode(result, ApplyLoanResult.class, responseJson)) {
-            return result;
-        }
-
-        // 封装结果
-        result.setReturnCode(ResultEnum.SUCCESS.code());
-        result.setMessage(responseJson.getString("msg"));
         return result;
     }
 

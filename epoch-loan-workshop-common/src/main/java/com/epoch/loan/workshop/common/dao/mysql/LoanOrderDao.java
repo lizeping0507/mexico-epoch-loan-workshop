@@ -16,6 +16,8 @@ import java.util.List;
  */
 @Mapper
 public interface LoanOrderDao {
+
+
     /**
      * 查询用户最后一条放款成功的订单
      *
@@ -110,6 +112,16 @@ public interface LoanOrderDao {
      * @return
      */
     int updateOrderExaminePassTime(String orderId, Date examinePassTime, Date updateTime);
+
+    /**
+     * 更新申请时间
+     *
+     * @param orderId
+     * @param applyTime
+     * @param updateTime
+     * @return
+     */
+    int updateOrderApplyTime(String orderId, Date applyTime, Date updateTime);
 
     /**
      * 更改实际放款金额
@@ -240,6 +252,7 @@ public interface LoanOrderDao {
      * 新增订单
      *
      * @param loanOrderEntity
+     * @return
      */
     Integer insertOrder(@Param("loanOrderEntity") LoanOrderEntity loanOrderEntity);
 }

@@ -62,6 +62,39 @@ public class OrderController extends BaseController {
         }
     }
 
+    /**
+     * 申请
+     *
+     * @param applyParams
+     * @return
+     */
+    @PostMapping(URL.APPLY)
+    public Result apply(ApplyParams applyParams) {
+        // 结果集
+        Result result = new Result();
+
+        try {
+            // 验证请求参数是否合法
+            if (!applyParams.isOrderIdLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":orderNo");
+                return result;
+            }
+
+            // 申请
+            return orderService.apply(applyParams);
+        } catch (Exception e) {
+            LogUtil.sysError("[OrderController apply]", e);
+
+            // 异常返回结果
+            result.setEx(ThrowableUtils.throwableToString(e));
+            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
+            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
+            return result;
+        }
+    }
+
 
     /**
      * 获取订单合同参数
@@ -107,31 +140,6 @@ public class OrderController extends BaseController {
             return orderService.list(params);
         } catch (Exception e) {
             LogUtil.sysError("[OrderController list]", e);
-
-            // 异常返回结果
-            result.setEx(ThrowableUtils.throwableToString(e));
-            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
-            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
-            return result;
-        }
-    }
-
-    /**
-     * 申请借款
-     *
-     * @param params 请求参数
-     * @return Result
-     */
-    @PostMapping(URL.APPLYLOAN)
-    public Result<ApplyLoanResult> applyLoan(ApplyLoanParams params) {
-        // 结果集
-        Result<ApplyLoanResult> result = new Result<ApplyLoanResult>();
-
-        try {
-            // 申请借款
-            return orderService.applyLoan(params);
-        } catch (Exception e) {
-            LogUtil.sysError("[OrderController applyLoan]", e);
 
             // 异常返回结果
             result.setEx(ThrowableUtils.throwableToString(e));

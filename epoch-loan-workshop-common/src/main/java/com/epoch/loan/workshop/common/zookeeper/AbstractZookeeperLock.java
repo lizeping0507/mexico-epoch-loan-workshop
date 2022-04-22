@@ -27,7 +27,7 @@ public abstract class AbstractZookeeperLock<T> {
      *
      * @return
      */
-    public abstract T execute();
+    public abstract T execute() throws Exception;
 
     public int getTimeout() {
         return TIME_OUT;

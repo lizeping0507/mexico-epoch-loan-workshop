@@ -1,8 +1,10 @@
-package com.epoch.loan.workshop.common.zookeeper;
+package com.epoch.loan.workshop.common.lock;
+
+import com.epoch.loan.workshop.common.zookeeper.AbstractZookeeperLock;
 
 /**
  * @author : Duke
- * @packageName : com.epoch.loan.workshop.common.zookeeper
+ * @packageName : com.epoch.loan.workshop.common.lock
  * @className : UserProductDetailLock
  * @createTime : 2022/4/22 19:17
  * @description : 用户产品

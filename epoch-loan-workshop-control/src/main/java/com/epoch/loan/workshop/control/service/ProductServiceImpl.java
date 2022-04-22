@@ -17,7 +17,7 @@ import com.epoch.loan.workshop.common.util.HttpUtils;
 import com.epoch.loan.workshop.common.util.ObjectIdUtil;
 import com.epoch.loan.workshop.common.util.PlatformUtil;
 import com.epoch.loan.workshop.common.util.RSAUtils;
-import com.epoch.loan.workshop.common.zookeeper.UserProductDetailLock;
+import com.epoch.loan.workshop.common.lock.UserProductDetailLock;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;

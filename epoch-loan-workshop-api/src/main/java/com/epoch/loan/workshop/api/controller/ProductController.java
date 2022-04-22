@@ -1,5 +1,6 @@
 package com.epoch.loan.workshop.api.controller;
 
+import com.epoch.loan.workshop.api.annotated.Authentication;
 import com.epoch.loan.workshop.common.config.URL;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
 import com.epoch.loan.workshop.common.params.params.BaseParams;
@@ -28,6 +29,7 @@ public class ProductController extends BaseController {
      * @param params
      * @return
      */
+    @Authentication
     @PostMapping(URL.PRODUCT_DETAIL)
     public Result<ProductDetailResult> productDetail(ProductDetailParams params) {
         // 结果集

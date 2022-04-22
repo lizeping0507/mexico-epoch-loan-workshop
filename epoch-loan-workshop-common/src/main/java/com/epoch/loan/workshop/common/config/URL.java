@@ -151,6 +151,12 @@ public class URL {
     public static final String CONTRACT = "/contract";
 
     /**
+     * 申请
+     */
+    public static final String APPLY = "/apply";
+
+
+    /**
      * 合同
      */
     public static final String BIND_REMITTANCE_ACCOUNT = "/bindRemittanceAccount";

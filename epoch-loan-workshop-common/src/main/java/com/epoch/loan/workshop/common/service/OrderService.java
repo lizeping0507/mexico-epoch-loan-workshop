@@ -20,6 +20,14 @@ public interface OrderService {
     Result bindRemittanceAccount(BindRemittanceAccountParams bindRemittanceAccountParams);
 
     /**
+     * 申请
+     *
+     * @param applyParams
+     * @return
+     */
+    Result apply(ApplyParams applyParams);
+
+    /**
      * 获取订单合同参数
      *
      * @param contractParams 请求参数
@@ -36,15 +44,6 @@ public interface OrderService {
      * @throws Exception 请求异常
      */
     Result<OrderListResult> list(OrderListParams params) throws Exception;
-
-    /**
-     * 申请借款
-     *
-     * @param params 请求参数
-     * @return Result
-     * @throws Exception 请求异常
-     */
-    Result<ApplyLoanResult> applyLoan(ApplyLoanParams params) throws Exception;
 
     /**
      * 申请确认
