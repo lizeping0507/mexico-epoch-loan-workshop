@@ -54,12 +54,6 @@ public class UserServiceImpl extends BaseService implements UserService {
     private String userFileBucketName;
 
     /**
-     * 临时获取存储用户照片链接过期时间
-     */
-    @Value("${oss.user.file.expiration}")
-    private String expiration;
-
-    /**
      * 判断手机号是否已经注册
      *
      * @param params 请求参数封装
@@ -559,8 +553,8 @@ public class UserServiceImpl extends BaseService implements UserService {
         // 获取请求参数
         String rfc = params.getRfc();
         String appName = params.getAppName();
-        String backJson = params.getBackJson();
         User user = params.getUser();
+        LoanUserInfoEntity userInfoById = loanUserInfoDao.findUserInfoById(user.getId());
         AdvanceOcrFrontInfoResult frontInfo = JSON.parseObject(params.getFrontJson(), AdvanceOcrFrontInfoResult.class);
         AdvanceOcrBackInfoResult backInfo = JSON.parseObject(params.getBackJson(), AdvanceOcrBackInfoResult.class);
         String idNumber = frontInfo.getIdNumber();
@@ -576,7 +570,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         }
 
         // INE/IFE证件id 单包唯一性验证
-        LoanUserInfoEntity userInfoEntity = loanUserInfoDao.getByPapersIdAndAppName(idNumber, appName);
+        LoanUserInfoEntity userInfoEntity = loanUserInfoDao.findUserInfoByPapersIdAndAppName(idNumber, appName);
         if (ObjectUtils.isNotEmpty(userInfoEntity)) {
             // 该 INE/IFE证件id 已经认证过了
             if (userInfoEntity.getUserId().equals(user.getId())) {
@@ -591,7 +585,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         }
 
         // rfc 单包唯一性验证
-        LoanUserInfoEntity userInfoRfc = loanUserInfoDao.getByRfcAndAppName(rfc, appName);
+        LoanUserInfoEntity userInfoRfc = loanUserInfoDao.findUserInfoByRfcAndAppName(rfc, appName);
         if (ObjectUtils.isNotEmpty(userInfoRfc)) {
             // 该 INE/IFE证件id 已经认证过了
             if (userInfoRfc.getUserId().equals(user.getId())) {
@@ -606,7 +600,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         }
 
         // 根据INE/IFE证件id 全包校验 rfc 与 手机号
-        LoanUserInfoEntity lastByPapersId = loanUserInfoDao.getLastByPapersId(idNumber);
+        LoanUserInfoEntity lastByPapersId = loanUserInfoDao.findLastUserInfoByPapersId(idNumber);
         if (ObjectUtils.isNotEmpty(lastByPapersId)) {
             if (!rfc.equals(lastByPapersId.getRfc()) || !user.getLoginName().equals(lastByPapersId.getMobile())) {
                 result.setReturnCode(ResultEnum.RFC_MOBILE_CERTIFIED_ERROR.code());
@@ -616,7 +610,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         }
 
         // 根据RFC 全包校验 手机号 与 INE/IFE证件id
-        LoanUserInfoEntity lastByRfc = loanUserInfoDao.getLastByRfc(rfc);
+        LoanUserInfoEntity lastByRfc = loanUserInfoDao.findLastUserInfoLastByRfc(rfc);
         if (ObjectUtils.isNotEmpty(lastByRfc)) {
             if (!idNumber.equals(lastByRfc.getPapersId()) || !user.getLoginName().equals(lastByRfc.getMobile())) {
                 result.setReturnCode(ResultEnum.INF_MOBILE_CERTIFIED_OTHER_ERROR.code());
@@ -626,7 +620,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         }
 
         // 根据手机号 全包校验 rfc 与 INE/IFE证件id
-        LoanUserInfoEntity lastByMobile = loanUserInfoDao.getLastByMobile(user.getMobile());
+        LoanUserInfoEntity lastByMobile = loanUserInfoDao.findLastUserInfoByMobile(user.getMobile());
         if (ObjectUtils.isNotEmpty(lastByMobile)) {
             if (!idNumber.equals(lastByRfc.getPapersId()) || !rfc.equals(lastByPapersId.getRfc())) {
                 result.setReturnCode(ResultEnum.RFC_INF_CERTIFIED_ERROR.code());
@@ -662,7 +656,28 @@ public class UserServiceImpl extends BaseService implements UserService {
             return result;
         }
 
-        // 保存 图片
+        // TODO 与风控交互，获取 证件编号与用户的 curp是否 通过
+
+
+        // 保存 图片信息
+        userInfoById.setUserFileBucketName(userFileBucketName);
+        userInfoById.setFrontPath(frontPath);
+        userInfoById.setBackPath(backPath);
+        userInfoById.setBackPath(facePath);
+
+        // 处理扫描识别的证件信息和RFC，保存用户基本信息
+        if (ObjectUtils.isNotEmpty(frontInfo)) {
+            userInfoById.setPapersAddress(frontInfo.getAddressAll());
+            userInfoById.setPapersFatherName(frontInfo.getFatherLastName());
+            userInfoById.setPapersName(frontInfo.getName());
+            userInfoById.setPapersMotherName(frontInfo.getMotherLastName());
+            userInfoById.setPapersFullName(frontInfo.getFullName());
+            userInfoById.setPapersId(idNumber);
+            userInfoById.setPapersVoterId(frontInfo.getVoterId());
+            userInfoById.setRfc(rfc);
+
+        }
+        loanUserInfoDao.update(userInfoById);
 
         // 封装结果
         result.setReturnCode(ResultEnum.SUCCESS.code());
