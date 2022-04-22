@@ -172,6 +172,7 @@ public class OcrController extends BaseController {
      * @param params 获取用户OCR保存信息请求参数封装类
      * @return 保存成功与否
      */
+    @Authentication
     @PostMapping(URL.SAVE_FILE)
     public Result<Object> uploadS3Images(UploadS3Params params, HttpServletRequest request) {
         // 结果集

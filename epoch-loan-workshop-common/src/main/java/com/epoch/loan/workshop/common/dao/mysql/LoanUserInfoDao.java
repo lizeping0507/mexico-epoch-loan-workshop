@@ -4,6 +4,8 @@ import com.epoch.loan.workshop.common.entity.mysql.LoanUserInfoEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 /**
  * @author : Duke
  * @packageName : com.epoch.loan.workshop.common.dao.mysql
@@ -34,4 +36,46 @@ public interface LoanUserInfoDao {
      * @param loanUserInfoEntity
      */
     void update(@Param("loanUserInfoEntity") LoanUserInfoEntity loanUserInfoEntity);
+
+    /**
+     * 根据 INE证件id 查询用户最近的详细信息
+     *
+     * @param papersId INE证件id
+     * @return 用户详细信息
+     */
+    LoanUserInfoEntity getLastByPapersId(String papersId);
+
+    /**
+     * 根据 INE证件id和 app标识 查询用户详细信息
+     *
+     * @param papersId INE证件id
+     * @param appName app标识
+     * @return 用户详细信息
+     */
+    LoanUserInfoEntity getByPapersIdAndAppName(String papersId,String appName);
+
+    /**
+     * 根据 rfc 和 app标识 查询用户详细信息
+     *
+     * @param rfc rfc
+     * @return 用户详细信息
+     */
+    LoanUserInfoEntity getLastByRfc(String rfc);
+
+    /**
+     * 根据 rfc 查询用户最近的详细信息
+     *
+     * @param rfc rfc
+     * @param appName app标识
+     * @return 用户详细信息
+     */
+    LoanUserInfoEntity getByRfcAndAppName(String rfc,String appName);
+
+    /**
+     * 根据 手机号 查询用户最近的详细信息
+     *
+     * @param mobile 手机号
+     * @return 用户详细信息
+     */
+    LoanUserInfoEntity getLastByMobile(String mobile);
 }
