@@ -2,10 +2,12 @@ package com.epoch.loan.workshop.control.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.epoch.loan.workshop.common.constant.OrderExamineStatus;
 import com.epoch.loan.workshop.common.constant.OrderStatus;
 import com.epoch.loan.workshop.common.constant.PlatformUrl;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
 import com.epoch.loan.workshop.common.entity.mysql.LoanOrderEntity;
+import com.epoch.loan.workshop.common.entity.mysql.LoanOrderExamineEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanProductEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanUserEntity;
 import com.epoch.loan.workshop.common.params.params.BaseParams;
@@ -124,7 +126,24 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 loanOrderEntity.setApplyTime(null);
                 loanOrderEntity.setUpdateTime(new Date());
                 loanOrderEntity.setCreateTime(new Date());
-                loanOrderDao.insertOrder(loanOrderEntity);
+                Integer insertOrder = loanOrderDao.insertOrder(loanOrderEntity);
+
+                // 判断是否新增成功
+                if (insertOrder > 0) {
+                    return null;
+                }
+
+                // 订单审核模型
+                List<String> modelList = loanOrderModelDao.findNamesByGroup(orderModelGroup);
+                modelList.parallelStream().forEach(model -> {
+                    LoanOrderExamineEntity loanOrderExamineEntity = new LoanOrderExamineEntity();
+                    loanOrderExamineEntity.setOrderId(orderId);
+                    loanOrderExamineEntity.setId(ObjectIdUtil.getObjectId());
+                    loanOrderExamineEntity.setStatus(OrderExamineStatus.CREATE);
+                    loanOrderExamineEntity.setModelName(model);
+                    loanOrderExamineEntity.setUpdateTime(new Date());
+                    loanOrderExamineEntity.setCreateTime(new Date());
+                });
 
                 return orderId;
             }

@@ -31,7 +31,7 @@ public class LoanOrderExamineEntity {
     /**
      * 状态
      */
-    private String status;
+    private Integer status;
 
     /**
      * 请求参数

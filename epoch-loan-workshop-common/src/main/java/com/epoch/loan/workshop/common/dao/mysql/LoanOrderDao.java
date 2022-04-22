@@ -221,5 +221,5 @@ public interface LoanOrderDao {
      *
      * @param loanOrderEntity
      */
-    void insertOrder(@Param("loanOrderEntity") LoanOrderEntity loanOrderEntity);
+    Integer insertOrder(@Param("loanOrderEntity") LoanOrderEntity loanOrderEntity);
 }
