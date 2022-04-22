@@ -94,4 +94,16 @@ public class BaseService {
      */
     @Autowired
     public LoanProductDao loanProductDao;
+
+    /**
+     * 订单模型
+     */
+    @Autowired
+    public LoanOrderModelDao loanOrderModelDao;
+
+    /**
+     * 订单审核
+     */
+    @Autowired
+    public LoanOrderExamineDao loanOrderExamineDao;
 }
