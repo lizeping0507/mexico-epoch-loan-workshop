@@ -2,6 +2,7 @@ package com.epoch.loan.workshop.common.dao.mysql;
 
 import com.epoch.loan.workshop.common.entity.mysql.LoanOrderEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 import java.util.List;
@@ -214,4 +215,11 @@ public interface LoanOrderDao {
      * @return
      */
     List<LoanOrderEntity> findOrderByUserAndProductIdAndStatus(String userId, String productId, Integer[] status);
+
+    /**
+     * 新增订单
+     *
+     * @param loanOrderEntity
+     */
+    void insertOrder(@Param("loanOrderEntity") LoanOrderEntity loanOrderEntity);
 }

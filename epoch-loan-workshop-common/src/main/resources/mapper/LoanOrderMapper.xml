@@ -1,6 +1,71 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.epoch.loan.workshop.common.dao.mysql.LoanOrderDao">
+    <insert id="insertOrder">
+        INSERT INTO `loan_order`(
+        `id`,
+        `user_id`,
+        `product_id`,
+        `bank_card_id`,
+        `user_channel_id`,
+        `reloan`,
+        `user_type`,
+        `order_model_group`,
+        `remittance_distribution_group`,
+        `repayment_distribution_group`,
+        `stages`,
+        `stages_day`,
+        `processing_fee_proportion`,
+        `interest`,
+        `penalty_interest`,
+        `status`,
+        `type`,
+        `approval_amount`,
+        `actual_amount`,
+        `incidental_amount`,
+        `estimated_repayment_amount`,
+        `actual_repayment_amount`,
+        `app_name`,
+        `app_version`,
+        `apply_time`,
+        `examine_pass_time`,
+        `loan_time`,
+        `arrival_time`,
+        `update_time`,
+        `create_time`
+        ) VALUES (
+        #{loanOrderEntity.id},
+        #{loanOrderEntity.userId},
+        #{loanOrderEntity.productId},
+        #{loanOrderEntity.bankCardId},
+        #{loanOrderEntity.userChannelId},
+        #{loanOrderEntity.reloan},
+        #{loanOrderEntity.userType},
+        #{loanOrderEntity.orderModelGroup},
+        #{loanOrderEntity.remittanceDistributionGroup},
+        #{loanOrderEntity.repaymentDistributionGroup},
+        #{loanOrderEntity.stages},
+        #{loanOrderEntity.stagesDay},
+        #{loanOrderEntity.processingFeeProportion},
+        #{loanOrderEntity.interest},
+        #{loanOrderEntity.penaltyInterest},
+        #{loanOrderEntity.status},
+        #{loanOrderEntity.type},
+        #{loanOrderEntity.approvalAmount},
+        #{loanOrderEntity.actualAmount},
+        #{loanOrderEntity.incidentalAmount},
+        #{loanOrderEntity.estimatedRepaymentAmount},
+        #{loanOrderEntity.actualRepaymentAmount},
+        #{loanOrderEntity.appName},
+        #{loanOrderEntity.appVersion},
+        #{loanOrderEntity.applyTime},
+        #{loanOrderEntity.examinePassTime},
+        #{loanOrderEntity.loanTime},
+        #{loanOrderEntity.arrivalTime},
+        #{loanOrderEntity.updateTime},
+        #{loanOrderEntity.createTime}
+        );
+    </insert>
     <update id="updateOrderStatus">
         UPDATE loan_order SET status=#{status},update_time=#{updateTime} WHERE id=#{orderId}
     </update>
