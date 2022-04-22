@@ -143,6 +143,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                     loanOrderExamineEntity.setModelName(model);
                     loanOrderExamineEntity.setUpdateTime(new Date());
                     loanOrderExamineEntity.setCreateTime(new Date());
+                    loanOrderExamineDao.insertOrderExamine(loanOrderExamineEntity);
                 });
 
                 return orderId;
