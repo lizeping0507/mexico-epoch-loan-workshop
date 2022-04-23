@@ -150,31 +150,6 @@ public class OrderController extends BaseController {
     }
 
     /**
-     * 申请确认
-     *
-     * @param params 请求参数
-     * @return Result
-     */
-    @PostMapping(URL.COMFIRM_APPLY)
-    public Result<ComfirmApplyResult> comfirmApply(ComfirmApplyParams params) {
-        // 结果集
-        Result<ComfirmApplyResult> result = new Result<ComfirmApplyResult>();
-
-        try {
-            // 订单详情
-            return orderService.comfirmApply(params);
-        } catch (Exception e) {
-            LogUtil.sysError("[OrderController comfirmApply]", e);
-
-            // 异常返回结果
-            result.setEx(ThrowableUtils.throwableToString(e));
-            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
-            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
-            return result;
-        }
-    }
-
-    /**
      * 订单详情
      *
      * @param params 请求参数
