@@ -489,27 +489,32 @@ public class UserServiceImpl extends BaseService implements UserService {
 
         String userId = params.getUser().getId();
         LoanUserInfoEntity info = loanUserInfoDao.findUserInfoById(userId);
-        if (ObjectUtils.isNotEmpty(info)) {
-            basicInfo.setRealName(info.getPapersName());
-            basicInfo.setDateOfBirth(info.getPapersDateOfBirth());
-            basicInfo.setGender(info.getPapersGender());
-            basicInfo.setAge(info.getPapersAge());
-            basicInfo.setIdAddr(info.getPapersAddress());
-            basicInfo.setIdNumber(info.getPapersId());
-            basicInfo.setRfc(info.getRfc());
-            basicInfo.setPostalCode(info.getPostalCode());
-            if (StringUtils.isNotBlank(info.getFrontPath())) {
-                String fileUrl = OssClient.getFileUrl(userFileBucketName, info.getFrontPath(), null);
-                basicInfo.setFrontImgUrl(fileUrl);
-            }
-            if (StringUtils.isNotBlank(info.getBackPath())) {
-                String fileUrl = OssClient.getFileUrl(userFileBucketName, info.getBackPath(), null);
-                basicInfo.setFrontImgUrl(fileUrl);
-            }
-            if (StringUtils.isNotBlank(info.getFacePath())) {
-                String fileUrl = OssClient.getFileUrl(userFileBucketName, info.getFacePath(), null);
-                basicInfo.setFrontImgUrl(fileUrl);
-            }
+
+        if (ObjectUtils.isEmpty(info)) {
+            result.setReturnCode(ResultEnum.SUCCESS.code());
+            result.setMessage(ResultEnum.SUCCESS.message());
+            return result;
+        }
+
+        basicInfo.setRealName(info.getPapersName());
+        basicInfo.setDateOfBirth(info.getPapersDateOfBirth());
+        basicInfo.setGender(info.getPapersGender());
+        basicInfo.setAge(info.getPapersAge());
+        basicInfo.setIdAddr(info.getPapersAddress());
+        basicInfo.setIdNumber(info.getPapersId());
+        basicInfo.setRfc(info.getRfc());
+        basicInfo.setPostalCode(info.getPostalCode());
+        if (StringUtils.isNotBlank(info.getFrontPath())) {
+            String fileUrl = OssClient.getFileUrl(userFileBucketName, info.getFrontPath(), null);
+            basicInfo.setFrontImgUrl(fileUrl);
+        }
+        if (StringUtils.isNotBlank(info.getBackPath())) {
+            String fileUrl = OssClient.getFileUrl(userFileBucketName, info.getBackPath(), null);
+            basicInfo.setFrontImgUrl(fileUrl);
+        }
+        if (StringUtils.isNotBlank(info.getFacePath())) {
+            String fileUrl = OssClient.getFileUrl(userFileBucketName, info.getFacePath(), null);
+            basicInfo.setFrontImgUrl(fileUrl);
         }
 
         // 封装结果
@@ -844,7 +849,6 @@ public class UserServiceImpl extends BaseService implements UserService {
 
         return result;
     }
-
 
     private File convertToFile(byte[] byteFile) {
         String objectId = ObjectIdUtil.getObjectId();
