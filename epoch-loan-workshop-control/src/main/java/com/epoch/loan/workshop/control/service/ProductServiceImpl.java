@@ -73,7 +73,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
         // 初始化订单
         LoanOrderEntity loanOrderEntity = initOrder(params.getUser(), OrderType.LOAN, appVersion, appName, orderModelGroup, loanProductEntity);
-        LogUtil.sysInfo("productDetail loanOrderEntity:{}", loanOrderEntity);
+        LogUtil.sysInfo("productDetail params.getUser():{}", params.getUser());
 
         // 订单状态
         Integer orderStatus = loanOrderEntity.getStatus();
@@ -226,7 +226,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
      * @return
      * @throws Exception
      */
-    protected LoanOrderEntity   initOrder(User user, Integer type, String appVersion, String appName, String orderModelGroup, LoanProductEntity productEntity) throws Exception {
+    protected LoanOrderEntity initOrder(User user, Integer type, String appVersion, String appName, String orderModelGroup, LoanProductEntity productEntity) throws Exception {
         // 用户id
         String userId = user.getId();
 
