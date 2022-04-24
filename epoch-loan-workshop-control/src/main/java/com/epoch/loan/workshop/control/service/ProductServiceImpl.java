@@ -71,6 +71,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
         // 初始化订单
         LoanOrderEntity loanOrderEntity = initOrder(params.getUser(), OrderType.LOAN, appVersion, appName, orderModelGroup, loanProductEntity);
+        LogUtil.sysInfo("productDetail loanOrderEntity:{}", loanOrderEntity);
 
         // 订单状态
         Integer orderStatus = loanOrderEntity.getStatus();
