@@ -34,7 +34,7 @@ spring:
   main:
     allow-bean-definition-overriding: true
   application:
-    name: epoch-loan-workshop-account
+    name: mexico-account
   cloud:
     nacos:
       discovery:

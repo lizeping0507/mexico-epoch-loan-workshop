@@ -20,7 +20,7 @@ spring:
   main:
     allow-bean-definition-overriding: true
   application:
-    name: epoch-loan-workshop-timing
+    name: mexico-timing
   cloud:
     nacos:
       discovery:
