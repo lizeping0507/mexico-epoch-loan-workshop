@@ -151,6 +151,18 @@ public class TokenManager {
         if (remittanceAccountCount == null && remittanceAccountCount == 0) {
             user.setRemittanceAccountAuth(false);
         }
+        // ocr认证状况
+        if (StringUtils.isEmpty(user.getPapersId())){
+            user.setOcrAuth(false);
+        }
+        // 用户信息认证状况
+        if (StringUtils.isEmpty(user.getChildrenNumber())){
+            user.setAddInfoAuth(false);
+        }
+        // 基本信息认证状况
+        if (StringUtils.isEmpty(user.getMonthlyIncome())){
+            user.setBasicInfoAuth(false);
+        }
 
         redisClient.set(RedisKeyField.USER_CACHE + user.getId(), JSONObject.toJSONString(user));
     }
