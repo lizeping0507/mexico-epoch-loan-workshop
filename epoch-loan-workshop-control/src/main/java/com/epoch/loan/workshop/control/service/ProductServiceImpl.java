@@ -91,13 +91,12 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
         }
 
-        // 认证状态
-        PlatformUserAuthEntity userAuth = platformUserAuthDao.findUserAuth(params.getUser().getId());
+        User user = params.getUser();
 
         // 封装认证状态
-        resData.setIdFlag("30".equals(userAuth.getIdCardState()) ? 1 : 0);
-        resData.setBaseInfoFlag("30".equals(userAuth.getBaseInfoState()) ? 1 : 0);
-        resData.setAddInfoFlag("30".equals(userAuth.getOtherInfoState()) ? 1 : 0);
+        resData.setIdFlag(StringUtils.isNotEmpty(user.getPapersId()) ? 1 : 0);
+        resData.setBaseInfoFlag(StringUtils.isNotEmpty(user.getMonthlyIncome()) ? 1 : 0);
+        resData.setAddInfoFlag(StringUtils.isNotEmpty(user.getChildrenNumber()) ? 1 : 0);
         resData.setOrderNo(loanOrderEntity.getId());
 
         return result;
@@ -186,12 +185,12 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         String result = HttpUtils.POST_FORM(riskConfig.getRiskUrl(), requestParams);
         LogUtil.sysInfo("requestParams: {} result:{}", requestParams, result);
 
-        if (StringUtils.isEmpty(result)) {
-            return false;
-        }
+//        if (StringUtils.isEmpty(result)) {
+//            return false;
+//        }
 
         // 更新节点响应数据
-        loanOrderExamineDao.updateOrderExamineResponse(loanOrderEntity.getId(), subExpression, result, new Date());
+//        loanOrderExamineDao.updateOrderExamineResponse(loanOrderEntity.getId(), subExpression, result, new Date());
 
         // 转换为JSON
 //        JSONObject resultJson = JSONObject.parseObject(result);
