@@ -108,4 +108,15 @@
     <update id="updateOrderBillPrincipalAmount">
         UPDATE loan_order_bill SET principal_amount=#{principalAmount},update_time=#{updateTime} WHERE id=#{id}
     </update>
+
+    <select id="sumOrderPunishmentAmount" resultType="java.lang.Double">
+        SELECT SUM(punishment_amount) FROM loan_order_bill WHERE order_id=#{orderId}
+    </select>
+    <select id="sumOrderInterestAmount" resultType="java.lang.Double">
+        SELECT SUM(interest_amount) FROM loan_order_bill WHERE order_id=#{orderId}
+    </select>
+
+    <select id="findLastOrderBill" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanOrderBillEntity">
+        SELECT * FROM loan_order_bill WHERE order_id=#{orderId} order by stages desc limit 0,1
+    </select>
 </mapper>

@@ -9,6 +9,7 @@ import com.epoch.loan.workshop.common.lock.UserApplyDetailLock;
 import com.epoch.loan.workshop.common.mq.order.params.OrderParams;
 import com.epoch.loan.workshop.common.params.params.request.*;
 import com.epoch.loan.workshop.common.params.params.result.*;
+import com.epoch.loan.workshop.common.params.params.result.model.LoanRepaymentRecordDTO;
 import com.epoch.loan.workshop.common.service.OrderService;
 import com.epoch.loan.workshop.common.util.DateUtil;
 import com.epoch.loan.workshop.common.util.HttpUtils;
@@ -19,10 +20,7 @@ import org.apache.dubbo.config.annotation.DubboService;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author : Shangkunfeng
@@ -134,7 +132,7 @@ public class OrderServiceImpl extends BaseService implements OrderService {
                 int updateOrderStatus = loanOrderDao.updateOrderStatus(orderId, OrderStatus.EXAMINE_WAIT, new Date());
                 if (updateOrderStatus != 0) {
                     // 更新申请时间
-                    loanOrderDao.updateOrderArrivalTime(orderId, new Date(), new Date());
+                    loanOrderDao.updateOrderApplyTime(orderId, new Date(), new Date());
 
                     // 查询审核模型列表
                     List<String> orderModelList = orderModelDao.findNamesByGroup(orderModelGroup);
@@ -378,7 +376,7 @@ public class OrderServiceImpl extends BaseService implements OrderService {
      * 订单详情
      *
      * @param params 请求参数
-     * @return Result
+     * @return Result 订单详情
      * @throws Exception 请求异常
      */
     @Override
@@ -403,9 +401,80 @@ public class OrderServiceImpl extends BaseService implements OrderService {
             return result;
         }
 
+        // 封装参数
+        OrderDetailResult detailResult = new OrderDetailResult();
+        detailResult.setOrderNo(orderEntity.getId());
+        detailResult.setProductId(orderEntity.getProductId());
+        detailResult.setOrderStatus(orderEntity.getStatus());
+        detailResult.setApprovalAmount(orderEntity.getApprovalAmount());
+        detailResult.setIncidentalAmount(orderEntity.getIncidentalAmount());
+        detailResult.setActualAmount(orderEntity.getActualAmount());
+
+        // 总利息
+        Double interestAmount = loanOrderBillDao.sumOrderInterestAmount(orderEntity.getId());
+        detailResult.setInterest(interestAmount);
+        Double estimatedRepaymentAmount = orderEntity.getEstimatedRepaymentAmount();
+        detailResult.setEstimatedRepaymentAmount(estimatedRepaymentAmount);
+        detailResult.setApplyTime(orderEntity.getApplyTime());
+        if (orderEntity.getStatus() <= OrderStatus.EXAMINE_FAIL) {
+            // 封装结果
+            result.setReturnCode(ResultEnum.SUCCESS.code());
+            result.setMessage(ResultEnum.SUCCESS.message());
+            result.setData(detailResult);
+            return result;
+        }
+
+        // 添加银行卡信息
+        String bankCardId = orderEntity.getBankCardId();
+        LoanRemittanceAccountEntity accountEntity = loanRemittanceAccountDao.findRemittanceAccount(bankCardId);
+        detailResult.setBankCardName(accountEntity.getName());
+        detailResult.setBankCardNo(accountEntity.getAccountNumber());
+        detailResult.setReceiveWay(accountEntity.getType());
+
+        // 废弃订单
+        if (orderEntity.getStatus() == OrderStatus.ABANDONED) {
+            // 封装结果
+            result.setReturnCode(ResultEnum.SUCCESS.code());
+            result.setMessage(ResultEnum.SUCCESS.message());
+            result.setData(detailResult);
+            return result;
+        }
+        detailResult.setLoanTime(orderEntity.getLoanTime());
+        LoanOrderBillEntity lastOrderBill = loanOrderBillDao.findLastOrderBill(orderId);
+
+        // 已还款
+        if (orderEntity.getStatus() == OrderStatus.COMPLETE
+                || orderEntity.getStatus() == OrderStatus.DUE_COMPLETE) {
+            detailResult.setActualRepaymentTime(lastOrderBill.getActualRepaymentTime());
+
+            // 封装结果
+            result.setReturnCode(ResultEnum.SUCCESS.code());
+            result.setMessage(ResultEnum.SUCCESS.message());
+            result.setData(detailResult);
+            return result;
+        }
+
+        // 预计还款时间
+        detailResult.setExpectedRepaymentTime(lastOrderBill.getRepaymentTime());
+
+        // 总罚息
+        Double punishmentAmount = loanOrderBillDao.sumOrderPunishmentAmount(orderEntity.getId());
+        detailResult.setPenaltyInterest(punishmentAmount);
+        Double actualRepaymentAmount = orderEntity.getActualRepaymentAmount();
+        detailResult.setActualRepaymentAmount(actualRepaymentAmount);
+
+        // 剩余还款金额
+        Double remainingRepaymentAmount = new BigDecimal(estimatedRepaymentAmount).subtract(new BigDecimal(actualRepaymentAmount)).doubleValue();
+        detailResult.setRemainingRepaymentAmount(remainingRepaymentAmount);
+
+        // TODO 已还款成功记录
+        List<LoanRepaymentRecordDTO> recordDTOList = new ArrayList<>();
+        detailResult.setRepayRecord(recordDTOList);
+
         // 封装结果
         result.setReturnCode(ResultEnum.SUCCESS.code());
         result.setMessage(ResultEnum.SUCCESS.message());
+        result.setData(detailResult);
         return result;
     }
 
