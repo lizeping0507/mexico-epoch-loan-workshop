@@ -9,20 +9,6 @@ import com.epoch.loan.workshop.mq.log.AccessLogStorage;
 import com.epoch.loan.workshop.mq.order.*;
 import com.epoch.loan.workshop.mq.order.screen.RiskModelV1;
 import com.epoch.loan.workshop.mq.remittance.DistributionRemittance;
-import com.epoch.loan.workshop.mq.remittance.payment.ac.AcPay;
-import com.epoch.loan.workshop.mq.remittance.payment.fast.FastPay;
-import com.epoch.loan.workshop.mq.remittance.payment.glob.GlobPay;
-import com.epoch.loan.workshop.mq.remittance.payment.hr.HrPay;
-import com.epoch.loan.workshop.mq.remittance.payment.in.InPay;
-import com.epoch.loan.workshop.mq.remittance.payment.incash.InCashPay;
-import com.epoch.loan.workshop.mq.remittance.payment.incash.InCashXjdPay;
-import com.epoch.loan.workshop.mq.remittance.payment.ocean.OceanPay;
-import com.epoch.loan.workshop.mq.remittance.payment.qe.QePay;
-import com.epoch.loan.workshop.mq.remittance.payment.sunflower.SunFlowerPay;
-import com.epoch.loan.workshop.mq.remittance.payment.trust.TrustPay;
-import com.epoch.loan.workshop.mq.remittance.payment.yeah.YeahPay;
-import com.epoch.loan.workshop.mq.remittance.payment.yeah.YeahPay1;
-import com.epoch.loan.workshop.mq.remittance.payment.yeah.YeahPay2;
 import com.epoch.loan.workshop.mq.repayment.DistributionRepayment;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,131 +40,67 @@ public class Application {
      */
     @Autowired
     public RepaymentMQManager repaymentMQManager;
+
     /**
      * 还款队列生产
      */
     @Autowired
     public DistributionRepayment distributionRepayment;
+
     /**
      * Zookeeper工具类
      */
     @Autowired
     public ZookeeperClient zookeeperClient;
+
     /**
      * 订单队列
      */
     @Autowired
     private OrderMQManager orderMQManager;
+
     /**
      * 风控V3策略队列
      */
     @Autowired
     private RiskModelV1 riskModelV1;
+
     /**
      * 审批通过
      */
     @Autowired
     private OrderExaminePass orderExaminePass;
+
     /**
      * 订单在途
      */
     @Autowired
     private OrderWay orderWay;
+
     /**
      * 订单完成
      */
     @Autowired
     private OrderComplete orderComplete;
+
     /**
      * 订单逾期
      */
     @Autowired
     private OrderDue orderDue;
+
     /**
      * 汇款分配队列
      */
     @Autowired
     private RemittanceMQManager remittanceMQManagerProduct;
+
     /**
      * 汇款分配队列
      */
     @Autowired
     private DistributionRemittance distributionRemittance;
-    /**
-     * yeahPay放款队列
-     */
-    @Autowired
-    private YeahPay yeahPay;
-    /**
-     * yeahPay2放款队列
-     */
-    @Autowired
-    private YeahPay2 yeahPay2;
-    /**
-     * yeahPa1放款队列
-     */
-    @Autowired
-    private YeahPay1 yeahPay1;
-    /**
-     * fastPay放款队列
-     */
-    @Autowired
-    private FastPay fastPay;
-    /**
-     * inPay放款队列
-     */
-    @Autowired
-    private InPay inPay;
-    /**
-     * subFlowerPay放款队列
-     */
-    @Autowired
-    private SunFlowerPay sunFlowerPay;
-    /**
-     * oceanPay放款队列
-     */
-    @Autowired
-    private OceanPay oceanPay;
-    /**
-     * acPay放款队列
-     */
-    @Autowired
-    private AcPay acPay;
-    /**
-     * IncashPay放款队列
-     */
-    @Autowired
-    private InCashPay inCashPay;
-    /**
-     * IncashXjdPay放款队列
-     */
-    @Autowired
-    private InCashXjdPay incashXjdPay;
-    /**
-     * TrustPay放款队列
-     */
-    @Autowired
-    private TrustPay trustPay;
-    /**
-     * QePay放款队列
-     */
-    @Autowired
-    private QePay qePay;
-    /**
-     * HrPay放款队列
-     */
-    @Autowired
-    private HrPay hrPay;
-    /**
-     * GlobPay放款队列
-     */
-    @Autowired
-    private GlobPay globPay;
-    /**
-     * yeahPay还款队列
-     */
-    @Autowired
-    private com.epoch.loan.workshop.mq.repayment.yeah.YeahPay1 repaymentYeahPay1;
+
     /**
      * 订单放款
      */
@@ -221,22 +143,7 @@ public class Application {
         orderExaminePass.start();
         orderWay.start();
         distributionRemittance.start();
-        yeahPay.start();
-        fastPay.start();
-        inPay.start();
-        yeahPay2.start();
-        yeahPay1.start();
-        sunFlowerPay.start();
-        oceanPay.start();
-        acPay.start();
-        inCashPay.start();
-        incashXjdPay.start();
-        trustPay.start();
-        qePay.start();
-        hrPay.start();
         accessLogStorage.start();
-        globPay.start();
-        repaymentYeahPay1.start();
         distributionRepayment.start();
     }
 }
