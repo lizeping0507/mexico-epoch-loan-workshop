@@ -184,6 +184,8 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
         // 发送请求
         String result = HttpUtils.POST_FORM(riskConfig.getRiskUrl(), requestParams);
+        LogUtil.sysInfo("requestParams: {} result:{}", requestParams, result);
+
         if (StringUtils.isEmpty(result)) {
             return false;
         }
