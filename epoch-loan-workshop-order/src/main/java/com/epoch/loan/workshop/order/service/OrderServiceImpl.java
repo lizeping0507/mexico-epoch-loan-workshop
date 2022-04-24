@@ -386,43 +386,26 @@ public class OrderServiceImpl extends BaseService implements OrderService {
         // 结果集
         Result<OrderDetailResult> result = new Result<>();
 
-        // 拼接请求路径
-        String url = platformConfig.getPlatformDomain() + PlatformUrl.PLATFORM_ORDER_DETAIL;
+        // 用户id
+        String userId = params.getUser().getId();
 
-        // 封装请求参数
-        JSONObject requestParam = new JSONObject();
-        requestParam.put("appFlag", params.getAppName());
-        requestParam.put("versionNumber", params.getAppVersion());
-        requestParam.put("mobileType", params.getMobileType());
-
-        requestParam.put("userId", params.getUserId());
-        requestParam.put("orderNo", params.getOrderNo());
-
-        // 封装请求头
-        Map<String, String> headers = new HashMap<>();
-        headers.put("token", params.getToken());
-
-        // 请求
-        String responseStr = HttpUtils.POST_WITH_HEADER(url, requestParam.toJSONString(), headers);
-
-        // 解析响应结果
-        JSONObject responseJson = JSONObject.parseObject(responseStr);
-
-        // 判断接口响应是否正常
-        if (!PlatformUtil.checkResponseCode(result, OrderDetailResult.class, responseJson)) {
+        // 订单id
+        String orderId = params.getOrderId();
+        LoanOrderEntity orderEntity = loanOrderDao.findOrder(orderId);
+        if (ObjectUtils.isEmpty(orderEntity)) {
+            result.setReturnCode(ResultEnum.NO_EXITS.code());
+            result.setMessage(ResultEnum.NO_EXITS.message());
             return result;
         }
-
-        // 获取结果集
-        JSONObject data = responseJson.getJSONObject("data");
-
-        // 封装结果就
-        OrderDetailResult res = JSONObject.parseObject(data.toJSONString(), OrderDetailResult.class);
+        if (!orderEntity.getUserId().equals(userId)) {
+            result.setReturnCode(ResultEnum.ORDER_ERROR.code());
+            result.setMessage(ResultEnum.ORDER_ERROR.message());
+            return result;
+        }
 
         // 封装结果
         result.setReturnCode(ResultEnum.SUCCESS.code());
         result.setMessage(ResultEnum.SUCCESS.message());
-        result.setData(res);
         return result;
     }
 

@@ -1,6 +1,7 @@
 package com.epoch.loan.workshop.api.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.epoch.loan.workshop.api.annotated.Authentication;
 import com.epoch.loan.workshop.common.config.URL;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
 import com.epoch.loan.workshop.common.params.params.request.*;
@@ -155,12 +156,21 @@ public class OrderController extends BaseController {
      * @param params 请求参数
      * @return Result
      */
+    @Authentication
     @PostMapping(URL.ORDER_DETAIL)
     public Result<OrderDetailResult> detail(OrderDetailParams params) {
         // 结果集
         Result<OrderDetailResult> result = new Result<OrderDetailResult>();
 
         try {
+            // 验证请求参数是否合法
+            if (!params.isOrderIdLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":orderNo");
+                return result;
+            }
+
             // 获取订单合同参数
             return orderService.detail(params);
         } catch (Exception e) {
@@ -180,6 +190,7 @@ public class OrderController extends BaseController {
      * @param params 请求参数
      * @return Result
      */
+    @Authentication
     @PostMapping(URL.REPAY_DETAIL)
     public Result<RepayDetailResult> repayDetail(RepayDetailParams params) {
         // 结果集
