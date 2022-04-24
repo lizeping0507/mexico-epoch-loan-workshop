@@ -95,9 +95,14 @@ public class LoanRepaymentPaymentRecordEntity {
     private String searchResponse;
 
     /**
-     * 业务Id
+     * 支付状态
      */
     private Integer status;
+
+    /**
+     * 支付方式 0:银行卡 1.clabe
+     */
+    private Integer type;
 
     /**
      * 创建时间

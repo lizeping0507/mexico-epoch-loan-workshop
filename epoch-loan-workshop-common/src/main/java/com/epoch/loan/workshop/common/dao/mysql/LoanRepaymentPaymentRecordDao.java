@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author : Shangkunfeng
@@ -41,7 +42,6 @@ public interface LoanRepaymentPaymentRecordDao {
      */
     void updateStatus(String id, int status, Date updateTime);
 
-
     /**
      * 根据订单账单id查询支付记录
      *
@@ -77,5 +77,21 @@ public interface LoanRepaymentPaymentRecordDao {
      */
     Double sumRepaymentRecordActualAmount(String orderBillId);
 
+    /**
+     * 更新订单还款记录里的 实际还款金额
+     *
+     * @param id           还款记录id
+     * @param actualAmount 时间还款金额
+     * @param updateTime   更新时间
+     */
     void updateRepaymentPaymentRecordActualAmount(String id, double actualAmount, Date updateTime);
+
+    /**
+     * 根据 订单id 查询所有还款成功记录
+     *
+     * @param orderId 订单id
+     * @param status 支付状态
+     * @return 还款成功记录
+     */
+    List<LoanRepaymentPaymentRecordEntity> findListRecordDTOByOrderIdAndStatus(String orderId, Integer status);
 }

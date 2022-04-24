@@ -72,4 +72,8 @@
     <select id="sumRepaymentRecordActualAmount" resultType="java.lang.Double">
         SELECT SUM(actual_amount) FROM loan_repayment_payment_record WHERE order_bill_id=#{orderBillId}
     </select>
+
+    <select id="findListRecordDTOByOrderIdAndStatus" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanRepaymentPaymentRecordEntity">
+        SELECT * FROM loan_repayment_payment_record WHERE order_id=#{orderId} AND status = #{status}
+    </select>
 </mapper>
