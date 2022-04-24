@@ -32,14 +32,14 @@ import java.util.Map;
 /**
  * @author : Duke
  * @packageName : com.epoch.loan.workshop.mq.order
- * @className : RiskModelV1
+ * @className : RiskMask
  * @createTime : 2021/11/16 18:02
  * @description : 风控V3
  */
 @RefreshScope
 @Component
 @Data
-public class RiskModelV1 extends BaseOrderMQListener implements MessageListenerConcurrently {
+public class RiskMask extends BaseOrderMQListener implements MessageListenerConcurrently {
     /**
      * 消息监听器
      */
@@ -133,6 +133,9 @@ public class RiskModelV1 extends BaseOrderMQListener implements MessageListenerC
                     // 是否通过
                     int pass = data.getInteger(Field.PASS);
 
+                    // 阈值级别
+                    String level = data.getString(Field.LEVEL);
+
                     // 通过
                     if (pass == 1) {
                         // 额度
@@ -174,10 +177,10 @@ public class RiskModelV1 extends BaseOrderMQListener implements MessageListenerC
                     // 异常,重试
                     retry(orderParams, subExpression());
                 } catch (Exception exception) {
-                    LogUtil.sysError("[RiskModelV1]", exception);
+                    LogUtil.sysError("[RiskMask]", exception);
                 }
 
-                LogUtil.sysError("[RiskModelV1]", e);
+                LogUtil.sysError("[RiskMask]", e);
             }
         }
         return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
@@ -257,7 +260,7 @@ public class RiskModelV1 extends BaseOrderMQListener implements MessageListenerC
             // 返回响应参数
             return JSONObject.parseObject(result);
         } catch (Exception e) {
-            LogUtil.sysError("[RiskModelV1 sendRiskV1Request]", e);
+            LogUtil.sysError("[RiskMask sendRiskV1Request]", e);
             return null;
         }
     }
