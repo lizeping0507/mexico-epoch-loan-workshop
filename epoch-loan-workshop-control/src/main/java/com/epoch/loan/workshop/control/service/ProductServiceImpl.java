@@ -72,8 +72,8 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         // 更新GPS信息(userInfo实时) TODO 更新到表里，然后更新缓存
 
         // 初始化订单
-        LoanOrderEntity loanOrderEntity = initOrder(params.getUser(), OrderType.LOAN, appVersion, appName, orderModelGroup, loanProductEntity);
         LogUtil.sysInfo("productDetail params.getUser():{}", params.getUser());
+        LoanOrderEntity loanOrderEntity = initOrder(params.getUser(), OrderType.LOAN, appVersion, appName, orderModelGroup, loanProductEntity);
 
         // 订单状态
         Integer orderStatus = loanOrderEntity.getStatus();
