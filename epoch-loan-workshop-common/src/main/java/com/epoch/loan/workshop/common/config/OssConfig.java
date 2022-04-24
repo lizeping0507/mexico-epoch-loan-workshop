@@ -1,7 +1,7 @@
 package com.epoch.loan.workshop.common.config;
 
 import com.aliyun.oss.ClientBuilderConfiguration;
-import com.aliyun.oss.OSSClient;
+import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.common.comm.Protocol;
 import lombok.Data;
@@ -43,7 +43,7 @@ public class OssConfig{
 
     @Bean
     @Primary
-    public OSSClient getOSSClient() {
+    public OSS getOSSClient() {
         ClientBuilderConfiguration conf = new ClientBuilderConfiguration();
 
         // 设置OSSClient允许打开的最大HTTP连接数，默认为1024个。
@@ -83,6 +83,6 @@ public class OssConfig{
         conf.setVerifySSLEnable(true);
 
         // 创建OSSClient实例
-        return (OSSClient) new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret, conf);
+        return new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret, conf);
     }
 }
