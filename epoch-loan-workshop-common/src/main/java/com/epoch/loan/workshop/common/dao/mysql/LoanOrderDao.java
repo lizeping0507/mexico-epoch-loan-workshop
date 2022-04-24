@@ -263,4 +263,14 @@ public interface LoanOrderDao {
      * @return
      */
     int countProcessOrderNo(String appName, String userId);
+
+    /**
+     * 小于指定状态的订单数量
+     *
+     * @param userId
+     * @param start
+     * @param end
+     * @return
+     */
+    Integer findUserBetweenSpecificStatusOrderNum(String userId, Integer start, Integer end);
 }

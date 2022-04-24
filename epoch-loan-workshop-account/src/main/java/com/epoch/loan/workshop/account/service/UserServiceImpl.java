@@ -347,15 +347,15 @@ public class UserServiceImpl extends BaseService implements UserService {
         data.setPhoneNumber(loginName.substring(0, 3) + "****" + loginName.substring(7));
 
         // 未完成的订单
-        Integer uncompletedOrder = platformOrderDao.findUserLessThanSpecificStatusOrderNum(userCache.getId(), 110);
+        Integer uncompletedOrder = loanOrderDao.findUserBetweenSpecificStatusOrderNum(userCache.getId(), OrderStatus.WAIT_PAY , OrderStatus.DUE);
         data.setUncompletedOrder(uncompletedOrder);
 
         // 待还款订单数量-
-        Integer noCompleteNum = platformOrderDao.findUserWaitRepaymentOrderNum(userCache.getId());
+        Integer noCompleteNum = loanOrderDao.findUserBetweenSpecificStatusOrderNum(userCache.getId(), OrderStatus.WAY , OrderStatus.DUE);
         data.setPenRepaymentOrder(noCompleteNum - uncompletedOrder);
 
         // 用户所有状态的订单数量
-        Integer allOrderNum = platformOrderDao.findUserAllOrderNum(userCache.getId());
+        Integer allOrderNum = loanOrderDao.findUserBetweenSpecificStatusOrderNum(userCache.getId(), null , null);
         data.setAllRepaymentOrder(allOrderNum);
 
         // 帮助中心地址 TODO 待确认

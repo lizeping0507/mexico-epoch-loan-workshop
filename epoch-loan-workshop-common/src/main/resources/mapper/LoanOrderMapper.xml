@@ -171,4 +171,13 @@
             AND app_name = #{appName}
         </if>
     </select>
+    <select id="findUserBetweenSpecificStatusOrderNum" resultType="java.lang.Integer">
+        Select  * from loan_order where user_id = #{userId}
+        <if test="end != null and end != ''">
+            and status &lt;= #{end}
+        </if>
+        <if test="appName != null and appName != ''">
+            and status &gt;= #{start}
+        </if>
+    </select>
 </mapper>
