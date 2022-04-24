@@ -77,7 +77,7 @@ public class OrderWay extends BaseOrderMQListener implements MessageListenerConc
                     continue;
                 }
 
-                /*计算还款金额及更新还款时间 TODO 还款金额应该移到审批通过节点计算*/
+                /*计算还款金额及更新还款时间*/
                 // 计算每期还款时间
                 Map<Integer, Date> repaymentTimeMap = new HashMap<>();
                 Date firstRepaymentTime;
@@ -118,13 +118,9 @@ public class OrderWay extends BaseOrderMQListener implements MessageListenerConc
                     loanOrderBillDao.updateOrderBillRepaymentTime(loanOrderBillEntity.getId(), repaymentTime, new Date());
                 }
 
-                // 新增还款计划 TODO 新老表 需要SKF写
-                addrepaymentPlan(loanOrderEntity, orderBillEntity, 0);
-
-                // 修改订单和订单账单状态为在途  FIXME 新老表
+                // 修改订单和订单账单状态为在途
                 updateOrderStatus(orderId, OrderStatus.WAY);
                 updateOrderBillStatusByOrderId(orderId, OrderBillStatus.WAY);
-                platformOrderDao.updateOrderStatus(orderId, 170, new Date());
 
                 // 发送还款策略组分配队列计算还款策略
                 DistributionRepaymentParams distributionRepaymentParams = new DistributionRepaymentParams();

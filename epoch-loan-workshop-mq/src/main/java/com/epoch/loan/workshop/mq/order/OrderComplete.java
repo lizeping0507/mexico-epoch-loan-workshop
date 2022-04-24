@@ -152,7 +152,6 @@ public class OrderComplete extends BaseOrderMQListener implements MessageListene
 
                     // 更新订单状态
                     updateOrderStatus(orderId, orderStatus);
-                    platformOrderDao.updateOrderStatus(orderId, 200, new Date());
                 }
             } catch (Exception e) {
                 try {

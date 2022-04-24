@@ -126,12 +126,8 @@ public class OrderDue extends BaseOrderMQListener implements MessageListenerConc
                 // 更新订单账单状态为逾期
                 updateOrderBillStatus(orderBillId, OrderBillStatus.DUE);
 
-                // 更新订单状态为逾期 TODO 新老表
+                // 更新订单状态为逾期
                 updateOrderStatus(orderId, OrderStatus.DUE);
-                platformOrderDao.updateOrderStatus(orderId, 180, new Date());
-
-                // 新增还款计划 TODO 新老表 需要SKF写
-                addrepaymentPlan(loanOrderEntity, loanOrderBillEntity, punishmentAmount);
 
                 // 删除计算标识
                 redisClient.del(RedisKeyField.ORDER_BILL_DUE_LOCK + orderId);

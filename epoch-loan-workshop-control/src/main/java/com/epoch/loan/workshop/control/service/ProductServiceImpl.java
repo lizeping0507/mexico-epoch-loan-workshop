@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.constant.*;
 import com.epoch.loan.workshop.common.entity.mysql.*;
+import com.epoch.loan.workshop.common.lock.UserProductDetailLock;
 import com.epoch.loan.workshop.common.params.User;
 import com.epoch.loan.workshop.common.params.params.BaseParams;
 import com.epoch.loan.workshop.common.params.params.request.*;
@@ -11,7 +12,6 @@ import com.epoch.loan.workshop.common.params.params.result.*;
 import com.epoch.loan.workshop.common.params.params.result.model.PayH5Result;
 import com.epoch.loan.workshop.common.service.ProductService;
 import com.epoch.loan.workshop.common.util.*;
-import com.epoch.loan.workshop.common.lock.UserProductDetailLock;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -394,6 +394,27 @@ public class ProductServiceImpl extends BaseService implements ProductService {
     public Result<AppModelResult> getAppModel(AppModelParams params) throws Exception {
         // 结果集
         Result<AppModelResult> result = new Result<>();
+
+        // 查询用户认证情况
+
+        // 查询用户有没有绑过卡
+
+        // 查询用户有没有贷超模式订单
+
+        // 查询用户指定状态下的订单
+        if (true) {
+            // 有指定状态下的订单
+
+            // 查询该承接盘，阈值
+
+        } else {
+            // 没有指定状态的订单就生成一个订单
+
+            // 查询承接盘-按照A阈值计算
+
+            // 生成订单
+        }
+
 
         // 拼接请求路径
         String url = platformConfig.getPlatformDomain() + PlatformUrl.PLATFORM_GETUSERAPPMODEL;

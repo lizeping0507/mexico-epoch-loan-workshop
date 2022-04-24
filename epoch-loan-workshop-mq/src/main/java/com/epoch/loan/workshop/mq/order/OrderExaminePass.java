@@ -94,9 +94,8 @@ public class OrderExaminePass extends BaseOrderMQListener implements MessageList
                 // 更新订单扣除费用
                 loanOrderDao.updateOrderIncidentalAmount(orderId, incidentalAmount, new Date());
 
-                // 更新实际放款金额 FIXME 新老表
+                // 更新实际放款金额
                 loanOrderDao.updateOrderActualAmount(orderId, realAmount, new Date());
-                platformOrderDao.updateOrderReceiveAmount(orderId, realAmount, new Date());
 
                 /* 计算还款金额 */
                 // 利率

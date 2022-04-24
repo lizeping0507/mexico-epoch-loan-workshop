@@ -121,9 +121,8 @@ public class OrderRemittance extends BaseOrderMQListener implements MessageListe
                     loanRemittanceOrderRecordEntity.setUpdateTime(new Date());
                     loanRemittanceOrderRecordDao.insert(loanRemittanceOrderRecordEntity);
 
-                    // 更新订单状态为等待放款 FIXME 新老表
+                    // 更新订单状态为等待放款
                     updateOrderStatus(orderId, OrderStatus.WAIT_PAY);
-                    platformOrderDao.updateOrderStatus(orderId, 115, new Date());
 
                     // 发送放款请求
                     DistributionRemittanceParams distributionRemittanceParams = new DistributionRemittanceParams();
@@ -162,9 +161,6 @@ public class OrderRemittance extends BaseOrderMQListener implements MessageListe
 
                         // 更改新表订单状态 : 废弃
                         updateOrderStatus(orderId, OrderStatus.ABANDONED);
-
-                        // 更改旧表订单状态 : 放款失败
-                        platformOrderDao.updateOrderStatus(orderId, 169, new Date());
                     } else {
                         // 放入队列等待放款成功
                         retry(orderParams, subExpression());
