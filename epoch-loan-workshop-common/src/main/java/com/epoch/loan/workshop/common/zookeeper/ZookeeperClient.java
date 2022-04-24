@@ -1,5 +1,6 @@
 package com.epoch.loan.workshop.common.zookeeper;
 
+import com.epoch.loan.workshop.common.util.LogUtil;
 import lombok.Data;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
@@ -54,7 +55,9 @@ public class ZookeeperClient {
         String path = PATH + mutex.getLockPath();
 
         //创建锁对象
-        InterProcessMutex lock = new InterProcessMutex(this.getClient(), path);
+        CuratorFramework client = this.getClient();
+        LogUtil.sysInfo("client:{}",client);
+        InterProcessMutex lock = new InterProcessMutex(client, path);
         boolean success = false;
         try {
             try {
