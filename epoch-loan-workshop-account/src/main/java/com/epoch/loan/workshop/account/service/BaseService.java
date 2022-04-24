@@ -222,6 +222,9 @@ public class BaseService {
         user.setCustomMotherName(userInfoEntity.getCustomMotherName());
         user.setCustomFullName(userInfoEntity.getCustomFullName());
         user.setUserFileBucketName(userInfoEntity.getUserFileBucketName());
+        user.setFrontPath(userInfoEntity.getFrontPath());
+        user.setBackPath(userInfoEntity.getBackPath());
+        user.setFacePath(userInfoEntity.getFacePath());
 
         LogUtil.sysInfo("用户信息缓存更新: {}", JSONObject.toJSONString(user));
         tokenManager.updateUserCache(user);

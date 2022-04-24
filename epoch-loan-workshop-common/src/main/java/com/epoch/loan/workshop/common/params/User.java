@@ -245,4 +245,19 @@ public class User implements Serializable {
      */
     private String userFileBucketName;
 
+    /**
+     * 上传证件的正面图片路径
+     */
+    private String frontPath;
+
+    /**
+     * 上传证件的背面图片路径
+     */
+    private String backPath;
+
+    /**
+     * 上传人脸的图片路径
+     */
+    private String facePath;
+
 }
