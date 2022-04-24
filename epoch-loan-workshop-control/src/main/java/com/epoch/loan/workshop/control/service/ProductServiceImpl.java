@@ -85,18 +85,17 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
             // 多投被拒返回
             if (!rejectionRule) {
-                // 封装结果 TODO 看看V1是返回啥
+                // 封装结果
                 return result;
             }
-
         }
 
         User user = params.getUser();
 
         // 封装认证状态
-        resData.setIdFlag(StringUtils.isNotEmpty(user.getPapersId()) ? 1 : 0);
-        resData.setBaseInfoFlag(StringUtils.isNotEmpty(user.getMonthlyIncome()) ? 1 : 0);
-        resData.setAddInfoFlag(StringUtils.isNotEmpty(user.getChildrenNumber()) ? 1 : 0);
+        resData.setIdFlag(user.isIdentityAuth() ? 1 : 0);
+        resData.setBaseInfoFlag(user.isBasicInfoAuth() ? 1 : 0);
+        resData.setAddInfoFlag(user.isAddInfoAuth() ? 1 : 0);
         resData.setOrderNo(loanOrderEntity.getId());
 
         return result;
