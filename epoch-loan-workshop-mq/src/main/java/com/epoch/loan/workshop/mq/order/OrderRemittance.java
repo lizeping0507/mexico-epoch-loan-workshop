@@ -88,17 +88,6 @@ public class OrderRemittance extends BaseOrderMQListener implements MessageListe
 
                 // 判断模型状态
                 if (status == OrderExamineStatus.CREATE) {
-                    // 查询用户Ocr信息 FIXME 老表需表合并
-                    PlatformUserOcrBasicInfoEntity platformUserOcrBasicInfoEntity = platformUserOcrBasicInfoDao.findUserOcrBasicInfo(userId);
-
-                    // 查询用户银行卡
-                    PlatformUserBankCardEntity platformUserBankCardEntity = null;//TODO platformUserBankCardDao.findUserBankCardById(loanOrderEntity.getBankCardId());
-
-                    // 查询用户信息 FIXME 老表需表合并
-                    PlatformUserEntity platformUserEntity = platformUserDao.findUser(userId);
-
-                    // 查询用户基本信息
-                    PlatformUserBasicInfoEntity platformUserBasicInfoEntity = platformUserBasicInfoDao.findUserBasicInfo(userId);
 
                     // 新增支付账单
                     String id = ObjectIdUtil.getObjectId();
@@ -107,13 +96,15 @@ public class OrderRemittance extends BaseOrderMQListener implements MessageListe
                     loanRemittanceOrderRecordEntity.setOrderId(orderId);
                     loanRemittanceOrderRecordEntity.setPaymentId("");
                     loanRemittanceOrderRecordEntity.setAmount(loanOrderEntity.getActualAmount());
-                    loanRemittanceOrderRecordEntity.setPhone(platformUserEntity.getPhoneNumber());
-                    loanRemittanceOrderRecordEntity.setAddCard(platformUserOcrBasicInfoEntity.getAadNo());
-                    loanRemittanceOrderRecordEntity.setPanCard(platformUserOcrBasicInfoEntity.getPanNo());
-                    loanRemittanceOrderRecordEntity.setEmail(platformUserBasicInfoEntity.getEmail());
-                    loanRemittanceOrderRecordEntity.setName(standardiseName(platformUserBankCardEntity.getUserName()));
-                    loanRemittanceOrderRecordEntity.setBankCard(platformUserBankCardEntity.getBankCard());
-                    loanRemittanceOrderRecordEntity.setIfsc(platformUserBankCardEntity.getOpenBank());
+
+//                    loanRemittanceOrderRecordEntity.setPhone(platformUserEntity.getPhoneNumber());
+//                    loanRemittanceOrderRecordEntity.setAddCard(platformUserOcrBasicInfoEntity.getAadNo());
+//                    loanRemittanceOrderRecordEntity.setPanCard(platformUserOcrBasicInfoEntity.getPanNo());
+//                    loanRemittanceOrderRecordEntity.setEmail(platformUserBasicInfoEntity.getEmail());
+//                    loanRemittanceOrderRecordEntity.setName(standardiseName(platformUserBankCardEntity.getUserName()));
+//                    loanRemittanceOrderRecordEntity.setBankCard(platformUserBankCardEntity.getBankCard());
+//                    loanRemittanceOrderRecordEntity.setIfsc(platformUserBankCardEntity.getOpenBank());
+
                     loanRemittanceOrderRecordEntity.setStatus(LoanRemittanceOrderRecordStatus.CREATE);
                     loanRemittanceOrderRecordEntity.setProcessRemittancePaymentRecordId("");
                     loanRemittanceOrderRecordEntity.setSuccessRemittancePaymentRecordId("");
