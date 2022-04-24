@@ -1,10 +1,6 @@
 package com.epoch.loan.workshop.common.util;
 
-import com.aliyun.oss.ClientException;
-import com.aliyun.oss.HttpMethod;
-import com.aliyun.oss.OSSClient;
-import com.aliyun.oss.OSSException;
-import com.aliyun.oss.model.GeneratePresignedUrlRequest;
+import com.aliyun.oss.*;
 import com.aliyun.oss.model.PutObjectRequest;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.InitializingBean;
@@ -26,9 +22,9 @@ import java.util.Date;
 public class OssFileUtils implements InitializingBean {
 
     @Autowired
-    private OSSClient ossClient;
+    private OSS ossClient;
 
-    private static OSSClient ossClientStatic;
+    private static OSS ossClientStatic;
 
     /**
      * 文件上传
@@ -63,7 +59,7 @@ public class OssFileUtils implements InitializingBean {
      * @param bucketName     桶名
      * @param objectName     上传路径
      * @param dateExpiration 过期时间
-     * @return预签
+     * @return 预签
      */
     public static String getFileUrl(String bucketName, String objectName, Date dateExpiration) {
         String fileUrl = null;
@@ -98,7 +94,7 @@ public class OssFileUtils implements InitializingBean {
      * @param objectName     上传路径
      * @param file           文件
      * @param dateExpiration 过期时间
-     * @return
+     * @return 预签
      */
     public static String uploadFileAndGetUrl(String bucketName, String objectName, File file, Date dateExpiration) {
         String fileUrl = null;
