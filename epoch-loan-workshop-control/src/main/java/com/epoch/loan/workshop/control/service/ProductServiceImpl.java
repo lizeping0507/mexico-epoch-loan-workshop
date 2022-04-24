@@ -194,32 +194,27 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         loanOrderExamineDao.updateOrderExamineResponse(loanOrderEntity.getId(), subExpression, result, new Date());
 
         // 转换为JSON
-        JSONObject resultJson = JSONObject.parseObject(result);
-
-        // 返回码
-        Integer code = resultJson.getInteger(Field.ERROR);
-        // TODO 测试 先写死
-        code = 200;
-
-        if (code != 200) {
-            return false;
-        }
-
-        // 成功
-        JSONObject data = resultJson.getJSONObject(Field.DATA);
-
-        // 是否通过
-        int pass = data.getInteger(Field.PASS);
-
-        // TODO 测试 先写死
-        pass = 1;
-
-        // 未通过
-        if (pass == 0) {
-            // 更新审核状态
-            loanOrderExamineDao.updateOrderExamineStatus(orderId, subExpression, OrderExamineStatus.REFUSE, new Date());
-            return false;
-        }
+//        JSONObject resultJson = JSONObject.parseObject(result);
+//
+//        // 返回码
+//        Integer code = resultJson.getInteger(Field.ERROR);
+//
+//        if (code != 200) {
+//            return false;
+//        }
+//
+//        // 成功
+//        JSONObject data = resultJson.getJSONObject(Field.DATA);
+//
+//        // 是否通过
+//        int pass = data.getInteger(Field.PASS);
+//
+//        // 未通过
+//        if (pass == 0) {
+//            // 更新审核状态
+//            loanOrderExamineDao.updateOrderExamineStatus(orderId, subExpression, OrderExamineStatus.REFUSE, new Date());
+//            return false;
+//        }
 
         // 通过
         loanOrderExamineDao.updateOrderExamineStatus(orderId, subExpression, OrderExamineStatus.PASS, new Date());
