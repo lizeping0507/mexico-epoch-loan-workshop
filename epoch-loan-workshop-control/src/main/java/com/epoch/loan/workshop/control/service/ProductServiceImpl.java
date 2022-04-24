@@ -43,6 +43,8 @@ public class ProductServiceImpl extends BaseService implements ProductService {
     public Result<ProductDetailResult> productDetail(ProductDetailParams params) throws Exception {
         // 结果集
         Result<ProductDetailResult> result = new Result<>();
+        ProductDetailResult resData = new ProductDetailResult();
+        result.setData(resData);
 
         // 产品id
         String productId = params.getProductId();
@@ -84,8 +86,16 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
         }
 
+        // 认证状态
+        PlatformUserAuthEntity userAuth = platformUserAuthDao.findUserAuth(params.getUser().getId());
 
-        return null;
+        // 封装认证状态
+        resData.setIdFlag("30".equals(userAuth.getIdCardState()) ? 1 : 0);
+        resData.setBaseInfoFlag("30".equals(userAuth.getBaseInfoState()) ? 1 : 0);
+        resData.setAddInfoFlag("30".equals(userAuth.getOtherInfoState()) ? 1 : 0);
+        resData.setOrderNo(loanOrderEntity.getId());
+
+        return result;
     }
 
     /**

@@ -118,4 +118,10 @@ public class BaseService {
      */
     @Autowired
     public PlatformChannelDao platformChannelDao;
+
+    /**
+     * 渠道
+     */
+    @Autowired
+    public PlatformUserAuthDao platformUserAuthDao;
 }
