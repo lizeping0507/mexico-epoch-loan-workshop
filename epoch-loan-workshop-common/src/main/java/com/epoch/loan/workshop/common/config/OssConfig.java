@@ -19,7 +19,7 @@ import org.springframework.context.annotation.Primary;
  * @Description: 阿里云服务器配置
  */
 @RefreshScope
-@Configuration
+//@Configuration TODO
 @Data
 public class OssConfig{
 

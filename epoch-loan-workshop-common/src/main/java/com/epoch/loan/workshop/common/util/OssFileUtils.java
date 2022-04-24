@@ -22,7 +22,7 @@ import java.util.Date;
  * @createTime : 2022/04/22 14:52
  * @Description: 阿里云OSS操作工具类
  */
-@Component
+//@Component TODO
 public class OssFileUtils implements InitializingBean {
 
     @Autowired
