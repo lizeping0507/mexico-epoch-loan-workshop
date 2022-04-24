@@ -69,7 +69,9 @@ public class ZookeeperClient {
             } else {
                 return null;
             }
-        } finally {
+        } catch (Exception e){
+            throw new RuntimeException("obtain lock error " + e.getMessage() + ", path " + path);
+        }finally {
             try {
                 if (success) {
                     lock.release(); //释放锁
