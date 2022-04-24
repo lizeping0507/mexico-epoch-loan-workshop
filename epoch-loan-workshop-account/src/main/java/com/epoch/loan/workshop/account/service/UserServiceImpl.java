@@ -50,7 +50,7 @@ public class UserServiceImpl extends BaseService implements UserService {
     /**
      * 存储用户 照片桶名
      */
-    @Value("${oss.user.file.bucketName}")
+    // @Value("${oss.user.file.bucketName}")
     private String userFileBucketName;
 
     /**
