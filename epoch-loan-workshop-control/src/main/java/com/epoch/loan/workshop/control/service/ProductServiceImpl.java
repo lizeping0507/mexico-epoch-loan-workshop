@@ -74,12 +74,14 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         // 初始化订单
         LogUtil.sysInfo("productDetail params.getUser():{}", params.getUser());
         LoanOrderEntity loanOrderEntity = initOrder(params.getUser(), OrderType.LOAN, appVersion, appName, orderModelGroup, loanProductEntity);
+        LogUtil.sysInfo("productDetail loanOrderEntity:{}", loanOrderEntity);
 
         // 订单状态
         Integer orderStatus = loanOrderEntity.getStatus();
         if (orderStatus == OrderStatus.CREATE) {
             // 如果订单状态处于创建状态，进行多投判断
             boolean rejectionRule = rejectionRule(loanOrderEntity, params.getUser());
+            LogUtil.sysInfo("productDetail rejectionRule:{}", rejectionRule);
 
             // 多投被拒返回
             if (!rejectionRule) {
@@ -182,6 +184,8 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
         // 发送请求
         String result = HttpUtils.POST_FORM(riskConfig.getRiskUrl(), requestParams);
+        LogUtil.sysInfo("requestParams: {} result:{}", requestParams, result);
+
         if (StringUtils.isEmpty(result)) {
             return false;
         }
@@ -190,26 +194,27 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         loanOrderExamineDao.updateOrderExamineResponse(loanOrderEntity.getId(), subExpression, result, new Date());
 
         // 转换为JSON
-        JSONObject resultJson = JSONObject.parseObject(result);
-
-        // 返回码
-        Integer code = resultJson.getInteger(Field.ERROR);
-        if (code != 200) {
-            return false;
-        }
-
-        // 成功
-        JSONObject data = resultJson.getJSONObject(Field.DATA);
-
-        // 是否通过
-        int pass = data.getInteger(Field.PASS);
-
-        // 未通过
-        if (pass == 0) {
-            // 更新审核状态
-            loanOrderExamineDao.updateOrderExamineStatus(orderId, subExpression, OrderExamineStatus.REFUSE, new Date());
-            return false;
-        }
+//        JSONObject resultJson = JSONObject.parseObject(result);
+//
+//        // 返回码
+//        Integer code = resultJson.getInteger(Field.ERROR);
+//
+//        if (code != 200) {
+//            return false;
+//        }
+//
+//        // 成功
+//        JSONObject data = resultJson.getJSONObject(Field.DATA);
+//
+//        // 是否通过
+//        int pass = data.getInteger(Field.PASS);
+//
+//        // 未通过
+//        if (pass == 0) {
+//            // 更新审核状态
+//            loanOrderExamineDao.updateOrderExamineStatus(orderId, subExpression, OrderExamineStatus.REFUSE, new Date());
+//            return false;
+//        }
 
         // 通过
         loanOrderExamineDao.updateOrderExamineStatus(orderId, subExpression, OrderExamineStatus.PASS, new Date());
