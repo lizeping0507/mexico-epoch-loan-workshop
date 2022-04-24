@@ -160,7 +160,7 @@ public class OrderController extends BaseController {
     @PostMapping(URL.ORDER_DETAIL)
     public Result<OrderDetailResult> detail(OrderDetailParams params) {
         // 结果集
-        Result<OrderDetailResult> result = new Result<OrderDetailResult>();
+        Result<OrderDetailResult> result = new Result<>();
 
         try {
             // 验证请求参数是否合法
@@ -171,7 +171,7 @@ public class OrderController extends BaseController {
                 return result;
             }
 
-            // 获取订单合同参数
+            // 获取订单详情
             return orderService.detail(params);
         } catch (Exception e) {
             LogUtil.sysError("[OrderController detail]", e);

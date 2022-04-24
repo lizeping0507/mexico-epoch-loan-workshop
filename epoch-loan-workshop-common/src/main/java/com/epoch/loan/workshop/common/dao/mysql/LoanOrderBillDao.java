@@ -213,4 +213,27 @@ public interface LoanOrderBillDao {
      * @return
      */
     LoanOrderBillEntity findFistRepayOrder(String userId, String appName);
+
+    /**
+     * 计算总罚息
+     *
+     * @param orderId
+     * @return
+     */
+    Double sumOrderPunishmentAmount(String orderId);
+
+    /**
+     * 计算总利息
+     * @param orderId
+     * @return
+     */
+    Double sumOrderInterestAmount(String orderId);
+
+    /**
+     * 查询订单最后一期账单
+     *
+     * @param orderId
+     * @return
+     */
+    LoanOrderBillEntity findLastOrderBill(String orderId);
 }

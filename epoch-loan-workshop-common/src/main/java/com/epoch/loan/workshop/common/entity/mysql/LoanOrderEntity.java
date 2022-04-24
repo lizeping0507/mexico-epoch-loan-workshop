@@ -81,7 +81,6 @@ public class LoanOrderEntity {
      */
     private Double penaltyInterest;
 
-
     /**
      * 订单状态
      */

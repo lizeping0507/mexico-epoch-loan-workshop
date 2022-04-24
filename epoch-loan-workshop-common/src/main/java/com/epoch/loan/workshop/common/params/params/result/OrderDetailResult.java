@@ -1,9 +1,10 @@
 package com.epoch.loan.workshop.common.params.params.result;
 
-import com.epoch.loan.workshop.common.params.params.result.model.OrderState;
+import com.epoch.loan.workshop.common.params.params.result.model.LoanRepaymentRecordDTO;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -22,82 +23,92 @@ public class OrderDetailResult implements Serializable {
     private String orderNo;
 
     /**
-     * 产品名
-     */
-    private String productName;
-
-    /**
-     * 机构名称
-     */
-    private String merchantName;
-
-    /**
-     * 申请额度
-     */
-    private String approvalAmount;
-
-    /**
-     * 还款时间
-     */
-    private String repaymentTime;
-
-    /**
-     * 实际到账金额
-     */
-    private String actualAmount;
-
-    /**
-     * 还款金额
-     */
-    private String repaymentAmount;
-
-    /**
-     * 申请借款时间
-     */
-    private String orderTime;
-
-    /**
-     * 银行卡名称
-     */
-    private String bankcardName;
-
-    /**
-     * 银行账户号
-     */
-    private String paymentCard;
-
-    /**
-     * 实际还款金额
-     */
-    private String actualRepaymentAmount;
-
-    /**
-     * 订单状态list
-     */
-    private List<OrderState> orderStatusList;
-
-    /**
      * 产品id
      */
-    private Long productId;
+    private String productId;
 
     /**
      * 订单状态
      */
-    private String orderStatus;
+    private Integer orderStatus;
 
     /**
-     * appid
+     * 申请额度
      */
-    private String appId;
+    private Double approvalAmount;
 
     /**
-     * 是否需要上报抓取数据
+     * 服务费
      */
-    private Boolean needCatchData;
+    private Double incidentalAmount;
 
     /**
-     * 借款协议
+     * 实际到账金额
      */
-    private String checkUrl;
+    private Double actualAmount;
+
+    /**
+     * 利息
+     */
+    private Double interest;
+
+    /**
+     * 罚息
+     */
+    private Double penaltyInterest;
+
+    /**
+     * 预计还款金额(总)
+     */
+    private Double estimatedRepaymentAmount;
+
+    /**
+     * 实际还款金额(总)
+     */
+    private Double actualRepaymentAmount;
+
+    /**
+     * 剩余还款金额(总)
+     */
+    private Double remainingRepaymentAmount;
+
+    /**
+     * 还款记录
+     */
+    private List<LoanRepaymentRecordDTO> repayRecord;
+
+    /**
+     * 银行卡名称
+     */
+    private String bankCardName;
+
+    /**
+     * 收款方式 0:银行卡 1.clabe
+     */
+    private Integer receiveWay;
+
+    /**
+     * 银行账户号
+     */
+    private String bankCardNo;
+
+    /**
+     * 申请时间
+     */
+    private Date applyTime;
+
+    /**
+     * 放款时间
+     */
+    private Date loanTime;
+
+    /**
+     * 预计还款时间
+     */
+    private Date expectedRepaymentTime;
+
+    /**
+     * 还款时间
+     */
+    private Date actualRepaymentTime;
 }

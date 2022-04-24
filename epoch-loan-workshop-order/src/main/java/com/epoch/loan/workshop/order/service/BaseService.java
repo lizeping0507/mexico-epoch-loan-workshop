@@ -28,6 +28,12 @@ public class BaseService {
     public LoanOrderDao loanOrderDao;
 
     /**
+     * 订单账单
+     */
+    @Autowired
+    public LoanOrderBillDao loanOrderBillDao;
+
+    /**
      * 旧订单
      */
     @Autowired

@@ -30,7 +30,7 @@ public class AddRemittanceAccountParams extends BaseParams {
     private String name;
 
     /**
-     * 类型
+     * 类型 0:借记卡 1:clabe账户
      */
     private Integer type;
 
