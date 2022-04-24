@@ -389,6 +389,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
     }
 
 
+
     /**
      * 获取用户app模式
      *
@@ -397,21 +398,41 @@ public class ProductServiceImpl extends BaseService implements ProductService {
      * @throws Exception 请求异常
      */
     @Override
-    public Result<AppModelResult> getAppModel(AppModelParams params) throws Exception {
+    public Result<AppMaskModelResult> getAppModel(AppModelParams params) throws Exception {
         // 结果集
-        Result<AppModelResult> result = new Result<>();
+        AppMaskModelResult appMaskModelResult = new AppMaskModelResult();
 
-        // 查询用户认证情况
+        // 初始化模式
+        int maskModel = 0;
 
-        // 查询用户有没有绑过卡
+        /*查询用户认证情况*/
+        // 身份认证
+        appMaskModelResult.setIdentityAuth(0);
+
+        // 基本信息认证
+        appMaskModelResult.setBasicInfoAuth(0);
+
+        // 补充信息认证
+        appMaskModelResult.setAddInfoAuth(0);
+
+        // OCR认证
+        appMaskModelResult.setOcrAuth(0);
+
+        // 查询四项认证是否都通过
+        if (false) {
+            // 没有通过 返回结果
+        }
+
+        // 查询用户有没有添加过卡
 
         // 查询用户有没有贷超模式订单
+
 
         // 查询用户指定状态下的订单
         if (true) {
             // 有指定状态下的订单
 
-            // 查询该承接盘，阈值
+            // 查询该承接盘,阈值
 
         } else {
             // 没有指定状态的订单就生成一个订单
@@ -419,55 +440,11 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             // 查询承接盘-按照A阈值计算
 
             // 生成订单
+
+
         }
 
-
-        // 拼接请求路径
-        String url = platformConfig.getPlatformDomain() + PlatformUrl.PLATFORM_GETUSERAPPMODEL;
-
-        // 封装请求参数
-        JSONObject requestParam = new JSONObject();
-        requestParam.put("registerAddr", params.getGpsAddress());
-        requestParam.put("gpsLocation", params.getGps());
-        requestParam.put("appFlag", params.getAppName());
-        requestParam.put("versionNumber", params.getAppVersion());
-        requestParam.put("mobileType", params.getMobileType());
-        if (ObjectUtils.isNotEmpty(params.getAppType())) {
-            requestParam.put("appType", params.getAppType());
-        }
-
-        requestParam.put("userId", params.getUserId());
-        requestParam.put("productId", params.getProductId());
-        requestParam.put("approvalGps", params.getApprovalGps());
-        requestParam.put("approvalAddr", params.getApprovalAddr());
-        requestParam.put("orderNo", params.getOrderNo());
-        requestParam.put("appsflyerId", params.getAppsflyerId());
-
-        // 封装请求头
-        Map<String, String> headers = new HashMap<>();
-        headers.put("token", params.getToken());
-
-        // 请求
-        String responseStr = HttpUtils.POST_WITH_HEADER(url, requestParam.toJSONString(), headers);
-
-        // 解析响应结果
-        JSONObject responseJson = JSONObject.parseObject(responseStr);
-
-        // 判断接口响应是否正常
-        if (!PlatformUtil.checkResponseCode(result, AppModelResult.class, responseJson)) {
-            return result;
-        }
-
-        // 获取结果集
-        JSONObject data = responseJson.getJSONObject("data");
-
-        // 封装结果就
-        AppModelResult appModelResult = JSONObject.parseObject(data.toJSONString(), AppModelResult.class);
-
-        // 封装结果
-        result.setReturnCode(ResultEnum.SUCCESS.code());
-        result.setMessage(ResultEnum.SUCCESS.message());
-        result.setData(appModelResult);
+        Result<AppMaskModelResult> result = new Result<>();
         return result;
     }
 

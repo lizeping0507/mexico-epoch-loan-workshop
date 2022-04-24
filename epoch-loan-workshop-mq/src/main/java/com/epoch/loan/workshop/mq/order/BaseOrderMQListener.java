@@ -152,6 +152,12 @@ public abstract class BaseOrderMQListener {
     public LoanUserInfoDao loanUserInfoDao;
 
     /**
+     * 变身包
+     */
+    @Autowired
+    public LoanMaskDao loanMaskDao;
+
+    /**
      * 获取子类消息监听
      */
     protected abstract MessageListenerConcurrently getMessageListener();
