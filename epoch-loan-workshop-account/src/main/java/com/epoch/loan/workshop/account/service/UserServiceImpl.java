@@ -147,7 +147,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         String token = this.tokenManager.updateUserToken(user.getId());
 
         // 更新缓存
-        updateUserCache(user.getId());
+        tokenManager.updateUserCache(user.getId());
 
         // 封装结果
         RegisterResult registerResult = new RegisterResult();
@@ -190,7 +190,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         String token = this.tokenManager.updateUserToken(user.getId());
 
         // 更新缓存
-        updateUserCache(user.getId());
+        tokenManager.updateUserCache(user.getId());
 
         // TODO 新增或更新afid
 
@@ -247,7 +247,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         loanUserDao.updatePassword(user.getId(), params.getPasswd());
 
         // 更新缓存
-        updateUserCache(user.getId());
+        tokenManager.updateUserCache(user.getId());
 
         // 生成Token
         String token1 = tokenManager.updateUserToken(user.getId());
@@ -307,7 +307,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         loanUserDao.updatePassword(userCache.getId(), params.getNewPassword());
 
         // 更新缓存
-        updateUserCache(userCache.getId());
+        tokenManager.updateUserCache(params.getUser().getId());
 
         // 生成Token
         String token1 = tokenManager.updateUserToken(userCache.getId());
@@ -406,7 +406,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         loanUserInfoDao.update(userInfo);
 
         // TODO 更新用户缓存
-        updateUserCache(user.getId());
+        tokenManager.updateUserCache(user.getId());
 
         // TODO 更新用户认证信息
 
@@ -444,7 +444,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         loanUserInfoDao.update(userInfo);
 
         // TODO 更新用户缓存
-        updateUserCache(user.getId());
+        tokenManager.updateUserCache(user.getId());
 
         // TODO 更新用户认证信息
 
@@ -688,7 +688,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         loanUserInfoDao.update(userInfoById);
 
         // TODO 更新用户缓存
-        updateUserCache(user.getId());
+        tokenManager.updateUserCache(user.getId());
 
         // TODO 更新用户认证信息
 

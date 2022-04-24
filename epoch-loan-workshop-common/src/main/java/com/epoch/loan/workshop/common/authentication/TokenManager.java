@@ -2,6 +2,11 @@ package com.epoch.loan.workshop.common.authentication;
 
 import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.constant.RedisKeyField;
+import com.epoch.loan.workshop.common.dao.mysql.LoanRemittanceAccountDao;
+import com.epoch.loan.workshop.common.dao.mysql.LoanUserDao;
+import com.epoch.loan.workshop.common.dao.mysql.LoanUserInfoDao;
+import com.epoch.loan.workshop.common.entity.mysql.LoanUserEntity;
+import com.epoch.loan.workshop.common.entity.mysql.LoanUserInfoEntity;
 import com.epoch.loan.workshop.common.params.User;
 import com.epoch.loan.workshop.common.redis.RedisClient;
 import com.epoch.loan.workshop.common.util.ObjectIdUtil;
@@ -25,6 +30,23 @@ public class TokenManager {
      */
     @Autowired
     private RedisClient redisClient;
+
+    /**
+     * 新用户表
+     */
+    @Autowired
+    public LoanUserDao loanUserDao;
+    /**
+     * 新用户详细表
+     */
+    @Autowired
+    public LoanUserInfoDao loanUserInfoDao;
+
+    /**
+     * 放款账户
+     */
+    @Autowired
+    public LoanRemittanceAccountDao loanRemittanceAccountDao;
 
     /**
      * 用户是否在线
@@ -66,9 +88,70 @@ public class TokenManager {
     /**
      * 更新用户缓存
      *
-     * @param user
+     * @param userId
      */
-    public void updateUserCache(User user) {
+    public void updateUserCache(String userId) {
+        User user = new User();
+        LoanUserEntity userEntity = loanUserDao.findById(userId);
+        LoanUserInfoEntity userInfoEntity = loanUserInfoDao.findUserInfoById(userId);
+
+        user.setId(userEntity.getId());
+        user.setAndroidId(userEntity.getAndroidId());
+        user.setChannelId(userEntity.getChannelId());
+        user.setGaId(userEntity.getGaId());
+        user.setImei(userEntity.getImei());
+        user.setPlatform(userEntity.getPlatform());
+        user.setLoginName(userEntity.getLoginName());
+        user.setPassword(userEntity.getPassword());
+        user.setAppName(userEntity.getAppName());
+        user.setAppVersion(userEntity.getAppVersion());
+        user.setUserInfoId(userInfoEntity.getId());
+        user.setMobile(userInfoEntity.getMobile());
+        user.setGps(userInfoEntity.getGps());
+        user.setGpsAddress(userInfoEntity.getGpsAddress());
+        user.setRegisterGps(userInfoEntity.getRegisterGps());
+        user.setRegisterAddress(userInfoEntity.getRegisterAddress());
+        user.setIp(userInfoEntity.getIp());
+        user.setIpAddress(userInfoEntity.getIpAddress());
+        user.setContacts(userInfoEntity.getContacts());
+        user.setMonthlyIncome(userInfoEntity.getMonthlyIncome());
+        user.setPayPeriod(userInfoEntity.getPayPeriod());
+        user.setOccupation(userInfoEntity.getOccupation());
+        user.setPayMethod(userInfoEntity.getPayMethod());
+        user.setEmail(userInfoEntity.getEmail());
+        user.setEducation(userInfoEntity.getEducation());
+        user.setMarital(userInfoEntity.getMarital());
+        user.setChildrenNumber(userInfoEntity.getChildrenNumber());
+        user.setLoanPurpose(userInfoEntity.getLoanPurpose());
+        user.setLiveType(userInfoEntity.getLiveType());
+        user.setPapersAddress(userInfoEntity.getPapersAddress());
+        user.setPapersFatherName(userInfoEntity.getPapersFatherName());
+        user.setPapersName(userInfoEntity.getPapersName());
+        user.setPapersMotherName(userInfoEntity.getPapersMotherName());
+        user.setPapersFullName(userInfoEntity.getPapersFullName());
+        user.setPapersId(userInfoEntity.getPapersId());
+        user.setPapersVoterId(userInfoEntity.getPapersVoterId());
+        user.setPapersGender(userInfoEntity.getPapersGender());
+        user.setPapersAge(userInfoEntity.getPapersAge());
+        user.setPapersDateOfBirth(userInfoEntity.getPapersDateOfBirth());
+        user.setPostalCode(userInfoEntity.getPostalCode());
+        user.setRfc(userInfoEntity.getRfc());
+        user.setCustomFatherName(userInfoEntity.getCustomFatherName());
+        user.setCustomName(userInfoEntity.getCustomName());
+        user.setCustomMotherName(userInfoEntity.getCustomMotherName());
+        user.setCustomFullName(userInfoEntity.getCustomFullName());
+        user.setUserFileBucketName(userInfoEntity.getUserFileBucketName());
+        user.setFrontPath(userInfoEntity.getFrontPath());
+        user.setBackPath(userInfoEntity.getBackPath());
+        user.setFacePath(userInfoEntity.getFacePath());
+        user.setRemittanceAccountAuth(true);
+
+        // 查询放款账户数量
+        Integer remittanceAccountCount = loanRemittanceAccountDao.findUserRemittanceAccountCount(userId);
+        if (remittanceAccountCount == null && remittanceAccountCount == 0) {
+            user.setRemittanceAccountAuth(false);
+        }
+
         redisClient.set(RedisKeyField.USER_CACHE + user.getId(), JSONObject.toJSONString(user));
     }
 
