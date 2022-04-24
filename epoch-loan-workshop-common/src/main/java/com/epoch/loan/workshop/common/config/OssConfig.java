@@ -41,7 +41,7 @@ public class OssConfig{
     @Value("${oss.accessKeySecret}")
     private String accessKeySecret;
 
-    @Bean
+    @Bean("ossClient")
     @Primary
     public OSSClient getOSSClient() {
         ClientBuilderConfiguration conf = new ClientBuilderConfiguration();
