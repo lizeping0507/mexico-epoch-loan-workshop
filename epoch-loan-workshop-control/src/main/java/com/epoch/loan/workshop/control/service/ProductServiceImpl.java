@@ -232,99 +232,105 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         String orderId = zookeeperClient.lock(new UserProductDetailLock<String>(userId) {
             @Override
             public String execute() {
-                // 产品id
-                String productId = productEntity.getId();
+                try {
+                    // 产品id
+                    String productId = productEntity.getId();
 
-                // 查询用户是否有已经创建且未完结的订单
-                Integer[] status = new Integer[]{OrderStatus.CREATE, OrderStatus.EXAMINE_WAIT, OrderStatus.EXAMINE_PASS, OrderStatus.WAIT_PAY, OrderStatus.WAY, OrderStatus.DUE};
-                List<LoanOrderEntity> loanOrderEntityList = loanOrderDao.findOrderByUserAndProductIdAndStatus(userId, productId, status);
-                if (CollectionUtils.isNotEmpty(loanOrderEntityList)) {
-                    return loanOrderEntityList.get(0).getId();
-                }
+                    // 查询用户是否有已经创建且未完结的订单
+                    Integer[] status = new Integer[]{OrderStatus.CREATE, OrderStatus.EXAMINE_WAIT, OrderStatus.EXAMINE_PASS, OrderStatus.WAIT_PAY, OrderStatus.WAY, OrderStatus.DUE};
+                    List<LoanOrderEntity> loanOrderEntityList = loanOrderDao.findOrderByUserAndProductIdAndStatus(userId, productId, status);
+                    if (CollectionUtils.isNotEmpty(loanOrderEntityList)) {
+                        return loanOrderEntityList.get(0).getId();
+                    }
 
 
-                // 查询用户指定状态订单
-                status = new Integer[]{OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE};
-                loanOrderEntityList = loanOrderDao.findOrderByUserAndProductIdAndStatus(userId, productId, status);
+                    // 查询用户指定状态订单
+                    status = new Integer[]{OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE};
+                    loanOrderEntityList = loanOrderDao.findOrderByUserAndProductIdAndStatus(userId, productId, status);
 
-                // 是否复贷
-                Integer reloan = 0;
-                if (CollectionUtils.isNotEmpty(loanOrderEntityList)) {
-                    reloan = 1;
-                }
+                    // 是否复贷
+                    Integer reloan = 0;
+                    if (CollectionUtils.isNotEmpty(loanOrderEntityList)) {
+                        reloan = 1;
+                    }
 
-                // 用户客群
-                Integer userType = userType(userId, productId, appName);
+                    // 用户客群
+                    Integer userType = userType(userId, productId, appName);
 
-                // 订单id
-                String orderId = ObjectIdUtil.getObjectId();
+                    // 订单id
+                    String orderId = ObjectIdUtil.getObjectId();
 
-                // 新增订单
-                LoanOrderEntity loanOrderEntity = new LoanOrderEntity();
-                loanOrderEntity = new LoanOrderEntity();
-                loanOrderEntity.setId(orderId);
-                loanOrderEntity.setUserId(userId);
-                loanOrderEntity.setProductId(productId);
-                loanOrderEntity.setUserChannelId(user.getChannelId());
-                loanOrderEntity.setBankCardId("");
-                loanOrderEntity.setReloan(reloan);
-                loanOrderEntity.setOrderModelGroup(orderModelGroup);
-                loanOrderEntity.setRemittanceDistributionGroup(productEntity.getRemittanceDistributionGroup());
-                loanOrderEntity.setRepaymentDistributionGroup("H6");
-                loanOrderEntity.setUserType(userType);
-                loanOrderEntity.setStages(productEntity.getStages());
-                loanOrderEntity.setStagesDay(productEntity.getStagesDay());
-                loanOrderEntity.setProcessingFeeProportion(productEntity.getProcessingFeeProportion());
-                loanOrderEntity.setInterest(productEntity.getInterest());
-                loanOrderEntity.setPenaltyInterest(productEntity.getPenaltyInterest());
-                loanOrderEntity.setStatus(OrderStatus.CREATE);
-                loanOrderEntity.setType(type);
-                loanOrderEntity.setApprovalAmount(0.0);
-                loanOrderEntity.setActualAmount(0.0);
-                loanOrderEntity.setIncidentalAmount(0.0);
-                loanOrderEntity.setEstimatedRepaymentAmount(0.0);
-                loanOrderEntity.setActualAmount(0.0);
-                loanOrderEntity.setActualRepaymentAmount(0.0);
-                loanOrderEntity.setAppName(appName);
-                loanOrderEntity.setAppVersion(appVersion);
-                loanOrderEntity.setApplyTime(null);
-                loanOrderEntity.setLoanTime(null);
-                loanOrderEntity.setApplyTime(null);
-                loanOrderEntity.setUpdateTime(new Date());
-                loanOrderEntity.setCreateTime(new Date());
-                Integer insertOrder = loanOrderDao.insertOrder(loanOrderEntity);
+                    // 新增订单
+                    LoanOrderEntity loanOrderEntity = new LoanOrderEntity();
+                    loanOrderEntity = new LoanOrderEntity();
+                    loanOrderEntity.setId(orderId);
+                    loanOrderEntity.setUserId(userId);
+                    loanOrderEntity.setProductId(productId);
+                    loanOrderEntity.setUserChannelId(user.getChannelId());
+                    loanOrderEntity.setBankCardId("");
+                    loanOrderEntity.setReloan(reloan);
+                    loanOrderEntity.setOrderModelGroup(orderModelGroup);
+                    loanOrderEntity.setRemittanceDistributionGroup(productEntity.getRemittanceDistributionGroup());
+                    loanOrderEntity.setRepaymentDistributionGroup("H6");
+                    loanOrderEntity.setUserType(userType);
+                    loanOrderEntity.setStages(productEntity.getStages());
+                    loanOrderEntity.setStagesDay(productEntity.getStagesDay());
+                    loanOrderEntity.setProcessingFeeProportion(productEntity.getProcessingFeeProportion());
+                    loanOrderEntity.setInterest(productEntity.getInterest());
+                    loanOrderEntity.setPenaltyInterest(productEntity.getPenaltyInterest());
+                    loanOrderEntity.setStatus(OrderStatus.CREATE);
+                    loanOrderEntity.setType(type);
+                    loanOrderEntity.setApprovalAmount(0.0);
+                    loanOrderEntity.setActualAmount(0.0);
+                    loanOrderEntity.setIncidentalAmount(0.0);
+                    loanOrderEntity.setEstimatedRepaymentAmount(0.0);
+                    loanOrderEntity.setActualAmount(0.0);
+                    loanOrderEntity.setActualRepaymentAmount(0.0);
+                    loanOrderEntity.setAppName(appName);
+                    loanOrderEntity.setAppVersion(appVersion);
+                    loanOrderEntity.setApplyTime(null);
+                    loanOrderEntity.setLoanTime(null);
+                    loanOrderEntity.setApplyTime(null);
+                    loanOrderEntity.setUpdateTime(new Date());
+                    loanOrderEntity.setCreateTime(new Date());
+                    Integer insertOrder = loanOrderDao.insertOrder(loanOrderEntity);
 
-                // 判断是否新增成功
-                if (insertOrder > 0) {
+                    // 判断是否新增成功
+                    if (insertOrder > 0) {
+                        return null;
+                    }
+
+                    // 订单审核模型
+                    List<String> modelList = loanOrderModelDao.findNamesByGroup(orderModelGroup);
+                    modelList.parallelStream().forEach(model -> {
+                        LoanOrderExamineEntity loanOrderExamineEntity = new LoanOrderExamineEntity();
+                        loanOrderExamineEntity.setOrderId(orderId);
+                        loanOrderExamineEntity.setId(ObjectIdUtil.getObjectId());
+                        loanOrderExamineEntity.setStatus(OrderExamineStatus.CREATE);
+                        loanOrderExamineEntity.setModelName(model);
+                        loanOrderExamineEntity.setUpdateTime(new Date());
+                        loanOrderExamineEntity.setCreateTime(new Date());
+                        loanOrderExamineDao.insertOrderExamine(loanOrderExamineEntity);
+                    });
+
+                    // 判断当前初始化订单是什么类型
+                    if (OrderType.LOAN == type) {
+                        LoanOrderExamineEntity loanOrderExamineEntity = new LoanOrderExamineEntity();
+                        loanOrderExamineEntity.setOrderId(orderId);
+                        loanOrderExamineEntity.setId(ObjectIdUtil.getObjectId());
+                        loanOrderExamineEntity.setStatus(OrderExamineStatus.CREATE);
+                        loanOrderExamineEntity.setModelName("rejectionRule");
+                        loanOrderExamineEntity.setUpdateTime(new Date());
+                        loanOrderExamineEntity.setCreateTime(new Date());
+                        loanOrderExamineDao.insertOrderExamine(loanOrderExamineEntity);
+                    }
+
+                    return orderId;
+
+                }catch (Exception e){
+                    LogUtil.sysError("[ProductServiceImpl initOrder]",e);
                     return null;
                 }
-
-                // 订单审核模型
-                List<String> modelList = loanOrderModelDao.findNamesByGroup(orderModelGroup);
-                modelList.parallelStream().forEach(model -> {
-                    LoanOrderExamineEntity loanOrderExamineEntity = new LoanOrderExamineEntity();
-                    loanOrderExamineEntity.setOrderId(orderId);
-                    loanOrderExamineEntity.setId(ObjectIdUtil.getObjectId());
-                    loanOrderExamineEntity.setStatus(OrderExamineStatus.CREATE);
-                    loanOrderExamineEntity.setModelName(model);
-                    loanOrderExamineEntity.setUpdateTime(new Date());
-                    loanOrderExamineEntity.setCreateTime(new Date());
-                    loanOrderExamineDao.insertOrderExamine(loanOrderExamineEntity);
-                });
-
-                // 判断当前初始化订单是什么类型
-                if (OrderType.LOAN == type) {
-                    LoanOrderExamineEntity loanOrderExamineEntity = new LoanOrderExamineEntity();
-                    loanOrderExamineEntity.setOrderId(orderId);
-                    loanOrderExamineEntity.setId(ObjectIdUtil.getObjectId());
-                    loanOrderExamineEntity.setStatus(OrderExamineStatus.CREATE);
-                    loanOrderExamineEntity.setModelName("rejectionRule");
-                    loanOrderExamineEntity.setUpdateTime(new Date());
-                    loanOrderExamineEntity.setCreateTime(new Date());
-                    loanOrderExamineDao.insertOrderExamine(loanOrderExamineEntity);
-                }
-
-                return orderId;
             }
         });
 
