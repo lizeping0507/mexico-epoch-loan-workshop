@@ -224,7 +224,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
      * @return
      * @throws Exception
      */
-    protected LoanOrderEntity initOrder(User user, Integer type, String appVersion, String appName, String orderModelGroup, LoanProductEntity productEntity) throws Exception {
+    protected LoanOrderEntity   initOrder(User user, Integer type, String appVersion, String appName, String orderModelGroup, LoanProductEntity productEntity) throws Exception {
         // 用户id
         String userId = user.getId();
 

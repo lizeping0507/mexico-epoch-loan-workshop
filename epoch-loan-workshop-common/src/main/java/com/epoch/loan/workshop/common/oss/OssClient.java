@@ -1,11 +1,11 @@
-package com.epoch.loan.workshop.common.util;
+package com.epoch.loan.workshop.common.oss;
 
 import com.aliyun.oss.*;
 import com.aliyun.oss.model.PutObjectRequest;
+import com.epoch.loan.workshop.common.util.LogUtil;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.net.URL;
@@ -14,12 +14,12 @@ import java.util.Date;
 /**
  * @author 魏玉强
  * @packagename : com.epoch.loan.workshop.common.util
- * @className : OssUtil
+ * @className : OssClient
  * @createTime : 2022/04/22 14:52
  * @Description: 阿里云OSS操作工具类
  */
 //@Component TODO
-public class OssFileUtils implements InitializingBean {
+public class OssClient implements InitializingBean {
 
     @Autowired
     private OSS ossClient;
@@ -131,6 +131,6 @@ public class OssFileUtils implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        OssFileUtils.ossClientStatic = this.ossClient;
+        OssClient.ossClientStatic = this.ossClient;
     }
 }

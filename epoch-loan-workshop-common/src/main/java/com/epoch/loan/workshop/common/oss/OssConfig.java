@@ -1,4 +1,4 @@
-package com.epoch.loan.workshop.common.config;
+package com.epoch.loan.workshop.common.oss;
 
 import com.aliyun.oss.ClientBuilderConfiguration;
 import com.aliyun.oss.OSS;
