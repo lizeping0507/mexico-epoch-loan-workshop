@@ -234,7 +234,7 @@ public interface LoanOrderDao {
      * @param status
      * @return
      */
-    Integer countUserOrderByAppInStatus(String userId, String appName, int[] status);
+    Integer countUserOrderByAppInStatus(String userId, String appName, @Param("array") int[] status);
 
     /**
      * 查询用户在指定包|指定状态|指定产品的订单数量
