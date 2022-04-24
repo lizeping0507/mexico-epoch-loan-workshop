@@ -48,6 +48,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
         // 产品id
         String productId = params.getProductId();
+        LogUtil.sysInfo("productDetail productId:{}",productId);
 
         // app版本
         String appVersion = params.getAppVersion();
@@ -235,6 +236,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 try {
                     // 产品id
                     String productId = productEntity.getId();
+                    LogUtil.sysInfo("productDetail productId:{}", productId);
 
                     // 查询用户是否有已经创建且未完结的订单
                     Integer[] status = new Integer[]{OrderStatus.CREATE, OrderStatus.EXAMINE_WAIT, OrderStatus.EXAMINE_PASS, OrderStatus.WAIT_PAY, OrderStatus.WAY, OrderStatus.DUE};
@@ -247,6 +249,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                     // 查询用户指定状态订单
                     status = new Integer[]{OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE};
                     loanOrderEntityList = loanOrderDao.findOrderByUserAndProductIdAndStatus(userId, productId, status);
+                    LogUtil.sysInfo("productDetail loanOrderEntityList:{}", loanOrderEntityList);
 
                     // 是否复贷
                     Integer reloan = 0;
@@ -294,6 +297,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                     loanOrderEntity.setUpdateTime(new Date());
                     loanOrderEntity.setCreateTime(new Date());
                     Integer insertOrder = loanOrderDao.insertOrder(loanOrderEntity);
+                    LogUtil.sysInfo("productDetail insertOrder:{}", insertOrder);
 
                     // 判断是否新增成功
                     if (insertOrder > 0) {
@@ -312,6 +316,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                         loanOrderExamineEntity.setCreateTime(new Date());
                         loanOrderExamineDao.insertOrderExamine(loanOrderExamineEntity);
                     });
+                    LogUtil.sysInfo("productDetail 订单审核模型");
 
                     // 判断当前初始化订单是什么类型
                     if (OrderType.LOAN == type) {
