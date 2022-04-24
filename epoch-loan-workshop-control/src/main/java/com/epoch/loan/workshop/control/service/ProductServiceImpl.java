@@ -390,7 +390,6 @@ public class ProductServiceImpl extends BaseService implements ProductService {
     }
 
 
-
     /**
      * 获取用户app模式
      *
@@ -399,32 +398,55 @@ public class ProductServiceImpl extends BaseService implements ProductService {
      * @throws Exception 请求异常
      */
     @Override
-    public Result<AppMaskModelResult> getAppModel(AppModelParams params) throws Exception {
+    public Result<AppMaskModelResult> getAppModel(AppMaskModelParams params) throws Exception {
         // 结果集
+        Result<AppMaskModelResult> result = new Result<>();
         AppMaskModelResult appMaskModelResult = new AppMaskModelResult();
 
-        // 初始化模式
-        int maskModel = 0;
+        // 初始化金额
+        appMaskModelResult.setAmount("10000");
 
         /*查询用户认证情况*/
         // 身份认证
         appMaskModelResult.setIdentityAuth(0);
+        if (params.getUser().isIdentityAuth()) {
+            appMaskModelResult.setIdentityAuth(1);
+        }
 
         // 基本信息认证
         appMaskModelResult.setBasicInfoAuth(0);
+        if (params.getUser().isBasicInfoAuth()) {
+            appMaskModelResult.setBasicInfoAuth(1);
+        }
 
         // 补充信息认证
         appMaskModelResult.setAddInfoAuth(0);
+        if (params.getUser().isAddInfoAuth()) {
+            appMaskModelResult.setAddInfoAuth(1);
+        }
 
         // OCR认证
         appMaskModelResult.setOcrAuth(0);
-
-        // 查询四项认证是否都通过
-        if (false) {
-            // 没有通过 返回结果
+        if (params.getUser().isOcrAuth()) {
+            appMaskModelResult.setOcrAuth(1);
         }
 
         // 查询用户有没有添加过卡
+        appMaskModelResult.setRemittanceAccountAuth(0);
+        if (params.getUser().isRemittanceAccountAuth()) {
+            appMaskModelResult.setRemittanceAccountAuth(1);
+        }
+
+        // 查询四项认证是否都通过
+        if (!params.getUser().isIdentityAuth() || !params.getUser().isBasicInfoAuth() || !params.getUser().isAddInfoAuth() || !params.getUser().isOcrAuth()) {
+            // 没有通过 返回结果
+            appMaskModelResult.setMaskModel(3);
+            appMaskModelResult.setButton("");
+            result.setData(appMaskModelResult);
+            result.setReturnCode(ResultEnum.SUCCESS.code());
+            result.setMessage(ResultEnum.SUCCESS.message());
+            return result;
+        }
 
         // 查询用户有没有贷超模式订单
 
@@ -445,7 +467,8 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
         }
 
-        Result<AppMaskModelResult> result = new Result<>();
+        result.setReturnCode(ResultEnum.SUCCESS.code());
+        result.setMessage(ResultEnum.SUCCESS.message());
         return result;
     }
 
