@@ -159,9 +159,11 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         bizData.put(Field.SINGLE_QUANTITY, singleQuantity);
         bizData.put(Field.ALL_QUANTITY, allQuantity);
         LoanOrderBillEntity fistRepayOrder = loanOrderBillDao.findFistRepayOrder(userId, user.getAppName());
-        Date actualRepaymentTime = fistRepayOrder.getActualRepaymentTime();
-        int intervalDays = DateUtil.getIntervalDays(new Date(), actualRepaymentTime);
-        bizData.put(Field.REPAYMENT_TIME, intervalDays);
+        if (null != fistRepayOrder){
+            Date actualRepaymentTime = fistRepayOrder.getActualRepaymentTime();
+            int intervalDays = DateUtil.getIntervalDays(new Date(), actualRepaymentTime);
+            bizData.put(Field.REPAYMENT_TIME, intervalDays);
+        }
         bizData.put(Field.USER_TYPE, userType);
         bizData.put(Field.PHONE, mobile);
         bizData.put(Field.APP_NAME, appName);
