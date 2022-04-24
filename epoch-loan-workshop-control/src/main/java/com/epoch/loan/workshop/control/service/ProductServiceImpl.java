@@ -67,6 +67,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
         // 订单审核模型
         String orderModelGroup = loanProductEntity.getOrderModelGroup();
+        LogUtil.sysInfo("productDetail orderModelGroup:{}",orderModelGroup);
 
         // 更新GPS信息(userInfo实时) TODO 更新到表里，然后更新缓存
 
