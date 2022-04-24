@@ -74,12 +74,14 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         // 初始化订单
         LogUtil.sysInfo("productDetail params.getUser():{}", params.getUser());
         LoanOrderEntity loanOrderEntity = initOrder(params.getUser(), OrderType.LOAN, appVersion, appName, orderModelGroup, loanProductEntity);
+        LogUtil.sysInfo("productDetail loanOrderEntity:{}", loanOrderEntity);
 
         // 订单状态
         Integer orderStatus = loanOrderEntity.getStatus();
         if (orderStatus == OrderStatus.CREATE) {
             // 如果订单状态处于创建状态，进行多投判断
             boolean rejectionRule = rejectionRule(loanOrderEntity, params.getUser());
+            LogUtil.sysInfo("productDetail rejectionRule:{}", rejectionRule);
 
             // 多投被拒返回
             if (!rejectionRule) {
