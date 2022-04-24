@@ -160,33 +160,6 @@ public class PlatformUrl {
      */
     public final static String PLATFORM_CONFIRM_MERGE_PUSH_APPLY = "/api/v1/product/comfirmMergePushApply";
 
-    /**
-     * 订单详情
-     */
-    public final static String PLATFORM_ORDER_DETAIL = "/api/v1/order/getOrderDetail";
-
-    /**
-     * 还款详情
-     */
-    public final static String PLATFORM_REPAY_DETAIL = "/api/v1/order/repayDetail";
-
-    // ================ OCR相关 ===================
-
-    /**
-     * 用户OCR保存
-     */
-    public static final String PLATFORM_SAVE_OCR_INFO = "/api/v1/userInfo/userOcr";
-
-    /**
-     * 用户OCR识别信息保存
-     */
-    public static final String PLATFORM_UPLOAD_S3_IMAGES = "/api/v1/upload/s3/images";
-
-    /**
-     * 获取用户OCR保存信息
-     */
-    public static final String PLATFORM_GET_OCR_INFO = "/api/v1/userInfo/getUserOcrInfo";
-
 
     // ================ 银行卡相关 ===================
 

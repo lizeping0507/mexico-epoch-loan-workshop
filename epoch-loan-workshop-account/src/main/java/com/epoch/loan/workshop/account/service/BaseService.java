@@ -207,11 +207,24 @@ public class BaseService {
         user.setLiveType(userInfoEntity.getLiveType());
         user.setPapersAddress(userInfoEntity.getPapersAddress());
         user.setPapersFatherName(userInfoEntity.getPapersFatherName());
-        user.setPapersFullName(userInfoEntity.getPapersFullName());
-        user.setPapersMotherName(userInfoEntity.getPapersMotherName());
-        user.setPapersId(userInfoEntity.getPapersId());
         user.setPapersName(userInfoEntity.getPapersName());
+        user.setPapersMotherName(userInfoEntity.getPapersMotherName());
+        user.setPapersFullName(userInfoEntity.getPapersFullName());
+        user.setPapersId(userInfoEntity.getPapersId());
         user.setPapersVoterId(userInfoEntity.getPapersVoterId());
+        user.setPapersGender(userInfoEntity.getPapersGender());
+        user.setPapersAge(userInfoEntity.getPapersAge());
+        user.setPapersDateOfBirth(userInfoEntity.getPapersDateOfBirth());
+        user.setPostalCode(userInfoEntity.getPostalCode());
+        user.setRfc(userInfoEntity.getRfc());
+        user.setCustomFatherName(userInfoEntity.getCustomFatherName());
+        user.setCustomName(userInfoEntity.getCustomName());
+        user.setCustomMotherName(userInfoEntity.getCustomMotherName());
+        user.setCustomFullName(userInfoEntity.getCustomFullName());
+        user.setUserFileBucketName(userInfoEntity.getUserFileBucketName());
+        user.setFrontPath(userInfoEntity.getFrontPath());
+        user.setBackPath(userInfoEntity.getBackPath());
+        user.setFacePath(userInfoEntity.getFacePath());
 
         LogUtil.sysInfo("用户信息缓存更新: {}", JSONObject.toJSONString(user));
         tokenManager.updateUserCache(user);

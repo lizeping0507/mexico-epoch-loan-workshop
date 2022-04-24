@@ -55,12 +55,12 @@ public class UserOcrBasicInfoResult implements Serializable {
     private String idAddr;
 
     /**
-     * ad卡正面访问地址
+     *证件正面访问地址
      */
     private String frontImgUrl;
 
     /**
-     * ad卡背面访问地址
+     * 证件背面访问地址
      */
     private String backImgUrl;
 

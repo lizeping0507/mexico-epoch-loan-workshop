@@ -185,32 +185,6 @@ public class OrderController extends BaseController {
     }
 
     /**
-     * 还款详情
-     *
-     * @param params 请求参数
-     * @return Result
-     */
-    @Authentication
-    @PostMapping(URL.REPAY_DETAIL)
-    public Result<RepayDetailResult> repayDetail(RepayDetailParams params) {
-        // 结果集
-        Result<RepayDetailResult> result = new Result<>();
-
-        try {
-            // 获取订单合同参数
-            return orderService.repayDetail(params);
-        } catch (Exception e) {
-            LogUtil.sysError("[OrderController repayDetail]", e);
-
-            // 异常返回结果
-            result.setEx(ThrowableUtils.throwableToString(e));
-            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
-            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
-            return result;
-        }
-    }
-
-    /**
      * 多推--申请确认
      *
      * @param params 请求参数

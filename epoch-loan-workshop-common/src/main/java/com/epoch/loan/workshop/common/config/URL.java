@@ -363,11 +363,6 @@ public class URL {
     public static final String ORDER_DETAIL = "/detail";
 
     /**
-     * 还款详情
-     */
-    public static final String REPAY_DETAIL = "/repayDetail";
-
-    /**
      * SDK - SDK上传同步回调
      */
     public static final String SDK_UPLOAD_CALLBACK = "/sdkUploadCallBack";
