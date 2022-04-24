@@ -59,10 +59,9 @@ public class UserServiceImpl extends BaseService implements UserService {
      *
      * @param params 请求参数封装
      * @return Result<IsRegisterResult>
-     * @throws Exception 请求异常
      */
     @Override
-    public Result<IsRegisterResult> isRegister(IsRegisterParams params) throws Exception {
+    public Result<IsRegisterResult> isRegister(IsRegisterParams params) {
         // 结果集
         Result<IsRegisterResult> result = new Result<>();
         result.setReturnCode(ResultEnum.SUCCESS.code());
@@ -89,10 +88,9 @@ public class UserServiceImpl extends BaseService implements UserService {
      *
      * @param params 请求参数封装
      * @return Result<RegisterResult>
-     * @throws Exception 请求异常
      */
     @Override
-    public Result<RegisterResult> register(RegisterParams params) throws Exception {
+    public Result<RegisterResult> register(RegisterParams params) {
         // 结果结果集
         Result<RegisterResult> result = new Result<>();
 
@@ -165,10 +163,9 @@ public class UserServiceImpl extends BaseService implements UserService {
      *
      * @param params 请求参数封装
      * @return Result<LoginResult>
-     * @throws Exception 请求异常
      */
     @Override
-    public Result<LoginResult> login(LoginParams params) throws Exception {
+    public Result<LoginResult> login(LoginParams params) {
         // 结果结果集
         Result<LoginResult> result = new Result<>();
 
@@ -217,10 +214,9 @@ public class UserServiceImpl extends BaseService implements UserService {
      *
      * @param params 请求参数封装
      * @return Result<ChangePasswordResult>
-     * @throws Exception 请求异常
      */
     @Override
-    public Result<ChangePasswordResult> forgotPwd(ForgotPwdParams params) throws Exception {
+    public Result<ChangePasswordResult> forgotPwd(ForgotPwdParams params) {
         // 结果结果集
         Result<ChangePasswordResult> result = new Result<>();
 
@@ -271,10 +267,9 @@ public class UserServiceImpl extends BaseService implements UserService {
      *
      * @param params 请求参数封装
      * @return Result<ChangePasswordResult>
-     * @throws Exception 请求异常
      */
     @Override
-    public Result<ChangePasswordResult> modifyPassword(ModifyPasswordParams params) throws Exception {
+    public Result<ChangePasswordResult> modifyPassword(ModifyPasswordParams params) {
         // 结果结果集
         Result<ChangePasswordResult> result = new Result<>();
 
@@ -332,10 +327,9 @@ public class UserServiceImpl extends BaseService implements UserService {
      *
      * @param params 请求参数封装
      * @return Result<MineResult>
-     * @throws Exception 请求异常
      */
     @Override
-    public Result<MineResult> mine(MineParams params) throws Exception {
+    public Result<MineResult> mine(MineParams params) {
         // 结果结果集
         Result<MineResult> result = new Result<>();
         MineResult data = new MineResult();
@@ -479,10 +473,9 @@ public class UserServiceImpl extends BaseService implements UserService {
      *
      * @param params 请求参数封装
      * @return Result<UserOcrBasicInfoResult>
-     * @throws Exception 请求异常
      */
     @Override
-    public Result<UserOcrBasicInfoResult> getOcrInfo(BaseParams params) throws Exception {
+    public Result<UserOcrBasicInfoResult> getOcrInfo(BaseParams params) {
         // 结果集
         Result<UserOcrBasicInfoResult> result = new Result<>();
         UserOcrBasicInfoResult basicInfo = new UserOcrBasicInfoResult();
@@ -529,10 +522,9 @@ public class UserServiceImpl extends BaseService implements UserService {
      *
      * @param params 请求参数封装
      * @return Result<PersonInfoResult>
-     * @throws Exception 请求异常
      */
     @Override
-    public Result<Object> uploadS3Images(UploadS3Params params) throws Exception {
+    public Result<Object> uploadS3Images(UploadS3Params params) {
         // 结果集
         Result<Object> result = new Result<>();
 
@@ -615,7 +607,29 @@ public class UserServiceImpl extends BaseService implements UserService {
             }
         }
 
-        // TODO 与风控交互，获取 证件编号与用户的 curp是否 通过
+        // 与风控交互，获取 CURP校验结果
+        JSONObject riskObject = sendRiskCheckCURPRequest(userInfoById, idNumber);
+        if (ObjectUtils.isEmpty(riskObject)) {
+            result.setReturnCode(ResultEnum.LOAN_RISK_EACH_ERROR.code());
+            result.setMessage(ResultEnum.LOAN_RISK_EACH_ERROR.message());
+            return result;
+        }
+
+        // 解析风控校验结果
+        Integer code = riskObject.getInteger(Field.ERROR);
+        if (code != 200) {
+            result.setReturnCode(ResultEnum.RFC_CHECK_CURP_ERROR.code());
+            result.setMessage(ResultEnum.RFC_CHECK_CURP_ERROR.message());
+            return result;
+        }
+        JSONObject dataObject = riskObject.getJSONObject(Field.DATA);
+        Integer dataCode = dataObject.getInteger(RiskField.RISK_DATA_ERROR_CODE);
+        if (code != RiskField.RISK_CURP_CHECK_PASS_CODE) {
+            String errMessage = dataObject.getString(RiskField.RISK_DATA_ERROR_MESSAGE);
+            result.setReturnCode(dataCode);
+            result.setMessage(errMessage);
+            return result;
+        }
 
         // 上传证件正面图片
         File frontFile = convertToFile(params.getIdFrontImgData());
@@ -642,7 +656,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         //上传人脸照片
         File faceFile = convertToFile(params.getFaceImgData());
         String facePath = BusinessNameUtils.createUserIdTypeFileName(NameField.USR_ID, user.getUserInfoId(), NameField.FACE_IMAGE_TYPE);
-        String faceImageUrl = OssClient.uploadFileAndGetUrl(userFileBucketName, facePath, faceFile,null);
+        String faceImageUrl = OssClient.uploadFileAndGetUrl(userFileBucketName, facePath, faceFile, null);
         faceFile.deleteOnExit();
         if (StringUtils.isBlank(faceImageUrl)) {
             result.setReturnCode(ResultEnum.KYC_UPLOAD_FILE_ERROR.code());
@@ -906,5 +920,56 @@ public class UserServiceImpl extends BaseService implements UserService {
             result = config.getString(configKey);
         }
         return result;
+    }
+
+    /**
+     * 请求风控CURP校验
+     *
+     * @param loanUserInfoEntity 用户实体类
+     * @param idNumber           证件号
+     * @return 风控响应信息
+     */
+    private JSONObject sendRiskCheckCURPRequest(LoanUserInfoEntity loanUserInfoEntity, String idNumber) {
+        try {
+            // 用户Id
+            String userId = loanUserInfoEntity.getUserId();
+
+            // 手机号
+            String mobile = loanUserInfoEntity.getMobile();
+
+            // 封装请求参数
+            Map<String, String> params = new HashMap<>();
+            params.put(Field.METHOD, RiskField.RISK_CURP_CHECK_METHOD);
+            params.put(Field.APP_ID, riskConfig.getAppId());
+            params.put(Field.VERSION, RiskField.RISK_VERSION_V1);
+            params.put(Field.SIGN_TYPE, RiskField.RISK_SIGN_TYPE_RSA);
+            params.put(Field.FORMAT, RiskField.RISK_MESSAGE_TYPE_JSON);
+            params.put(Field.TIMESTAMP, String.valueOf(System.currentTimeMillis() / 1000));
+            JSONObject bizData = new JSONObject();
+            bizData.put(Field.TRANSACTION_ID, userId);
+            bizData.put(RiskField.RISK_MOBILE, mobile);
+            bizData.put(RiskField.RISK_CURP, idNumber);
+            params.put(Field.BIZ_DATA, bizData.toJSONString());
+
+            // 生成签名
+            String paramsStr = RSAUtils.getSortParams(params);
+            String sign = RSAUtils.addSign(riskConfig.getPrivateKey(), paramsStr);
+            params.put(Field.SIGN, sign);
+
+            // 请求参数
+            String requestParams = JSONObject.toJSONString(params);
+
+            // 发送请求
+            String riskResult = HttpUtils.POST_FORM(riskConfig.getRiskUrl(), requestParams);
+            if (StringUtils.isEmpty(riskResult)) {
+                return null;
+            }
+
+            // 返回响应参数
+            return JSONObject.parseObject(riskResult);
+        } catch (Exception e) {
+            LogUtil.sysError("[UserServiceImpl sendRiskCheckCURPRequest]", e);
+            return null;
+        }
     }
 }

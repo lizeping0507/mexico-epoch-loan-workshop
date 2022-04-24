@@ -60,6 +60,12 @@ public class RiskConfig {
     public String cloudPayStatusUrl;
 
     /**
+     * 风控CURP校验请求地址
+     */
+    @Value("${risk.cloudCheckCURPUrl}")
+    public String cloudCheckCURPUrl;
+
+    /**
      * 贷超公钥
      */
     @Value("${risk.loanPrivateKey}")

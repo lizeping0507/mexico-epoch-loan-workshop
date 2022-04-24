@@ -160,7 +160,17 @@ public enum ResultEnum {
     /**
      * 根据RFC查询 当前账号认证信息与主账户不匹配
      */
-    INF_MOBILE_CERTIFIED_OTHER_ERROR(6032, "La información de certificación de la cuenta principal no satisfacen los requisitos que exigen la cuenta principal"),
+    INF_MOBILE_CERTIFIED_OTHER_ERROR(6042, "La información de certificación de la cuenta principal no satisfacen los requisitos que exigen la cuenta principal"),
+
+    /**
+     * 与风控交互出错
+     */
+    LOAN_RISK_EACH_ERROR(6050, "Internal communication error"),
+
+    /**
+     * CURP校验失败
+     */
+    RFC_CHECK_CURP_ERROR(6051, "CURP verification failed"),
     ;
 
 
