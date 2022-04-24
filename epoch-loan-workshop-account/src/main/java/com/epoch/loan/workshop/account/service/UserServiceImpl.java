@@ -612,8 +612,10 @@ public class UserServiceImpl extends BaseService implements UserService {
         // TODO 与风控交互，获取 证件编号与用户的 curp是否 通过
 
         // 上传证件正面图片
+        File frontFile = convertToFile(params.getIdFrontImgData());
         String frontPath = BusinessNameUtils.createUserIdTypeFileName(NameField.USR_ID, user.getUserInfoId(), NameField.FRONT_IMAGE_TYPE);
-        String frontImageUrl = OssFileUtils.uploadFileAndGetUrl(userFileBucketName, frontPath, convertToFile(params.getIdFrontImgData()), null);
+        String frontImageUrl = OssFileUtils.uploadFileAndGetUrl(userFileBucketName, frontPath, frontFile, null);
+        frontFile.deleteOnExit();
         if (StringUtils.isBlank(frontImageUrl)) {
             result.setReturnCode(ResultEnum.KYC_UPLOAD_FILE_ERROR.code());
             result.setMessage(ResultEnum.KYC_UPLOAD_FILE_ERROR.message());
@@ -621,8 +623,10 @@ public class UserServiceImpl extends BaseService implements UserService {
         }
 
         //上传证件背面图片 并获取链接
+        File backFile = convertToFile(params.getIdBackImgData());
         String backPath = BusinessNameUtils.createUserIdTypeFileName(NameField.USR_ID, user.getUserInfoId(), NameField.BACK_IMAGE_TYPE);
-        String backImageUrl = OssFileUtils.uploadFileAndGetUrl(userFileBucketName, backPath, convertToFile(params.getIdBackImgData()), null);
+        String backImageUrl = OssFileUtils.uploadFileAndGetUrl(userFileBucketName, backPath, backFile, null);
+        backFile.deleteOnExit();
         if (StringUtils.isBlank(backImageUrl)) {
             result.setReturnCode(ResultEnum.KYC_UPLOAD_FILE_ERROR.code());
             result.setMessage(ResultEnum.KYC_UPLOAD_FILE_ERROR.message());
@@ -630,8 +634,10 @@ public class UserServiceImpl extends BaseService implements UserService {
         }
 
         //上传人脸照片
+        File faceFile = convertToFile(params.getFaceImgData());
         String facePath = BusinessNameUtils.createUserIdTypeFileName(NameField.USR_ID, user.getUserInfoId(), NameField.FACE_IMAGE_TYPE);
-        String faceImageUrl = OssFileUtils.uploadFileAndGetUrl(userFileBucketName, facePath, convertToFile(params.getFaceImgData()),null);
+        String faceImageUrl = OssFileUtils.uploadFileAndGetUrl(userFileBucketName, facePath, faceFile,null);
+        faceFile.deleteOnExit();
         if (StringUtils.isBlank(faceImageUrl)) {
             result.setReturnCode(ResultEnum.KYC_UPLOAD_FILE_ERROR.code());
             result.setMessage(ResultEnum.KYC_UPLOAD_FILE_ERROR.message());

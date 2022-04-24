@@ -2,6 +2,7 @@ package com.epoch.loan.workshop.common.params.params.request;
 
 import com.epoch.loan.workshop.common.params.params.BaseParams;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author : Shangkunfeng
@@ -16,10 +17,17 @@ public class OrderDetailParams extends BaseParams {
     /**
      * 订单号
      */
-    private String orderNo;
+    private String orderId;
 
     /**
-     * 用户Id
+     * 验证 订单号 是否合法
+     *
+     * @return true或false
      */
-    private Long userId;
+    public boolean isOrderIdLegal() {
+        if (StringUtils.isEmpty(this.orderId)) {
+            return false;
+        }
+        return true;
+    }
 }
