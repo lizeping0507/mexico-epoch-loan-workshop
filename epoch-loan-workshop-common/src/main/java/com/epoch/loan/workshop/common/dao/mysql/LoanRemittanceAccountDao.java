@@ -24,6 +24,14 @@ public interface LoanRemittanceAccountDao {
     List<LoanRemittanceAccountEntity> findUserRemittanceAccountList(String userId);
 
     /**
+     * 查询用户放款账户数量
+     *
+     * @param userId
+     * @return
+     */
+    Integer findUserRemittanceAccountCount(String userId);
+
+    /**
      * 查询放款账户
      *
      * @param id

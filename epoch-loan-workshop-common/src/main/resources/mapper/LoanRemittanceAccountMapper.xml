@@ -13,4 +13,7 @@
             resultType="com.epoch.loan.workshop.common.entity.mysql.LoanRemittanceAccountEntity">
         SELECT * FROM loan_remittance_account WHERE id=#{id}
     </select>
+    <select id="findUserRemittanceAccountCount" resultType="java.lang.Integer">
+        SELECT COUNT(1) FROM loan_remittance_account WHERE user_id=#{userId}
+    </select>
 </mapper>

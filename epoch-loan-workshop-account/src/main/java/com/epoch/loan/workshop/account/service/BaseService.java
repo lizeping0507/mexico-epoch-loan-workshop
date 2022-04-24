@@ -140,6 +140,12 @@ public class BaseService {
     LoanRemittancePaymentRecordDao paymentRecordDao;
 
     /**
+     * 放款账户
+     */
+    @Autowired
+    LoanRemittanceAccountDao loanRemittanceAccountDao;
+
+    /**
      * 发送队列
      *
      * @param orderId 订单号
@@ -225,6 +231,13 @@ public class BaseService {
         user.setFrontPath(userInfoEntity.getFrontPath());
         user.setBackPath(userInfoEntity.getBackPath());
         user.setFacePath(userInfoEntity.getFacePath());
+        user.setRemittanceAccountAuth(true);
+
+        // 查询放款账户数量
+        Integer remittanceAccountCount = loanRemittanceAccountDao.findUserRemittanceAccountCount(userId);
+        if (remittanceAccountCount == null && remittanceAccountCount == 0) {
+            user.setRemittanceAccountAuth(false);
+        }
 
         LogUtil.sysInfo("用户信息缓存更新: {}", JSONObject.toJSONString(user));
         tokenManager.updateUserCache(user);

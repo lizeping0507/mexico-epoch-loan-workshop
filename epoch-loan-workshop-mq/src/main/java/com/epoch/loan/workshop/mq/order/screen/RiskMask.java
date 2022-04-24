@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.constant.Field;
 import com.epoch.loan.workshop.common.constant.OrderExamineStatus;
 import com.epoch.loan.workshop.common.constant.OrderStatus;
+import com.epoch.loan.workshop.common.entity.mysql.LoanMaskEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanOrderEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanOrderExamineEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanUserInfoEntity;
@@ -143,6 +144,12 @@ public class RiskMask extends BaseOrderMQListener implements MessageListenerConc
 
                         // 更新订单批准额度
                         loanOrderDao.updateOrderApprovalAmount(orderId, quota, new Date());
+
+                        // 查询指定级别的承接盘
+                        LoanMaskEntity loanMaskEntity = loanMaskDao.findLoanMaskByAppNameAndLevel(loanOrderEntity.getAppName(), level);
+
+                        // 将承接盘更新
+                        loanOrderDao.updateOrderProductId(orderId, loanMaskEntity.getProductId(), new Date());
 
                         // 更新对应模型审核状态
                         updateModeExamine(orderId, subExpression(), OrderExamineStatus.PASS);

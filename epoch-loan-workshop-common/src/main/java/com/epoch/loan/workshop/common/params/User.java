@@ -260,4 +260,28 @@ public class User implements Serializable {
      */
     private String facePath;
 
+    /**
+     * 身份认证信息
+     */
+    private boolean identityAuth;
+
+    /**
+     * Ocr认证信息
+     */
+    private boolean ocrAuth;
+
+    /**
+     * 补充信息
+     */
+    private boolean addInfoAuth;
+
+    /**
+     * 基本信息
+     */
+    private boolean basicInfoAuth;
+
+    /**
+     * 放款账户 0: 未认证 1:认证
+     */
+    private boolean remittanceAccountAuth;
 }
