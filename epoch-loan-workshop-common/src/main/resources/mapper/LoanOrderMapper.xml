@@ -141,7 +141,6 @@
         ORDER BY
         create_time DESC
     </select>
-
     <select id="findOrderByUserAndProductIdAndStatus"
             resultType="com.epoch.loan.workshop.common.entity.mysql.LoanOrderEntity">
         SELECT
@@ -165,5 +164,11 @@
     <select id="countUserOrderByProductAndAppInStatus" resultType="java.lang.Integer">
         SELECT count(1) from loan_order WHERE app_name = #{appName} And user_id = #{userId} And product_id = #{productId}
         <foreach collection="array" item="statu" index="index" open="AND status IN(" close=")" separator=",">#{statu}</foreach>
+    </select>
+    <select id="countProcessOrderNo" resultType="java.lang.Integer">
+        SELECT COUNT(1) FROM loan_order WHERE status &gt;= 70 AND status &lt; 100
+        <if test="appName != null and appName != ''">
+            AND app_name = #{appName}
+        </if>
     </select>
 </mapper>

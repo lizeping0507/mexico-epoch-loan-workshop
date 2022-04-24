@@ -90,6 +90,12 @@ public class BaseService {
     public LoanUserDao loanUserDao;
 
     /**
+     * 用户
+     */
+    @Autowired
+    public LoanOrderBillDao loanOrderBillDao;
+
+    /**
      * 产品
      */
     @Autowired

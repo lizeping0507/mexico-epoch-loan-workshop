@@ -205,4 +205,12 @@ public interface LoanOrderBillDao {
     List<LoanOrderBillEntity> findByDay(String createTime);
 
     void updateOrderBillPrincipalAmount(String id, Double principalAmount, Date updateTime);
+
+    /**
+     * 查询第一笔还款订单
+     * @param userId
+     * @param appName
+     * @return
+     */
+    LoanOrderBillEntity findFistRepayOrder(String userId, String appName);
 }

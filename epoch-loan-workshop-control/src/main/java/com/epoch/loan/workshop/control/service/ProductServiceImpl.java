@@ -3,20 +3,14 @@ package com.epoch.loan.workshop.control.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.constant.*;
-import com.epoch.loan.workshop.common.entity.mysql.LoanOrderEntity;
-import com.epoch.loan.workshop.common.entity.mysql.LoanOrderExamineEntity;
-import com.epoch.loan.workshop.common.entity.mysql.LoanProductEntity;
-import com.epoch.loan.workshop.common.entity.mysql.PlatformChannelEntity;
+import com.epoch.loan.workshop.common.entity.mysql.*;
 import com.epoch.loan.workshop.common.params.User;
 import com.epoch.loan.workshop.common.params.params.BaseParams;
 import com.epoch.loan.workshop.common.params.params.request.*;
 import com.epoch.loan.workshop.common.params.params.result.*;
 import com.epoch.loan.workshop.common.params.params.result.model.PayH5Result;
 import com.epoch.loan.workshop.common.service.ProductService;
-import com.epoch.loan.workshop.common.util.HttpUtils;
-import com.epoch.loan.workshop.common.util.ObjectIdUtil;
-import com.epoch.loan.workshop.common.util.PlatformUtil;
-import com.epoch.loan.workshop.common.util.RSAUtils;
+import com.epoch.loan.workshop.common.util.*;
 import com.epoch.loan.workshop.common.lock.UserProductDetailLock;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
@@ -142,17 +136,22 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         params.put(Field.FORMAT, "json");
         params.put(Field.TIMESTAMP, String.valueOf(System.currentTimeMillis() / 1000));
         JSONObject bizData = new JSONObject();
-        bizData.put("transactionId", userId);
-        bizData.put("borrowId", orderId);
-        bizData.put("progress", 0);
-        bizData.put("registerAddr", registerAddress);
-        bizData.put("channelName", channelName);
-        bizData.put("singleQuantity", ""); // 单包在贷笔数
-        bizData.put("allQuantity", ""); // 多包在贷笔数
-        bizData.put("repaymentTime", ""); // 第一笔还款距今天数
-        bizData.put("userType", userType);
-        bizData.put("phone", mobile);
-        bizData.put("appName", appName);
+        bizData.put(Field.TRANSACTION_ID, userId);
+        bizData.put(Field.BORROW_ID, orderId);
+        bizData.put(Field.PROGRESS, 0);
+        bizData.put(Field.REGISTER_ADDR, registerAddress);
+        bizData.put(Field.CHANNEL_NAME, channelName);
+        int singleQuantity = loanOrderDao.countProcessOrderNo(user.getAppName(),userId);
+        int allQuantity = loanOrderDao.countProcessOrderNo(null, user.getId());
+        bizData.put(Field.SINGLE_QUANTITY, singleQuantity);
+        bizData.put(Field.ALL_QUANTITY, allQuantity);
+        LoanOrderBillEntity fistRepayOrder = loanOrderBillDao.findFistRepayOrder(userId, user.getAppName());
+        Date actualRepaymentTime = fistRepayOrder.getActualRepaymentTime();
+        int intervalDays = DateUtil.getIntervalDays(new Date(), actualRepaymentTime);
+        bizData.put(Field.REPAYMENT_TIME, intervalDays);
+        bizData.put(Field.USER_TYPE, userType);
+        bizData.put(Field.PHONE, mobile);
+        bizData.put(Field.APP_NAME, appName);
         params.put(Field.BIZ_DATA, bizData.toJSONString());
 
         // 生成签名

@@ -83,6 +83,10 @@
     <select id="findByDay" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanOrderBillEntity">
         SELECT * FROM loan_order_bill WHERE create_time like #{createTime}
     </select>
+    <select id="findFistRepayOrder"
+            resultType="com.epoch.loan.workshop.common.entity.mysql.LoanOrderBillEntity">
+        SELECT * FROM loan_order_bill WHERE status &gt;= 50 ORDER BY actual_repayment_time ASC LIMIT 1
+    </select>
     <update id="updateOrderBillPunishmentAmount">
         UPDATE loan_order_bill SET punishment_amount=#{punishmentAmount},update_time=#{updateTime} WHERE id=#{id}
     </update>

@@ -229,8 +229,6 @@ public interface LoanOrderDao {
     List<LoanOrderEntity> findOrderByUserAndProductIdAndStatus(String userId, String productId, Integer[] status);
 
     /**
-     *
-     *
      * @param userId
      * @param appName
      * @param status
@@ -240,6 +238,7 @@ public interface LoanOrderDao {
 
     /**
      * 查询用户在指定包|指定状态|指定产品的订单数量
+     *
      * @param userId
      * @param productId
      * @param appName
@@ -255,4 +254,13 @@ public interface LoanOrderDao {
      * @return
      */
     Integer insertOrder(@Param("loanOrderEntity") LoanOrderEntity loanOrderEntity);
+
+    /**
+     * 查询用户进行中订单数量
+     *
+     * @param appName App名称 不填就是所有包
+     * @param userId  用户Id
+     * @return
+     */
+    int countProcessOrderNo(String appName, String userId);
 }

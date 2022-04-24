@@ -311,4 +311,37 @@ public class Field {
      * 用户
      */
     public static final String USER = "user";
+    /**
+     *
+     */
+    public static final String PROGRESS = "progress";
+    /**
+     * 注册地址
+     */
+    public static final String REGISTER_ADDR = "registerAddr";
+    /**
+     * 渠道名称
+     */
+    public static final String CHANNEL_NAME = "channelName";
+    /**
+     * 单包在贷笔数
+     */
+    public static final String SINGLE_QUANTITY = "singleQuantity";
+    /**
+     * 多包在贷笔数
+     */
+    public static final String ALL_QUANTITY = "allQuantity";
+    /**
+     * 第一笔还款距今天数
+     */
+    public static final String REPAYMENT_TIME = "repaymentTime";
+    /**
+     * 用户客群
+     */
+    public static final String USER_TYPE = "userType";
+    /**
+     * 用户手机号
+     */
+    public static final String PHONE = "phone";
+
 }
