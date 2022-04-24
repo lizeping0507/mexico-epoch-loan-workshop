@@ -7,6 +7,7 @@ import com.epoch.loan.workshop.common.constant.*;
 import com.epoch.loan.workshop.common.entity.elastic.OcrLivingDetectionLogElasticEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanUserEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanUserInfoEntity;
+import com.epoch.loan.workshop.common.oss.OssClient;
 import com.epoch.loan.workshop.common.params.User;
 import com.epoch.loan.workshop.common.params.params.BaseParams;
 import com.epoch.loan.workshop.common.params.params.request.*;
@@ -498,15 +499,15 @@ public class UserServiceImpl extends BaseService implements UserService {
             basicInfo.setRfc(info.getRfc());
             basicInfo.setPostalCode(info.getPostalCode());
             if (StringUtils.isNotBlank(info.getFrontPath())) {
-                String fileUrl = OssFileUtils.getFileUrl(userFileBucketName, info.getFrontPath(), null);
+                String fileUrl = OssClient.getFileUrl(userFileBucketName, info.getFrontPath(), null);
                 basicInfo.setFrontImgUrl(fileUrl);
             }
             if (StringUtils.isNotBlank(info.getBackPath())) {
-                String fileUrl = OssFileUtils.getFileUrl(userFileBucketName, info.getBackPath(), null);
+                String fileUrl = OssClient.getFileUrl(userFileBucketName, info.getBackPath(), null);
                 basicInfo.setFrontImgUrl(fileUrl);
             }
             if (StringUtils.isNotBlank(info.getFacePath())) {
-                String fileUrl = OssFileUtils.getFileUrl(userFileBucketName, info.getFacePath(), null);
+                String fileUrl = OssClient.getFileUrl(userFileBucketName, info.getFacePath(), null);
                 basicInfo.setFrontImgUrl(fileUrl);
             }
         }
@@ -614,7 +615,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         // 上传证件正面图片
         File frontFile = convertToFile(params.getIdFrontImgData());
         String frontPath = BusinessNameUtils.createUserIdTypeFileName(NameField.USR_ID, user.getUserInfoId(), NameField.FRONT_IMAGE_TYPE);
-        String frontImageUrl = OssFileUtils.uploadFileAndGetUrl(userFileBucketName, frontPath, frontFile, null);
+        String frontImageUrl = OssClient.uploadFileAndGetUrl(userFileBucketName, frontPath, frontFile, null);
         frontFile.deleteOnExit();
         if (StringUtils.isBlank(frontImageUrl)) {
             result.setReturnCode(ResultEnum.KYC_UPLOAD_FILE_ERROR.code());
@@ -625,7 +626,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         //上传证件背面图片 并获取链接
         File backFile = convertToFile(params.getIdBackImgData());
         String backPath = BusinessNameUtils.createUserIdTypeFileName(NameField.USR_ID, user.getUserInfoId(), NameField.BACK_IMAGE_TYPE);
-        String backImageUrl = OssFileUtils.uploadFileAndGetUrl(userFileBucketName, backPath, backFile, null);
+        String backImageUrl = OssClient.uploadFileAndGetUrl(userFileBucketName, backPath, backFile, null);
         backFile.deleteOnExit();
         if (StringUtils.isBlank(backImageUrl)) {
             result.setReturnCode(ResultEnum.KYC_UPLOAD_FILE_ERROR.code());
@@ -636,7 +637,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         //上传人脸照片
         File faceFile = convertToFile(params.getFaceImgData());
         String facePath = BusinessNameUtils.createUserIdTypeFileName(NameField.USR_ID, user.getUserInfoId(), NameField.FACE_IMAGE_TYPE);
-        String faceImageUrl = OssFileUtils.uploadFileAndGetUrl(userFileBucketName, facePath, faceFile,null);
+        String faceImageUrl = OssClient.uploadFileAndGetUrl(userFileBucketName, facePath, faceFile,null);
         faceFile.deleteOnExit();
         if (StringUtils.isBlank(faceImageUrl)) {
             result.setReturnCode(ResultEnum.KYC_UPLOAD_FILE_ERROR.code());
