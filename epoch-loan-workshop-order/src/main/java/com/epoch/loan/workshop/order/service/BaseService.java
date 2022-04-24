@@ -80,4 +80,10 @@ public class BaseService {
      */
     @Autowired
     public OrderMQManager orderMQManager;
+
+    /**
+     * 还款记录
+     */
+    @Autowired
+    public LoanRepaymentPaymentRecordDao loanRepaymentPaymentRecordDao;
 }

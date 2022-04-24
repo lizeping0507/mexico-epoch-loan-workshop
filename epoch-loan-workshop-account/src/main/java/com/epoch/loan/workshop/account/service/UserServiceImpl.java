@@ -687,10 +687,9 @@ public class UserServiceImpl extends BaseService implements UserService {
         }
         loanUserInfoDao.update(userInfoById);
 
-        // TODO 更新用户缓存
+        // 更新用户缓存
+        user.setOcrAuth(true);
         tokenManager.updateUserCache(user.getId());
-
-        // TODO 更新用户认证信息
 
         // 封装结果
         result.setReturnCode(ResultEnum.SUCCESS.code());

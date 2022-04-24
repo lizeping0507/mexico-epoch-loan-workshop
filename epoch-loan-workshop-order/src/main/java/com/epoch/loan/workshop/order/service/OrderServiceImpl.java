@@ -1,6 +1,7 @@
 package com.epoch.loan.workshop.order.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.epoch.loan.workshop.common.constant.LoanRepaymentPaymentRecordStatus;
 import com.epoch.loan.workshop.common.constant.OrderStatus;
 import com.epoch.loan.workshop.common.constant.PlatformUrl;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
@@ -14,6 +15,7 @@ import com.epoch.loan.workshop.common.service.OrderService;
 import com.epoch.loan.workshop.common.util.DateUtil;
 import com.epoch.loan.workshop.common.util.HttpUtils;
 import com.epoch.loan.workshop.common.util.PlatformUtil;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -467,9 +469,24 @@ public class OrderServiceImpl extends BaseService implements OrderService {
         Double remainingRepaymentAmount = new BigDecimal(estimatedRepaymentAmount).subtract(new BigDecimal(actualRepaymentAmount)).doubleValue();
         detailResult.setRemainingRepaymentAmount(remainingRepaymentAmount);
 
-        // TODO 已还款成功记录
+        // 已还款成功记录
         List<LoanRepaymentRecordDTO> recordDTOList = new ArrayList<>();
-        detailResult.setRepayRecord(recordDTOList);
+        List<LoanRepaymentPaymentRecordEntity> paymentRecordList = loanRepaymentPaymentRecordDao.findListRecordDTOByOrderIdAndStatus(orderId, LoanRepaymentPaymentRecordStatus.SUCCESS);
+        paymentRecordList.stream().forEach(paymentRecord -> {
+            LoanRepaymentRecordDTO recordDTO = new LoanRepaymentRecordDTO();
+            recordDTO.setRepaymentAmount(paymentRecord.getAmount());
+            recordDTO.setTotalAmount(paymentRecord.getActualAmount());
+
+            // 手续费
+            double charge = new BigDecimal(paymentRecord.getAmount()).subtract(new BigDecimal(paymentRecord.getActualAmount())).doubleValue();
+            recordDTO.setCharge(charge);
+            recordDTO.setSuccessTime(paymentRecord.getUpdateTime());
+            recordDTO.setRepayWay(paymentRecord.getType());
+            recordDTOList.add(recordDTO);
+        });
+        if (CollectionUtils.isNotEmpty(recordDTOList)) {
+            detailResult.setRepayRecord(recordDTOList);
+        }
 
         // 封装结果
         result.setReturnCode(ResultEnum.SUCCESS.code());

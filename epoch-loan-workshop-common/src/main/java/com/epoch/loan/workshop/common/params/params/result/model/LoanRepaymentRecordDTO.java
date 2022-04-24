@@ -3,6 +3,7 @@ package com.epoch.loan.workshop.common.params.params.result.model;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @author 魏玉强
@@ -32,10 +33,10 @@ public class LoanRepaymentRecordDTO implements Serializable {
     /**
      * 还款时间
      */
-    private String successTime;
+    private Date successTime;
 
     /**
-     * 还款方式
+     * 还款方式  0:银行卡 1.clabe
      */
     private Integer repayWay;
 }
