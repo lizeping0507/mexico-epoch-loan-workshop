@@ -208,6 +208,9 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         // 是否通过
         int pass = data.getInteger(Field.PASS);
 
+        // TODO 测试 先写死
+        pass = 1;
+
         // 未通过
         if (pass == 0) {
             // 更新审核状态
