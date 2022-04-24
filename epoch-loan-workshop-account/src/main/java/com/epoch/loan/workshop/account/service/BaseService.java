@@ -3,6 +3,7 @@ package com.epoch.loan.workshop.account.service;
 import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.authentication.TokenManager;
 import com.epoch.loan.workshop.common.config.PlatformConfig;
+import com.epoch.loan.workshop.common.config.RiskConfig;
 import com.epoch.loan.workshop.common.dao.elastic.OcrLivingDetectionLogElasticDao;
 import com.epoch.loan.workshop.common.dao.mysql.*;
 import com.epoch.loan.workshop.common.entity.mysql.LoanRemittancePaymentRecordEntity;
@@ -138,6 +139,12 @@ public class BaseService {
      */
     @Autowired
     LoanRemittancePaymentRecordDao paymentRecordDao;
+
+    /**
+     * 风控配置
+     */
+    @Autowired
+    public RiskConfig riskConfig;
 
     /**
      * 放款账户

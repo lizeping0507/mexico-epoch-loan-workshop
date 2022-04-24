@@ -11,7 +11,7 @@ import lombok.Data;
  * @description : 获取产品模式接口参数封装
  */
 @Data
-public class AppModelParams extends BaseParams {
+public class AppMaskModelParams extends BaseParams {
 
     /**
      * GPS经纬度

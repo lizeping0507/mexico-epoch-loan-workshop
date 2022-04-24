@@ -281,7 +281,7 @@ public class User implements Serializable {
     private boolean basicInfoAuth;
 
     /**
-     * 放款账户 0: 未认证 1:认证
+     * 放款账户
      */
     private boolean remittanceAccountAuth;
 }

@@ -57,7 +57,7 @@ public class ProductController extends BaseController {
      * @return 首页信息
      */
     @PostMapping(URL.APP_MODEL)
-    public Result<AppMaskModelResult> appModel(AppModelParams params) {
+    public Result<AppMaskModelResult> appModel(AppMaskModelParams params) {
         // 结果集
         Result<AppMaskModelResult> result = new Result<>();
 
