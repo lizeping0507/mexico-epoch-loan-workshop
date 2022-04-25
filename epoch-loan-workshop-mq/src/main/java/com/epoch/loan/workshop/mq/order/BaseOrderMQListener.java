@@ -158,6 +158,12 @@ public abstract class BaseOrderMQListener {
     public LoanMaskDao loanMaskDao;
 
     /**
+     * 放款账户
+     */
+    @Autowired
+    public LoanRemittanceAccountDao loanRemittanceAccountDao;
+
+    /**
      * 获取子类消息监听
      */
     protected abstract MessageListenerConcurrently getMessageListener();

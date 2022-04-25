@@ -425,6 +425,9 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         // App版本
         String appVersion = params.getAppVersion();
 
+        // 更新GPS信息(userInfo实时)
+        updateUserGpsMsg(userId, params.getGps(), params.getGpsAddress());
+
         // 初始化金额
         appMaskModelResult.setAmount("10000");
 
