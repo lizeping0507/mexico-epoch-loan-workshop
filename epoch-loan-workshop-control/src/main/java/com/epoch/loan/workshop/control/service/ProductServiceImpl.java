@@ -76,7 +76,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         String orderModelGroup = loanProductEntity.getOrderModelGroup();
         LogUtil.sysInfo("productDetail orderModelGroup:{}",orderModelGroup);
 
-        // 更新GPS信息(userInfo实时) TODO 更新到表里，然后更新缓存
+        // 更新GPS信息(userInfo实时)
         updateUserGpsMsg(user.getUserInfoId(), params.getGps(), params.getGpsAddress());
 
         // 初始化订单
@@ -423,6 +423,9 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
         // App版本
         String appVersion = params.getAppVersion();
+
+        // 更新GPS信息(userInfo实时)
+        updateUserGpsMsg(userId, params.getGps(), params.getGpsAddress());
 
         // 初始化金额
         appMaskModelResult.setAmount("10000");
