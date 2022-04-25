@@ -89,7 +89,19 @@
         where id = #{loanUserInfoEntity.id}
     </update>
     <update id="updateUserGpsMsg">
-        update loan_user_info set gps = #{gps},gps_address= #{gpsAddress},update_time=#{updateTime} where id = #{id}
+        update loan_user_info update_time=#{updateTime}
+        <set>
+            <if test="gps!=null and gps!=''">
+                gps = #{gps},
+            </if>
+            <if test="gpsAddress!=null and gpsAddress!=''">
+                gps_address= #{gpsAddress},
+            </if>
+            <if test="updateTime!=null and updateTime!=''">
+                update_time=#{updateTime},
+            </if>
+        </set>
+        where id = #{id}
     </update>
 
     <select id="findLastUserInfoByPapersId" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanUserInfoEntity">

@@ -76,8 +76,9 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         String orderModelGroup = loanProductEntity.getOrderModelGroup();
         LogUtil.sysInfo("productDetail orderModelGroup:{}",orderModelGroup);
 
-        // 更新GPS信息(userInfo实时) TODO 更新到表里，然后更新缓存
+        // 更新GPS信息(userInfo实时)
         updateUserGpsMsg(user.getUserInfoId(), params.getGps(), params.getGpsAddress());
+        tokenManager.updateUserCache(user.getId());
 
         // 初始化订单
         LogUtil.sysInfo("productDetail params.getUser():{}", params.getUser());

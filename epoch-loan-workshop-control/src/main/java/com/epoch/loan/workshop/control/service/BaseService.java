@@ -1,5 +1,6 @@
 package com.epoch.loan.workshop.control.service;
 
+import com.epoch.loan.workshop.common.authentication.TokenManager;
 import com.epoch.loan.workshop.common.config.PlatformConfig;
 import com.epoch.loan.workshop.common.config.RiskConfig;
 import com.epoch.loan.workshop.common.dao.elastic.OcrLivingDetectionLogElasticDao;
@@ -132,6 +133,12 @@ public class BaseService {
      */
     @Autowired
     public LoanUserInfoDao loanUserInfoDao;
+
+    /**
+     * 变身包承接盘配置
+     */
+    @Autowired
+    public TokenManager tokenManager;
 
 
     /**
