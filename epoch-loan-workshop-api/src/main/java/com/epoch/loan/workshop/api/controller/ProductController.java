@@ -56,6 +56,7 @@ public class ProductController extends BaseController {
      * @param params 入参
      * @return 首页信息
      */
+    @Authentication
     @PostMapping(URL.APP_MASK_MODEL)
     public Result<AppMaskModelResult> appMaskModel(AppMaskModelParams params) {
         // 结果集
@@ -81,6 +82,7 @@ public class ProductController extends BaseController {
      * @param params 入参
      * @return 首页信息
      */
+    @Authentication
     @PostMapping(URL.MERGE_PUSH_HOME)
     public Result<MergePushHomeResult> mergePushHome(MergePushHomeParams params) {
         // 结果集
@@ -106,6 +108,7 @@ public class ProductController extends BaseController {
      * @param params 入参
      * @return 产品列表
      */
+    @Authentication
     @PostMapping(URL.MERGE_PUSH_LIST)
     public Result<MergePushListResult> mergePushList(MergePushListParams params) {
         // 结果集
@@ -131,6 +134,7 @@ public class ProductController extends BaseController {
      * @param params 入参
      * @return 变身成功与否
      */
+    @Authentication
     @PostMapping(URL.TURN_INTO_LOAN)
     public Result<Object> turnIntoLoan(MergePushHomeParams params) {
         // 结果集
@@ -156,6 +160,7 @@ public class ProductController extends BaseController {
      * @param params 入参
      * @return 产品列表
      */
+    @Authentication
     @PostMapping(URL.LIST)
     public Result<ProductListResult> list(ProductListParams params) {
         // 结果集
@@ -181,6 +186,7 @@ public class ProductController extends BaseController {
      * @param params 入参
      * @return 产品信息
      */
+    @Authentication
     @PostMapping(URL.VIEW_DETAIL)
     public Result<ProductViewDetailResult> viewDetail(ProductViewDetailParams params) {
         // 结果集
@@ -206,6 +212,7 @@ public class ProductController extends BaseController {
      * @param params 入参
      * @return 是否续贷开量
      */
+    @Authentication
     @PostMapping(URL.ISRELOAN)
     public Result<ProductIsReloanResult> isReloan(ProductIsReloanParams params) {
         // 结果集
@@ -231,6 +238,7 @@ public class ProductController extends BaseController {
      * @param params 入参
      * @return 聚道信息
      */
+    @Authentication
     @PostMapping(URL.PAY_CHANNEL)
     public Result<ProductPayChannelResult> payChannel(ProductPayChannelParams params) {
         // 结果集
@@ -306,6 +314,7 @@ public class ProductController extends BaseController {
      * @param params 基础参数
      * @return 推荐列表
      */
+    @Authentication
     @PostMapping(URL.PRODUCT_RECOMMEND_LIST)
     public Result<ProductRecommendResult> recommendList(ProductRecommendListParams params) {
         // 结果集
