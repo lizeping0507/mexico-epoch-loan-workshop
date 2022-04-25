@@ -97,7 +97,7 @@
             <if test="gpsAddress!=null and gpsAddress!=''">
                 gps_address= #{gpsAddress},
             </if>
-            <if test="updateTime!=null and updateTime!=''">
+            <if test="updateTime!=null">
                 update_time=#{updateTime},
             </if>
         </set>
