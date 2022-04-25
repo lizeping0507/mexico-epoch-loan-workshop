@@ -38,7 +38,7 @@ public class LoanOcrProviderConfig implements Serializable {
     /**
      * app标识
      */
-    private Integer appName;
+    private String appName;
 
     /**
      * 更新时间

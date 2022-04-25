@@ -131,7 +131,7 @@ public enum ResultEnum {
     /**
      * 上传文件失败
      */
-    KYC_UPLOAD_FILE_ERROR(6040, "Failed to upload file, please upload the image again."),
+    KYC_UPLOAD_FILE_ERROR(6003, "Failed to upload file, please upload the image again."),
 
     /**
      * Rfc或者INE/IFE格式错误
@@ -141,37 +141,37 @@ public enum ResultEnum {
     /**
      * INE/IFE证件id 已经被认证了
      */
-    INF_CERTIFIED_ERROR(6020, "INE/IFE ha sido certificado."),
+    INF_CERTIFIED_ERROR(6011, "INE/IFE ha sido certificado."),
 
     /**
      * INE/IFE证件id 已经被其他用户认证了
      */
-    INF_CERTIFIED_OTHER_ERROR(6021, "The INE/IFE has been authenticated by other users"),
+    INF_CERTIFIED_OTHER_ERROR(6012, "The INE/IFE has been authenticated by other users"),
 
     /**
      * RFC 已经被认证了
      */
-    RFC_CERTIFIED_ERROR(6030, "RFC ha sido certificado."),
+    RFC_CERTIFIED_ERROR(6013, "RFC ha sido certificado."),
 
     /**
      * RFC 已经被其他用户认证了
      */
-    RFC_CERTIFIED_OTHER_ERROR(6031, "The RFC has been authenticated by other users"),
+    RFC_CERTIFIED_OTHER_ERROR(6014, "The RFC has been authenticated by other users"),
 
     /**
      * 根据手机号查询 当前账号认证信息与主账户不匹配
      */
-    RFC_INF_CERTIFIED_ERROR(6040, "La información de certificación de la cuenta principal no satisfacen los requisitos que exigen la cuenta principal"),
+    RFC_INF_CERTIFIED_ERROR(6015, "La información de certificación de la cuenta principal no satisfacen los requisitos que exigen la cuenta principal"),
 
     /**
      * 根据INE/IFE证件id查询 当前账号认证信息与主账户不匹配
      */
-    RFC_MOBILE_CERTIFIED_ERROR(6041, "La información de certificación de la cuenta principal no satisfacen los requisitos que exigen la cuenta principal"),
+    RFC_MOBILE_CERTIFIED_ERROR(6016, "La información de certificación de la cuenta principal no satisfacen los requisitos que exigen la cuenta principal"),
 
     /**
      * 根据RFC查询 当前账号认证信息与主账户不匹配
      */
-    INF_MOBILE_CERTIFIED_OTHER_ERROR(6042, "La información de certificación de la cuenta principal no satisfacen los requisitos que exigen la cuenta principal"),
+    INF_MOBILE_CERTIFIED_OTHER_ERROR(6017, "La información de certificación de la cuenta principal no satisfacen los requisitos que exigen la cuenta principal"),
 
     /**
      * 与风控交互出错
@@ -196,6 +196,10 @@ public enum ResultEnum {
     DELIVERY_REJECTED_ERROR(7001, "delivery rejected"),
 
 
+    /**
+     * 无可用聚道
+     */
+    CHANNEL_UN_DO_ERROR(6100, "No polyway available"),
     ;
 
 

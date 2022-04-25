@@ -16,17 +16,12 @@ public class ProductDetailResult implements Serializable {
     /**
      * 订单编号
      */
-    private String orderNo;
+    private String orderId;
 
     /**
      * 额度范围
      */
     private String amount;
-
-    /**
-     * 是否需要sdk抓取并上报数据
-     */
-    private Boolean needCatchData;
 
     /**
      * 身份证认证状态 0：未认证，1认证

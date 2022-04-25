@@ -98,13 +98,14 @@ public class OrderController extends BaseController {
 
 
     /**
-     * 订单列表
+     * 全部订单列表
      *
      * @param params 请求参数
      * @return Result
      */
-    @PostMapping(URL.ORDER_LIST)
-    public Result<OrderListResult> list(OrderListParams params) {
+    @Authentication
+    @PostMapping(URL.ORDER_LIST_ALL)
+    public Result<OrderListResult> listAll(OrderListParams params) {
         // 结果集
         Result<OrderListResult> result = new Result<>();
 
@@ -118,13 +119,75 @@ public class OrderController extends BaseController {
             }
 
             // 订单列表
-            if (params.getOrderQueryReq() == 1) {
-                return orderService.unfinishedOrderList(params);
-            } else if (params.getOrderQueryReq() == 2) {
-                return orderService.unRepaymentOrderList(params);
-            } else {
-                return orderService.listAll(params);
+            return orderService.listAll(params);
+        } catch (Exception e) {
+            LogUtil.sysError("[OrderController list]", e);
+
+            // 异常返回结果
+            result.setEx(ThrowableUtils.throwableToString(e));
+            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
+            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
+            return result;
+        }
+    }
+
+    /**
+     * 待完成订单列表
+     *
+     * @param params 请求参数
+     * @return Result
+     */
+    @Authentication
+    @PostMapping(URL.ORDER_UN_FINISHED_LIST)
+    public Result<OrderListResult> unfinishedOrderList(OrderListParams params) {
+        // 结果集
+        Result<OrderListResult> result = new Result<>();
+
+        try {
+            // 验证请求参数是否合法
+            if (!params.isOrderQueryReqLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":orderQueryReq");
+                return result;
             }
+
+            // 订单列表
+            return orderService.unfinishedOrderList(params);
+        } catch (Exception e) {
+            LogUtil.sysError("[OrderController list]", e);
+
+            // 异常返回结果
+            result.setEx(ThrowableUtils.throwableToString(e));
+            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
+            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
+            return result;
+        }
+    }
+
+    /**
+     * 待还款订单列表
+     *
+     * @param params 请求参数
+     * @return Result
+     */
+    @Authentication
+    @PostMapping(URL.ORDER_UN_REPAYMENT_LIST)
+    public Result<OrderListResult> unRepaymentOrderList(OrderListParams params) {
+        // 结果集
+        Result<OrderListResult> result = new Result<>();
+
+        try {
+            // 验证请求参数是否合法
+            if (!params.isOrderQueryReqLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":orderQueryReq");
+                return result;
+            }
+
+            // 订单列表
+            return orderService.unRepaymentOrderList(params);
         } catch (Exception e) {
             LogUtil.sysError("[OrderController list]", e);
 
