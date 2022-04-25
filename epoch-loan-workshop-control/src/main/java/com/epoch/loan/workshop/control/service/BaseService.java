@@ -120,8 +120,8 @@ public class BaseService {
     public PlatformChannelDao platformChannelDao;
 
     /**
-     * 渠道
+     * 变身包承接盘配置
      */
     @Autowired
-    public PlatformUserAuthDao platformUserAuthDao;
+    public LoanMaskDao loanMaskDao;
 }

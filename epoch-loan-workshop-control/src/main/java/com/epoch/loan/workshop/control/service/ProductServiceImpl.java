@@ -401,6 +401,15 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         Result<AppMaskModelResult> result = new Result<>();
         AppMaskModelResult appMaskModelResult = new AppMaskModelResult();
 
+        // 用户id
+        String userId = params.getUser().getId();
+
+        // app名称
+        String appName = params.getUser().getAppName();
+
+        // App版本
+        String appVersion = params.getAppVersion();
+
         // 初始化金额
         appMaskModelResult.setAmount("10000");
 
@@ -447,22 +456,69 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         }
 
         // 查询用户有没有贷超模式订单
-
+        Integer orderCount = loanOrderDao.findOrderCountByUserIdAndType(userId, OrderType.LOAN);
 
         // 查询用户指定状态下的订单
-        if (true) {
+        if (orderCount == null || orderCount == 0) {
+            // 没有指定状态的订单就生成一个订单
+            Integer[] status = new Integer[]{OrderStatus.CREATE, OrderStatus.EXAMINE_WAIT, OrderStatus.EXAMINE_PASS, OrderStatus.WAIT_PAY, OrderStatus.WAY, OrderStatus.DUE, OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE};
+            List<LoanOrderEntity> loanOrderEntityList = loanOrderDao.findOrderByUserIdAndStatus(userId, status);
+
+            if (CollectionUtils.isEmpty(loanOrderEntityList)) {
+                /*查询订单是否全部被拒*/
+                status = new Integer[]{OrderStatus.EXAMINE_FAIL};
+                loanOrderEntityList = loanOrderDao.findOrderByUserIdAndStatus(userId, status);
+                if (CollectionUtils.isNotEmpty(loanOrderEntityList)){
+                    loanOrderEntityList.get(0).getUpdateTime();
+                }
+
+
+                // 查询A阈值的承接盘
+                LoanMaskEntity loanMaskEntity = loanMaskDao.findLoanMaskByAppNameAndLevel(appName, "A");
+
+                // 查询承接盘详细信息
+                LoanProductEntity loanProductEntity = loanProductDao.findProduct(loanMaskEntity.getProductId());
+
+                // 生成订单
+                LoanOrderEntity loanOrderEntity = initOrder(params.getUser(), OrderType.MASK, appVersion, appName, "MASK", loanProductEntity);
+
+                // 返回结果集
+                appMaskModelResult.setMaskModel(0);
+                appMaskModelResult.setButton("");
+                appMaskModelResult.setOrderNo(loanOrderEntity.getId());
+                result.setData(appMaskModelResult);
+                result.setReturnCode(ResultEnum.SUCCESS.code());
+                result.setMessage(ResultEnum.SUCCESS.message());
+                return result;
+            }
+
+            // 如果是已经还款的订单那么直接变贷超
+            LoanOrderEntity loanOrderEntity = loanOrderEntityList.get(0);
+            if (loanOrderEntity.getStatus() == OrderStatus.DUE_COMPLETE || loanOrderEntity.getStatus() == OrderStatus.COMPLETE) {
+                // 没有通过 返回结果
+                appMaskModelResult.setMaskModel(1);
+                appMaskModelResult.setButton("");
+                result.setData(appMaskModelResult);
+                result.setReturnCode(ResultEnum.SUCCESS.code());
+                result.setMessage(ResultEnum.SUCCESS.message());
+                return result;
+            }
+
+            // 查询承接盘
+            String productId = loanOrderEntity.getProductId();
+            LoanMaskEntity loanMaskEntity = loanMaskDao.findLoanMaskByAppNameAndProductId(appName, productId);
+
+            if (loanMaskEntity.getLevel().equals("A")) {
+
+            } else {
+
+            }
+
+
+        } else {
             // 有指定状态下的订单
 
             // 查询该承接盘,阈值
-
-        } else {
-            // 没有指定状态的订单就生成一个订单
-
-            // 查询承接盘-按照A阈值计算
-
-            // 生成订单
-
-
         }
 
         result.setReturnCode(ResultEnum.SUCCESS.code());

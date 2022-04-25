@@ -20,4 +20,13 @@ public interface LoanMaskDao {
      * @return
      */
     LoanMaskEntity findLoanMaskByAppNameAndLevel(String appName, String level);
+
+    /**
+     * 根据产品id和App名称查询变身包承接盘信息
+     *
+     * @param appName
+     * @param productId
+     * @return
+     */
+    LoanMaskEntity findLoanMaskByAppNameAndProductId(String appName, String productId);
 }

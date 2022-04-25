@@ -177,11 +177,10 @@ public interface LoanOrderDao {
      * 查询用户订单数量
      *
      * @param userId
-     * @param appName
      * @param status
      * @return
      */
-    int findOrderCountByAppNameAndUserIdAndStatus(String userId, String appName, int status);
+    int findOrderCountByAppNameAndUserIdAndStatus(String userId, int status);
 
     /**
      * 查询订单使用的支付策略组
@@ -217,6 +216,15 @@ public interface LoanOrderDao {
      * @param updateTime
      */
     void updateBankCardId(String orderId, String remittanceAccountId, Date updateTime);
+
+    /**
+     * 根据用户id查询指定状态的订单
+     *
+     * @param userId
+     * @param status
+     * @return
+     */
+    List<LoanOrderEntity> findOrderByUserIdAndStatus(String userId, Integer[] status);
 
     /**
      * 根据用户id查询指定状态的订单
@@ -273,4 +281,13 @@ public interface LoanOrderDao {
      * @return
      */
     Integer findUserBetweenSpecificStatusOrderNum(String userId, Integer start, Integer end);
+
+    /**
+     * 根据用户id和订单类型查询订单数量
+     *
+     * @param userId
+     * @param type
+     * @return
+     */
+    Integer findOrderCountByUserIdAndType(String userId, int type);
 }
