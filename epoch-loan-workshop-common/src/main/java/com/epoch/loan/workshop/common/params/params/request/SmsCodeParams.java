@@ -2,6 +2,7 @@ package com.epoch.loan.workshop.common.params.params.request;
 
 import com.epoch.loan.workshop.common.params.params.BaseParams;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author : Shangkunfeng
@@ -11,9 +12,23 @@ import lombok.Data;
  * @description : 查询手机号是否注册接口参数封装
  */
 @Data
-public class SendRegisterMessageParams extends BaseParams {
+public class SmsCodeParams extends BaseParams {
     /**
      * 手机号
      */
-    private String phoneNumber;
+    private String mobile;
+
+
+
+    /**
+     * 验证手机号是否合法
+     *
+     * @return
+     */
+    public boolean isMobileLegal() {
+        if (StringUtils.isEmpty(this.mobile)) {
+            return false;
+        }
+        return true;
+    }
 }

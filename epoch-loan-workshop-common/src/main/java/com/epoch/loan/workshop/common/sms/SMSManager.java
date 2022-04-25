@@ -5,6 +5,7 @@ import com.epoch.loan.workshop.common.dao.mysql.LoanSMSChannelConfigDao;
 import com.epoch.loan.workshop.common.entity.mysql.LoanSMSChannelConfigEntity;
 import com.epoch.loan.workshop.common.sms.channel.SMSChannel;
 import com.epoch.loan.workshop.common.sms.channel.Situation;
+import com.epoch.loan.workshop.common.util.LogUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,9 +42,11 @@ public class SMSManager {
         String code = generateVerificationCode();
 
         // 发送短信验证码
-        Situation situation = smsChannel().sendVerificationCode(code, mobile);
+        Situation situation = smsChannel().sendVerificationCode(code,
+                "0052" + mobile);
         if (!situation.isResult()) {
-            throw new Exception();
+            LogUtil.sysError("[SMSManager sendVerificationCode]"+ situation.getResponse());
+            return null;
         }
 
         return code;

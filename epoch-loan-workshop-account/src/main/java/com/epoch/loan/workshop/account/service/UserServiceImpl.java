@@ -113,8 +113,8 @@ public class UserServiceImpl extends BaseService implements UserService {
             registerCode = "0000";
         }
         if (StringUtils.isEmpty(registerCode) || !registerCode.equals(params.getSmsCode())) {
-            result.setReturnCode(ResultEnum.SMSCODE_ERROR.code());
-            result.setMessage(ResultEnum.SMSCODE_ERROR.message());
+            result.setReturnCode(ResultEnum.SMS_CODE_ERROR.code());
+            result.setMessage(ResultEnum.SMS_CODE_ERROR.message());
             return result;
         }
 
@@ -230,8 +230,8 @@ public class UserServiceImpl extends BaseService implements UserService {
             registerCode = "0000";
         }
         if (StringUtils.isEmpty(registerCode) || !registerCode.equals(params.getSmsCode())) {
-            result.setReturnCode(ResultEnum.SMSCODE_ERROR.code());
-            result.setMessage(ResultEnum.SMSCODE_ERROR.message());
+            result.setReturnCode(ResultEnum.SMS_CODE_ERROR.code());
+            result.setMessage(ResultEnum.SMS_CODE_ERROR.message());
             return result;
         }
 

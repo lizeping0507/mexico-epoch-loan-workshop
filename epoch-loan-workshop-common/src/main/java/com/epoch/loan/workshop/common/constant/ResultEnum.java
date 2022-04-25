@@ -65,9 +65,9 @@ public enum ResultEnum {
      */
     PHONE_EXIT(4010, ""),
     /**
-     * 手机号已存在
+     * 验证码错误
      */
-    SMSCODE_ERROR(4011, "OTP error, please try again"),
+    SMS_CODE_ERROR(4011, "OTP error, please try again"),
 
     /**
      * 还款账户异常
@@ -78,6 +78,12 @@ public enum ResultEnum {
      * 订单异常
      */
     ORDER_ERROR(4013, "Order error"),
+
+    /**
+     * 验证码错误
+     */
+    SMS_CODE_SEND_FAILED(4011, "smsCode send failed"),
+
 
     // ======= 服务端错误 ========
     /**

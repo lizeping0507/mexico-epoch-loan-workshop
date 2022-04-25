@@ -1,6 +1,6 @@
 package com.epoch.loan.workshop.common.service;
 
-import com.epoch.loan.workshop.common.params.params.request.SendRegisterMessageParams;
+import com.epoch.loan.workshop.common.params.params.request.SmsCodeParams;
 import com.epoch.loan.workshop.common.params.params.result.Result;
 
 /**
@@ -15,9 +15,9 @@ public interface ShortMessageService {
     /**
      * 发送注册短信
      *
-     * @param sendRegisterMessageParams 入参
+     * @param smsCodeParams 入参
      * @return 发送结果
      * @throws Exception 请求异常
      */
-    Result<Object> sendRegisterMessage(SendRegisterMessageParams sendRegisterMessageParams) throws Exception;
+    Result<Object> sendRegisterMessage(SmsCodeParams smsCodeParams) throws Exception;
 }

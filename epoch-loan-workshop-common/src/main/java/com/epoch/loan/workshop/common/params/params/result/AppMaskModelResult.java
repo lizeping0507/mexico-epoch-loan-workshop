@@ -57,9 +57,4 @@ public class AppMaskModelResult implements Serializable {
      * 订单状态
      */
     private Integer orderStatus;
-
-    /**
-     * 公告
-     */
-    private String cashNotice;
 }

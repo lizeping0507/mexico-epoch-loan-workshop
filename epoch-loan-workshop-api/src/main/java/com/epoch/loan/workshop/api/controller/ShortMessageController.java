@@ -2,7 +2,7 @@ package com.epoch.loan.workshop.api.controller;
 
 import com.epoch.loan.workshop.common.config.URL;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
-import com.epoch.loan.workshop.common.params.params.request.SendRegisterMessageParams;
+import com.epoch.loan.workshop.common.params.params.request.SmsCodeParams;
 import com.epoch.loan.workshop.common.params.params.result.Result;
 import com.epoch.loan.workshop.common.util.LogUtil;
 import com.epoch.loan.workshop.common.util.ThrowableUtils;
@@ -24,17 +24,26 @@ public class ShortMessageController extends BaseController {
     /**
      * 发送注册短信
      *
-     * @param sendRegisterMessageParams 入参
+     * @param smsCodeParams 入参
      * @return 发送结果
      */
-    @PostMapping(URL.SEND_REGISTER_MESSAGE)
-    public Result<Object> sendRegisterMessage(SendRegisterMessageParams sendRegisterMessageParams) {
+    @PostMapping(URL.SEND_SMSCODE)
+    public Result<Object> sendSmsCodeMessage(SmsCodeParams smsCodeParams) {
         // 结果集
         Result<Object> result = new Result<>();
 
         try {
+
+            // 验证请求参数是否合法
+            if (!smsCodeParams.isMobileLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":mobile");
+                return result;
+            }
+
             // 发送注册短信
-            return shortMessageService.sendRegisterMessage(sendRegisterMessageParams);
+            return shortMessageService.sendRegisterMessage(smsCodeParams);
         } catch (Exception e) {
             LogUtil.sysError("[ShortMessageController sendRegisterMessage]", e);
 

@@ -56,7 +56,6 @@ public class UserController extends BaseController {
      * @param registerParams
      * @return 结果
      */
-    @Authentication(auth = false)
     @PostMapping(URL.REGISTER)
     public Result<RegisterResult> register(RegisterParams registerParams) {
         LogUtil.sysInfo("用户注册 : {}", JSONObject.toJSONString(registerParams));
@@ -391,6 +390,7 @@ public class UserController extends BaseController {
             return result;
         }
     }
+
     /**
      * 保存用户个人信息
      *

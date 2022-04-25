@@ -2,9 +2,10 @@ package com.epoch.loan.workshop.control.service;
 
 import com.epoch.loan.workshop.common.constant.RedisKeyField;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
-import com.epoch.loan.workshop.common.params.params.request.SendRegisterMessageParams;
+import com.epoch.loan.workshop.common.params.params.request.SmsCodeParams;
 import com.epoch.loan.workshop.common.params.params.result.Result;
 import com.epoch.loan.workshop.common.service.ShortMessageService;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 
 /**
@@ -25,15 +26,20 @@ public class ShortMessageServiceImpl extends BaseService implements ShortMessage
      * @throws Exception 请求异常
      */
     @Override
-    public Result<Object> sendRegisterMessage(SendRegisterMessageParams params) throws Exception {
+    public Result<Object> sendRegisterMessage(SmsCodeParams params) throws Exception {
         // 结果结果集
         Result<Object> result = new Result<>();
 
         // 发送验证码
-        String smsCode = smsManager.sendVerificationCode(params.getPhoneNumber());
+        String smsCode = smsManager.sendVerificationCode(params.getMobile());
+
+        if (StringUtils.isBlank(smsCode)) {
+            result.setReturnCode(ResultEnum.SMS_CODE_SEND_FAILED.code());
+            result.setMessage(ResultEnum.SMS_CODE_SEND_FAILED.message());
+        }
 
         // 缓存
-        String key = String.format(RedisKeyField.SMS_CODE_TEMPLATE, params.getAppName(), params.getPhoneNumber());
+        String key = String.format(RedisKeyField.SMS_CODE_TEMPLATE, params.getAppName(), params.getMobile());
         redisClient.set(key, smsCode, 60 * 5);
 
         // 封装结果
