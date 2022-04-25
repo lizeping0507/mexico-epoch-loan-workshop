@@ -528,7 +528,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             return result;
         }
 
-        // 如果是已经还款的订单那么直接变贷超
+        // 获取订单
         LoanOrderEntity loanOrderEntity = loanOrderEntityList.get(0);
 
         // 订单编号
@@ -558,6 +558,11 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             appMaskModelResult.setOrderStatus(orderStatus);
             result.setData(appMaskModelResult);
             return result;
+        }
+
+        // 如果订单处于在途或者在途之后的状态那么金额就为预计还款金额
+        if (orderStatus >= OrderStatus.WAY) {
+            appMaskModelResult.setAmount(String.valueOf(loanOrderEntity.getEstimatedRepaymentAmount()));
         }
 
         // 返回结果
