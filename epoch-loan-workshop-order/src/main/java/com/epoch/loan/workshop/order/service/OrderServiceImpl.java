@@ -167,43 +167,82 @@ public class OrderServiceImpl extends BaseService implements OrderService {
     }
 
     /**
-     * 订单列表
+     * 全部订单列表
      *
      * @param params 请求参数
-     * @return Result
-     * @throws Exception 请求异常
+     * @return Result 订单列表
      */
     @Override
-    public Result<OrderListResult> list(OrderListParams params) {
+    public Result<OrderListResult> listAll(OrderListParams params) {
         // 结果集
         Result<OrderListResult> result = new Result<>();
         String userId = params.getUser().getId();
-        Integer orderQueryReq = params.getOrderQueryReq();
         List<OrderDTO> orderDTOList = new ArrayList<>();
+        Integer[] status = new Integer[]{OrderStatus.CREATE, OrderStatus.EXAMINE_WAIT, OrderStatus.EXAMINE_PASS, OrderStatus.EXAMINE_FAIL, OrderStatus.WAIT_PAY, OrderStatus.WAY, OrderStatus.DUE, OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE, OrderStatus.ABANDONED};
+        List<OrderDTO> orderOtherDTOList = loanOrderDao.findOrderListByUserIdAndStatusAndOrderByField(userId, status, OrderByField.APPLY_TIME, OrderByField.DESC);
+        if (CollectionUtils.isNotEmpty(orderOtherDTOList)) {
+            orderDTOList.addAll(orderOtherDTOList);
+        }
+
+        // 封装结果
+        result.setReturnCode(ResultEnum.SUCCESS.code());
+        result.setMessage(ResultEnum.SUCCESS.message());
+        result.setData(new OrderListResult(orderDTOList));
+        return result;
+    }
+
+    /**
+     * 待完成订单列表
+     *
+     * @param params 请求参数
+     * @return Result 订单列表
+     */
+    @Override
+    public Result<OrderListResult> unfinishedOrderList(OrderListParams params) {
+        // 结果集
+        Result<OrderListResult> result = new Result<>();
+        String userId = params.getUser().getId();
+        List<OrderDTO> orderDTOList = new ArrayList<>();
+
+        // 查询用户审核通过的订单
         Integer[] status = new Integer[]{OrderStatus.EXAMINE_PASS};
+        List<OrderDTO> orderPassDTOList = loanOrderDao.findOrderListByUserIdAndStatusAndOrderByField(userId, status, OrderByField.EXAMINE_PASS_TIME, OrderByField.ASC);
+        if (CollectionUtils.isNotEmpty(orderPassDTOList)) {
+            orderDTOList.addAll(orderPassDTOList);
+        }
 
-        // 待完成订单
-        if (orderQueryReq == 1) {
-            // 查询用户审核通过的订单
-            List<OrderDTO> orderPassDTOList = loanOrderDao.findOrderListByUserIdAndStatusAndOrderByField(userId, status, OrderByField.EXAMINE_PASS_TIME, OrderByField.ASC);
-            if (CollectionUtils.isNotEmpty(orderPassDTOList)) {
-                orderDTOList.addAll(orderPassDTOList);
-            }
+        // 查询其他状态的订单
+        status = new Integer[]{OrderStatus.CREATE, OrderStatus.EXAMINE_WAIT, OrderStatus.WAIT_PAY, OrderStatus.WAY};
+        List<OrderDTO> orderOtherDTOList = loanOrderDao.findOrderListByUserIdAndStatusAndOrderByField(userId, status, OrderByField.UPDATE_TIME, OrderByField.DESC);
+        if (CollectionUtils.isNotEmpty(orderOtherDTOList)) {
+            orderDTOList.addAll(orderOtherDTOList);
+        }
 
-            // 查询其他状态的订单
-            status = new Integer[]{OrderStatus.CREATE, OrderStatus.EXAMINE_WAIT, OrderStatus.WAIT_PAY, OrderStatus.WAY};
-            List<OrderDTO> orderOtherDTOList = loanOrderDao.findOrderListByUserIdAndStatusAndOrderByField(userId, status, OrderByField.UPDATE_TIME, OrderByField.DESC);
-            if (CollectionUtils.isNotEmpty(orderOtherDTOList)) {
-                orderDTOList.addAll(orderOtherDTOList);
-            }
-        } else if (orderQueryReq == 2) {
-            status = new Integer[]{OrderStatus.WAY, OrderStatus.DUE};
-            List<OrderDTO> orderOtherDTOList = loanOrderDao.findOrderListByUserIdAndStatusAndOrderByField(userId, status, OrderByField.APPLY_TIME, OrderByField.ASC);
-            if (CollectionUtils.isNotEmpty(orderOtherDTOList)) {
-                orderDTOList.addAll(orderOtherDTOList);
-            }
-        } else {
-            status = new Integer[]{OrderStatus.CREATE, OrderStatus.EXAMINE_WAIT, OrderStatus.EXAMINE_PASS, OrderStatus.EXAMINE_FAIL, OrderStatus.WAIT_PAY, OrderStatus.WAY, OrderStatus.DUE, OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE, OrderStatus.ABANDONED};
+        // 封装结果
+        result.setReturnCode(ResultEnum.SUCCESS.code());
+        result.setMessage(ResultEnum.SUCCESS.message());
+        result.setData(new OrderListResult(orderDTOList));
+        return result;
+    }
+
+    /**
+     * 未还款订单列表
+     *
+     * @param params 请求参数
+     * @return Result 订单列表
+     */
+    @Override
+    public Result<OrderListResult> unRepaymentOrderList(OrderListParams params) {
+        // 结果集
+        Result<OrderListResult> result = new Result<>();
+        String userId = params.getUser().getId();
+        List<OrderDTO> orderDTOList = new ArrayList<>();
+
+        // 查询用户待还款的订单
+        Integer[] status = new Integer[]{OrderStatus.WAY, OrderStatus.DUE};
+        List<OrderDTO> orderOtherDTOList = loanOrderDao.findOrderListByUserIdAndStatusAndOrderByField(userId, status, OrderByField.CREATE_TIME, OrderByField.ASC);
+        if (CollectionUtils.isNotEmpty(orderOtherDTOList)) {
+            orderDTOList.addAll(orderOtherDTOList);
         }
 
         // 封装结果

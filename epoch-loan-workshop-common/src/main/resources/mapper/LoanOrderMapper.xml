@@ -202,7 +202,7 @@
         loan_time
         FROM
         loan_order
-        LEFT JOIN loan_product ON loan_order.product_id = loan_product.id WHERE user_id = #{userId}
+        WHERE user_id = #{userId}
         <foreach collection="array" item="statu" index="index" open="AND status IN(" close=")" separator=",">#{statu}</foreach>
         ORDER BY #{field} #{sequence}
     </select>

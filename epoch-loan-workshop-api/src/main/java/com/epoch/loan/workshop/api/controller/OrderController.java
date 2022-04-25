@@ -106,7 +106,7 @@ public class OrderController extends BaseController {
     @PostMapping(URL.ORDER_LIST)
     public Result<OrderListResult> list(OrderListParams params) {
         // 结果集
-        Result<OrderListResult> result = new Result<OrderListResult>();
+        Result<OrderListResult> result = new Result<>();
 
         try {
             // 验证请求参数是否合法
@@ -118,7 +118,13 @@ public class OrderController extends BaseController {
             }
 
             // 订单列表
-            return orderService.list(params);
+            if (params.getOrderQueryReq() == 1) {
+                return orderService.unfinishedOrderList(params);
+            } else if (params.getOrderQueryReq() == 2) {
+                return orderService.unRepaymentOrderList(params);
+            } else {
+                return orderService.listAll(params);
+            }
         } catch (Exception e) {
             LogUtil.sysError("[OrderController list]", e);
 

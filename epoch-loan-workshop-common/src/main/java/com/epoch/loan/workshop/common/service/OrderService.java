@@ -28,12 +28,28 @@ public interface OrderService {
     Result apply(ApplyParams applyParams);
 
     /**
-     * 订单列表
+     * 全部订单列表
      *
      * @param params 请求参数
-     * @return Result
+     * @return Result 订单列表
      */
-    Result<OrderListResult> list(OrderListParams params);
+    Result<OrderListResult> listAll(OrderListParams params);
+
+    /**
+     * 未完成订单列表
+     *
+     * @param params 请求参数
+     * @return Result 订单列表
+     */
+    Result<OrderListResult> unfinishedOrderList(OrderListParams params);
+
+    /**
+     * 未还款订单列表
+     *
+     * @param params 请求参数
+     * @return Result 订单列表
+     */
+    public Result<OrderListResult> unRepaymentOrderList(OrderListParams params);
 
     /**
      * 订单详情
