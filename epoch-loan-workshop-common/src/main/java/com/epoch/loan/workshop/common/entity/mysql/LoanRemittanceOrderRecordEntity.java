@@ -35,39 +35,39 @@ public class LoanRemittanceOrderRecordEntity {
     private Double amount;
 
     /**
-     * 手机号
-     */
-    private String phone;
-
-    /**
-     * ad卡号
-     */
-    private String addCard;
-
-    /**
-     * pan卡号
-     */
-    private String panCard;
-
-    /**
-     * 邮箱
-     */
-    private String email;
-
-    /**
-     * 姓名
+     * 收款人姓名
      */
     private String name;
 
     /**
-     * 银行卡
+     * 备注
      */
-    private String bankCard;
+    private String remarks;
 
     /**
-     * 银行ifsc编码
+     * 收款人账户
      */
-    private String ifsc;
+    private String remittanceAccount;
+
+    /**
+     * 银行
+     */
+    private String bank;
+
+    /**
+     * rfc信息
+     */
+    private String rfc;
+
+    /**
+     * 身份证
+     */
+    private String curp;
+
+    /**
+     * 类型 0:借记卡 1:clabe账户
+     */
+    private Integer type;
 
     /**
      * 状态

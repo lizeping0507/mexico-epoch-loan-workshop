@@ -3,7 +3,10 @@ package com.epoch.loan.workshop.mq.order;
 import com.epoch.loan.workshop.common.constant.LoanRemittanceOrderRecordStatus;
 import com.epoch.loan.workshop.common.constant.OrderExamineStatus;
 import com.epoch.loan.workshop.common.constant.OrderStatus;
-import com.epoch.loan.workshop.common.entity.mysql.*;
+import com.epoch.loan.workshop.common.entity.mysql.LoanOrderEntity;
+import com.epoch.loan.workshop.common.entity.mysql.LoanRemittanceAccountEntity;
+import com.epoch.loan.workshop.common.entity.mysql.LoanRemittanceOrderRecordEntity;
+import com.epoch.loan.workshop.common.entity.mysql.LoanUserInfoEntity;
 import com.epoch.loan.workshop.common.mq.order.params.OrderParams;
 import com.epoch.loan.workshop.common.mq.remittance.params.DistributionRemittanceParams;
 import com.epoch.loan.workshop.common.util.LogUtil;
@@ -86,8 +89,16 @@ public class OrderRemittance extends BaseOrderMQListener implements MessageListe
                 // 查询当前模型处理状态
                 int status = getModelStatus(orderId, subExpression());
 
+                // 账户
+                String accountId = loanOrderEntity.getBankCardId();
+
                 // 判断模型状态
                 if (status == OrderExamineStatus.CREATE) {
+                    // 查询用户信息
+                    LoanUserInfoEntity loanUserInfoEntity = loanUserInfoDao.findUserInfoById(userId);
+
+                    // 查询银行卡信息
+                    LoanRemittanceAccountEntity loanRemittanceAccountEntity = loanRemittanceAccountDao.findRemittanceAccount(accountId);
 
                     // 新增支付账单
                     String id = ObjectIdUtil.getObjectId();
@@ -96,15 +107,13 @@ public class OrderRemittance extends BaseOrderMQListener implements MessageListe
                     loanRemittanceOrderRecordEntity.setOrderId(orderId);
                     loanRemittanceOrderRecordEntity.setPaymentId("");
                     loanRemittanceOrderRecordEntity.setAmount(loanOrderEntity.getActualAmount());
-
-//                    loanRemittanceOrderRecordEntity.setPhone(platformUserEntity.getPhoneNumber());
-//                    loanRemittanceOrderRecordEntity.setAddCard(platformUserOcrBasicInfoEntity.getAadNo());
-//                    loanRemittanceOrderRecordEntity.setPanCard(platformUserOcrBasicInfoEntity.getPanNo());
-//                    loanRemittanceOrderRecordEntity.setEmail(platformUserBasicInfoEntity.getEmail());
-//                    loanRemittanceOrderRecordEntity.setName(standardiseName(platformUserBankCardEntity.getUserName()));
-//                    loanRemittanceOrderRecordEntity.setBankCard(platformUserBankCardEntity.getBankCard());
-//                    loanRemittanceOrderRecordEntity.setIfsc(platformUserBankCardEntity.getOpenBank());
-
+                    loanRemittanceOrderRecordEntity.setName(loanUserInfoEntity.getPapersName());
+                    loanRemittanceOrderRecordEntity.setRemarks(loanUserInfoEntity.getPapersName() + " remittance");
+                    loanRemittanceOrderRecordEntity.setRemittanceAccount(loanRemittanceAccountEntity.getAccountNumber());
+                    loanRemittanceOrderRecordEntity.setBank(loanRemittanceAccountEntity.getBank());
+                    loanRemittanceOrderRecordEntity.setType(loanRemittanceAccountEntity.getType());
+                    loanRemittanceOrderRecordEntity.setRfc(loanUserInfoEntity.getRfc());
+                    loanRemittanceOrderRecordEntity.setCurp(loanUserInfoEntity.getPapersVoterId());
                     loanRemittanceOrderRecordEntity.setStatus(LoanRemittanceOrderRecordStatus.CREATE);
                     loanRemittanceOrderRecordEntity.setProcessRemittancePaymentRecordId("");
                     loanRemittanceOrderRecordEntity.setSuccessRemittancePaymentRecordId("");
