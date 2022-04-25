@@ -89,7 +89,7 @@
         where id = #{loanUserInfoEntity.id}
     </update>
     <update id="updateUserGpsMsg">
-        update loan_user_info update_time=#{updateTime}
+        update loan_user_info
         <set>
             <if test="gps!=null and gps!=''">
                 gps = #{gps},
