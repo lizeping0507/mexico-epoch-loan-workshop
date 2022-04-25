@@ -1,6 +1,7 @@
 package com.epoch.loan.workshop.common.dao.mysql;
 
 import com.epoch.loan.workshop.common.entity.mysql.LoanOrderEntity;
+import com.epoch.loan.workshop.common.params.params.result.model.OrderDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -180,7 +181,7 @@ public interface LoanOrderDao {
      * @param status
      * @return
      */
-    int findOrderCountByAppNameAndUserIdAndStatus(String userId, int status);
+    int findOrderCountByUserIdAndStatus(String userId, int status);
 
     /**
      * 查询订单使用的支付策略组
@@ -290,4 +291,15 @@ public interface LoanOrderDao {
      * @return
      */
     Integer findOrderCountByUserIdAndType(String userId, int type);
+
+    /**
+     * 根据用户id查询指定状态的订单计划，并按照指定字段 指定顺序进行排列
+     *
+     * @param userId 用户id
+     * @param status 订单状态集合
+     * @param field 排序字段
+     * @param sequence 正序-ASC 还是 倒序-DESC
+     * @return
+     */
+    List<OrderDTO> findOrderListByUserIdAndStatusAndOrderByField(String userId, Integer[] status, String field, String sequence);
 }

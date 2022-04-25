@@ -1,7 +1,9 @@
 package com.epoch.loan.workshop.common.params.params.result;
 
-import com.epoch.loan.workshop.common.params.params.result.model.OrderList;
+import com.epoch.loan.workshop.common.params.params.result.model.OrderDTO;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.List;
@@ -14,11 +16,13 @@ import java.util.List;
  * @description : 订单列表接口结果封装
  */
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class OrderListResult implements Serializable {
 
     /**
      * 订单列表
      */
-    private List<OrderList> list;
+    private List<OrderDTO> list;
 
 }

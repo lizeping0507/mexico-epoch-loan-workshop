@@ -32,25 +32,22 @@ public interface OrderService {
      *
      * @param params 请求参数
      * @return Result
-     * @throws Exception 请求异常
      */
-    Result<OrderListResult> list(OrderListParams params) throws Exception;
+    Result<OrderListResult> list(OrderListParams params);
 
     /**
      * 订单详情
      *
      * @param params 请求参数
      * @return Result
-     * @throws Exception 请求异常
      */
-    Result<OrderDetailResult> detail(OrderDetailParams params) throws Exception;
+    Result<OrderDetailResult> detail(OrderDetailParams params);
 
     /**
      * 多推--申请确认
      *
      * @param params 请求参数
      * @return Result
-     * @throws Exception 请求异常
      */
     Result<ConfirmMergePushApplyResult> confirmMergePushApply(ConfirmMergePushApplyParams params) throws Exception;
 
