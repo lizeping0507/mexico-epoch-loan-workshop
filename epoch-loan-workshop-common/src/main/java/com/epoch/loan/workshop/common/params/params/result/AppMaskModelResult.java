@@ -1,11 +1,7 @@
 package com.epoch.loan.workshop.common.params.params.result;
 
-import com.epoch.loan.workshop.common.params.params.result.model.Banner;
-import com.epoch.loan.workshop.common.params.params.result.model.Notifcation;
 import lombok.Data;
-
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * @author : Shangkunfeng
@@ -66,16 +62,4 @@ public class AppMaskModelResult implements Serializable {
      * 公告
      */
     private String cashNotice;
-
-    /**
-     * 轮播图列表
-     */
-    private List<Banner> banner;
-
-    /**
-     * 公告列表
-     */
-    private List<Notifcation> list;
-
-
 }

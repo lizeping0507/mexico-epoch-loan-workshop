@@ -365,13 +365,13 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
         // 判断订单号是否为空
         if (StringUtils.isEmpty(orderId)) {
-            throw new Exception();
+           return null;
         }
 
         // 查询订单
         LoanOrderEntity loanOrderEntity = loanOrderDao.findOrder(orderId);
         if (ObjectUtils.isEmpty(loanOrderEntity)) {
-            throw new Exception();
+            return null;
         }
 
         return loanOrderEntity;
