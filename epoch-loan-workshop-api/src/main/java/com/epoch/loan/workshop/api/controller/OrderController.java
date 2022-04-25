@@ -103,6 +103,7 @@ public class OrderController extends BaseController {
      * @param params 请求参数
      * @return Result
      */
+    @Authentication
     @PostMapping(URL.ORDER_LIST)
     public Result<OrderListResult> list(OrderListParams params) {
         // 结果集

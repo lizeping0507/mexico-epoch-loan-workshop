@@ -23,22 +23,6 @@ public class StaticResourcesController extends BaseController {
     /**
      * 注册协议地址
      *
-     * @param params param
-     * @return 重定向
-     */
-    @GetMapping(URL.CONTRACT)
-    public String contractPage(StaticResourcesParam params, HttpServletResponse response) throws IOException {
-        // 静态资源url
-        String staticUrl = staticResourcesService.contractPage(params);
-
-        // 重定向 到静态页面
-        response.sendRedirect(staticUrl);
-        return null;
-    }
-
-    /**
-     * 注册协议地址
-     *
      * @param param param
      * @return 重定向
      */
