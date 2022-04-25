@@ -36,6 +36,7 @@ public class ShortMessageServiceImpl extends BaseService implements ShortMessage
         if (StringUtils.isBlank(smsCode)) {
             result.setReturnCode(ResultEnum.SMS_CODE_SEND_FAILED.code());
             result.setMessage(ResultEnum.SMS_CODE_SEND_FAILED.message());
+            return result;
         }
 
         // 缓存
