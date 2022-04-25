@@ -81,7 +81,6 @@ public class RbplSMSChannel implements SMSChannel {
 
         // 发送请求
         String result = HttpUtils.POST(url, params);
-        LogUtil.sysInfo("sendVerificationCode params:{} \n result:{}",JSONObject.toJSONString(params),result);
 
         // 封装结果就
         situation.setRequest(JSONObject.toJSONString(params));
