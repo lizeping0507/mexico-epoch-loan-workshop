@@ -23,12 +23,12 @@ public class OrderDTO implements Serializable {
     /**
      * 产品Id
      */
-    private Long productId;
+    private String productId;
 
     /**
      * 贷款金额
      */
-    private String approvalAmount;
+    private Double approvalAmount;
 
     /**
      * 订单状态
@@ -53,7 +53,7 @@ public class OrderDTO implements Serializable {
     /**
      * 到期时间
      */
-    private String repaymentTime;
+    private Date repaymentTime;
 
     /**
      * 按钮文案 pagado-还款 rechazado-被拒 vencido-逾期 completar

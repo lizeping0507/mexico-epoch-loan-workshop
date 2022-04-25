@@ -11,14 +11,15 @@ import com.epoch.loan.workshop.common.params.params.result.model.LoanRepaymentRe
 import com.epoch.loan.workshop.common.params.params.result.model.OrderDTO;
 import com.epoch.loan.workshop.common.service.OrderService;
 import com.epoch.loan.workshop.common.util.HttpUtils;
+import com.epoch.loan.workshop.common.util.OrderUtils;
 import com.epoch.loan.workshop.common.util.PlatformUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.beans.BeanUtils;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.*;
 
 /**
@@ -176,17 +177,31 @@ public class OrderServiceImpl extends BaseService implements OrderService {
     public Result<OrderListResult> listAll(OrderListParams params) {
         // 结果集
         Result<OrderListResult> result = new Result<>();
+        result.setReturnCode(ResultEnum.SUCCESS.code());
+        result.setMessage(ResultEnum.SUCCESS.message());
+
+        // 查询订单列表
         String userId = params.getUser().getId();
         List<OrderDTO> orderDTOList = new ArrayList<>();
         Integer[] status = new Integer[]{OrderStatus.CREATE, OrderStatus.EXAMINE_WAIT, OrderStatus.EXAMINE_PASS, OrderStatus.EXAMINE_FAIL, OrderStatus.WAIT_PAY, OrderStatus.WAY, OrderStatus.DUE, OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE, OrderStatus.ABANDONED};
-        List<OrderDTO> orderOtherDTOList = loanOrderDao.findOrderListByUserIdAndStatusAndOrderByField(userId, status, OrderByField.APPLY_TIME, OrderByField.DESC);
-        if (CollectionUtils.isNotEmpty(orderOtherDTOList)) {
-            orderDTOList.addAll(orderOtherDTOList);
+        List<LoanOrderEntity> orderAllList = loanOrderDao.findOrderListByUserIdAndStatusAndOrderByField(userId, status, OrderByField.APPLY_TIME, OrderByField.DESC);
+        if (CollectionUtils.isEmpty(orderAllList)) {
+            result.setData(new OrderListResult());
+            return result;
         }
 
-        // 封装结果
-        result.setReturnCode(ResultEnum.SUCCESS.code());
-        result.setMessage(ResultEnum.SUCCESS.message());
+        // 转换响应参数
+        orderAllList.stream().forEach(loanOrderEntity -> {
+            OrderDTO orderDTO = new OrderDTO();
+            BeanUtils.copyProperties(loanOrderEntity, orderDTO);
+            orderDTO.setOrderStatus(loanOrderEntity.getStatus());
+            orderDTO.setOrderStatusStr(OrderUtils.button(loanOrderEntity.getStatus()));
+            if (loanOrderEntity.getStatus() >= OrderStatus.WAY && loanOrderEntity.getStatus() != OrderStatus.ABANDONED) {
+                LoanOrderBillEntity lastOrderBill = loanOrderBillDao.findLastOrderBill(loanOrderEntity.getId());
+                orderDTO.setRepaymentTime(lastOrderBill.getRepaymentTime());
+            }
+            orderDTOList.add(orderDTO);
+        });
         result.setData(new OrderListResult(orderDTOList));
         return result;
     }
@@ -201,26 +216,38 @@ public class OrderServiceImpl extends BaseService implements OrderService {
     public Result<OrderListResult> unfinishedOrderList(OrderListParams params) {
         // 结果集
         Result<OrderListResult> result = new Result<>();
+        result.setReturnCode(ResultEnum.SUCCESS.code());
+        result.setMessage(ResultEnum.SUCCESS.message());
         String userId = params.getUser().getId();
         List<OrderDTO> orderDTOList = new ArrayList<>();
+        List<LoanOrderEntity> orderEntityList = new ArrayList<>();
 
         // 查询用户审核通过的订单
         Integer[] status = new Integer[]{OrderStatus.EXAMINE_PASS};
-        List<OrderDTO> orderPassDTOList = loanOrderDao.findOrderListByUserIdAndStatusAndOrderByField(userId, status, OrderByField.EXAMINE_PASS_TIME, OrderByField.ASC);
-        if (CollectionUtils.isNotEmpty(orderPassDTOList)) {
-            orderDTOList.addAll(orderPassDTOList);
+        List<LoanOrderEntity> passOrderEntityList = loanOrderDao.findOrderListByUserIdAndStatusAndOrderByField(userId, status, OrderByField.EXAMINE_PASS_TIME, OrderByField.ASC);
+        if (CollectionUtils.isNotEmpty(passOrderEntityList)) {
+            orderEntityList.addAll(passOrderEntityList);
         }
 
         // 查询其他状态的订单
-        status = new Integer[]{OrderStatus.CREATE, OrderStatus.EXAMINE_WAIT, OrderStatus.WAIT_PAY, OrderStatus.WAY};
-        List<OrderDTO> orderOtherDTOList = loanOrderDao.findOrderListByUserIdAndStatusAndOrderByField(userId, status, OrderByField.UPDATE_TIME, OrderByField.DESC);
-        if (CollectionUtils.isNotEmpty(orderOtherDTOList)) {
-            orderDTOList.addAll(orderOtherDTOList);
+        status = new Integer[]{OrderStatus.CREATE, OrderStatus.EXAMINE_WAIT, OrderStatus.WAIT_PAY};
+        List<LoanOrderEntity> otherOrderEntityList = loanOrderDao.findOrderListByUserIdAndStatusAndOrderByField(userId, status, OrderByField.UPDATE_TIME, OrderByField.DESC);
+        if (CollectionUtils.isNotEmpty(otherOrderEntityList)) {
+            orderEntityList.addAll(otherOrderEntityList);
+        }
+        if (CollectionUtils.isEmpty(orderEntityList)) {
+            result.setData(new OrderListResult());
+            return result;
         }
 
-        // 封装结果
-        result.setReturnCode(ResultEnum.SUCCESS.code());
-        result.setMessage(ResultEnum.SUCCESS.message());
+        // 转换响应参数
+        orderEntityList.stream().forEach(loanOrderEntity -> {
+            OrderDTO orderDTO = new OrderDTO();
+            BeanUtils.copyProperties(loanOrderEntity, orderDTO);
+            orderDTO.setOrderStatus(loanOrderEntity.getStatus());
+            orderDTO.setOrderStatusStr(OrderUtils.button(loanOrderEntity.getStatus()));
+            orderDTOList.add(orderDTO);
+        });
         result.setData(new OrderListResult(orderDTOList));
         return result;
     }
@@ -235,19 +262,29 @@ public class OrderServiceImpl extends BaseService implements OrderService {
     public Result<OrderListResult> unRepaymentOrderList(OrderListParams params) {
         // 结果集
         Result<OrderListResult> result = new Result<>();
+        result.setReturnCode(ResultEnum.SUCCESS.code());
+        result.setMessage(ResultEnum.SUCCESS.message());
         String userId = params.getUser().getId();
         List<OrderDTO> orderDTOList = new ArrayList<>();
 
         // 查询用户待还款的订单
         Integer[] status = new Integer[]{OrderStatus.WAY, OrderStatus.DUE};
-        List<OrderDTO> orderOtherDTOList = loanOrderDao.findOrderListByUserIdAndStatusAndOrderByField(userId, status, OrderByField.CREATE_TIME, OrderByField.ASC);
-        if (CollectionUtils.isNotEmpty(orderOtherDTOList)) {
-            orderDTOList.addAll(orderOtherDTOList);
+        List<LoanOrderEntity> orderEntityList = loanOrderDao.findOrderListByUserIdAndStatusAndOrderByField(userId, status, OrderByField.CREATE_TIME, OrderByField.ASC);
+        if (CollectionUtils.isEmpty(orderEntityList)) {
+            result.setData(new OrderListResult());
+            return result;
         }
 
-        // 封装结果
-        result.setReturnCode(ResultEnum.SUCCESS.code());
-        result.setMessage(ResultEnum.SUCCESS.message());
+        // 转换响应参数
+        orderEntityList.stream().forEach(loanOrderEntity -> {
+            OrderDTO orderDTO = new OrderDTO();
+            BeanUtils.copyProperties(loanOrderEntity, orderDTO);
+            orderDTO.setOrderStatus(loanOrderEntity.getStatus());
+            orderDTO.setOrderStatusStr(OrderUtils.button(loanOrderEntity.getStatus()));
+            LoanOrderBillEntity lastOrderBill = loanOrderBillDao.findLastOrderBill(loanOrderEntity.getId());
+            orderDTO.setRepaymentTime(lastOrderBill.getRepaymentTime());
+            orderDTOList.add(orderDTO);
+        });
         result.setData(new OrderListResult(orderDTOList));
         return result;
     }

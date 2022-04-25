@@ -191,18 +191,8 @@
     </select>
 
     <select id="findOrderListByUserIdAndStatusAndOrderByField"
-            resultType="com.epoch.loan.workshop.common.params.params.result.model.OrderDTO">
-        SELECT
-        loan_order.id AS 'order_no',
-        product_id,
-        approval_amount,
-        `status` as 'order_status',
-        apply_time,
-        examine_pass_time,
-        loan_time
-        FROM
-        loan_order
-        WHERE user_id = #{userId}
+            resultType="com.epoch.loan.workshop.common.entity.mysql.LoanOrderEntity">
+        SELECT * FROM loan_order WHERE user_id = #{userId}
         <foreach collection="array" item="statu" index="index" open="AND status IN(" close=")" separator=",">#{statu}</foreach>
         ORDER BY #{field} #{sequence}
     </select>
