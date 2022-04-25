@@ -779,5 +779,4 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         result.setData(res);
         return result;
     }
-
 }
