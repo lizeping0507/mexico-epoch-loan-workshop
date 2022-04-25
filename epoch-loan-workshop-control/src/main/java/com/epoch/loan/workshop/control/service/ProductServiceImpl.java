@@ -10,6 +10,7 @@ import com.epoch.loan.workshop.common.params.params.BaseParams;
 import com.epoch.loan.workshop.common.params.params.request.*;
 import com.epoch.loan.workshop.common.params.params.result.*;
 import com.epoch.loan.workshop.common.params.params.result.model.PayH5Result;
+import com.epoch.loan.workshop.common.params.params.result.model.ProductList;
 import com.epoch.loan.workshop.common.service.ProductService;
 import com.epoch.loan.workshop.common.util.*;
 import org.apache.commons.collections.CollectionUtils;
@@ -17,10 +18,7 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author : Shangkunfeng
@@ -365,7 +363,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
         // 判断订单号是否为空
         if (StringUtils.isEmpty(orderId)) {
-           return null;
+            return null;
         }
 
         // 查询订单
@@ -734,47 +732,158 @@ public class ProductServiceImpl extends BaseService implements ProductService {
      */
     @Override
     public Result<ProductListResult> list(ProductListParams params) throws Exception {
-        // 结果集
         Result<ProductListResult> result = new Result<>();
 
-        // 拼接请求路径
-        String url = platformConfig.getPlatformDomain() + PlatformUrl.PLATFORM_PRODUCT_LIST;
+        // 产品列表
+        List<ProductList> list = new ArrayList<>();
 
-        // 封装请求参数
-        JSONObject requestParam = new JSONObject();
-        requestParam.put("appFlag", params.getAppName());
-        requestParam.put("versionNumber", params.getAppVersion());
-        requestParam.put("mobileType", params.getMobileType());
-        requestParam.put("gpsLocation", params.getGps());
-        requestParam.put("registerAddr", params.getGpsAddress());
-        requestParam.put("type", params.getType());
+        // 待还款订单产品
+        List<ProductList> waitRepaymentOrderProductList = new ArrayList<>();
+
+        // 可续贷且开量产品
+        List<ProductList> reloanOrderProductList = new ArrayList<>();
+
+        // 审核中或放款中 且开量产品
+        List<ProductList> examineWaitOrWaitPayOrderProductList = new ArrayList<>();
+
+        // 被拒产品
+        List<ProductList> examineFailOrderProductList = new ArrayList<>();
+
+        // 新贷且开量产品
+        List<ProductList> newLoanAndOpenProductList = new ArrayList<>();
+
+        // 关量产品
+        List<ProductList> closeProductList = new ArrayList<>();
 
 
-        // 封装请求头
-        Map<String, String> headers = new HashMap<>();
-        headers.put("token", params.getToken());
+        String userId = params.getUser().getId();
 
-        // 请求
-        String responseStr = HttpUtils.POST_WITH_HEADER(url, requestParam.toJSONString(), headers);
+        // 查询所有产品
+        List<LoanProductEntity> products = loanProductDao.findAll();
+        Map<String, LoanProductEntity> productMap = new HashMap<>();
+        products.forEach(product -> {
+            productMap.put(product.getId(), product);
+        });
 
-        // 解析响应结果
-        JSONObject responseJson = JSONObject.parseObject(responseStr);
+        // 查询其他包承接盘
+        List<LoanMaskEntity> otherLoanMaskList = loanMaskDao.findLoanMaskByAppNameIsNot(params.getAppName());
 
-        // 判断接口响应是否正常
-        if (!PlatformUtil.checkResponseCode(result, ProductListResult.class, responseJson)) {
-            return result;
+        // 过滤它包承接盘产品
+        otherLoanMaskList.parallelStream().forEach(loanMask -> {
+            productMap.remove(loanMask.getProductId());
+        });
+
+        /*所有待还款订单*/
+        int[] status = {OrderStatus.WAY, OrderStatus.DUE};
+        List<LoanOrderEntity> waitRepaymentOrderList = loanOrderDao.findOrderByUserAndStatusIn(userId, status);
+        for (LoanOrderEntity loanOrderEntity : waitRepaymentOrderList) {
+            String productId = loanOrderEntity.getProductId();
+            LoanProductEntity loanProductEntity = productMap.get(productId);
+
+            // TODO
+            waitRepaymentOrderProductList.add(convertToProductList(loanProductEntity, loanOrderEntity));
+
+            // 删除
+            productMap.remove(productId);
         }
 
-        // 获取结果集
-        JSONObject data = responseJson.getJSONObject("data");
+        /*可续贷且开量产品*/
+        status = new int[]{OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE};
+        List<LoanOrderEntity> reloanOrderList = loanOrderDao.findOrderByUserAndStatusIn(userId, status);
+        for (LoanOrderEntity loanOrderEntity : reloanOrderList) {
+            String productId = loanOrderEntity.getProductId();
+            LoanProductEntity loanProductEntity = productMap.get(productId);
 
-        // 封装结果就
-        ProductListResult res = JSONObject.parseObject(data.toJSONString(), ProductListResult.class);
+            if (loanProductEntity.getIsOpen() == 1) {
+                // TODO
+                reloanOrderProductList.add(convertToProductList(loanProductEntity, loanOrderEntity));
+                // 删除
+                productMap.remove(productId);
+            }
+        }
+
+        /*审核通过的产品*/
+        status = new int[]{OrderStatus.EXAMINE_PASS};
+        List<LoanOrderEntity> examinePassOrderList = loanOrderDao.findOrderByUserAndStatusIn(userId, status);
+        for (LoanOrderEntity loanOrderEntity : examinePassOrderList) {
+            String productId = loanOrderEntity.getProductId();
+            LoanProductEntity loanProductEntity = productMap.get(productId);
+
+            if (loanProductEntity.getIsOpen() == 1) {
+                // TODO
+                list.add(convertToProductList(loanProductEntity, loanOrderEntity));
+                // 删除
+                productMap.remove(productId);
+            }
+        }
+
+        /*审核中或放款中且开量产品*/
+        status = new int[]{OrderStatus.EXAMINE_WAIT, OrderStatus.WAIT_PAY};
+        List<LoanOrderEntity> examineWaitOrWaitPayOrderList = loanOrderDao.findOrderByUserAndStatusIn(userId, status);
+        for (LoanOrderEntity loanOrderEntity : examineWaitOrWaitPayOrderList) {
+            String productId = loanOrderEntity.getProductId();
+            LoanProductEntity loanProductEntity = productMap.get(productId);
+
+            if (loanProductEntity.getIsOpen() == 1) {
+                // TODO
+                examineWaitOrWaitPayOrderProductList.add(convertToProductList(loanProductEntity, loanOrderEntity));
+                // 删除
+                productMap.remove(productId);
+            }
+        }
+
+        /*被拒且开量产品*/
+        status = new int[]{OrderStatus.EXAMINE_FAIL};
+        List<LoanOrderEntity> examineFailOrderList = loanOrderDao.findOrderByUserAndStatusIn(userId, status);
+        for (LoanOrderEntity loanOrderEntity : examineFailOrderList) {
+            String productId = loanOrderEntity.getProductId();
+            LoanProductEntity loanProductEntity = productMap.get(productId);
+
+            if (loanProductEntity.getIsOpen() == 1) {
+                // TODO
+                examineFailOrderProductList.add(convertToProductList(loanProductEntity, loanOrderEntity));
+                // 删除
+                productMap.remove(productId);
+            }
+        }
+
+        /*挑选关量产品*/
+        for (Map.Entry<String, LoanProductEntity> entry : productMap.entrySet()) {
+            LoanProductEntity value = entry.getValue();
+            if (value.getIsOpen() == 0){
+                // TODO
+                closeProductList.add(convertToProductList(value, null));
+
+                // 删除
+                productMap.remove(entry.getKey());
+            }
+        }
+
+        /*挑选 新贷&开量产品*/
+        for (Map.Entry<String, LoanProductEntity> entry : productMap.entrySet()) {
+            LoanProductEntity value = entry.getValue();
+            if (value.getIsOpen() == 1){
+                // TODO
+                newLoanAndOpenProductList.add(convertToProductList(value, null));
+
+                // 删除
+                productMap.remove(entry.getKey());
+            }
+        }
+
+        list.addAll(waitRepaymentOrderProductList);
+        list.addAll(reloanOrderProductList);
+        list.addAll(examineWaitOrWaitPayOrderProductList);
+        list.addAll(examineFailOrderProductList);
+        list.addAll(newLoanAndOpenProductList);
+        list.addAll(closeProductList);
 
         // 封装结果
+        ProductListResult productListResult = new ProductListResult();
+        productListResult.setList(list);
+        result.setData(productListResult);
         result.setReturnCode(ResultEnum.SUCCESS.code());
         result.setMessage(ResultEnum.SUCCESS.message());
-        result.setData(res);
         return result;
     }
 

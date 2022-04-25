@@ -17,21 +17,6 @@ import java.util.List;
 public class ProductListResult implements Serializable {
 
     /**
-     * App标识
-     */
-    private String appId;
-
-    /**
-     * 是否抓取数据
-     */
-    private Boolean needCatchData;
-
-    /**
-     * 订单编号
-     */
-    private String dataNo;
-
-    /**
      * 产品列表
      */
     private List<ProductList> list;

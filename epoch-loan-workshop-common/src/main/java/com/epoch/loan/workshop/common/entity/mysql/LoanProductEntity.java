@@ -110,4 +110,14 @@ public class LoanProductEntity {
      * 手续费范围
      */
     private String serviceFeeRange;
+
+    /**
+     * 手续费范围
+     */
+    private String amountRange;
+
+    /**
+     * 是否续贷开量
+     */
+    private Integer isOpen;
 }
