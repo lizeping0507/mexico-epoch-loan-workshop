@@ -98,32 +98,6 @@ public class OrderController extends BaseController {
 
 
     /**
-     * 获取订单合同参数
-     *
-     * @param contractParams 订单合同请求封装类
-     * @return 合同参数
-     */
-    @PostMapping(URL.CONTRACT)
-    public Result<OrderContractResult> contract(ContractParams contractParams) {
-        // 结果集
-        Result<OrderContractResult> result = new Result<OrderContractResult>();
-
-        try {
-            // 判断手机号是否已经注册过
-            return orderService.contract(contractParams);
-        } catch (Exception e) {
-            LogUtil.sysError("[OrderController contract]", e);
-
-            // 异常返回结果
-            result.setEx(ThrowableUtils.throwableToString(e));
-            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
-            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
-            return result;
-        }
-
-    }
-
-    /**
      * 订单列表
      *
      * @param params 请求参数

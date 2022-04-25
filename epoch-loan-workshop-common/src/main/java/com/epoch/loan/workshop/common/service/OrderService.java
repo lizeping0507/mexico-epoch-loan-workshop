@@ -28,15 +28,6 @@ public interface OrderService {
     Result apply(ApplyParams applyParams);
 
     /**
-     * 获取订单合同参数
-     *
-     * @param contractParams 请求参数
-     * @return Result
-     * @throws Exception 请求异常
-     */
-    Result<OrderContractResult> contract(ContractParams contractParams) throws Exception;
-
-    /**
      * 订单列表
      *
      * @param params 请求参数

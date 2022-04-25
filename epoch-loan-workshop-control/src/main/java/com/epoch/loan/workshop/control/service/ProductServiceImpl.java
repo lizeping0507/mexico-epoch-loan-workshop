@@ -64,6 +64,11 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             result.setMessage(ResultEnum.NO_EXITS.message());
             return result;
         }
+        resData.setArrivalRange(loanProductEntity.getArrivalRange());
+        resData.setInterestRange(loanProductEntity.getInterestRange());
+        resData.setRepaymentRange(loanProductEntity.getRepaymentRange());
+        resData.setServiceFeeRange(loanProductEntity.getServiceFeeRange());
+        resData.setAmount("2000-8000");
 
         // 订单审核模型
         String orderModelGroup = loanProductEntity.getOrderModelGroup();
@@ -75,6 +80,11 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         LogUtil.sysInfo("productDetail params.getUser():{}", params.getUser());
         LoanOrderEntity loanOrderEntity = initOrder(params.getUser(), OrderType.LOAN, appVersion, appName, orderModelGroup, loanProductEntity);
         LogUtil.sysInfo("productDetail loanOrderEntity:{}", loanOrderEntity);
+
+        // 订单是否创建成功
+        if (null == loanOrderEntity){
+            return result;
+        }
 
         // 订单状态
         Integer orderStatus = loanOrderEntity.getStatus();

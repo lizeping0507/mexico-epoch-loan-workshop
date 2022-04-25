@@ -19,6 +19,11 @@ public class ProductDetailResult implements Serializable {
     private String orderNo;
 
     /**
+     * 额度范围
+     */
+    private String amount;
+
+    /**
      * 是否需要sdk抓取并上报数据
      */
     private Boolean needCatchData;
@@ -37,4 +42,24 @@ public class ProductDetailResult implements Serializable {
      * 基本信息认证状态 0：未认证，1认证
      */
     private Integer baseInfoFlag;
+
+    /**
+     * 还款范围
+     */
+    private String arrivalRange;
+
+    /**
+     * 利息范围
+     */
+    private String interestRange;
+
+    /**
+     * 放款到账范围
+     */
+    private String repaymentRange;
+
+    /**
+     * 手续费范围
+     */
+    private String serviceFeeRange;
 }
