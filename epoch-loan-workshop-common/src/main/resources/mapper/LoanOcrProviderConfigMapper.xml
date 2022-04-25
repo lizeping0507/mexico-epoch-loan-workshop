@@ -9,6 +9,6 @@
 
     <select id="selectAdvanceConfigByAppNameAndStatus"
             resultType="java.lang.String">
-        SELECT * FROM loan_ocr_provider_config WHERE app_name = #{appName} AND status = #{status} AND channel_code = 1
+        SELECT config FROM loan_ocr_provider_config WHERE app_name = #{appName} AND status = #{status} AND channel_code = 1
     </select>
 </mapper>
