@@ -10,10 +10,10 @@ import com.epoch.loan.workshop.common.entity.mysql.LoanUserInfoEntity;
 import com.epoch.loan.workshop.common.params.User;
 import com.epoch.loan.workshop.common.redis.RedisClient;
 import com.epoch.loan.workshop.common.util.ObjectIdUtil;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
 /**
  * @author : Duke
@@ -152,15 +152,15 @@ public class TokenManager {
             user.setRemittanceAccountAuth(false);
         }
         // ocr认证状况
-        if (StringUtils.isEmpty(user.getPapersId())){
+        if (StringUtils.isNotEmpty(user.getPapersId())){
             user.setOcrAuth(false);
         }
         // 用户信息认证状况
-        if (StringUtils.isEmpty(user.getChildrenNumber())){
+        if (StringUtils.isNotEmpty(user.getChildrenNumber())){
             user.setAddInfoAuth(false);
         }
         // 基本信息认证状况
-        if (StringUtils.isEmpty(user.getMonthlyIncome())){
+        if (StringUtils.isNotEmpty(user.getMonthlyIncome())){
             user.setBasicInfoAuth(false);
         }
 
