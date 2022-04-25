@@ -4,6 +4,7 @@ import com.epoch.loan.workshop.common.entity.mysql.LoanUserInfoEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -78,4 +79,13 @@ public interface LoanUserInfoDao {
      * @return 用户详细信息
      */
     LoanUserInfoEntity findLastUserInfoByMobile(String mobile);
+
+    /**
+     * 更新gps信息
+     *
+     * @param id
+     * @param gps
+     * @param gpsAddress
+     */
+    void updateUserGpsMsg(String id, String gps, String gpsAddress, Date updateTime);
 }
