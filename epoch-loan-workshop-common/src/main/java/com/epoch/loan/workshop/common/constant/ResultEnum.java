@@ -100,6 +100,11 @@ public enum ResultEnum {
      */
     TIMEOUT_ERROR(5003, "Request is timeout"),
 
+    /**
+     * 同步错误
+     */
+    SYNCHRONIZATION_ERROR(5004, "Synchronization error"),
+
     // ======= KYC错误========
 
     /**
@@ -171,6 +176,20 @@ public enum ResultEnum {
      * CURP校验失败
      */
     RFC_CHECK_CURP_ERROR(6051, "CURP verification failed"),
+
+
+    // 业务错误
+    /**
+     * 被拒
+     */
+    REJECTED_ERROR(7000, ""),
+
+    /**
+     * 多投被拒
+     */
+    DELIVERY_REJECTED_ERROR(7001, "delivery rejected"),
+
+
     ;
 
 

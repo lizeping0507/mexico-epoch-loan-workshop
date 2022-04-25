@@ -50,7 +50,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
         // 产品id
         String productId = params.getProductId();
-        LogUtil.sysInfo("productDetail productId:{}",productId);
+        LogUtil.sysInfo("productDetail productId:{}", productId);
 
         // app版本
         String appVersion = params.getAppVersion();
@@ -74,7 +74,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
         // 订单审核模型
         String orderModelGroup = loanProductEntity.getOrderModelGroup();
-        LogUtil.sysInfo("productDetail orderModelGroup:{}",orderModelGroup);
+        LogUtil.sysInfo("productDetail orderModelGroup:{}", orderModelGroup);
 
         // 更新GPS信息(userInfo实时)
         updateUserGpsMsg(user.getUserInfoId(), params.getGps(), params.getGpsAddress());
@@ -86,7 +86,10 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         LogUtil.sysInfo("productDetail loanOrderEntity:{}", loanOrderEntity);
 
         // 订单是否创建成功
-        if (null == loanOrderEntity){
+        if (ObjectUtils.isEmpty(loanOrderEntity)) {
+            // 封装结果
+            result.setReturnCode(ResultEnum.SYNCHRONIZATION_ERROR.code());
+            result.setMessage(ResultEnum.SYNCHRONIZATION_ERROR.message());
             return result;
         }
 
@@ -100,6 +103,8 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             // 多投被拒返回
             if (!rejectionRule) {
                 // 封装结果
+                result.setReturnCode(ResultEnum.DELIVERY_REJECTED_ERROR.code());
+                result.setMessage(ResultEnum.DELIVERY_REJECTED_ERROR.message());
                 return result;
             }
         }
@@ -167,12 +172,12 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         bizData.put(Field.PROGRESS, 0);
         bizData.put(Field.REGISTER_ADDR, registerAddress);
         bizData.put(Field.CHANNEL_NAME, channelName);
-        int singleQuantity = loanOrderDao.countProcessOrderNo(user.getAppName(),userId);
+        int singleQuantity = loanOrderDao.countProcessOrderNo(user.getAppName(), userId);
         int allQuantity = loanOrderDao.countProcessOrderNo(null, user.getId());
         bizData.put(Field.SINGLE_QUANTITY, singleQuantity);
         bizData.put(Field.ALL_QUANTITY, allQuantity);
         LoanOrderBillEntity fistRepayOrder = loanOrderBillDao.findFistRepayOrder(userId, user.getAppName());
-        if (null != fistRepayOrder){
+        if (null != fistRepayOrder) {
             Date actualRepaymentTime = fistRepayOrder.getActualRepaymentTime();
             int intervalDays = DateUtil.getIntervalDays(new Date(), actualRepaymentTime);
             bizData.put(Field.REPAYMENT_TIME, intervalDays);
@@ -351,8 +356,8 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
                     return orderId;
 
-                }catch (Exception e){
-                    LogUtil.sysError("[ProductServiceImpl initOrder]",e);
+                } catch (Exception e) {
+                    LogUtil.sysError("[ProductServiceImpl initOrder]", e);
                     return null;
                 }
             }
@@ -386,14 +391,14 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         int[] status = {OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE};
         Integer count = loanOrderDao.countUserOrderByAppInStatus(userId, appName, status);
         // 无:2客群
-        if (count == 0){
+        if (count == 0) {
             return 2;
         }
 
         // 本包本产品是否有还款
         count = loanOrderDao.countUserOrderByProductAndAppInStatus(userId, productId, appName, status);
         // 无:1客群
-        if (count == 0){
+        if (count == 0) {
             return 1;
         }
 
@@ -451,12 +456,6 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             appMaskModelResult.setAddInfoAuth(1);
         }
 
-        // OCR认证
-        appMaskModelResult.setOcrAuth(0);
-        if (params.getUser().isOcrAuth()) {
-            appMaskModelResult.setOcrAuth(1);
-        }
-
         // 查询用户有没有添加过卡
         appMaskModelResult.setRemittanceAccountAuth(0);
         if (params.getUser().isRemittanceAccountAuth()) {
@@ -464,7 +463,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         }
 
         // 查询四项认证是否都通过
-        if (!params.getUser().isIdentityAuth() || !params.getUser().isBasicInfoAuth() || !params.getUser().isAddInfoAuth() || !params.getUser().isOcrAuth()) {
+        if (!params.getUser().isIdentityAuth() || !params.getUser().isBasicInfoAuth() || !params.getUser().isAddInfoAuth()) {
             // 没有通过 返回结果
             appMaskModelResult.setMaskModel(3);
             appMaskModelResult.setButton(button(OrderStatus.CREATE));
@@ -514,6 +513,14 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
             // 生成订单
             LoanOrderEntity loanOrderEntity = initOrder(params.getUser(), OrderType.MASK, appVersion, appName, "MASK", loanProductEntity);
+
+            // 订单是否创建成功
+            if (ObjectUtils.isEmpty(loanOrderEntity)) {
+                // 封装结果
+                result.setReturnCode(ResultEnum.SYNCHRONIZATION_ERROR.code());
+                result.setMessage(ResultEnum.SYNCHRONIZATION_ERROR.message());
+                return result;
+            }
 
             // 订单状态
             Integer orderStatus = loanOrderEntity.getStatus();

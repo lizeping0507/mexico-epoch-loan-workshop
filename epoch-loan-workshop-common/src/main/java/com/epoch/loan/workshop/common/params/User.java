@@ -266,11 +266,6 @@ public class User implements Serializable {
     private boolean identityAuth;
 
     /**
-     * Ocr认证信息
-     */
-    private boolean ocrAuth;
-
-    /**
      * 补充信息
      */
     private boolean addInfoAuth;

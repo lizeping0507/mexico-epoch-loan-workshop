@@ -153,15 +153,15 @@ public class TokenManager {
         }
         // ocr认证状况
         if (StringUtils.isNotEmpty(user.getPapersId())){
-            user.setOcrAuth(false);
+            user.setIdentityAuth(true);
         }
         // 用户信息认证状况
         if (StringUtils.isNotEmpty(user.getChildrenNumber())){
-            user.setAddInfoAuth(false);
+            user.setAddInfoAuth(true);
         }
         // 基本信息认证状况
         if (StringUtils.isNotEmpty(user.getMonthlyIncome())){
-            user.setBasicInfoAuth(false);
+            user.setBasicInfoAuth(true);
         }
 
         redisClient.set(RedisKeyField.USER_CACHE + user.getId(), JSONObject.toJSONString(user));

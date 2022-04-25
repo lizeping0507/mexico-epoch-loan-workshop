@@ -28,11 +28,6 @@ public class AppMaskModelResult implements Serializable {
     private Integer identityAuth;
 
     /**
-     * Ocr认证信息 0: 未认证 1:认证
-     */
-    private Integer ocrAuth;
-
-    /**
      * 补充信息 0: 未认证 1:认证
      */
     private Integer addInfoAuth;
