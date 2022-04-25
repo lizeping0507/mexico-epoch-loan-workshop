@@ -82,27 +82,22 @@ public class LoanProductEntity {
     private String companyLogo;
 
     /**
-     * NBFC名称
+     * 放款到账范围
      */
-    private String nbfcName;
+    private String arrivalRange;
 
     /**
-     * NBFC地址
+     * 利息范围
      */
-    private String nbfcAddr;
+    private String interestRange;
 
     /**
-     * NBFC邮箱
+     * 还款范围
      */
-    private String nbfcEmail;
+    private String repaymentRange;
 
     /**
-     * NBFC电话
+     * 手续费范围
      */
-    private String nbfcPhone;
-
-    /**
-     * NBFC-logo链接
-     */
-    private String nbfcLogo;
+    private String serviceFeeRange;
 }
