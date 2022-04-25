@@ -196,4 +196,5 @@
         <foreach collection="array" item="statu" index="index" open="AND status IN(" close=")" separator=",">#{statu}</foreach>
         ORDER BY #{field} #{sequence}
     </select>
+
 </mapper>

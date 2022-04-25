@@ -9,4 +9,8 @@
             resultType="com.epoch.loan.workshop.common.entity.mysql.LoanMaskEntity">
         SELECT * FROM loan_mask WHERE app_name=#{appName} and product_id=#{productId}
     </select>
+    <select id="findLoanMaskByAppNameIsNot"
+            resultType="com.epoch.loan.workshop.common.entity.mysql.LoanMaskEntity">
+        SELECT * FROM loan_mask WHERE app_name != #{appName}
+    </select>
 </mapper>

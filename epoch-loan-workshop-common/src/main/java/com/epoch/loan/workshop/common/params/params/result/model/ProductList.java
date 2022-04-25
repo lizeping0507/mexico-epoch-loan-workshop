@@ -19,37 +19,22 @@ public class ProductList implements Serializable {
     /**
      * 产品Id
      */
-    private Long id;
+    private String id;
 
     /**
      * 产品名称
      */
-    private String name;
+    private String productName;
 
     /**
      * 金额
      */
-    private String amount;
+    private String amountRange;
 
     /**
      * 利率
      */
-    private String rate;
-
-    /**
-     * 订单状态
-     */
-    private String orderStatus;
-
-    /**
-     * 产品标签集合
-     */
-    private List<String> tagList;
-
-    /**
-     * 按钮文案
-     */
-    private String button;
+    private String interest;
 
     /**
      * 产品Icon图标
@@ -57,7 +42,22 @@ public class ProductList implements Serializable {
     private String icon;
 
     /**
+     * 按钮文案
+     */
+    private String button;
+
+    /**
+     * 高通过率标识
+     */
+    private String passRate;
+
+    /**
      * 产品标签
      */
-    private String tag;
+    private String orderNo;
+
+    /**
+     * 订单状态
+     */
+    private Integer orderStatus;
 }

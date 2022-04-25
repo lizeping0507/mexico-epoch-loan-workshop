@@ -3,6 +3,8 @@ package com.epoch.loan.workshop.common.dao.mysql;
 import com.epoch.loan.workshop.common.entity.mysql.LoanMaskEntity;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 /**
  * @author : Duke
  * @packageName : com.epoch.loan.workshop.common.dao.mysql
@@ -29,4 +31,12 @@ public interface LoanMaskDao {
      * @return
      */
     LoanMaskEntity findLoanMaskByAppNameAndProductId(String appName, String productId);
+
+    /**
+     * 查询指定包之外的所有承接盘配置
+     *
+     * @param appName
+     * @return
+     */
+    List<LoanMaskEntity> findLoanMaskByAppNameIsNot(String appName);
 }
