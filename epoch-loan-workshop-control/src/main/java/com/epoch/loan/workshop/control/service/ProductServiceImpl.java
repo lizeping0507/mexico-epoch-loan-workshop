@@ -324,7 +324,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                     LogUtil.sysInfo("productDetail insertOrder:{}", insertOrder);
 
                     // 判断是否新增成功
-                    if (insertOrder > 0) {
+                    if (insertOrder == 0) {
                         return null;
                     }
 
