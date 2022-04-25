@@ -225,7 +225,7 @@ public interface LoanOrderDao {
      * @param status
      * @return
      */
-    List<LoanOrderEntity> findOrderByUserIdAndStatus(String userId, Integer[] status);
+    List<LoanOrderEntity> findOrderByUserIdAndStatus(String userId, @Param("array") Integer[] status);
 
     /**
      * 根据用户id查询指定状态的订单
@@ -235,7 +235,7 @@ public interface LoanOrderDao {
      * @param status
      * @return
      */
-    List<LoanOrderEntity> findOrderByUserAndProductIdAndStatus(String userId, String productId, Integer[] status);
+    List<LoanOrderEntity> findOrderByUserAndProductIdAndStatus(String userId, String productId, @Param("array") Integer[] status);
 
     /**
      * @param userId
@@ -254,7 +254,7 @@ public interface LoanOrderDao {
      * @param status
      * @return
      */
-    Integer countUserOrderByProductAndAppInStatus(String userId, String productId, String appName, int[] status);
+    Integer countUserOrderByProductAndAppInStatus(String userId, String productId, String appName, @Param("array") int[] status);
 
     /**
      * 新增订单
@@ -301,5 +301,5 @@ public interface LoanOrderDao {
      * @param sequence 正序-ASC 还是 倒序-DESC
      * @return
      */
-    List<OrderDTO> findOrderListByUserIdAndStatusAndOrderByField(String userId, Integer[] status, String field, String sequence);
+    List<OrderDTO> findOrderListByUserIdAndStatusAndOrderByField(String userId, @Param("array") Integer[] status, String field, String sequence);
 }
