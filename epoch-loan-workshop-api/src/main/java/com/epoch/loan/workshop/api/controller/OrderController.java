@@ -105,12 +105,18 @@ public class OrderController extends BaseController {
      */
     @PostMapping(URL.ORDER_LIST)
     public Result<OrderListResult> list(OrderListParams params) {
-        LogUtil.sysInfo(URL.ORDER + URL.ORDER_LIST + " params : {}", JSONObject.toJSONString(params));
-
         // 结果集
         Result<OrderListResult> result = new Result<OrderListResult>();
 
         try {
+            // 验证请求参数是否合法
+            if (!params.isOrderQueryReqLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":orderQueryReq");
+                return result;
+            }
+
             // 订单列表
             return orderService.list(params);
         } catch (Exception e) {
@@ -141,7 +147,7 @@ public class OrderController extends BaseController {
             if (!params.isOrderIdLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":orderNo");
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":orderId");
                 return result;
             }
 

@@ -1,18 +1,15 @@
 package com.epoch.loan.workshop.order.service;
 
 import com.alibaba.fastjson.JSONObject;
-import com.epoch.loan.workshop.common.constant.LoanRepaymentPaymentRecordStatus;
-import com.epoch.loan.workshop.common.constant.OrderStatus;
-import com.epoch.loan.workshop.common.constant.PlatformUrl;
-import com.epoch.loan.workshop.common.constant.ResultEnum;
+import com.epoch.loan.workshop.common.constant.*;
 import com.epoch.loan.workshop.common.entity.mysql.*;
 import com.epoch.loan.workshop.common.lock.UserApplyDetailLock;
 import com.epoch.loan.workshop.common.mq.order.params.OrderParams;
 import com.epoch.loan.workshop.common.params.params.request.*;
 import com.epoch.loan.workshop.common.params.params.result.*;
 import com.epoch.loan.workshop.common.params.params.result.model.LoanRepaymentRecordDTO;
+import com.epoch.loan.workshop.common.params.params.result.model.OrderDTO;
 import com.epoch.loan.workshop.common.service.OrderService;
-import com.epoch.loan.workshop.common.util.DateUtil;
 import com.epoch.loan.workshop.common.util.HttpUtils;
 import com.epoch.loan.workshop.common.util.PlatformUtil;
 import org.apache.commons.collections.CollectionUtils;
@@ -177,47 +174,42 @@ public class OrderServiceImpl extends BaseService implements OrderService {
      * @throws Exception 请求异常
      */
     @Override
-    public Result<OrderListResult> list(OrderListParams params) throws Exception {
+    public Result<OrderListResult> list(OrderListParams params) {
         // 结果集
         Result<OrderListResult> result = new Result<>();
+        String userId = params.getUser().getId();
+        Integer orderQueryReq = params.getOrderQueryReq();
+        List<OrderDTO> orderDTOList = new ArrayList<>();
+        Integer[] status = new Integer[]{OrderStatus.EXAMINE_PASS};
 
-        // 拼接请求路径
-        String url = platformConfig.getPlatformDomain() + PlatformUrl.PLATFORM_ORDER_LIST;
+        // 待完成订单
+        if (orderQueryReq == 1) {
+            // 查询用户审核通过的订单
+            List<OrderDTO> orderPassDTOList = loanOrderDao.findOrderListByUserIdAndStatusAndOrderByField(userId, status, OrderByField.EXAMINE_PASS_TIME, OrderByField.ASC);
+            if (CollectionUtils.isNotEmpty(orderPassDTOList)) {
+                orderDTOList.addAll(orderPassDTOList);
+            }
 
-        // 封装请求参数
-        JSONObject requestParam = new JSONObject();
-        requestParam.put("appFlag", params.getAppName());
-        requestParam.put("versionNumber", params.getAppVersion());
-        requestParam.put("mobileType", params.getMobileType());
-
-        requestParam.put("orderQueryReq", params.getOrderQueryReq());
-        requestParam.put("userId", params.getUserId());
-
-        // 封装请求头
-        Map<String, String> headers = new HashMap<>(1);
-        headers.put("token", params.getToken());
-
-        // 请求
-        String responseStr = HttpUtils.POST_WITH_HEADER(url, requestParam.toJSONString(), headers);
-
-        // 解析响应结果
-        JSONObject responseJson = JSONObject.parseObject(responseStr);
-
-        // 判断接口响应是否正常
-        if (!PlatformUtil.checkResponseCode(result, OrderListResult.class, responseJson)) {
-            return result;
+            // 查询其他状态的订单
+            status = new Integer[]{OrderStatus.CREATE, OrderStatus.EXAMINE_WAIT, OrderStatus.WAIT_PAY, OrderStatus.WAY};
+            List<OrderDTO> orderOtherDTOList = loanOrderDao.findOrderListByUserIdAndStatusAndOrderByField(userId, status, OrderByField.UPDATE_TIME, OrderByField.DESC);
+            if (CollectionUtils.isNotEmpty(orderOtherDTOList)) {
+                orderDTOList.addAll(orderOtherDTOList);
+            }
+        } else if (orderQueryReq == 2) {
+            status = new Integer[]{OrderStatus.WAY, OrderStatus.DUE};
+            List<OrderDTO> orderOtherDTOList = loanOrderDao.findOrderListByUserIdAndStatusAndOrderByField(userId, status, OrderByField.APPLY_TIME, OrderByField.ASC);
+            if (CollectionUtils.isNotEmpty(orderOtherDTOList)) {
+                orderDTOList.addAll(orderOtherDTOList);
+            }
+        } else {
+            status = new Integer[]{OrderStatus.CREATE, OrderStatus.EXAMINE_WAIT, OrderStatus.EXAMINE_PASS, OrderStatus.EXAMINE_FAIL, OrderStatus.WAIT_PAY, OrderStatus.WAY, OrderStatus.DUE, OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE, OrderStatus.ABANDONED};
         }
-
-        // 获取结果集
-        JSONObject data = responseJson.getJSONObject("data");
-
-        // 封装结果就
-        OrderListResult res = JSONObject.parseObject(data.toJSONString(), OrderListResult.class);
 
         // 封装结果
         result.setReturnCode(ResultEnum.SUCCESS.code());
         result.setMessage(ResultEnum.SUCCESS.message());
-        result.setData(res);
+        result.setData(new OrderListResult(orderDTOList));
         return result;
     }
 
@@ -226,10 +218,9 @@ public class OrderServiceImpl extends BaseService implements OrderService {
      *
      * @param params 请求参数
      * @return Result 订单详情
-     * @throws Exception 请求异常
      */
     @Override
-    public Result<OrderDetailResult> detail(OrderDetailParams params) throws Exception {
+    public Result<OrderDetailResult> detail(OrderDetailParams params) {
         // 结果集
         Result<OrderDetailResult> result = new Result<>();
 
@@ -347,7 +338,6 @@ public class OrderServiceImpl extends BaseService implements OrderService {
      *
      * @param params 请求参数
      * @return Result
-     * @throws Exception 请求异常
      */
     @Override
     public Result<ConfirmMergePushApplyResult> confirmMergePushApply(ConfirmMergePushApplyParams params) throws Exception {

@@ -17,6 +17,21 @@ public class LoanProductEntity {
     private String id;
 
     /**
+     * 产品名称
+     */
+    private String productName;
+
+    /**
+     * 产品图片url
+     */
+    private String productImgUrl;
+
+    /**
+     * 产品Icon图片url
+     */
+    private String productIconUrl;
+
+    /**
      * 手续费
      */
     private Double processingFeeProportion;
@@ -50,11 +65,6 @@ public class LoanProductEntity {
      * 每期天数
      */
     private Integer stagesDay;
-
-    /**
-     * 产品名称
-     */
-    private String productName;
 
     /**
      * 机构名称
