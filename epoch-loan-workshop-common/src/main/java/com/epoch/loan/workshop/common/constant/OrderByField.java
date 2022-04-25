@@ -32,7 +32,12 @@ public class OrderByField {
     public final static String UPDATE_TIME = "update_time";
 
     /**
-     * 下单时间
+     * 申请时间
      */
     public final static String APPLY_TIME = "apply_time";
+
+    /**
+     * 创建时间
+     */
+    public final static String CREATE_TIME = "create_time";
 }
