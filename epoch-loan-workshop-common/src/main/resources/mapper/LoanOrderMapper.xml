@@ -121,7 +121,7 @@
         SELECT * FROM loan_order WHERE id=#{orderId}
     </select>
     <select id="findOrderCountByAppNameAndUserIdAndStatus" resultType="java.lang.Integer">
-        SELECT COUNT(1) FROM loan_order WHERE user_id=#{userId} AND app_name=#{appName} AND status=#{status}
+        SELECT COUNT(1) FROM loan_order WHERE user_id=#{userId}  AND status=#{status}
     </select>
     <select id="findRemittanceDistributionGroupById" resultType="java.lang.String">
         SELECT remittance_distribution_group FROM loan_order WHERE id = #{orderId}
@@ -172,12 +172,21 @@
         </if>
     </select>
     <select id="findUserBetweenSpecificStatusOrderNum" resultType="java.lang.Integer">
-        Select  * from loan_order where user_id = #{userId}
+        Select * from loan_order where user_id = #{userId}
         <if test="end != null and end != ''">
             and status &lt;= #{end}
         </if>
         <if test="appName != null and appName != ''">
             and status &gt;= #{start}
         </if>
+    </select>
+    <select id="findOrderCountByUserIdAndType" resultType="java.lang.Integer">
+        SELECT COUNT(1) FROM loan_order WHERE user_id=#{userId} AND type=#{type}
+    </select>
+    <select id="findOrderByUserIdAndStatus"
+            resultType="com.epoch.loan.workshop.common.entity.mysql.LoanOrderEntity">
+        SELECT * FROM loan_order WHERE user_id = #{userId}
+        <foreach collection="array" item="statu" index="index" open="AND status IN(" close=")" separator=",">#{statu}</foreach>
+        ORDER BY update_time DESC
     </select>
 </mapper>

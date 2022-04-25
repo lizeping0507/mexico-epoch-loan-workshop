@@ -148,7 +148,7 @@ public class TokenManager {
 
         // 查询放款账户数量
         Integer remittanceAccountCount = loanRemittanceAccountDao.findUserRemittanceAccountCount(userId);
-        if (remittanceAccountCount == null && remittanceAccountCount == 0) {
+        if (remittanceAccountCount == null || remittanceAccountCount == 0) {
             user.setRemittanceAccountAuth(false);
         }
         // ocr认证状况

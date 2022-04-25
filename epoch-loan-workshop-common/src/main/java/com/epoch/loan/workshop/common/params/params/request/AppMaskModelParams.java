@@ -21,36 +21,4 @@ public class AppMaskModelParams extends BaseParams {
      * GPS地址
      */
     public String gpsAddress;
-    /**
-     * 用户Id
-     */
-    private String userId;
-    /**
-     * 产品Id
-     */
-    private String productId;
-    /**
-     * 申请时的经纬度
-     */
-    private String approvalGps;
-    /**
-     * 申请时的地址
-     */
-    private String approvalAddr;
-    /**
-     * 订单号
-     */
-    private String orderNo;
-    /**
-     * afid
-     */
-    private String appsflyerId;
-    /**
-     * 系统
-     */
-    private String platform;
-    /**
-     * 贷超包类型 1-多推包
-     */
-    private Integer appType;
 }

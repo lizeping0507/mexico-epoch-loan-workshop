@@ -5,4 +5,8 @@
     <select id="findLoanMaskByAppNameAndLevel" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanMaskEntity">
         SELECT * FROM loan_mask WHERE app_name=#{appName} and level=#{level}
     </select>
+    <select id="findLoanMaskByAppNameAndProductId"
+            resultType="com.epoch.loan.workshop.common.entity.mysql.LoanMaskEntity">
+        SELECT * FROM loan_mask WHERE app_name=#{appName} and product_id=#{productId}
+    </select>
 </mapper>
