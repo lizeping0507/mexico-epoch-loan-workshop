@@ -89,7 +89,7 @@ public class OrderExaminePass extends BaseOrderMQListener implements MessageList
                 double incidentalAmount = approvalAmount * (processingFeeProportion / 100);
 
                 // 计算扣除费用后真实放款金额
-                double realAmount = loanOrderEntity.getApprovalAmount() - incidentalAmount;
+                double realAmount = loanOrderEntity.getApprovalAmount();
 
                 // 更新订单扣除费用
                 loanOrderDao.updateOrderIncidentalAmount(orderId, incidentalAmount, new Date());

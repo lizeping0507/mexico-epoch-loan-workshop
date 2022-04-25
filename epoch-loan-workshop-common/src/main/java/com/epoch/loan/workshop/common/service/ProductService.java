@@ -28,7 +28,7 @@ public interface ProductService {
      * @return Result
      * @throws Exception 请求异常
      */
-    Result<AppMaskModelResult> getAppModel(AppMaskModelParams params) throws Exception;
+    Result<AppMaskModelResult> appMaskModel(AppMaskModelParams params) throws Exception;
 
     /**
      * 多推-贷超模式-首页

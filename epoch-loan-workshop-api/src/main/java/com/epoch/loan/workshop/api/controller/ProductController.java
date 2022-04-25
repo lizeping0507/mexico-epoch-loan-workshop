@@ -56,14 +56,14 @@ public class ProductController extends BaseController {
      * @param params 入参
      * @return 首页信息
      */
-    @PostMapping(URL.APP_MODEL)
-    public Result<AppMaskModelResult> appModel(AppMaskModelParams params) {
+    @PostMapping(URL.APP_MASK_MODEL)
+    public Result<AppMaskModelResult> appMaskModel(AppMaskModelParams params) {
         // 结果集
         Result<AppMaskModelResult> result = new Result<>();
 
         try {
             // 获取App模式
-            return productService.getAppModel(params);
+            return productService.appMaskModel(params);
         } catch (Exception e) {
             LogUtil.sysError("[ProductController appModel]", e);
 

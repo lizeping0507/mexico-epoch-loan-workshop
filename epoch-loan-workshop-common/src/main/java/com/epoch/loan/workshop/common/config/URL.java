@@ -184,7 +184,7 @@ public class URL {
     /**
      * 是否已注册
      */
-    public static final String APP_MODEL = "/appModel";
+    public static final String APP_MASK_MODEL = "/appMaskModel";
 
     /**
      * 放款账户列表
