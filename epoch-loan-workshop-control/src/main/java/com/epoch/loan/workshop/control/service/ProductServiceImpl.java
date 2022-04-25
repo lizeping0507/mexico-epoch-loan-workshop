@@ -113,283 +113,6 @@ public class ProductServiceImpl extends BaseService implements ProductService {
     }
 
     /**
-     * 多投限制
-     *
-     * @param loanOrderEntity
-     * @param user
-     * @return
-     * @throws Exception
-     */
-    protected boolean rejectionRule(LoanOrderEntity loanOrderEntity, User user) throws Exception {
-        // 模型名称
-        String subExpression = "rejectionRule";
-
-        // 用户id
-        String userId = loanOrderEntity.getUserId();
-
-        // 注册地址
-        String registerAddress = user.getRegisterAddress();
-
-        // 订单id
-        String orderId = loanOrderEntity.getId();
-
-        // 用户客群
-        Integer userType = loanOrderEntity.getUserType();
-
-        // 手机哈
-        String mobile = user.getMobile();
-
-        // app名称
-        String appName = loanOrderEntity.getAppName();
-
-        // 渠道ID
-        Integer userChannelId = loanOrderEntity.getUserChannelId();
-
-        // 查询渠道信息
-        PlatformChannelEntity platformChannelEntity = platformChannelDao.findChannel(userChannelId);
-
-        // 渠道名称
-        String channelName = platformChannelEntity.getChannelName();
-
-        // 封装请求参数
-        Map<String, String> params = new HashMap<>();
-        params.put(Field.METHOD, "riskmanagement.mexico.rejection.rule");
-        params.put(Field.APP_ID, riskConfig.getAppId());
-        params.put(Field.VERSION, "1.0");
-        params.put(Field.SIGN_TYPE, "RSA");
-        params.put(Field.FORMAT, "json");
-        params.put(Field.TIMESTAMP, String.valueOf(System.currentTimeMillis() / 1000));
-        JSONObject bizData = new JSONObject();
-        bizData.put(Field.TRANSACTION_ID, userId);
-        bizData.put(Field.BORROW_ID, orderId);
-        bizData.put(Field.PROGRESS, 0);
-        bizData.put(Field.REGISTER_ADDR, registerAddress);
-        bizData.put(Field.CHANNEL_NAME, channelName);
-        int singleQuantity = loanOrderDao.countProcessOrderNo(user.getAppName(), userId);
-        int allQuantity = loanOrderDao.countProcessOrderNo(null, user.getId());
-        bizData.put(Field.SINGLE_QUANTITY, singleQuantity);
-        bizData.put(Field.ALL_QUANTITY, allQuantity);
-        LoanOrderBillEntity fistRepayOrder = loanOrderBillDao.findFistRepayOrder(userId, user.getAppName());
-        if (null != fistRepayOrder) {
-            Date actualRepaymentTime = fistRepayOrder.getActualRepaymentTime();
-            int intervalDays = DateUtil.getIntervalDays(new Date(), actualRepaymentTime);
-            bizData.put(Field.REPAYMENT_TIME, intervalDays);
-        }
-        bizData.put(Field.USER_TYPE, userType);
-        bizData.put(Field.PHONE, mobile);
-        bizData.put(Field.APP_NAME, appName);
-        params.put(Field.BIZ_DATA, bizData.toJSONString());
-
-        // 生成签名
-        String paramsStr = RSAUtils.getSortParams(params);
-        String sign = RSAUtils.addSign(riskConfig.getPrivateKey(), paramsStr);
-        params.put(Field.SIGN, sign);
-
-        // 请求参数
-        String requestParams = JSONObject.toJSONString(params);
-
-        // 更新节点请求数据
-        loanOrderExamineDao.updateOrderExamineRequest(loanOrderEntity.getId(), subExpression, requestParams, new Date());
-
-        // 发送请求
-        String result = HttpUtils.POST_FORM(riskConfig.getRiskUrl(), requestParams);
-        LogUtil.sysInfo("requestParams: {} result:{}", requestParams, result);
-
-//        if (StringUtils.isEmpty(result)) {
-//            return false;
-//        }
-
-        // 更新节点响应数据
-//        loanOrderExamineDao.updateOrderExamineResponse(loanOrderEntity.getId(), subExpression, result, new Date());
-
-        // 转换为JSON
-//        JSONObject resultJson = JSONObject.parseObject(result);
-//
-//        // 返回码
-//        Integer code = resultJson.getInteger(Field.ERROR);
-//
-//        if (code != 200) {
-//            return false;
-//        }
-//
-//        // 成功
-//        JSONObject data = resultJson.getJSONObject(Field.DATA);
-//
-//        // 是否通过
-//        int pass = data.getInteger(Field.PASS);
-//
-//        // 未通过
-//        if (pass == 0) {
-//            // 更新审核状态
-//            loanOrderExamineDao.updateOrderExamineStatus(orderId, subExpression, OrderExamineStatus.REFUSE, new Date());
-//            return false;
-//        }
-
-        // 通过
-        loanOrderExamineDao.updateOrderExamineStatus(orderId, subExpression, OrderExamineStatus.PASS, new Date());
-        return true;
-    }
-
-    /**
-     * 初始化订单
-     *
-     * @param user
-     * @param type
-     * @param appVersion
-     * @param appName
-     * @param orderModelGroup
-     * @param productEntity
-     * @return
-     * @throws Exception
-     */
-    protected LoanOrderEntity initOrder(User user, Integer type, String appVersion, String appName, String orderModelGroup, LoanProductEntity productEntity) throws Exception {
-        // 用户id
-        String userId = user.getId();
-
-        // 使用分布式锁，防止同时创建多条订单
-        String orderId = zookeeperClient.lock(new UserProductDetailLock<String>(userId) {
-            @Override
-            public String execute() {
-                    // 产品id
-                    String productId = productEntity.getId();
-
-                    // 查询用户是否有已经创建且未完结的订单
-                    Integer[] status = new Integer[]{OrderStatus.CREATE, OrderStatus.EXAMINE_WAIT, OrderStatus.EXAMINE_PASS, OrderStatus.WAIT_PAY, OrderStatus.WAY, OrderStatus.DUE};
-                    List<LoanOrderEntity> loanOrderEntityList = loanOrderDao.findOrderByUserAndProductIdAndStatus(userId, productId, status);
-                    if (CollectionUtils.isNotEmpty(loanOrderEntityList)) {
-                        return loanOrderEntityList.get(0).getId();
-                    }
-
-
-                    // 查询用户指定状态订单
-                    status = new Integer[]{OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE};
-                    loanOrderEntityList = loanOrderDao.findOrderByUserAndProductIdAndStatus(userId, productId, status);
-
-
-                    // 是否复贷
-                    Integer reloan = 0;
-                    if (CollectionUtils.isNotEmpty(loanOrderEntityList)) {
-                        reloan = 1;
-                    }
-
-                    // 用户客群
-                    Integer userType = userType(userId, productId, appName);
-
-                    // 订单id
-                    String orderId = ObjectIdUtil.getObjectId();
-
-                    // 新增订单
-                    LoanOrderEntity loanOrderEntity = new LoanOrderEntity();
-                    loanOrderEntity = new LoanOrderEntity();
-                    loanOrderEntity.setId(orderId);
-                    loanOrderEntity.setUserId(userId);
-                    loanOrderEntity.setProductId(productId);
-                    loanOrderEntity.setUserChannelId(user.getChannelId());
-                    loanOrderEntity.setBankCardId("");
-                    loanOrderEntity.setReloan(reloan);
-                    loanOrderEntity.setOrderModelGroup(orderModelGroup);
-                    loanOrderEntity.setRemittanceDistributionGroup(productEntity.getRemittanceDistributionGroup());
-                    loanOrderEntity.setRepaymentDistributionGroup("H6");
-                    loanOrderEntity.setUserType(userType);
-                    loanOrderEntity.setStages(productEntity.getStages());
-                    loanOrderEntity.setStagesDay(productEntity.getStagesDay());
-                    loanOrderEntity.setProcessingFeeProportion(productEntity.getProcessingFeeProportion());
-                    loanOrderEntity.setInterest(productEntity.getInterest());
-                    loanOrderEntity.setPenaltyInterest(productEntity.getPenaltyInterest());
-                    loanOrderEntity.setStatus(OrderStatus.CREATE);
-                    loanOrderEntity.setType(type);
-                    loanOrderEntity.setApprovalAmount(0.0);
-                    loanOrderEntity.setActualAmount(0.0);
-                    loanOrderEntity.setIncidentalAmount(0.0);
-                    loanOrderEntity.setEstimatedRepaymentAmount(0.0);
-                    loanOrderEntity.setActualAmount(0.0);
-                    loanOrderEntity.setActualRepaymentAmount(0.0);
-                    loanOrderEntity.setAppName(appName);
-                    loanOrderEntity.setAppVersion(appVersion);
-                    loanOrderEntity.setApplyTime(null);
-                    loanOrderEntity.setLoanTime(null);
-                    loanOrderEntity.setApplyTime(null);
-                    loanOrderEntity.setUpdateTime(new Date());
-                    loanOrderEntity.setCreateTime(new Date());
-                    Integer insertOrder = loanOrderDao.insertOrder(loanOrderEntity);
-
-                    // 判断是否新增成功
-                    if (insertOrder == 0) {
-                        return null;
-                    }
-
-                    // 订单审核模型
-                    List<String> modelList = loanOrderModelDao.findNamesByGroup(orderModelGroup);
-                    modelList.parallelStream().forEach(model -> {
-                        LoanOrderExamineEntity loanOrderExamineEntity = new LoanOrderExamineEntity();
-                        loanOrderExamineEntity.setOrderId(orderId);
-                        loanOrderExamineEntity.setId(ObjectIdUtil.getObjectId());
-                        loanOrderExamineEntity.setStatus(OrderExamineStatus.CREATE);
-                        loanOrderExamineEntity.setModelName(model);
-                        loanOrderExamineEntity.setUpdateTime(new Date());
-                        loanOrderExamineEntity.setCreateTime(new Date());
-                        loanOrderExamineDao.insertOrderExamine(loanOrderExamineEntity);
-                    });
-
-                    // 判断当前初始化订单是什么类型
-                    if (OrderType.LOAN == type) {
-                        LoanOrderExamineEntity loanOrderExamineEntity = new LoanOrderExamineEntity();
-                        loanOrderExamineEntity.setOrderId(orderId);
-                        loanOrderExamineEntity.setId(ObjectIdUtil.getObjectId());
-                        loanOrderExamineEntity.setStatus(OrderExamineStatus.CREATE);
-                        loanOrderExamineEntity.setModelName("rejectionRule");
-                        loanOrderExamineEntity.setUpdateTime(new Date());
-                        loanOrderExamineEntity.setCreateTime(new Date());
-                        loanOrderExamineDao.insertOrderExamine(loanOrderExamineEntity);
-                    }
-
-                    return orderId;
-            }
-        });
-
-        // 判断订单号是否为空
-        if (StringUtils.isEmpty(orderId)) {
-            return null;
-        }
-
-        // 查询订单
-        LoanOrderEntity loanOrderEntity = loanOrderDao.findOrder(orderId);
-        if (ObjectUtils.isEmpty(loanOrderEntity)) {
-            return null;
-        }
-
-        return loanOrderEntity;
-
-    }
-
-    /**
-     * 计算用户客群
-     *
-     * @param userId
-     * @param productId
-     * @param appName
-     * @return
-     */
-    protected Integer userType(String userId, String productId, String appName) {
-        // 用户在本包是否有还款
-        int[] status = {OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE};
-        Integer count = loanOrderDao.countUserOrderByAppInStatus(userId, appName, status);
-        // 无:2客群
-        if (count == 0) {
-            return 2;
-        }
-
-        // 本包本产品是否有还款
-        count = loanOrderDao.countUserOrderByProductAndAppInStatus(userId, productId, appName, status);
-        // 无:1客群
-        if (count == 0) {
-            return 1;
-        }
-
-        return 0;
-    }
-
-    /**
      * 获取用户app模式
      *
      * @param params 入参
@@ -719,5 +442,282 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         result.setMessage(ResultEnum.SUCCESS.message());
         result.setData(res);
         return result;
+    }
+
+    /**
+     * 多投限制
+     *
+     * @param loanOrderEntity
+     * @param user
+     * @return
+     * @throws Exception
+     */
+    protected boolean rejectionRule(LoanOrderEntity loanOrderEntity, User user) throws Exception {
+        // 模型名称
+        String subExpression = "rejectionRule";
+
+        // 用户id
+        String userId = loanOrderEntity.getUserId();
+
+        // 注册地址
+        String registerAddress = user.getRegisterAddress();
+
+        // 订单id
+        String orderId = loanOrderEntity.getId();
+
+        // 用户客群
+        Integer userType = loanOrderEntity.getUserType();
+
+        // 手机哈
+        String mobile = user.getMobile();
+
+        // app名称
+        String appName = loanOrderEntity.getAppName();
+
+        // 渠道ID
+        Integer userChannelId = loanOrderEntity.getUserChannelId();
+
+        // 查询渠道信息
+        PlatformChannelEntity platformChannelEntity = platformChannelDao.findChannel(userChannelId);
+
+        // 渠道名称
+        String channelName = platformChannelEntity.getChannelName();
+
+        // 封装请求参数
+        Map<String, String> params = new HashMap<>();
+        params.put(Field.METHOD, "riskmanagement.mexico.rejection.rule");
+        params.put(Field.APP_ID, riskConfig.getAppId());
+        params.put(Field.VERSION, "1.0");
+        params.put(Field.SIGN_TYPE, "RSA");
+        params.put(Field.FORMAT, "json");
+        params.put(Field.TIMESTAMP, String.valueOf(System.currentTimeMillis() / 1000));
+        JSONObject bizData = new JSONObject();
+        bizData.put(Field.TRANSACTION_ID, userId);
+        bizData.put(Field.BORROW_ID, orderId);
+        bizData.put(Field.PROGRESS, 0);
+        bizData.put(Field.REGISTER_ADDR, registerAddress);
+        bizData.put(Field.CHANNEL_NAME, channelName);
+        int singleQuantity = loanOrderDao.countProcessOrderNo(user.getAppName(), userId);
+        int allQuantity = loanOrderDao.countProcessOrderNo(null, user.getId());
+        bizData.put(Field.SINGLE_QUANTITY, singleQuantity);
+        bizData.put(Field.ALL_QUANTITY, allQuantity);
+        LoanOrderBillEntity fistRepayOrder = loanOrderBillDao.findFistRepayOrder(userId, user.getAppName());
+        if (null != fistRepayOrder) {
+            Date actualRepaymentTime = fistRepayOrder.getActualRepaymentTime();
+            int intervalDays = DateUtil.getIntervalDays(new Date(), actualRepaymentTime);
+            bizData.put(Field.REPAYMENT_TIME, intervalDays);
+        }
+        bizData.put(Field.USER_TYPE, userType);
+        bizData.put(Field.PHONE, mobile);
+        bizData.put(Field.APP_NAME, appName);
+        params.put(Field.BIZ_DATA, bizData.toJSONString());
+
+        // 生成签名
+        String paramsStr = RSAUtils.getSortParams(params);
+        String sign = RSAUtils.addSign(riskConfig.getPrivateKey(), paramsStr);
+        params.put(Field.SIGN, sign);
+
+        // 请求参数
+        String requestParams = JSONObject.toJSONString(params);
+
+        // 更新节点请求数据
+        loanOrderExamineDao.updateOrderExamineRequest(loanOrderEntity.getId(), subExpression, requestParams, new Date());
+
+        // 发送请求
+        String result = HttpUtils.POST_FORM(riskConfig.getRiskUrl(), requestParams);
+        LogUtil.sysInfo("requestParams: {} result:{}", requestParams, result);
+
+//        if (StringUtils.isEmpty(result)) {
+//            return false;
+//        }
+
+        // 更新节点响应数据
+//        loanOrderExamineDao.updateOrderExamineResponse(loanOrderEntity.getId(), subExpression, result, new Date());
+
+        // 转换为JSON
+//        JSONObject resultJson = JSONObject.parseObject(result);
+//
+//        // 返回码
+//        Integer code = resultJson.getInteger(Field.ERROR);
+//
+//        if (code != 200) {
+//            return false;
+//        }
+//
+//        // 成功
+//        JSONObject data = resultJson.getJSONObject(Field.DATA);
+//
+//        // 是否通过
+//        int pass = data.getInteger(Field.PASS);
+//
+//        // 未通过
+//        if (pass == 0) {
+//            // 更新审核状态
+//            loanOrderExamineDao.updateOrderExamineStatus(orderId, subExpression, OrderExamineStatus.REFUSE, new Date());
+//            return false;
+//        }
+
+        // 通过
+        loanOrderExamineDao.updateOrderExamineStatus(orderId, subExpression, OrderExamineStatus.PASS, new Date());
+        return true;
+    }
+
+    /**
+     * 初始化订单
+     *
+     * @param user
+     * @param type
+     * @param appVersion
+     * @param appName
+     * @param orderModelGroup
+     * @param productEntity
+     * @return
+     * @throws Exception
+     */
+    protected LoanOrderEntity initOrder(User user, Integer type, String appVersion, String appName, String orderModelGroup, LoanProductEntity productEntity) throws Exception {
+        // 用户id
+        String userId = user.getId();
+
+        // 使用分布式锁，防止同时创建多条订单
+        String orderId = zookeeperClient.lock(new UserProductDetailLock<String>(userId) {
+            @Override
+            public String execute() {
+                // 产品id
+                String productId = productEntity.getId();
+
+                // 查询用户是否有已经创建且未完结的订单
+                Integer[] status = new Integer[]{OrderStatus.CREATE, OrderStatus.EXAMINE_WAIT, OrderStatus.EXAMINE_PASS, OrderStatus.WAIT_PAY, OrderStatus.WAY, OrderStatus.DUE};
+                List<LoanOrderEntity> loanOrderEntityList = loanOrderDao.findOrderByUserAndProductIdAndStatus(userId, productId, status);
+                if (CollectionUtils.isNotEmpty(loanOrderEntityList)) {
+                    return loanOrderEntityList.get(0).getId();
+                }
+
+
+                // 查询用户指定状态订单
+                status = new Integer[]{OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE};
+                loanOrderEntityList = loanOrderDao.findOrderByUserAndProductIdAndStatus(userId, productId, status);
+
+
+                // 是否复贷
+                Integer reloan = 0;
+                if (CollectionUtils.isNotEmpty(loanOrderEntityList)) {
+                    reloan = 1;
+                }
+
+                // 用户客群
+                Integer userType = userType(userId, productId, appName);
+
+                // 订单id
+                String orderId = ObjectIdUtil.getObjectId();
+
+                // 新增订单
+                LoanOrderEntity loanOrderEntity = new LoanOrderEntity();
+                loanOrderEntity = new LoanOrderEntity();
+                loanOrderEntity.setId(orderId);
+                loanOrderEntity.setUserId(userId);
+                loanOrderEntity.setProductId(productId);
+                loanOrderEntity.setUserChannelId(user.getChannelId());
+                loanOrderEntity.setBankCardId("");
+                loanOrderEntity.setReloan(reloan);
+                loanOrderEntity.setOrderModelGroup(orderModelGroup);
+                loanOrderEntity.setRemittanceDistributionGroup(productEntity.getRemittanceDistributionGroup());
+                loanOrderEntity.setRepaymentDistributionGroup("H6");
+                loanOrderEntity.setUserType(userType);
+                loanOrderEntity.setStages(productEntity.getStages());
+                loanOrderEntity.setStagesDay(productEntity.getStagesDay());
+                loanOrderEntity.setProcessingFeeProportion(productEntity.getProcessingFeeProportion());
+                loanOrderEntity.setInterest(productEntity.getInterest());
+                loanOrderEntity.setPenaltyInterest(productEntity.getPenaltyInterest());
+                loanOrderEntity.setStatus(OrderStatus.CREATE);
+                loanOrderEntity.setType(type);
+                loanOrderEntity.setApprovalAmount(0.0);
+                loanOrderEntity.setActualAmount(0.0);
+                loanOrderEntity.setIncidentalAmount(0.0);
+                loanOrderEntity.setEstimatedRepaymentAmount(0.0);
+                loanOrderEntity.setActualAmount(0.0);
+                loanOrderEntity.setActualRepaymentAmount(0.0);
+                loanOrderEntity.setAppName(appName);
+                loanOrderEntity.setAppVersion(appVersion);
+                loanOrderEntity.setApplyTime(null);
+                loanOrderEntity.setLoanTime(null);
+                loanOrderEntity.setApplyTime(null);
+                loanOrderEntity.setUpdateTime(new Date());
+                loanOrderEntity.setCreateTime(new Date());
+                Integer insertOrder = loanOrderDao.insertOrder(loanOrderEntity);
+
+                // 判断是否新增成功
+                if (insertOrder == 0) {
+                    return null;
+                }
+
+                // 订单审核模型
+                List<String> modelList = loanOrderModelDao.findNamesByGroup(orderModelGroup);
+                modelList.parallelStream().forEach(model -> {
+                    LoanOrderExamineEntity loanOrderExamineEntity = new LoanOrderExamineEntity();
+                    loanOrderExamineEntity.setOrderId(orderId);
+                    loanOrderExamineEntity.setId(ObjectIdUtil.getObjectId());
+                    loanOrderExamineEntity.setStatus(OrderExamineStatus.CREATE);
+                    loanOrderExamineEntity.setModelName(model);
+                    loanOrderExamineEntity.setUpdateTime(new Date());
+                    loanOrderExamineEntity.setCreateTime(new Date());
+                    loanOrderExamineDao.insertOrderExamine(loanOrderExamineEntity);
+                });
+
+                // 判断当前初始化订单是什么类型
+                if (OrderType.LOAN == type) {
+                    LoanOrderExamineEntity loanOrderExamineEntity = new LoanOrderExamineEntity();
+                    loanOrderExamineEntity.setOrderId(orderId);
+                    loanOrderExamineEntity.setId(ObjectIdUtil.getObjectId());
+                    loanOrderExamineEntity.setStatus(OrderExamineStatus.CREATE);
+                    loanOrderExamineEntity.setModelName("rejectionRule");
+                    loanOrderExamineEntity.setUpdateTime(new Date());
+                    loanOrderExamineEntity.setCreateTime(new Date());
+                    loanOrderExamineDao.insertOrderExamine(loanOrderExamineEntity);
+                }
+
+                return orderId;
+            }
+        });
+
+        // 判断订单号是否为空
+        if (StringUtils.isEmpty(orderId)) {
+            return null;
+        }
+
+        // 查询订单
+        LoanOrderEntity loanOrderEntity = loanOrderDao.findOrder(orderId);
+        if (ObjectUtils.isEmpty(loanOrderEntity)) {
+            return null;
+        }
+
+        return loanOrderEntity;
+
+    }
+
+    /**
+     * 计算用户客群
+     *
+     * @param userId
+     * @param productId
+     * @param appName
+     * @return
+     */
+    protected Integer userType(String userId, String productId, String appName) {
+        // 用户在本包是否有还款
+        int[] status = {OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE};
+        Integer count = loanOrderDao.countUserOrderByAppInStatus(userId, appName, status);
+        // 无:2客群
+        if (count == 0) {
+            return 2;
+        }
+
+        // 本包本产品是否有还款
+        count = loanOrderDao.countUserOrderByProductAndAppInStatus(userId, productId, appName, status);
+        // 无:1客群
+        if (count == 0) {
+            return 1;
+        }
+
+        return 0;
     }
 }
