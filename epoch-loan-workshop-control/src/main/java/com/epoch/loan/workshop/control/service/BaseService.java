@@ -144,11 +144,12 @@ public class BaseService {
     /**
      * 更新gps信息
      *
-     * @param userInfoId
+     * @param userId
      * @param gps
      * @param gpsAddress
      */
-    protected void updateUserGpsMsg(String userInfoId, String gps, String gpsAddress) {
-        loanUserInfoDao.updateUserGpsMsg(userInfoId, gps, gpsAddress, new Date());
+    protected void updateUserGpsMsg(String userId, String gps, String gpsAddress) {
+        loanUserInfoDao.updateUserGpsMsg(userId, gps, gpsAddress, new Date());
+        tokenManager.updateUserCache(userId);
     }
 }

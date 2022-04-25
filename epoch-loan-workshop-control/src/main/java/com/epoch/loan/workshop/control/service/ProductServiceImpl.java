@@ -57,9 +57,6 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         // 用户id
         String userId = params.getUser().getId();
 
-        // 用户详细信息id
-        String userInfoId = params.getUser().getUserInfoId();
-
         // 查询产品详情
         LoanProductEntity loanProductEntity = loanProductDao.findProduct(productId);
         if (ObjectUtils.isEmpty(loanProductEntity)) {
@@ -73,9 +70,8 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         String orderModelGroup = loanProductEntity.getOrderModelGroup();
 
         // 更新GPS信息(userInfo实时)
-        updateUserGpsMsg(userInfoId, params.getGps(), params.getGpsAddress());
-        tokenManager.updateUserCache(userId);
-
+        updateUserGpsMsg(userId, params.getGps(), params.getGpsAddress());
+        
         // 初始化订单
         LoanOrderEntity loanOrderEntity = initOrder(params.getUser(), OrderType.LOAN, appVersion, appName, orderModelGroup, loanProductEntity);
 

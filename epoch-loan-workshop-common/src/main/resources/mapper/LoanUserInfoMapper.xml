@@ -101,7 +101,7 @@
                 update_time=#{updateTime},
             </if>
         </set>
-        where id = #{id}
+        where user_id = #{id}
     </update>
 
     <select id="findLastUserInfoByPapersId" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanUserInfoEntity">
