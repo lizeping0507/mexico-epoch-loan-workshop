@@ -88,6 +88,9 @@
                                   `update_time` = #{loanUserInfoEntity.updateTime}
         where id = #{loanUserInfoEntity.id}
     </update>
+    <update id="updateUserGpsMsg">
+        update loan_user_info set gps = #{gps},gps_address= #{gpsAddress},update_time=#{updateTime} where id = #{id}
+    </update>
 
     <select id="findLastUserInfoByPapersId" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanUserInfoEntity">
         SELECT * FROM loan_user_info where papers_id = #{papersId} order by update_time limit 1

@@ -9,6 +9,8 @@ import com.epoch.loan.workshop.common.sms.SMSManager;
 import com.epoch.loan.workshop.common.zookeeper.ZookeeperClient;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Date;
+
 /**
  * @author : Shangkunfeng
  * @packageName : com.epoch.loan.workshop.control.service;
@@ -124,4 +126,22 @@ public class BaseService {
      */
     @Autowired
     public LoanMaskDao loanMaskDao;
+
+    /**
+     * 变身包承接盘配置
+     */
+    @Autowired
+    public LoanUserInfoDao loanUserInfoDao;
+
+
+    /**
+     * 更新gps信息
+     *
+     * @param userInfoId
+     * @param gps
+     * @param gpsAddress
+     */
+    protected void updateUserGpsMsg(String userInfoId, String gps, String gpsAddress) {
+        loanUserInfoDao.updateUserGpsMsg(userInfoId, gps, gpsAddress, new Date());
+    }
 }

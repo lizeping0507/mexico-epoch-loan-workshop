@@ -46,6 +46,8 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         ProductDetailResult resData = new ProductDetailResult();
         result.setData(resData);
 
+        User user = params.getUser();
+
         // 产品id
         String productId = params.getProductId();
         LogUtil.sysInfo("productDetail productId:{}",productId);
@@ -75,6 +77,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         LogUtil.sysInfo("productDetail orderModelGroup:{}",orderModelGroup);
 
         // 更新GPS信息(userInfo实时) TODO 更新到表里，然后更新缓存
+        updateUserGpsMsg(user.getUserInfoId(), params.getGps(), params.getGpsAddress());
 
         // 初始化订单
         LogUtil.sysInfo("productDetail params.getUser():{}", params.getUser());
@@ -100,8 +103,6 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             }
         }
 
-        User user = params.getUser();
-
         // 封装认证状态
         resData.setIdFlag(user.isIdentityAuth() ? 1 : 0);
         resData.setBaseInfoFlag(user.isBasicInfoAuth() ? 1 : 0);
@@ -110,6 +111,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
         return result;
     }
+
 
     /**
      * 多投限制
