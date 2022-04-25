@@ -105,7 +105,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         resData.setInterestRange(loanProductEntity.getInterestRange());
         resData.setRepaymentRange(loanProductEntity.getRepaymentRange());
         resData.setServiceFeeRange(loanProductEntity.getServiceFeeRange());
-        resData.setAmount("2000-8000");
+        resData.setAmount(loanProductEntity.getAmountRange());
         resData.setIdFlag(params.getUser().isIdentityAuth() ? 1 : 0);
         resData.setBaseInfoFlag(params.getUser().isBasicInfoAuth() ? 1 : 0);
         resData.setAddInfoFlag(params.getUser().isAddInfoAuth() ? 1 : 0);
