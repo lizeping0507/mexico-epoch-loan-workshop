@@ -153,7 +153,7 @@
         product_id=#{productId}
         AND
         status in
-        <foreach collection="status" item="sts" index="index" open="(" close=")" separator=",">
+        <foreach collection="array" item="sts" index="index" open="(" close=")" separator=",">
             #{sts}
         </foreach>
     </select>
