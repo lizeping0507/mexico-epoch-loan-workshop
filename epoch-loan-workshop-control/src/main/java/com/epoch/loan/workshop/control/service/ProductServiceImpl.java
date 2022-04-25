@@ -44,19 +44,21 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         // 结果集
         Result<ProductDetailResult> result = new Result<>();
         ProductDetailResult resData = new ProductDetailResult();
-        result.setData(resData);
-
-        User user = params.getUser();
 
         // 产品id
         String productId = params.getProductId();
-        LogUtil.sysInfo("productDetail productId:{}", productId);
 
         // app版本
         String appVersion = params.getAppVersion();
 
         // app名称
         String appName = params.getAppName();
+
+        // 用户id
+        String userId = params.getUser().getId();
+
+        // 用户详细信息id
+        String userInfoId = params.getUser().getUserInfoId();
 
         // 查询产品详情
         LoanProductEntity loanProductEntity = loanProductDao.findProduct(productId);
@@ -66,24 +68,16 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             result.setMessage(ResultEnum.NO_EXITS.message());
             return result;
         }
-        resData.setArrivalRange(loanProductEntity.getArrivalRange());
-        resData.setInterestRange(loanProductEntity.getInterestRange());
-        resData.setRepaymentRange(loanProductEntity.getRepaymentRange());
-        resData.setServiceFeeRange(loanProductEntity.getServiceFeeRange());
-        resData.setAmount("2000-8000");
 
         // 订单审核模型
         String orderModelGroup = loanProductEntity.getOrderModelGroup();
-        LogUtil.sysInfo("productDetail orderModelGroup:{}", orderModelGroup);
 
         // 更新GPS信息(userInfo实时)
-        updateUserGpsMsg(user.getUserInfoId(), params.getGps(), params.getGpsAddress());
-        tokenManager.updateUserCache(user.getId());
+        updateUserGpsMsg(userInfoId, params.getGps(), params.getGpsAddress());
+        tokenManager.updateUserCache(userId);
 
         // 初始化订单
-        LogUtil.sysInfo("productDetail params.getUser():{}", params.getUser());
         LoanOrderEntity loanOrderEntity = initOrder(params.getUser(), OrderType.LOAN, appVersion, appName, orderModelGroup, loanProductEntity);
-        LogUtil.sysInfo("productDetail loanOrderEntity:{}", loanOrderEntity);
 
         // 订单是否创建成功
         if (ObjectUtils.isEmpty(loanOrderEntity)) {
@@ -98,7 +92,6 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         if (orderStatus == OrderStatus.CREATE) {
             // 如果订单状态处于创建状态，进行多投判断
             boolean rejectionRule = rejectionRule(loanOrderEntity, params.getUser());
-            LogUtil.sysInfo("productDetail rejectionRule:{}", rejectionRule);
 
             // 多投被拒返回
             if (!rejectionRule) {
@@ -109,12 +102,19 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             }
         }
 
-        // 封装认证状态
-        resData.setIdFlag(user.isIdentityAuth() ? 1 : 0);
-        resData.setBaseInfoFlag(user.isBasicInfoAuth() ? 1 : 0);
-        resData.setAddInfoFlag(user.isAddInfoAuth() ? 1 : 0);
-        resData.setOrderNo(loanOrderEntity.getId());
-
+        // 封装结果集
+        resData.setArrivalRange(loanProductEntity.getArrivalRange());
+        resData.setInterestRange(loanProductEntity.getInterestRange());
+        resData.setRepaymentRange(loanProductEntity.getRepaymentRange());
+        resData.setServiceFeeRange(loanProductEntity.getServiceFeeRange());
+        resData.setAmount("2000-8000");
+        resData.setIdFlag(params.getUser().isIdentityAuth() ? 1 : 0);
+        resData.setBaseInfoFlag(params.getUser().isBasicInfoAuth() ? 1 : 0);
+        resData.setAddInfoFlag(params.getUser().isAddInfoAuth() ? 1 : 0);
+        resData.setOrderId(loanOrderEntity.getId());
+        result.setData(resData);
+        result.setReturnCode(ResultEnum.SUCCESS.code());
+        result.setMessage(ResultEnum.SUCCESS.message());
         return result;
     }
 
