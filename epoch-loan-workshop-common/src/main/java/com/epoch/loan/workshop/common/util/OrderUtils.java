@@ -1,5 +1,7 @@
 package com.epoch.loan.workshop.common.util;
 
+import com.epoch.loan.workshop.common.constant.OrderStatus;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -57,8 +59,6 @@ public class OrderUtils {
 
     /**
      * 生成不带类别标头的编码
-     *
-     * @param userId
      */
     private static synchronized String getCode() {
         return getDateTime() + getRandom(MAX_LENGTH);
@@ -87,5 +87,38 @@ public class OrderUtils {
      */
     public static String getWithdrawCode() {
         return WITHDRAW_ORDER + getCode();
+    }
+
+    /**
+     * 按钮文案
+     *
+     * @param orderStatus 订单状态
+     * @return 按钮文案
+     */
+    public static String button(Integer orderStatus) {
+        // 根据订单状态获取按钮文案
+        switch (orderStatus) {
+            case OrderStatus.CREATE:
+                return "Pagado";
+            case OrderStatus.EXAMINE_WAIT:
+                return "Bajo revisión";
+            case OrderStatus.EXAMINE_PASS:
+                return "Aprobado";
+            case OrderStatus.EXAMINE_FAIL:
+                return "Rechazado";
+            case OrderStatus.WAIT_PAY:
+                return "Pagando";
+            case OrderStatus.WAY:
+                return "Reembolsando";
+            case OrderStatus.DUE:
+                return "Vencido";
+            case OrderStatus.COMPLETE:
+                return "Pagado";
+            case OrderStatus.DUE_COMPLETE:
+                return "Pagado";
+            case OrderStatus.ABANDONED:
+                return "Pagado";
+        }
+        return "";
     }
 }

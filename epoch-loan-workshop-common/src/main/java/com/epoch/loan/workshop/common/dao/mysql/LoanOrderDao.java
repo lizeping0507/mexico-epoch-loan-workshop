@@ -301,5 +301,5 @@ public interface LoanOrderDao {
      * @param sequence 正序-ASC 还是 倒序-DESC
      * @return
      */
-    List<OrderDTO> findOrderListByUserIdAndStatusAndOrderByField(String userId, Integer[] status, String field, String sequence);
+    List<LoanOrderEntity> findOrderListByUserIdAndStatusAndOrderByField(String userId, Integer[] status, String field, String sequence);
 }

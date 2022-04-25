@@ -466,7 +466,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         if (!params.getUser().isIdentityAuth() || !params.getUser().isBasicInfoAuth() || !params.getUser().isAddInfoAuth()) {
             // 没有通过 返回结果
             appMaskModelResult.setMaskModel(3);
-            appMaskModelResult.setButton(button(OrderStatus.CREATE));
+            appMaskModelResult.setButton(OrderUtils.button(OrderStatus.CREATE));
             result.setData(appMaskModelResult);
             return result;
         }
@@ -498,7 +498,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 if (updateTimeStr.equals(DateUtil.getDefault())) {
                     // 当天订单不允许再次进行申请
                     appMaskModelResult.setMaskModel(2);
-                    appMaskModelResult.setButton(button(OrderStatus.EXAMINE_FAIL));
+                    appMaskModelResult.setButton(OrderUtils.button(OrderStatus.EXAMINE_FAIL));
                     result.setData(appMaskModelResult);
                     return result;
                 }
@@ -527,7 +527,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
             // 返回结果集
             appMaskModelResult.setMaskModel(0);
-            appMaskModelResult.setButton(button(orderStatus));
+            appMaskModelResult.setButton(OrderUtils.button(orderStatus));
             appMaskModelResult.setOrderNo(loanOrderEntity.getId());
             appMaskModelResult.setOrderStatus(orderStatus);
             result.setData(appMaskModelResult);
@@ -559,7 +559,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         if (loanMaskEntity.getLevel().equals("A") && orderStatus >= OrderStatus.WAY) {
             // 返回结果
             appMaskModelResult.setMaskModel(1);
-            appMaskModelResult.setButton(button(orderStatus));
+            appMaskModelResult.setButton(OrderUtils.button(orderStatus));
             appMaskModelResult.setOrderNo(orderNo);
             appMaskModelResult.setOrderStatus(orderStatus);
             result.setData(appMaskModelResult);
@@ -568,44 +568,11 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
         // 返回结果
         appMaskModelResult.setMaskModel(0);
-        appMaskModelResult.setButton(button(orderStatus));
+        appMaskModelResult.setButton(OrderUtils.button(orderStatus));
         appMaskModelResult.setOrderNo(orderNo);
         appMaskModelResult.setOrderStatus(orderStatus);
         result.setData(appMaskModelResult);
         return result;
-    }
-
-    /**
-     * 按钮
-     *
-     * @param orderStatus
-     * @return
-     */
-    protected String button(Integer orderStatus) {
-        // 根据订单状态获取按钮文案
-        switch (orderStatus) {
-            case OrderStatus.CREATE:
-                return "Pagado";
-            case OrderStatus.EXAMINE_WAIT:
-                return "Bajo revisión";
-            case OrderStatus.EXAMINE_PASS:
-                return "Aprobado";
-            case OrderStatus.EXAMINE_FAIL:
-                return "Rechazado";
-            case OrderStatus.WAIT_PAY:
-                return "Pagando";
-            case OrderStatus.WAY:
-                return "Reembolsando";
-            case OrderStatus.DUE:
-                return "Vencido";
-            case OrderStatus.COMPLETE:
-                return "Pagado";
-            case OrderStatus.DUE_COMPLETE:
-                return "Pagado";
-            case OrderStatus.ABANDONED:
-                return "Pagado";
-        }
-        return "";
     }
 
     /**
