@@ -106,13 +106,14 @@ public class OcrServiceImpl extends BaseService implements OcrService {
 
         // 发送请求
         String response = HttpUtils.POST_WITH_HEADER(licenseUrl, param, headers);
+        LogUtil.sysInfo("advance响应结果：{}",response);
         if (StringUtils.isBlank(response)) {
             result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
             result.setMessage(ResultEnum.SYSTEM_ERROR.message());
             return result;
         }
         AdvanceLicenseResult licenseResult = JSONObject.parseObject(response, AdvanceLicenseResult.class);
-
+        LogUtil.sysInfo("advance licenseResult响应结果：{}",licenseResult.toString());
         // 日志写入Elastic
         OcrLivingDetectionLogElasticEntity livingDetectionLog = new OcrLivingDetectionLogElasticEntity();
         BeanUtils.copyProperties(licenseResult, livingDetectionLog);
@@ -123,6 +124,8 @@ public class OcrServiceImpl extends BaseService implements OcrService {
         livingDetectionLog.setUserId(userId);
         livingDetectionLog.setCreateTime(new Date());
         ocrLivingDetectionLogElasticDao.save(livingDetectionLog);
+
+        LogUtil.sysInfo("advance 日志上传");
 
         // 判断是否请求成功
         String code = licenseResult.getCode();
