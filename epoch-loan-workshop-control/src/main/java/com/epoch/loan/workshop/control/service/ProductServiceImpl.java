@@ -475,7 +475,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         Integer orderCount = loanOrderDao.findOrderCountByUserIdAndType(userId, OrderType.LOAN);
 
         // 查询用户指定状态下的订单
-        if (orderCount != null || orderCount > 0) {
+        if (orderCount > 0) {
             // 贷超模式已经有订单
             appMaskModelResult.setMaskModel(1);
             result.setData(appMaskModelResult);
