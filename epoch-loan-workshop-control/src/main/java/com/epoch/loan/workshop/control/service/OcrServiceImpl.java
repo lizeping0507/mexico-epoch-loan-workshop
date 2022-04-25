@@ -50,16 +50,17 @@ public class OcrServiceImpl extends BaseService implements OcrService {
 
         // 该APP是否有可用聚道
         if (CollectionUtils.isEmpty(thirdConfigList)) {
-            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
-            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
+            result.setReturnCode(ResultEnum.CHANNEL_UN_DO_ERROR.code());
+            result.setMessage(ResultEnum.CHANNEL_UN_DO_ERROR.message());
             return result;
         }
 
         LoanOcrProviderConfig thirdConfig = chooseByWeight(thirdConfigList);
-        // 有可用聚道
+
+        // 是否选举出可用聚道
         if (ObjectUtils.isEmpty(thirdConfig)) {
-            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
-            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
+            result.setReturnCode(ResultEnum.CHANNEL_UN_DO_ERROR.code());
+            result.setMessage(ResultEnum.CHANNEL_UN_DO_ERROR.message());
             return result;
         }
 

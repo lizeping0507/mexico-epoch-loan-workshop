@@ -288,11 +288,6 @@ public class URL {
     public static final String OCR_CHANNEL_TYPE = "/ocrChannelType";
 
     /**
-     * 调用advance 获取证件信息接口
-     */
-    public static final String OCR_ADVANCE_CARD_INFO = "/userCardInfo";
-
-    /**
      * 获取advance license
      */
     public static final String OCR_ADVANCE_LICENSE = "/advanceLicense";
@@ -301,11 +296,6 @@ public class URL {
      * 获取advance 活体识别分
      */
     public static final String OCR_ADVANCE_LIVENESS_SCORE = "/advanceLivenessScore";
-
-    /**
-     * 用户OCR识别信息保存
-     */
-    public static final String SAVE_USER_OCR_INFO = "/saveOcrInfo";
 
     /**
      * 获取保存的用户OCR信息
@@ -333,9 +323,19 @@ public class URL {
     public static final String PRODUCT_RECOMMEND_LIST = "/recommendList";
 
     /**
-     * 订单 - 订单列表
+     * 订单 - 全部订单列表
      */
-    public static final String ORDER_LIST = "/list";
+    public static final String ORDER_LIST_ALL = "/listAll";
+
+    /**
+     * 订单 - 待完成订单列表
+     */
+    public static final String ORDER_UN_FINISHED_LIST = "/unfinishedOrderList";
+
+    /**
+     * 订单 - 待还款订单列表
+     */
+    public static final String ORDER_UN_REPAYMENT_LIST = "/unRepaymentOrderList";
 
     /**
      * 订单 - 申请放款
