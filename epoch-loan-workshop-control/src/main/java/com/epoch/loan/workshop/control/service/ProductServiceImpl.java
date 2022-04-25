@@ -41,7 +41,6 @@ public class ProductServiceImpl extends BaseService implements ProductService {
     public Result<ProductDetailResult> productDetail(ProductDetailParams params) throws Exception {
         // 结果集
         Result<ProductDetailResult> result = new Result<>();
-        ProductDetailResult resData = new ProductDetailResult();
 
         // 产品id
         String productId = params.getProductId();
@@ -97,6 +96,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         }
 
         // 封装结果集
+        ProductDetailResult resData = new ProductDetailResult();
         resData.setArrivalRange(loanProductEntity.getArrivalRange());
         resData.setInterestRange(loanProductEntity.getInterestRange());
         resData.setRepaymentRange(loanProductEntity.getRepaymentRange());
