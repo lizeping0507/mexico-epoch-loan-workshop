@@ -82,7 +82,7 @@ public class LoanProductEntity {
     private String companyLogo;
 
     /**
-     * 还款范围
+     * 放款到账范围
      */
     private String arrivalRange;
 
@@ -92,7 +92,7 @@ public class LoanProductEntity {
     private String interestRange;
 
     /**
-     * 放款到账范围
+     * 还款范围
      */
     private String repaymentRange;
 
