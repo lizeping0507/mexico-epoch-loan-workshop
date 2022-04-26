@@ -19,9 +19,8 @@ public interface SdkService {
      *
      * @param params 入参
      * @return 上传结果
-     * @throws Exception 请求异常
      */
-    Result<Object> sdkPuloadCallBack(SdkUploadParams params) throws Exception;
+    Result<Object> sdkUploadCallBack(SdkUploadParams params);
 
     /**
      * 是否推送基本信息

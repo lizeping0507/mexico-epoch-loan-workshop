@@ -4,6 +4,7 @@ import com.epoch.loan.workshop.common.authentication.TokenManager;
 import com.epoch.loan.workshop.common.config.PlatformConfig;
 import com.epoch.loan.workshop.common.config.RiskConfig;
 import com.epoch.loan.workshop.common.dao.elastic.OcrLivingDetectionLogElasticDao;
+import com.epoch.loan.workshop.common.dao.elastic.SdkCatchDataSyncLogElasticDao;
 import com.epoch.loan.workshop.common.dao.mysql.*;
 import com.epoch.loan.workshop.common.redis.RedisClient;
 import com.epoch.loan.workshop.common.sms.SMSManager;
@@ -61,6 +62,12 @@ public class BaseService {
      */
     @Autowired
     public OcrLivingDetectionLogElasticDao ocrLivingDetectionLogElasticDao;
+
+    /**
+     * sdk同步上传日志日志
+     */
+    @Autowired
+    public SdkCatchDataSyncLogElasticDao sdkCatchDataSyncLogElasticDao;
 
     /**
      * 订单

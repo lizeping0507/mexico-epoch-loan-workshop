@@ -3,6 +3,8 @@ package com.epoch.loan.workshop.common.params.params.request;
 import com.epoch.loan.workshop.common.params.params.BaseParams;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author : ljy
@@ -16,22 +18,17 @@ import lombok.NoArgsConstructor;
 public class SdkUploadParams extends BaseParams {
 
     /**
-     * 用户id
-     */
-    private String userId;
-
-    /**
      * 订单id
      */
     private String orderNo;
 
     /**
-     * 报告抓取状态1：成功 2 成功失败
+     * 抓取状态 1：成功 2 成功失败
      */
     private Integer reportStatus;
 
     /**
-     * sdk抓取epoch相应吗
+     * sdk抓取epoch响应码
      */
     private String code;
 
@@ -44,4 +41,64 @@ public class SdkUploadParams extends BaseParams {
      * 抓取类型：msg：短信 app: app img：相册 contact：通讯录 device：设备信息
      */
     private String type;
+
+    /**
+     * 验证 订单编号 是否合法
+     *
+     * @return true或false
+     */
+    public boolean isOrderNoLegal() {
+        if (StringUtils.isEmpty(this.orderNo)) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * 验证 抓取状态 是否合法
+     *
+     * @return true或false
+     */
+    public boolean isReportStatusLegal() {
+        if (ObjectUtils.isEmpty(this.reportStatus)) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * 验证 sdk抓取epoch响应码 是否合法
+     *
+     * @return true或false
+     */
+    public boolean isCodeLegal() {
+        if (StringUtils.isEmpty(this.code)) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * 验证 epoch抓取响应信息 是否合法
+     *
+     * @return true或false
+     */
+    public boolean isMessageLegal() {
+        if (StringUtils.isEmpty(this.message)) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * 验证 抓取类型 是否合法
+     *
+     * @return true或false
+     */
+    public boolean isTypeLegal() {
+        if (StringUtils.isEmpty(this.type)) {
+            return false;
+        }
+        return true;
+    }
 }
