@@ -90,7 +90,8 @@ public class ProductController extends BaseController {
 
         try {
             // 多推-贷超模式-首页
-            return productService.mergePushHome(params);
+            // return productService.mergePushHome(params);
+            return null;
         } catch (Exception e) {
             LogUtil.sysError("[ProductController mergePushHome]", e);
 
@@ -116,7 +117,8 @@ public class ProductController extends BaseController {
 
         try {
             // 多推-贷超模式-产品列表
-            return productService.mergePushList(params);
+            //return productService.mergePushList(params);
+            return null;
         } catch (Exception e) {
             LogUtil.sysError("[ProductController mergePushList]", e);
 
@@ -142,7 +144,8 @@ public class ProductController extends BaseController {
 
         try {
             // 多推-变身贷超模式
-            return productService.turnIntoLoan(params);
+            //return productService.turnIntoLoan(params);
+            return null;
         } catch (Exception e) {
             LogUtil.sysError("[ProductController turnIntoLoan]", e);
 
@@ -194,7 +197,8 @@ public class ProductController extends BaseController {
 
         try {
             // 产品详情
-            return productService.viewDetail(params);
+            // return productService.viewDetail(params);
+            return null;
         } catch (Exception e) {
             LogUtil.sysError("[ProductController viewDetail]", e);
 
@@ -220,7 +224,8 @@ public class ProductController extends BaseController {
 
         try {
             // 产品是否续贷开量
-            return productService.isReloan(params);
+            // return productService.isReloan(params);
+            return null;
         } catch (Exception e) {
             LogUtil.sysError("[ProductController isReloan]", e);
 
@@ -246,7 +251,8 @@ public class ProductController extends BaseController {
 
         try {
             // 获取产品支付渠道
-            return productService.payChannel(params);
+            // return productService.payChannel(params);
+            return null;
         } catch (Exception e) {
             LogUtil.sysError("[ProductController payChannel]", e);
 
@@ -271,7 +277,8 @@ public class ProductController extends BaseController {
 
         try {
             // 获取产品支付渠道
-            return productService.findRegisterBanner(params);
+            // return productService.findRegisterBanner(params);
+            return null;
         } catch (Exception e) {
             LogUtil.sysError("[ProductController findRegisterBanner]", e);
 
@@ -296,7 +303,8 @@ public class ProductController extends BaseController {
 
         try {
             // 获取产品支付渠道
-            return productService.productBannerList(params);
+            // return productService.productBannerList(params);
+            return null;
         } catch (Exception e) {
             LogUtil.sysError("[ProductController productBannerList]", e);
 
@@ -348,7 +356,8 @@ public class ProductController extends BaseController {
 
         try {
             // 获取产品推荐列表
-            return productService.countView(params);
+            // return productService.countView(params);
+            return null;
         } catch (Exception e) {
             LogUtil.sysError("[ProductController countView]", e);
 
