@@ -727,7 +727,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         fileMap.put("secondImage", convertToFile(params.getFaceImageData()));
 
         // 发送请求
-        String resultStr = HttpUtils.POST_WITH_HEADER_FORM_FILE(faceComparisonUrl, null, heardMap, fileMap,"utf-8");
+        String resultStr = HttpUtils.POST_WITH_HEADER_FORM_FILE(faceComparisonUrl, null, heardMap, fileMap);
 
         // 释放文件
         for (Map.Entry<String, File> entry : fileMap.entrySet()) {
@@ -812,7 +812,7 @@ public class UserServiceImpl extends BaseService implements UserService {
 
         // 发送请求
         LogUtil.sysInfo("advance获取证件信息请求参数：param：{} , heardMap: {}",paramMap.toString(),heardMap.toString());
-        String resultStr = HttpUtils.POST_WITH_HEADER_FORM_FILE(cardInfoUrl, paramMap, heardMap, fileMap,"utf-8");
+        String resultStr = HttpUtils.POST_WITH_HEADER_FORM_FILE(cardInfoUrl, paramMap, heardMap, fileMap);
         LogUtil.sysInfo("advance获取证件信息,url {} , result: {}", cardInfoUrl, resultStr);
 
         // 释放文件

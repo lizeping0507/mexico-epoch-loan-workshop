@@ -570,18 +570,17 @@ public class HttpUtils {
     /**
      * 以HTTP方式POST发送键值对及二进制文件
      *
-     * @param url 请求地址
-     * @param params 参数
+     * @param url      请求地址
+     * @param params   参数
      * @param heardMap 标题头
-     * @param files 文件map
-     * @param charset  需要特别注意，UTF-8会报错， utf-8正确
+     * @param files    文件map
      * @return
      * @throws URISyntaxException
      * @throws ClientProtocolException
      * @throws IOException
      */
-    public static String POST_WITH_HEADER_FORM_FILE(String url, Map<String, String> params, Map<String, String> heardMap, Map<String, File> files,String charset) throws Exception {
-        return paramsWithHeaderFilesPostInvoke(url, params, heardMap, files, charset);
+    public static String POST_WITH_HEADER_FORM_FILE(String url, Map<String, String> params, Map<String, String> heardMap, Map<String, File> files) throws Exception {
+        return paramsWithHeaderFilesPostInvoke(url, params, heardMap, files);
     }
 
 
@@ -809,12 +808,12 @@ public class HttpUtils {
      * @return
      * @throws Exception
      */
-    public static HttpPost buildHttpWithHeaderParamFilePost(String url, Map<String, String> params,Map<String, String> heardMap, Map<String, File> files)
+    public static HttpPost buildHttpWithHeaderParamFilePost(String url, Map<String, String> params, Map<String, String> heardMap, Map<String, File> files)
             throws Exception {
         HttpPost post = new HttpPost(url);
 
         // Httpbody体 boundary分隔符
-        String boundary = "----" + System.currentTimeMillis() + "----";
+        String boundary = "----------ThIs_Is_tHe_bouNdaRY_$";
 
         // 设置超时时间
         post.setConfig(buildRequestConfig());
@@ -1112,11 +1111,10 @@ public class HttpUtils {
      * @param params   表单普通参数
      * @param heardMap 请求头
      * @param files    文件参数
-     * @param charset  编码格式
      * @return
      * @throws Exception
      */
-    public static String paramsWithHeaderFilesPostInvoke(String url, Map<String, String> params, Map<String, String> heardMap, Map<String, File> files, String charset) throws Exception {
+    public static String paramsWithHeaderFilesPostInvoke(String url, Map<String, String> params, Map<String, String> heardMap, Map<String, File> files) throws Exception {
         CloseableHttpResponse response = null;
         HttpPost post = buildHttpWithHeaderParamFilePost(url, params, heardMap, files);
         try {
@@ -1125,7 +1123,7 @@ public class HttpUtils {
                 HttpEntity entity = response.getEntity();
                 if (entity != null) {
                     // 输入流关闭，同时会自动触发http连接的release
-                    String returnStr = EntityUtils.toString(entity, charset);
+                    String returnStr = EntityUtils.toString(entity, CONTENT_CHARSET);
                     return returnStr;
                 }
             } else {
