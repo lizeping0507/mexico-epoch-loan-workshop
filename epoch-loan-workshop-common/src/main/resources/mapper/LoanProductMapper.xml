@@ -10,6 +10,6 @@
     </select>
     <select id="findProductWithoutUserOrder"
             resultType="com.epoch.loan.workshop.common.entity.mysql.LoanProductEntity">
-        SELECT * FROM loan_product WHERE id in (select DISTINCT(product_id) FROM loan_order WHERE user_id = #{userId})
+        SELECT * FROM loan_product WHERE id not in (select DISTINCT(product_id) FROM loan_order WHERE user_id = #{userId})
     </select>
 </mapper>
