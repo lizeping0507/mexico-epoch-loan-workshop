@@ -1,5 +1,6 @@
 package com.epoch.loan.workshop.account.service;
 
+import cn.hutool.http.ContentType;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
@@ -901,7 +902,8 @@ public class UserServiceImpl extends BaseService implements UserService {
         HashMap<String, String> headers = Maps.newHashMap();
         String advanceConfig = getAdvanceConfig(appName, OcrField.ADVANCE_ACCESS_KEY);
         headers.put(OcrField.ADVANCE_ACCESS_KEY_KEY, advanceConfig);
-        headers.put(HTTP.CONTENT_TYPE, OcrField.ADVANCE_MULTIPART_VALUE);
+        //headers.put(HTTP.CONTENT_TYPE, OcrField.ADVANCE_MULTIPART_VALUE);
+        headers.put(HTTP.CONTENT_TYPE, ContentType.MULTIPART.getValue());
         return headers;
     }
 
