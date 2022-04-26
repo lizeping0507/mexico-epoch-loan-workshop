@@ -834,13 +834,13 @@ public class HttpUtils {
 
         // 设置form表单参数
         for (Entry<String, String> entry : params.entrySet()) {
-            builder.addPart(entry.getKey(), new StringBody(entry.getValue(), UTF_8));
+            builder.addPart(entry.getKey(), new StringBody(entry.getValue(), ContentType.TEXT_PLAIN.withCharset(UTF_8)));
         }
 
         // 设置文件参数
         for (Entry<String, File> entry : files.entrySet()) {
             File temp = entry.getValue();
-            builder.addPart(entry.getKey(), new FileBody(temp, ContentType.APPLICATION_OCTET_STREAM, temp.getName()));
+            builder.addPart(entry.getKey(), new FileBody(temp, ContentType.MULTIPART_FORM_DATA, temp.getName()));
         }
 
         // 设置参数
