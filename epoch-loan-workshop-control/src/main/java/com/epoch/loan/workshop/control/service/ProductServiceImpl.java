@@ -402,7 +402,6 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             // 新贷开量产品
             if (loanProductEntity.getIsOpen() == 1){
                 productList.setButton(OrderUtils.button(OrderStatus.CREATE));
-                productList.setOrderStatus(OrderStatus.CREATE);
                 newLoanAndOpenProductList.add(productList);
                 // 移除
                 productMap.remove(productId);
@@ -449,17 +448,9 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 Integer cdDays = productEntity.getCdDays();
                 Date updateTime = lastOrder.getUpdateTime();
                 Date nowDate = new Date();
-                int intervalDays = DateUtil.getIntervalDays(nowDate, updateTime);
 
-                // 格式化时间判断是否是当天的订单
-                if (OrderUtils.isCdWithTime(cdDays, updateTime)) {
-                    // 封装结果
-                    result.setReturnCode(ResultEnum.COOLING_PERIOD.code());
-                    result.setMessage(ResultEnum.COOLING_PERIOD.message());
-                    return result;
-                }
                 // 已过冷却期
-                if (intervalDays >= cdDays){
+                if (OrderUtils.isCdWithTime(cdDays, updateTime)) {
                     productList.setButton(OrderUtils.button(OrderStatus.CREATE));
                     productList.setOrderStatus(OrderStatus.CREATE);
                     newCreateProductList.add(productList);
@@ -467,8 +458,8 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 }
 
                 // 未过冷却期
-                productList.setButton(OrderUtils.button(OrderStatus.CREATE));
-                productList.setOrderStatus(OrderStatus.CREATE);
+                productList.setButton(OrderUtils.button(OrderStatus.EXAMINE_FAIL));
+                productList.setOrderStatus(OrderStatus.EXAMINE_FAIL);
                 examineFailOrderProductList.add(productList);
                 continue;
             }
