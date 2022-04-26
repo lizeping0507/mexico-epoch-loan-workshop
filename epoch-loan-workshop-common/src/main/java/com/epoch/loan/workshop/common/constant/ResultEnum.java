@@ -173,21 +173,6 @@ public enum ResultEnum {
      */
     INF_MOBILE_CERTIFIED_OTHER_ERROR(6017, "La información de certificación de la cuenta principal no satisfacen los requisitos que exigen la cuenta principal"),
 
-    /**
-     * 与风控交互出错
-     */
-    LOAN_RISK_EACH_ERROR(6050, "Internal communication error"),
-
-    /**
-     * CURP校验失败
-     */
-    RFC_CHECK_CURP_ERROR(6051, "CURP verification failed"),
-
-    /**
-     * 无可用聚道
-     */
-    CHANNEL_UN_DO_ERROR(6100, "No polyway available"),
-
     // 业务错误
     /**
      * 被拒
@@ -204,6 +189,20 @@ public enum ResultEnum {
      */
     COOLING_PERIOD(7002, "Cooling period"),
 
+    /**
+     * 与风控交互出错
+     */
+    LOAN_RISK_EACH_ERROR(9001, "Internal communication error"),
+
+    /**
+     * CURP校验失败
+     */
+    RFC_CHECK_CURP_ERROR(9002, "CURP verification failed"),
+
+    /**
+     * 无可用聚道
+     */
+    CHANNEL_UN_DO_ERROR(10000, "No polyway available"),
     ;
 
 
