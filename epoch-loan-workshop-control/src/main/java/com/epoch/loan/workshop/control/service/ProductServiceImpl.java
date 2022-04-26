@@ -398,7 +398,6 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             // 封装
             ProductList productList = new ProductList();
             BeansUtil.copyProperties(loanProductEntity,productList);
-            list.add(productList);
 
             // 新贷开量产品
             if (loanProductEntity.getIsOpen() == 1){
