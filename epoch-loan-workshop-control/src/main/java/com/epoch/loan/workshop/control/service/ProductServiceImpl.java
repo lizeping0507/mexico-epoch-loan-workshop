@@ -6,7 +6,6 @@ import com.epoch.loan.workshop.common.entity.mysql.*;
 import com.epoch.loan.workshop.common.lock.UserProductDetailLock;
 import com.epoch.loan.workshop.common.params.User;
 import com.epoch.loan.workshop.common.params.params.BaseParams;
-import com.epoch.loan.workshop.common.params.params.request.AppMaskModelParams;
 import com.epoch.loan.workshop.common.params.params.request.ProductDetailParams;
 import com.epoch.loan.workshop.common.params.params.request.ProductRecommendListParams;
 import com.epoch.loan.workshop.common.params.params.result.*;
@@ -84,9 +83,6 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         // 订单审核模型
         String orderModelGroup = loanProductEntity.getOrderModelGroup();
 
-        // 更新GPS信息(userInfo实时)
-        updateUserGpsMsg(userId, params.getGps(), params.getGpsAddress());
-
         // 初始化订单
         LoanOrderEntity loanOrderEntity = initOrder(params.getUser(), OrderType.LOAN, appVersion, appName, orderModelGroup, loanProductEntity);
 
@@ -138,7 +134,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
      * @throws Exception 请求异常
      */
     @Override
-    public Result<AppMaskModelResult> appMaskModel(AppMaskModelParams params) throws Exception {
+    public Result<AppMaskModelResult> appMaskModel(BaseParams params) throws Exception {
         // 结果集
         Result<AppMaskModelResult> result = new Result<>();
         AppMaskModelResult appMaskModelResult = new AppMaskModelResult();
@@ -153,10 +149,6 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
         // App版本
         String appVersion = params.getAppVersion();
-
-        // 更新GPS信息(userInfo实时)
-        updateUserGpsMsg(params.getUser().getUserInfoId(), params.getGps(), params.getGpsAddress());
-        tokenManager.updateUserCache(userId);
 
         // 初始化金额
         appMaskModelResult.setAmount("10000");

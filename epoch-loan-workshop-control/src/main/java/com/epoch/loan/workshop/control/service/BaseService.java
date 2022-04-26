@@ -146,17 +146,4 @@ public class BaseService {
      */
     @Autowired
     public TokenManager tokenManager;
-
-
-    /**
-     * 更新gps信息
-     *
-     * @param userId
-     * @param gps
-     * @param gpsAddress
-     */
-    protected void updateUserGpsMsg(String userId, String gps, String gpsAddress) {
-        loanUserInfoDao.updateUserGpsMsg(userId, gps, gpsAddress, new Date());
-        tokenManager.updateUserCache(userId);
-    }
 }

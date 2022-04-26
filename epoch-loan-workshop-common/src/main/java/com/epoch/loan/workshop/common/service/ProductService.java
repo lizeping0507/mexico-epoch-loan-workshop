@@ -28,7 +28,7 @@ public interface ProductService {
      * @return Result
      * @throws Exception 请求异常
      */
-    Result<AppMaskModelResult> appMaskModel(AppMaskModelParams params) throws Exception;
+    Result<AppMaskModelResult> appMaskModel(BaseParams params) throws Exception;
 
     /**
      * 产品列表

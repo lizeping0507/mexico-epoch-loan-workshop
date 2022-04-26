@@ -667,7 +667,6 @@ public class UserServiceImpl extends BaseService implements UserService {
         userInfoById.setBackPath(backPath);
         userInfoById.setBackPath(facePath);
 
-        // TODO 需要与风控核对拉取原始数据所需字段
         // 处理扫描识别的证件信息和RFC，保存用户基本信息
         if (ObjectUtils.isNotEmpty(frontInfo)) {
             userInfoById.setPostalCode(frontInfo.getPostalCode());
@@ -681,6 +680,11 @@ public class UserServiceImpl extends BaseService implements UserService {
             userInfoById.setRfc(rfc);
             userInfoById.setPapersAge(frontInfo.getAge());
             userInfoById.setPapersDateOfBirth(frontInfo.getBirthday());
+            userInfoById.setCustomName(params.getName());
+            userInfoById.setCustomFatherName(params.getFatherName());
+            userInfoById.setCustomMotherName(params.getMotherName());
+            userInfoById.setCustomFullName(params.getFatherName() + " " + params.getName() + " " + params.getMotherName());
+            userInfoById.setCurp(params.getCurp());
         }
         loanUserInfoDao.update(userInfoById);
 

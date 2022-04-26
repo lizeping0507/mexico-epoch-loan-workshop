@@ -195,6 +195,11 @@ public class LoanUserInfoEntity {
     private String customName;
 
     /**
+     * 身份证号
+     */
+    private String curp;
+
+    /**
      * 用户图片文件保存桶名
      */
     private String userFileBucketName;
