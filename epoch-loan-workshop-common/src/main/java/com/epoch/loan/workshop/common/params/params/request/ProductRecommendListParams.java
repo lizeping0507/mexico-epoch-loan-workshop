@@ -14,23 +14,7 @@ import lombok.Data;
 public class ProductRecommendListParams extends BaseParams {
 
     /**
-     * 用户id
-     */
-    private Long userId;
-
-    /**
-     * 类型
-     */
-    private Integer type;
-
-    /**
      * 产品id
      */
-    private Long productId;
-
-    /**
-     *
-     */
-    private Integer tag;
-
+    private String productId;
 }

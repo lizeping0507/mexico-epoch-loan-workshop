@@ -1,7 +1,7 @@
 package com.epoch.loan.workshop.common.params.params.result;
 
+import com.epoch.loan.workshop.common.params.params.result.model.ProductList;
 import lombok.Data;
-
 import java.io.Serializable;
 import java.util.List;
 
@@ -15,5 +15,5 @@ import java.util.List;
 @Data
 public class ProductRecommendResult implements Serializable {
 
-    private List<ProductRecommendListResult> list;
+    private List<ProductList> list;
 }
