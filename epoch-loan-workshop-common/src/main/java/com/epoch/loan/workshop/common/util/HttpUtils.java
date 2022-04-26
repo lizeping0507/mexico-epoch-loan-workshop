@@ -810,7 +810,7 @@ public class HttpUtils {
         HttpPost post = new HttpPost(url);
 
         // Httpbody体 boundary分隔符
-        String boundary = "----" + System.currentTimeMillis() + "----";
+        String boundary = "----------ThIs_Is_tHe_bouNdaRY_$";
 
         // 设置超时时间
         post.setConfig(buildRequestConfig());
@@ -822,7 +822,6 @@ public class HttpUtils {
                 post.setHeader(key, heardMap.get(key));
             }
         }
-        post.setHeader(HTTP.USER_AGENT, USER_AGENT);
 
         // 创建一个多参数的builder
         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
