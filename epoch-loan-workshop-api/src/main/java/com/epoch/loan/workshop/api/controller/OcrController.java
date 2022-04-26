@@ -96,7 +96,7 @@ public class OcrController extends BaseController {
 
         try {
             // 验证请求参数是否合法
-            if (params.isLivenessIdLegal()) {
+            if (!params.isLivenessIdLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
                 result.setMessage(ResultEnum.PARAM_ERROR.message() + ":livenessId");
@@ -221,7 +221,7 @@ public class OcrController extends BaseController {
 
         try {
             // 验证请求参数是否合法
-            if (params.isImageTypeLegal()) {
+            if (!params.isImageTypeLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
                 result.setMessage(ResultEnum.PARAM_ERROR.message() + ":imageType");

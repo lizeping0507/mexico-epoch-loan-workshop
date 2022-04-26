@@ -105,18 +105,15 @@ public class OcrServiceImpl extends BaseService implements OcrService {
         param.put(OcrField.ADVANCE_APP_ID_KEY, appPackageName);
         param.put(OcrField.ADVANCE_LICENSE_EFFECTIVE_SECONDS, OcrField.ADVANCE_LICENSE_SECONDS);
 
-        LogUtil.sysInfo("advance发送请求：url:{} param:{} , hearder:{}",licenseUrl,param.toString(),headers.toString());
-
         // 发送请求
         String response = HttpUtils.POST_WITH_HEADER_NOCHARSET(licenseUrl, JSON.toJSONString(param), headers);
-        LogUtil.sysInfo("advance响应结果：{}",response);
         if (StringUtils.isBlank(response)) {
             result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
             result.setMessage(ResultEnum.SYSTEM_ERROR.message());
             return result;
         }
         AdvanceLicenseResult licenseResult = JSONObject.parseObject(response, AdvanceLicenseResult.class);
-        LogUtil.sysInfo("advance licenseResult响应结果：{}",licenseResult.toString());
+
         // 日志写入Elastic
         OcrLivingDetectionLogElasticEntity livingDetectionLog = new OcrLivingDetectionLogElasticEntity();
         BeanUtils.copyProperties(licenseResult, livingDetectionLog);
@@ -250,7 +247,6 @@ public class OcrServiceImpl extends BaseService implements OcrService {
         // 查询渠道列表
         // 随机范围 = 渠道权重和
         int range = providerConfigList.stream().mapToInt(LoanOcrProviderConfig::getProportion).sum();
-        LogUtil.sysInfo("providerConfig range:{}", range);
         if (range == 0) {
             return null;
         }
@@ -258,7 +254,6 @@ public class OcrServiceImpl extends BaseService implements OcrService {
         // 取随机数
         Random random = new Random();
         int randomNum = random.nextInt(range) + 1;
-        LogUtil.sysInfo("providerConfig randomNum:{}", randomNum);
 
         // 选择渠道
         int start = 0;
@@ -270,7 +265,6 @@ public class OcrServiceImpl extends BaseService implements OcrService {
             }
             start += proportion;
         }
-        LogUtil.sysInfo("providerConfig res:{}", res);
 
         return res;
     }
