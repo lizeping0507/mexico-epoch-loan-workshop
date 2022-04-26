@@ -190,6 +190,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             // 没有通过 返回结果
             appMaskModelResult.setMaskModel(3);
             appMaskModelResult.setButton(OrderUtils.button(OrderStatus.CREATE));
+            appMaskModelResult.setStatusDescription(OrderUtils.statusDescription(OrderStatus.CREATE));
             result.setData(appMaskModelResult);
             return result;
         }
@@ -222,6 +223,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                     // 当天订单不允许再次进行申请
                     appMaskModelResult.setMaskModel(2);
                     appMaskModelResult.setButton(OrderUtils.button(OrderStatus.EXAMINE_FAIL));
+                    appMaskModelResult.setStatusDescription(OrderUtils.statusDescription(OrderStatus.EXAMINE_FAIL));
                     result.setData(appMaskModelResult);
                     return result;
                 }
@@ -251,7 +253,8 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             // 返回结果集
             appMaskModelResult.setMaskModel(0);
             appMaskModelResult.setButton(OrderUtils.button(orderStatus));
-            appMaskModelResult.setOrderNo(loanOrderEntity.getId());
+            appMaskModelResult.setStatusDescription(OrderUtils.statusDescription(orderStatus));
+            appMaskModelResult.setOrderId(loanOrderEntity.getId());
             appMaskModelResult.setOrderStatus(orderStatus);
             result.setData(appMaskModelResult);
             return result;
@@ -261,7 +264,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         LoanOrderEntity loanOrderEntity = loanOrderEntityList.get(0);
 
         // 订单编号
-        String orderNo = loanOrderEntity.getId();
+        String orderId = loanOrderEntity.getId();
 
         // 订单状态
         Integer orderStatus = loanOrderEntity.getStatus();
@@ -283,7 +286,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             // 返回结果
             appMaskModelResult.setMaskModel(1);
             appMaskModelResult.setButton(OrderUtils.button(orderStatus));
-            appMaskModelResult.setOrderNo(orderNo);
+            appMaskModelResult.setOrderId(orderId);
             appMaskModelResult.setOrderStatus(orderStatus);
             result.setData(appMaskModelResult);
             return result;
@@ -291,13 +294,22 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
         // 如果订单处于在途或者在途之后的状态那么金额就为预计还款金额
         if (orderStatus >= OrderStatus.WAY) {
-            appMaskModelResult.setAmount(String.valueOf(loanOrderEntity.getEstimatedRepaymentAmount()));
+            // 查询最早一期没还款的账单
+            Integer[] statusArray = {OrderBillStatus.WAY, OrderBillStatus.DUE};
+            LoanOrderBillEntity loanOrderBillEntity = loanOrderBillDao.findOrderBillFastStagesByStatusAndOrderId(orderId, statusArray);
+
+            // 还款时间
+            appMaskModelResult.setRepaymentTime(DateUtil.DateToString(loanOrderBillEntity.getRepaymentTime(), "yyyy-MM-dd"));
+
+            // 应还金额
+            appMaskModelResult.setAmount(String.valueOf(loanOrderBillEntity.getRepaymentAmount() - loanOrderBillEntity.getReductionAmount()));
         }
 
         // 返回结果
         appMaskModelResult.setMaskModel(0);
         appMaskModelResult.setButton(OrderUtils.button(orderStatus));
-        appMaskModelResult.setOrderNo(orderNo);
+        appMaskModelResult.setStatusDescription(OrderUtils.statusDescription(orderStatus));
+        appMaskModelResult.setOrderId(orderId);
         appMaskModelResult.setOrderStatus(orderStatus);
         result.setData(appMaskModelResult);
         return result;

@@ -236,4 +236,13 @@ public interface LoanOrderBillDao {
      * @return
      */
     LoanOrderBillEntity findLastOrderBill(String orderId);
+
+    /**
+     * 查询指定状态订单并只返回最早的一期账单
+     *
+     * @param orderId
+     * @param statusArray
+     * @return
+     */
+    LoanOrderBillEntity findOrderBillFastStagesByStatusAndOrderId(String orderId, @Param("array") Integer[] statusArray);
 }

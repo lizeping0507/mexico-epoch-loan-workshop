@@ -1,6 +1,7 @@
 package com.epoch.loan.workshop.common.params.params.result;
 
 import lombok.Data;
+
 import java.io.Serializable;
 
 /**
@@ -44,14 +45,24 @@ public class AppMaskModelResult implements Serializable {
     private String amount;
 
     /**
+     * 还款时间
+     */
+    private String repaymentTime;
+
+    /**
      * 按钮文案
      */
     private String button;
 
     /**
+     * 状态描述
+     */
+    private String statusDescription;
+
+    /**
      * 订单号
      */
-    private String orderNo;
+    private String orderId;
 
     /**
      * 订单状态
