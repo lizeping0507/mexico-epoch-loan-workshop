@@ -119,4 +119,13 @@
     <select id="findLastOrderBill" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanOrderBillEntity">
         SELECT * FROM loan_order_bill WHERE order_id=#{orderId} order by stages desc limit 0,1
     </select>
+    <select id="findOrderBillFastStagesByStatusAndOrderId"
+            resultType="com.epoch.loan.workshop.common.entity.mysql.LoanOrderBillEntity">
+        SELECT * FROM loan_order_bill
+        WHERE order_id=#{orderId}
+        <foreach collection="array" item="statu" index="index" open="AND status IN(" close=")" separator=",">#{statu}
+        </foreach>
+        ORDER BY stages ASC
+        LIMIT 0,1
+    </select>
 </mapper>

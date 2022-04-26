@@ -99,6 +99,41 @@ public class OrderUtils {
         // 根据订单状态获取按钮文案
         switch (orderStatus) {
             case OrderStatus.CREATE:
+                return "Aplicar ahora";
+            case OrderStatus.EXAMINE_WAIT:
+                return "Ver detalles";
+            case OrderStatus.EXAMINE_PASS:
+                return "obtener el dinero";
+            case OrderStatus.EXAMINE_FAIL:
+                return "Ver detalles";
+            case OrderStatus.WAIT_PAY:
+                return "Ver detalles";
+            case OrderStatus.WAY:
+                return "Ir a reembolsar";
+            case OrderStatus.DUE:
+                return "Ir a reembolsar";
+            case OrderStatus.COMPLETE:
+                return "Aplicar ahora";
+            case OrderStatus.DUE_COMPLETE:
+                return "Aplicar ahora";
+            case OrderStatus.ABANDONED:
+                return "Aplicar ahora";
+            default:
+                return "";
+        }
+    }
+
+
+    /**
+     * 状态描述文案
+     *
+     * @param orderStatus 订单状态
+     * @return 按钮文案
+     */
+    public static String statusDescription(Integer orderStatus) {
+        // 根据订单状态获取按钮文案
+        switch (orderStatus) {
+            case OrderStatus.CREATE:
                 return "Pagado";
             case OrderStatus.EXAMINE_WAIT:
                 return "Bajo revisión";
