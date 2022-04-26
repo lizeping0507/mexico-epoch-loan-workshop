@@ -118,7 +118,8 @@ public class OrderUtils {
                 return "Pagado";
             case OrderStatus.ABANDONED:
                 return "Pagado";
+            default:
+                return "";
         }
-        return "";
     }
 }

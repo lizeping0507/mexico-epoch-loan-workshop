@@ -117,7 +117,12 @@ public class LoanProductEntity {
     private String amountRange;
 
     /**
-     * 是否续贷开量
+     * 是否开量
+     */
+    private String icon;
+
+    /**
+     * 是否开量
      */
     private Integer isOpen;
 }

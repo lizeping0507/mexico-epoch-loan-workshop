@@ -5,4 +5,7 @@
     <select id="findProduct" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanProductEntity">
         SELECT * FROM loan_product WHERE id=#{id} LIMIT 0,1
     </select>
+    <select id="findAll" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanProductEntity">
+        SELECT * FROM loan_product
+    </select>
 </mapper>

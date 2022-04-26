@@ -3,6 +3,8 @@ package com.epoch.loan.workshop.common.dao.mysql;
 import com.epoch.loan.workshop.common.entity.mysql.LoanProductEntity;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 /**
  * @author : Duke
  * @packageName : com.epoch.loan.workshop.common.dao.mysql
@@ -20,4 +22,11 @@ public interface LoanProductDao {
      * @return
      */
     LoanProductEntity findProduct(String id);
+
+    /**
+     * 查询所有产品
+     *
+     * @return
+     */
+    List<LoanProductEntity> findAll();
 }
