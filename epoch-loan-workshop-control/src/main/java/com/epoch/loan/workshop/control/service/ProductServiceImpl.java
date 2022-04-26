@@ -350,6 +350,11 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         // 用户id
         String userId = params.getUser().getId();
 
+        // 是否有过放款成功
+        int[] statues = {OrderStatus.WAY,OrderStatus.DUE,OrderStatus.COMPLETE,OrderStatus.DUE_COMPLETE};
+        Integer integer = loanOrderDao.countUserOrderByAppInStatus(userId, params.getAppName(), statues);
+        boolean hasPaymentOrder = integer > 0;
+
         // 查询所有产品
         List<LoanProductEntity> products = loanProductDao.findAll();
         Map<String, LoanProductEntity> productMap = new HashMap<>();
@@ -364,16 +369,16 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         otherLoanMaskList.parallelStream().forEach(loanMask -> productMap.remove(loanMask.getProductId()));
 
         /*所有待还款订单*/
-        productListQuery(waitRepaymentOrderProductList, userId, productMap, OrderStatus.WAY, OrderStatus.DUE);
+        productListQuery(waitRepaymentOrderProductList, userId, productMap, false, OrderStatus.WAY, OrderStatus.DUE);
 
         /*审核通过的产品*/
-        productListQuery(examinePassOrderProductList, userId, productMap, OrderStatus.EXAMINE_PASS);
+        productListQuery(examinePassOrderProductList, userId, productMap, false, OrderStatus.EXAMINE_PASS);
 
         /*审核中或放款中且开量产品*/
-        productListQuery(examineWaitOrWaitPayOrderProductList, userId, productMap, OrderStatus.EXAMINE_WAIT, OrderStatus.WAIT_PAY);
+        productListQuery(examineWaitOrWaitPayOrderProductList, userId, productMap, false, OrderStatus.EXAMINE_WAIT, OrderStatus.WAIT_PAY);
 
         /*新建且开量产品*/
-        productListQuery(newCreateProductList, userId, productMap, OrderStatus.CREATE);
+        productListQuery(newCreateProductList, userId, productMap, hasPaymentOrder, OrderStatus.CREATE);
 
         LogUtil.sysInfo("productMap : {}", JSONObject.toJSONString(productMap));
 
@@ -391,8 +396,13 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             ProductList productList = new ProductList();
             BeansUtil.copyProperties(loanProductEntity,productList);
 
+
             // 新贷开量产品
             if (loanProductEntity.getIsOpen() == 1){
+                // 如果用户在本包没有放款成功记录 不展示通过率
+                if(!hasPaymentOrder){
+                    productList.setPassRate("");
+                }
                 productList.setButton(OrderUtils.button(OrderStatus.CREATE));
                 newLoanAndOpenProductList.add(productList);
                 // 移除
@@ -402,6 +412,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
             // 关量产品
             if (loanProductEntity.getIsOpen() == 0){
+                productList.setPassRate("");
                 productList.setButton("Full");
                 productList.setOrderStatus(OrderStatus.CREATE);
                 closeProductList.add(productList);
@@ -427,7 +438,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             ProductList productList = new ProductList();
             BeansUtil.copyProperties(productEntity, productList);
 
-            // 续贷
+            // 续贷 必定展示通过率
             if (status == OrderStatus.COMPLETE || status == OrderStatus.DUE_COMPLETE) {
                 productList.setButton(OrderUtils.button(status));
                 productList.setOrderStatus(status);
@@ -442,6 +453,10 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
                 // 已过冷却期
                 if (OrderUtils.isCdWithTime(cdDays, updateTime)) {
+                    // 如果用户在本包没有放款成功记录 不展示通过率
+                    if(!hasPaymentOrder){
+                        productList.setPassRate("");
+                    }
                     productList.setButton(OrderUtils.button(OrderStatus.CREATE));
                     productList.setOrderStatus(OrderStatus.CREATE);
                     newCreateProductList.add(productList);
@@ -449,6 +464,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 }
 
                 // 未过冷却期
+                productList.setPassRate("");
                 productList.setButton(OrderUtils.button(OrderStatus.EXAMINE_FAIL));
                 productList.setOrderStatus(OrderStatus.EXAMINE_FAIL);
                 examineFailOrderProductList.add(productList);
@@ -456,6 +472,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             }
 
             // 剩余产品认为是关量产品
+            productList.setPassRate("");
             productList.setButton("Full");
             productList.setOrderStatus(OrderStatus.CREATE);
             closeProductList.add(productList);
@@ -499,7 +516,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
      * @param productMap
      * @param status
      */
-    private void productListQuery(List<ProductList> list, String userId, Map<String, LoanProductEntity> productMap, Integer ... status) {
+    private void productListQuery(List<ProductList> list, String userId, Map<String, LoanProductEntity> productMap, boolean showPassRate, Integer ... status) {
         List<LoanOrderEntity> waitRepaymentOrderList = loanOrderDao.findOrderListByUserIdAndStatusAndOrderByField(userId, status, OrderByField.CREATE_TIME,OrderByField.ASC);
         for (LoanOrderEntity loanOrderEntity : waitRepaymentOrderList) {
             String productId = loanOrderEntity.getProductId();
@@ -508,6 +525,11 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             // 封装
             ProductList productList = new ProductList();
             BeansUtil.copyProperties(loanProductEntity,productList);
+
+            // 如果用户在本包没有放款成功记录 不展示通过率
+            if(!showPassRate){
+                productList.setPassRate("");
+            }
             productList.setButton(OrderUtils.button(loanOrderEntity.getStatus()));
             productList.setOrderStatus(loanOrderEntity.getStatus());
             productList.setOrderNo(loanOrderEntity.getId());

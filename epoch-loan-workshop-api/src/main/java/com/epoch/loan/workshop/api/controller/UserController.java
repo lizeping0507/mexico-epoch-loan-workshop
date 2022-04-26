@@ -354,30 +354,6 @@ public class UserController extends BaseController {
                 result.setMessage(ResultEnum.PARAM_ERROR.message() + ":LoanPurpose");
                 return result;
             }
-            if (!params.isCustomFatherNameLegal()) {
-                // 异常返回结果
-                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":CustomFatherName");
-                return result;
-            }
-            if (!params.isCustomFullNameLegal()) {
-                // 异常返回结果
-                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":CustomFullName");
-                return result;
-            }
-            if (!params.isCustomMotherNameLegal()) {
-                // 异常返回结果
-                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":CustomMotherName");
-                return result;
-            }
-            if (!params.isCustomNameLegal()) {
-                // 异常返回结果
-                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":CustomName");
-                return result;
-            }
             // 获取个人信息
             return userService.saveUserBasicInfo(params);
         } catch (Exception e) {

@@ -30,15 +30,50 @@ public class SdkController extends BaseController {
      * @return 上传结果
      */
     @PostMapping(URL.SDK_UPLOAD_CALLBACK)
-    public Result<Object> sdkPuloadCallBack(SdkUploadParams params) {
+    public Result<Object> sdkUploadCallBack(SdkUploadParams params) {
         // 结果集
         Result<Object> result = new Result<>();
 
         try {
+            // 验证请求参数是否合法
+            if (!params.isOrderNoLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":orderNo");
+                return result;
+            }
 
-            return sdkService.sdkPuloadCallBack(params);
+            if (!params.isReportStatusLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":reportStatus");
+                return result;
+            }
+
+            if (!params.isCodeLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":code");
+                return result;
+            }
+
+            if (!params.isMessageLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":message");
+                return result;
+            }
+
+            if (!params.isTypeLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":type");
+                return result;
+            }
+
+            return sdkService.sdkUploadCallBack(params);
         } catch (Exception e) {
-            LogUtil.sysError("[SdkController sdkPuloadCallBack]", e);
+            LogUtil.sysError("[SdkController sdkUploadCallBack]", e);
 
             // 异常返回结果
             result.setEx(ThrowableUtils.throwableToString(e));
