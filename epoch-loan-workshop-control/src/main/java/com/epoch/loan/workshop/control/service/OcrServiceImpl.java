@@ -103,6 +103,7 @@ public class OcrServiceImpl extends BaseService implements OcrService {
         HashMap<String, String> param = Maps.newHashMap();
         param.put(OcrField.ADVANCE_APP_ID_KEY, appPackageName);
         param.put(OcrField.ADVANCE_LICENSE_EFFECTIVE_SECONDS, OcrField.ADVANCE_LICENSE_SECONDS);
+        LogUtil.sysInfo("advance发送请求：url:{} param:{} , hearder:{}",licenseUrl,param.toString(),headers.toString());
 
         // 发送请求
         String response = HttpUtils.POST_WITH_HEADER(licenseUrl, param, headers);
@@ -124,8 +125,6 @@ public class OcrServiceImpl extends BaseService implements OcrService {
         livingDetectionLog.setUserId(userId);
         livingDetectionLog.setCreateTime(new Date());
         ocrLivingDetectionLogElasticDao.save(livingDetectionLog);
-
-        LogUtil.sysInfo("advance 日志上传");
 
         // 判断是否请求成功
         String code = licenseResult.getCode();
