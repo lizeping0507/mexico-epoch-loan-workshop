@@ -481,6 +481,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         }
 
         // 组装列表
+        LogUtil.sysInfo("list 1:  {}", list);
         list.addAll(waitRepaymentOrderProductList);
         list.addAll(reloanOrderProductList);
         list.addAll(examinePassOrderProductList);
@@ -489,6 +490,16 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         list.addAll(examineWaitOrWaitPayOrderProductList);
         list.addAll(closeProductList);
         list.addAll(examineFailOrderProductList);
+        LogUtil.sysInfo("list 2:  {}", list);
+
+        LogUtil.sysInfo("waitRepaymentOrderProductList:  {}", waitRepaymentOrderProductList);
+        LogUtil.sysInfo("reloanOrderProductList:  {}", reloanOrderProductList);
+        LogUtil.sysInfo("examinePassOrderProductList:  {}", examinePassOrderProductList);
+        LogUtil.sysInfo("newCreateProductList:  {}", newCreateProductList);
+        LogUtil.sysInfo("newLoanAndOpenProductList:  {}", newLoanAndOpenProductList);
+        LogUtil.sysInfo("examineWaitOrWaitPayOrderProductList:  {}", examineWaitOrWaitPayOrderProductList);
+        LogUtil.sysInfo("closeProductList:  {}", closeProductList);
+        LogUtil.sysInfo("examineFailOrderProductList:  {}", examineFailOrderProductList);
 
         // 封装结果
         ProductListResult productListResult = new ProductListResult();
