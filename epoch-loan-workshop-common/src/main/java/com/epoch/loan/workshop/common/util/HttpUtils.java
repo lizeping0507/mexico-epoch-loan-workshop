@@ -829,11 +829,12 @@ public class HttpUtils {
         // 设置基本参数
         builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
         builder.setBoundary(boundary);
+        builder.setContentType(ContentType.MULTIPART_FORM_DATA);
         builder.setCharset(UTF_8);
 
         // 设置form表单参数
         for (Entry<String, String> entry : params.entrySet()) {
-            builder.addPart(entry.getKey(), new StringBody(entry.getValue(), ContentType.TEXT_PLAIN.withCharset(UTF_8)));
+            builder.addPart(entry.getKey(), new StringBody(entry.getValue(), UTF_8));
         }
 
         // 设置文件参数
