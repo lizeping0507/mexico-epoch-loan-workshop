@@ -25,6 +25,9 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.http.protocol.HTTP;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Example;
+import org.thymeleaf.standard.expression.Each;
+import sun.rmi.runtime.Log;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -809,6 +812,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         fileMap.put("image", convertToFile(params.getImageData()));
 
         // 发送请求
+        LogUtil.sysInfo("advance获取证件信息请求参数：param：{} , heardMap: {}",paramMap.toString(),heardMap.toString());
         String resultStr = HttpUtils.POST_WITH_HEADER_FORM_FILE(cardInfoUrl, paramMap, heardMap, fileMap);
         LogUtil.sysInfo("advance获取证件信息,url {} , result: {}", cardInfoUrl, resultStr);
 

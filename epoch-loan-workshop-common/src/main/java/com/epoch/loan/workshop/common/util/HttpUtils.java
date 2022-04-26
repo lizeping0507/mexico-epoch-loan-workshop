@@ -810,7 +810,7 @@ public class HttpUtils {
         HttpPost post = new HttpPost(url);
 
         // Httpbody体 boundary分隔符
-        String boundary = "----ThIs_Is_tHe_bouNdaRY_$----";
+        String boundary = "----------ThIs_Is_tHe_bouNdaRY_$";
 
         // 设置超时时间
         post.setConfig(buildRequestConfig());
