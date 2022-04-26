@@ -383,8 +383,11 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         /*新建且开量产品*/
         productListQuery(newCreateProductList, userId, productMap, OrderStatus.CREATE);
 
+        LogUtil.sysInfo("productMap : {}", JSONObject.toJSONString(productMap));
+
         // 查询无订单产品
         List<LoanProductEntity> withoutUserOrderProductList = loanProductDao.findProductWithoutUserOrder(userId);
+        LogUtil.sysInfo("withoutUserOrderProductList : {}", JSONObject.toJSONString(withoutUserOrderProductList));
         for (LoanProductEntity loanProduct : withoutUserOrderProductList) {
             String productId = loanProduct.getId();
             LoanProductEntity loanProductEntity = productMap.get(productId);
@@ -416,11 +419,13 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             // 移除
             productMap.remove(productId);
         }
+        LogUtil.sysInfo("productMap : {}", JSONObject.toJSONString(productMap));
 
         // 查询剩余产品 最后一笔订单
         for (Map.Entry<String, LoanProductEntity> entry : productMap.entrySet()) {
             LoanProductEntity productEntity = entry.getValue();
             String productId = productEntity.getId();
+            LogUtil.sysInfo("productEntity : {}", JSONObject.toJSONString(productEntity));
 
             // 查询用户在该产品最后一笔订单
             LoanOrderEntity lastOrder = loanOrderDao.findUserLastOrderWithProduct(userId, productId);
