@@ -869,6 +869,7 @@ public class UserServiceImpl extends BaseService implements UserService {
 
     private File convertToFile(byte[] byteFile) {
         String objectId = ObjectIdUtil.getObjectId();
+        LogUtil.sysInfo("objectId: {}", objectId );
         String newFilePath = "/tmp/" + objectId;
 
         File file = new File(newFilePath);
