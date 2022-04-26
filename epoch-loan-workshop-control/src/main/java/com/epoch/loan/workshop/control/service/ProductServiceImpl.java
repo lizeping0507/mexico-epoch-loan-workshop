@@ -523,7 +523,9 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         for (LoanOrderEntity loanOrderEntity : waitRepaymentOrderList) {
             String productId = loanOrderEntity.getProductId();
             LoanProductEntity loanProductEntity = productMap.get(productId);
-
+            if (ObjectUtils.isEmpty(loanProductEntity)){
+                continue;
+            }
             // 封装
             ProductList productList = new ProductList();
             BeansUtil.copyProperties(loanProductEntity,productList);
