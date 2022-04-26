@@ -117,7 +117,7 @@ public class AdvanceOcrFrontInfoResult implements Serializable {
     /**
      * 年龄
      */
-    private String age;
+    private Integer age;
 
     /**
      * 市政府编号

@@ -221,7 +221,7 @@ public class RiskMask extends BaseOrderMQListener implements MessageListenerConc
             LoanUserInfoEntity loanUserInfoEntity = loanUserInfoDao.findUserInfoById(userId);
 
             // 年龄
-            Integer age = loanUserInfoEntity.getAge();
+            Integer age = loanUserInfoEntity.getPapersAge();
 
             // 手机号
             String mobile = loanUserInfoEntity.getMobile();

@@ -383,12 +383,6 @@ public class URL {
     public static final String USER_OCR_INFO = "/userOcrInfo";
 
     /**
-     * uv统计
-     */
-    public static final String UV = "/uv";
-
-
-    /**
      * 发起
      */
     public static final String PREPAY = "/prepay";

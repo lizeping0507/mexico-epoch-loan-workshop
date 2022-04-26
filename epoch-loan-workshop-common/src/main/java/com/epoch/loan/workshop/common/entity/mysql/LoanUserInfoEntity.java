@@ -90,11 +90,6 @@ public class LoanUserInfoEntity {
     private String email;
 
     /**
-     * 年龄
-     */
-    private Integer age;
-
-    /**
      * 学历
      */
     private String education;
@@ -162,7 +157,7 @@ public class LoanUserInfoEntity {
     /**
      * INE/IFE 年龄
      */
-    private String papersAge;
+    private Integer papersAge;
 
     /**
      * INE/IFE 出生日期
