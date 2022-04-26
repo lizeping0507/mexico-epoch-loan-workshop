@@ -185,6 +185,11 @@ public enum ResultEnum {
     DELIVERY_REJECTED_ERROR(7001, "delivery rejected"),
 
     /**
+     * 冷却期
+     */
+    COOLING_PERIOD(7002, "Cooling period"),
+
+    /**
      * 与风控交互出错
      */
     LOAN_RISK_EACH_ERROR(9001, "Internal communication error"),
