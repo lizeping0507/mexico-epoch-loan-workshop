@@ -831,7 +831,7 @@ public class HttpUtils {
 
         // 设置form表单参数
         for (Entry<String, String> entry : params.entrySet()) {
-            multipartEntity.addPart(entry.getKey(), new StringBody(entry.getValue(), ContentType.TEXT_PLAIN.withCharset(UTF_8)));
+            multipartEntity.addPart(entry.getKey(), new StringBody(entry.getValue(), Charset.forName("UTF-8")));
         }
 
         // 设置文件参数
