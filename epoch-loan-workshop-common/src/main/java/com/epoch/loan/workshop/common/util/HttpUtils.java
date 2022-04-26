@@ -2,6 +2,7 @@ package com.epoch.loan.workshop.common.util;
 
 
 import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.*;
@@ -838,8 +839,10 @@ public class HttpUtils {
 
 
         // 设置form表单参数
-        for (Entry<String, String> entry : params.entrySet()) {
-            builder.addPart(entry.getKey(), new StringBody(entry.getValue(), ContentType.TEXT_PLAIN.withCharset(UTF_8)));
+        if(MapUtils.isNotEmpty(params)) {
+            for (Entry<String, String> entry : params.entrySet()) {
+                builder.addPart(entry.getKey(), new StringBody(entry.getValue(), ContentType.TEXT_PLAIN.withCharset(UTF_8)));
+            }
         }
 
         // 设置文件参数

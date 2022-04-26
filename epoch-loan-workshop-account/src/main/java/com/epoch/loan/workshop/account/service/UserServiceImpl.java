@@ -1,6 +1,5 @@
 package com.epoch.loan.workshop.account.service;
 
-import cn.hutool.http.ContentType;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
@@ -26,9 +25,6 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.http.protocol.HTTP;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Example;
-import org.thymeleaf.standard.expression.Each;
-import sun.rmi.runtime.Log;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -811,9 +807,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         fileMap.put("image", convertToFile(params.getImageData()));
 
         // 发送请求
-        LogUtil.sysInfo("advance获取证件信息请求参数：param：{} , heardMap: {}",paramMap.toString(),heardMap.toString());
         String resultStr = HttpUtils.POST_WITH_HEADER_FORM_FILE(cardInfoUrl, paramMap, heardMap, fileMap);
-        LogUtil.sysInfo("advance获取证件信息,url {} , result: {}", cardInfoUrl, resultStr);
 
         // 释放文件
         for (Map.Entry<String, File> entry : fileMap.entrySet()) {
@@ -872,7 +866,6 @@ public class UserServiceImpl extends BaseService implements UserService {
 
     private File convertToFile(byte[] byteFile) {
         String objectId = ObjectIdUtil.getObjectId();
-        LogUtil.sysInfo("objectId: {}", objectId );
         String newFilePath = "/tmp/" + objectId;
 
         File file = new File(newFilePath);
