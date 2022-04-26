@@ -370,17 +370,60 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         // 过滤它包承接盘产品
         otherLoanMaskList.parallelStream().forEach(loanMask -> productMap.remove(loanMask.getProductId()));
 
-        /*所有待还款订单*/
-        productListQuery(waitRepaymentOrderProductList, userId, productMap, false, OrderStatus.WAY, OrderStatus.DUE);
+        Integer[] processStatus = {
+                OrderStatus.CREATE, OrderStatus.EXAMINE_WAIT, OrderStatus.EXAMINE_PASS,
+                OrderStatus.WAIT_PAY, OrderStatus.WAY, OrderStatus.DUE, OrderStatus.DUE
+        };
+        List<LoanOrderEntity> allProcessOrderList = loanOrderDao.findOrderListByUserIdAndStatusAndOrderByField(userId, processStatus, OrderByField.CREATE_TIME, OrderByField.ASC);
+        for (LoanOrderEntity loanOrderEntity : allProcessOrderList) {
+            Integer orderStatus = loanOrderEntity.getStatus();
+            String productId = loanOrderEntity.getProductId();
+            LoanProductEntity loanProductEntity = productMap.get(productId);
 
-        /*审核通过的产品*/
-        productListQuery(examinePassOrderProductList, userId, productMap, false, OrderStatus.EXAMINE_PASS);
+            // 跳过不存在产品 以及未开量产品
+            if (ObjectUtils.isEmpty(loanProductEntity) || loanProductEntity.getIsOpen() == 0) {
+                continue;
+            }
 
-        /*审核中或放款中且开量产品*/
-        productListQuery(examineWaitOrWaitPayOrderProductList, userId, productMap, false, OrderStatus.EXAMINE_WAIT, OrderStatus.WAIT_PAY);
+            // 封装
+            ProductList productList = new ProductList();
+            BeansUtil.copyProperties(loanProductEntity,productList);
+            productList.setPassRate("");
+            productList.setButton(OrderUtils.button(loanOrderEntity.getStatus()));
+            productList.setOrderStatus(loanOrderEntity.getStatus());
+            productList.setOrderNo(loanOrderEntity.getId());
 
-        /*新建且开量产品*/
-        productListQuery(newCreateProductList, userId, productMap, hasPaymentOrder, OrderStatus.CREATE);
+            // 通过订单状态加入对应列表
+            switch (orderStatus){
+                case OrderStatus.WAY:
+                case OrderStatus.DUE:
+                    // 待还款
+                    waitRepaymentOrderProductList.add(productList);
+                    break;
+                case OrderStatus.EXAMINE_PASS:
+                    // 审核通过的产品
+                    examinePassOrderProductList.add(productList);
+                    break;
+                case OrderStatus.EXAMINE_WAIT:
+                case OrderStatus.WAIT_PAY:
+                    // 审核中或放款中且开量产品
+                    examineWaitOrWaitPayOrderProductList.add(productList);
+                    break;
+                case OrderStatus.CREATE:
+                    // 新建且开量产品
+                    // 如果用户在本包没有放款成功记录 不展示通过率
+                    if(hasPaymentOrder){
+                        productList.setPassRate(loanProductEntity.getPassRate().toString());
+                    }
+                    newCreateProductList.add(productList);
+                    break;
+                default:
+                    break;
+            }
+
+            // 移除
+            productMap.remove(productId);
+        }
 
         LogUtil.sysInfo("productMap : {}", JSONObject.toJSONString(productMap));
 
@@ -510,40 +553,6 @@ public class ProductServiceImpl extends BaseService implements ProductService {
     }
 
     /**
-     * 查询并转换
-     *
-     * @param list
-     * @param userId
-     * @param productMap
-     * @param status
-     */
-    private void productListQuery(List<ProductList> list, String userId, Map<String, LoanProductEntity> productMap, boolean showPassRate, Integer ... status) {
-        List<LoanOrderEntity> waitRepaymentOrderList = loanOrderDao.findOrderListByUserIdAndStatusAndOrderByField(userId, status, OrderByField.CREATE_TIME,OrderByField.ASC);
-        for (LoanOrderEntity loanOrderEntity : waitRepaymentOrderList) {
-            String productId = loanOrderEntity.getProductId();
-            LoanProductEntity loanProductEntity = productMap.get(productId);
-            if (ObjectUtils.isEmpty(loanProductEntity)){
-                continue;
-            }
-            // 封装
-            ProductList productList = new ProductList();
-            BeansUtil.copyProperties(loanProductEntity,productList);
-
-            // 如果用户在本包没有放款成功记录 不展示通过率
-            if(!showPassRate){
-                productList.setPassRate("");
-            }
-            productList.setButton(OrderUtils.button(loanOrderEntity.getStatus()));
-            productList.setOrderStatus(loanOrderEntity.getStatus());
-            productList.setOrderNo(loanOrderEntity.getId());
-            list.add(productList);
-
-            // 删除
-            productMap.remove(productId);
-        }
-    }
-
-    /**
      * 获取产品推荐列表
      *
      * @param params 入参
@@ -576,6 +585,9 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             }
         });
 
+        // 排除其他包承接盘产品
+        List<LoanMaskEntity> otherLoanMaskList = loanMaskDao.findLoanMaskByAppNameIsNot(params.getAppName());
+        otherLoanMaskList.parallelStream().forEach(loanMask -> productMap.remove(loanMask.getProductId()));
 
         // 排除有进行中订单产品
         Integer[] status = {OrderStatus.CREATE, OrderStatus.EXAMINE_WAIT, OrderStatus.EXAMINE_PASS, OrderStatus.WAIT_PAY, OrderStatus.WAY, OrderStatus.DUE, OrderStatus.DUE};
