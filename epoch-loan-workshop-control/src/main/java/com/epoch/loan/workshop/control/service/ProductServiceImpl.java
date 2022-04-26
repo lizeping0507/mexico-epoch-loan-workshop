@@ -6,6 +6,7 @@ import com.epoch.loan.workshop.common.dao.mysql.LoanOrderDao;
 import com.epoch.loan.workshop.common.entity.mysql.*;
 import com.epoch.loan.workshop.common.lock.UserProductDetailLock;
 import com.epoch.loan.workshop.common.params.User;
+import com.epoch.loan.workshop.common.params.params.BaseParams;
 import com.epoch.loan.workshop.common.params.params.request.AppMaskModelParams;
 import com.epoch.loan.workshop.common.params.params.request.ProductDetailParams;
 import com.epoch.loan.workshop.common.params.params.request.ProductListParams;
@@ -326,7 +327,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
      * @throws Exception 请求异常
      */
     @Override
-    public Result<ProductListResult> list(ProductListParams params) throws Exception {
+    public Result<ProductListResult> productList(BaseParams params) throws Exception {
         Result<ProductListResult> result = new Result<>();
 
         // 产品列表
@@ -413,6 +414,9 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 closeProductList.add(productList);
                 continue;
             }
+
+            // 移除
+            productMap.remove(productId);
         }
 
         // 查询剩余产品 最后一笔订单

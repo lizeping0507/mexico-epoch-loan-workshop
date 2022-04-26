@@ -3,9 +3,9 @@ package com.epoch.loan.workshop.api.controller;
 import com.epoch.loan.workshop.api.annotated.Authentication;
 import com.epoch.loan.workshop.common.config.URL;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
+import com.epoch.loan.workshop.common.params.params.BaseParams;
 import com.epoch.loan.workshop.common.params.params.request.AppMaskModelParams;
 import com.epoch.loan.workshop.common.params.params.request.ProductDetailParams;
-import com.epoch.loan.workshop.common.params.params.request.ProductListParams;
 import com.epoch.loan.workshop.common.params.params.request.ProductRecommendListParams;
 import com.epoch.loan.workshop.common.params.params.result.*;
 import com.epoch.loan.workshop.common.util.LogUtil;
@@ -87,13 +87,13 @@ public class ProductController extends BaseController {
      */
     @Authentication
     @PostMapping(URL.LIST)
-    public Result<ProductListResult> list(ProductListParams params) {
+    public Result<ProductListResult> productList(BaseParams params) {
         // 结果集
         Result<ProductListResult> result = new Result<>();
 
         try {
             // 产品列表
-            return productService.list(params);
+            return productService.productList(params);
         } catch (Exception e) {
             LogUtil.sysError("[ProductController list]", e);
 

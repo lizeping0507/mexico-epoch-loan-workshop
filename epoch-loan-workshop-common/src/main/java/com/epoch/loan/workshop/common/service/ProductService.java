@@ -37,7 +37,7 @@ public interface ProductService {
      * @return Result
      * @throws Exception 请求异常
      */
-    Result<ProductListResult> list(ProductListParams params) throws Exception;
+    Result<ProductListResult> productList(BaseParams params) throws Exception;
 
     /**
      * 获取产品推荐列表
