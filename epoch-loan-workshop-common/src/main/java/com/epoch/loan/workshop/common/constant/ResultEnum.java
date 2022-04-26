@@ -183,6 +183,10 @@ public enum ResultEnum {
      */
     RFC_CHECK_CURP_ERROR(6051, "CURP verification failed"),
 
+    /**
+     * 无可用聚道
+     */
+    CHANNEL_UN_DO_ERROR(6100, "No polyway available"),
 
     // 业务错误
     /**
@@ -195,11 +199,11 @@ public enum ResultEnum {
      */
     DELIVERY_REJECTED_ERROR(7001, "delivery rejected"),
 
-
     /**
-     * 无可用聚道
+     * 冷却期
      */
-    CHANNEL_UN_DO_ERROR(6100, "No polyway available"),
+    COOLING_PERIOD(7002, "Cooling period"),
+
     ;
 
 
