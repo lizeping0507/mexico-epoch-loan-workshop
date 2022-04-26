@@ -305,11 +305,11 @@ public interface LoanOrderDao {
     List<LoanOrderEntity> findOrderListByUserIdAndStatusAndOrderByField(String userId, @Param("array") Integer[] status, String field, String sequence);
 
     /**
-     * 查询用户指定产品最后一笔订单
+     * 查询用户在该产品最后一笔订单
      *
      * @param userId
-     * @param productIds
+     * @param productId
      * @return
      */
-    List<LoanOrderEntity> findUserLastOrderByProductIn(String userId, @Param("productIds") Set<String> productIds);
+    LoanOrderEntity findUserLastOrderWithProduct(String userId, String productId);
 }

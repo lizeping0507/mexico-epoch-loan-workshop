@@ -196,15 +196,9 @@
         <foreach collection="array" item="statu" index="index" open="AND status IN(" close=")" separator=",">#{statu}</foreach>
         ORDER BY #{field} #{sequence}
     </select>
-    <select id="findUserLastOrderByProductIn"
+    <select id="findUserLastOrderWithProduct"
             resultType="com.epoch.loan.workshop.common.entity.mysql.LoanOrderEntity">
-        SELECT product_id, FIRST(id) as id, FIRST(status) as status, FIRST(update_time) as update_time
-        FROM loan_order
-        WHERE user_id = #{userId}
-        <foreach collection="productIds" item="productId" index="index" open="AND product_id IN(" close=")" separator=",">
-            #{productId}
-        </foreach>
-        ORDER BY create_time DESC GROUP BY product_id
+        SELECT * FROM loan_order WHERE user_id = #{userId} AND product_id = #{productId} ORDER BY create_time DESC LIMIT 1
     </select>
 
 </mapper>

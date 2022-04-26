@@ -2,6 +2,7 @@ package com.epoch.loan.workshop.control.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.constant.*;
+import com.epoch.loan.workshop.common.dao.mysql.LoanOrderDao;
 import com.epoch.loan.workshop.common.entity.mysql.*;
 import com.epoch.loan.workshop.common.lock.UserProductDetailLock;
 import com.epoch.loan.workshop.common.params.User;
@@ -70,9 +71,10 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             // 更新时间
             Date updateTime = loanOrderEntityList.get(0).getUpdateTime();
 
-            // 格式化时间判断是否是当天的订单
-            String updateTimeStr = DateUtil.DateToString(updateTime, "yyyy-MM-dd");
-            if (DateUtil.getIntervalDays(DateUtil.StringToDate(updateTimeStr, "yyyy-MM-dd"), DateUtil.StringToDate(DateUtil.getDefault(), "yyyy-MM-dd")) > 7) {
+            // 产品冷却期
+            Integer cdDays = loanProductEntity.getCdDays();
+
+            if (OrderUtils.isCdWithTime(cdDays, updateTime)) {
                 // 封装结果
                 result.setReturnCode(ResultEnum.COOLING_PERIOD.code());
                 result.setMessage(ResultEnum.COOLING_PERIOD.message());
@@ -216,10 +218,11 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 // 更新时间
                 Date updateTime = loanOrderEntityList.get(0).getUpdateTime();
 
-                // 格式化时间判断是否是当天的订单
-                String updateTimeStr = DateUtil.DateToString(updateTime, "yyyy-MM-dd");
-                if (updateTimeStr.equals(DateUtil.getDefault())) {
-                    // 当天订单不允许再次进行申请
+                // 产品冷却期
+                int cdDays = 1;
+
+                if (OrderUtils.isCdWithTime(cdDays, updateTime)) {
+                    // 未过冷却期订单不允许再次进行申请
                     appMaskModelResult.setMaskModel(2);
                     appMaskModelResult.setButton(OrderUtils.button(OrderStatus.EXAMINE_FAIL));
                     result.setData(appMaskModelResult);
@@ -358,16 +361,16 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         otherLoanMaskList.parallelStream().forEach(loanMask -> productMap.remove(loanMask.getProductId()));
 
         /*所有待还款订单*/
-        extracted(waitRepaymentOrderProductList, userId, productMap, OrderStatus.WAY, OrderStatus.DUE);
+        productListQuery(waitRepaymentOrderProductList, userId, productMap, OrderStatus.WAY, OrderStatus.DUE);
 
         /*审核通过的产品*/
-        extracted(examinePassOrderProductList, userId, productMap, OrderStatus.EXAMINE_PASS);
+        productListQuery(examinePassOrderProductList, userId, productMap, OrderStatus.EXAMINE_PASS);
 
         /*审核中或放款中且开量产品*/
-        extracted(examineWaitOrWaitPayOrderProductList, userId, productMap, OrderStatus.EXAMINE_WAIT, OrderStatus.WAIT_PAY);
+        productListQuery(examineWaitOrWaitPayOrderProductList, userId, productMap, OrderStatus.EXAMINE_WAIT, OrderStatus.WAIT_PAY);
 
         /*新建且开量产品*/
-        extracted(newCreateProductList, userId, productMap, OrderStatus.CREATE);
+        productListQuery(newCreateProductList, userId, productMap, OrderStatus.CREATE);
 
         // 查询无订单产品
         List<LoanProductEntity> withoutUserOrderProductList = loanProductDao.findProductWithoutUserOrder(userId);
@@ -401,47 +404,60 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         }
 
         // 查询剩余产品 最后一笔订单
-        Set<String> productIds = productMap.keySet();
-        if (CollectionUtils.isNotEmpty(productIds)){
-            List<LoanOrderEntity> lastOrderList = loanOrderDao.findUserLastOrderByProductIn(userId, productIds);
-            for (LoanOrderEntity loanOrderEntity : lastOrderList) {
-                Integer status = loanOrderEntity.getStatus();
-                String productId = loanOrderEntity.getProductId();
-                LoanProductEntity loanProductEntity = productMap.get(productId);
-                if (ObjectUtils.isEmpty(loanProductEntity)){
-                    continue;
-                }
-
-                // 封装
-                ProductList productList = new ProductList();
-                BeansUtil.copyProperties(loanProductEntity,productList);
-
-                // 续贷
-                if (status == OrderStatus.COMPLETE || status == OrderStatus.DUE_COMPLETE){
-                    productList.setButton(OrderUtils.button(status));
-                    productList.setOrderStatus(status);
-                    reloanOrderProductList.add(productList);
-                    continue;
-                }
-
-                // 被拒
-                if (status == OrderStatus.EXAMINE_FAIL){
-                    // TODO 冷却期
-                    examineFailOrderProductList.add(productList);
-                    continue;
-                }
-            }
-        }
-
-        // 剩余产品认为是关量产品
         for (Map.Entry<String, LoanProductEntity> entry : productMap.entrySet()) {
+            LoanProductEntity productEntity = entry.getValue();
+            String productId = productEntity.getId();
+
+            // 查询用户在该产品最后一笔订单
+            LoanOrderEntity lastOrder = loanOrderDao.findUserLastOrderWithProduct(userId, productId);
+            Integer status = lastOrder.getStatus();
+
+            // 封装
             ProductList productList = new ProductList();
-            BeansUtil.copyProperties(entry.getValue(),productList);
+            BeansUtil.copyProperties(productEntity, productList);
+
+            // 续贷
+            if (status == OrderStatus.COMPLETE || status == OrderStatus.DUE_COMPLETE) {
+                productList.setButton(OrderUtils.button(status));
+                productList.setOrderStatus(status);
+                reloanOrderProductList.add(productList);
+                continue;
+            }
+
+            // 被拒
+            if (status == OrderStatus.EXAMINE_FAIL) {
+                Integer cdDays = productEntity.getCdDays();
+                Date updateTime = lastOrder.getUpdateTime();
+                Date nowDate = new Date();
+                int intervalDays = DateUtil.getIntervalDays(nowDate, updateTime);
+
+                // 格式化时间判断是否是当天的订单
+                if (OrderUtils.isCdWithTime(cdDays, updateTime)) {
+                    // 封装结果
+                    result.setReturnCode(ResultEnum.COOLING_PERIOD.code());
+                    result.setMessage(ResultEnum.COOLING_PERIOD.message());
+                    return result;
+                }
+                // 已过冷却期
+                if (intervalDays >= cdDays){
+                    productList.setButton(OrderUtils.button(OrderStatus.CREATE));
+                    productList.setOrderStatus(OrderStatus.CREATE);
+                    newCreateProductList.add(productList);
+                    continue;
+                }
+
+                // 未过冷却期
+                productList.setButton(OrderUtils.button(OrderStatus.CREATE));
+                productList.setOrderStatus(OrderStatus.CREATE);
+                examineFailOrderProductList.add(productList);
+                continue;
+            }
+
+            // 剩余产品认为是关量产品
             productList.setButton("Full");
             productList.setOrderStatus(OrderStatus.CREATE);
             closeProductList.add(productList);
         }
-
 
         // 组装列表
         list.addAll(waitRepaymentOrderProductList);
@@ -462,8 +478,15 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         return result;
     }
 
-    // TODO
-    private void extracted(List<ProductList> list, String userId, Map<String, LoanProductEntity> productMap, Integer ... status) {
+    /**
+     * 查询并转换
+     *
+     * @param list
+     * @param userId
+     * @param productMap
+     * @param status
+     */
+    private void productListQuery(List<ProductList> list, String userId, Map<String, LoanProductEntity> productMap, Integer ... status) {
         List<LoanOrderEntity> waitRepaymentOrderList = loanOrderDao.findOrderListByUserIdAndStatusAndOrderByField(userId, status, OrderByField.CREATE_TIME,OrderByField.ASC);
         for (LoanOrderEntity loanOrderEntity : waitRepaymentOrderList) {
             String productId = loanOrderEntity.getProductId();
@@ -618,35 +641,35 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         String result = HttpUtils.POST_FORM(riskConfig.getRiskUrl(), requestParams);
         LogUtil.sysInfo("requestParams: {} result:{}", requestParams, result);
 
-//        if (StringUtils.isEmpty(result)) {
-//            return false;
-//        }
+        if (StringUtils.isEmpty(result)) {
+            return false;
+        }
 
         // 更新节点响应数据
-//        loanOrderExamineDao.updateOrderExamineResponse(loanOrderEntity.getId(), subExpression, result, new Date());
+        loanOrderExamineDao.updateOrderExamineResponse(loanOrderEntity.getId(), subExpression, result, new Date());
 
         // 转换为JSON
-//        JSONObject resultJson = JSONObject.parseObject(result);
-//
-//        // 返回码
-//        Integer code = resultJson.getInteger(Field.ERROR);
-//
-//        if (code != 200) {
-//            return false;
-//        }
-//
-//        // 成功
-//        JSONObject data = resultJson.getJSONObject(Field.DATA);
-//
-//        // 是否通过
-//        int pass = data.getInteger(Field.PASS);
-//
-//        // 未通过
-//        if (pass == 0) {
-//            // 更新审核状态
-//            loanOrderExamineDao.updateOrderExamineStatus(orderId, subExpression, OrderExamineStatus.REFUSE, new Date());
-//            return false;
-//        }
+        JSONObject resultJson = JSONObject.parseObject(result);
+
+        // 返回码
+        Integer code = resultJson.getInteger(Field.ERROR);
+
+        if (code != 200) {
+            return false;
+        }
+
+        // 成功
+        JSONObject data = resultJson.getJSONObject(Field.DATA);
+
+        // 是否通过
+        int pass = data.getInteger(Field.PASS);
+
+        // 未通过
+        if (pass == 0) {
+            // 更新审核状态
+            loanOrderExamineDao.updateOrderExamineStatus(orderId, subExpression, OrderExamineStatus.REFUSE, new Date());
+            return false;
+        }
 
         // 通过
         loanOrderExamineDao.updateOrderExamineStatus(orderId, subExpression, OrderExamineStatus.PASS, new Date());

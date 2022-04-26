@@ -122,4 +122,20 @@ public class OrderUtils {
                 return "";
         }
     }
+
+    /**
+     * 时间是否已过冷却期
+     *
+     * @param cdDays
+     * @param time
+     * @return
+     */
+    public static boolean isCdWithTime(int cdDays, Date time) {
+        // 格式化时间判断是否是当天的订单
+        String updateTimeStr = DateUtil.DateToString(time, "yyyy-MM-dd");
+        if (DateUtil.getIntervalDays(DateUtil.StringToDate(updateTimeStr, "yyyy-MM-dd"), DateUtil.StringToDate(DateUtil.getDefault(), "yyyy-MM-dd")) > cdDays) {
+            return  true;
+        }
+        return false;
+    }
 }

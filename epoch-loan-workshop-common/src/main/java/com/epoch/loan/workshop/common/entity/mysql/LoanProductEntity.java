@@ -125,4 +125,9 @@ public class LoanProductEntity {
      * 是否开量
      */
     private Integer isOpen;
+
+    /**
+     * 冷却天数
+     */
+    private Integer cdDays;
 }
