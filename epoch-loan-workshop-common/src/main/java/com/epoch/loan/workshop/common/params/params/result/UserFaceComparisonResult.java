@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 /**
  * @author 魏玉强
  * @packagename : com.epoch.loan.workshop.common.params.params.result
@@ -14,7 +16,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserFaceComparisonResult {
+public class UserFaceComparisonResult implements Serializable {
 
     /**
      * 相似度值
