@@ -29,4 +29,12 @@ public interface LoanProductDao {
      * @return
      */
     List<LoanProductEntity> findAll();
+
+    /**
+     * 查询用户无订单的产品
+     *
+     * @param userId
+     * @return
+     */
+    List<LoanProductEntity> findProductWithoutUserOrder(String userId);
 }

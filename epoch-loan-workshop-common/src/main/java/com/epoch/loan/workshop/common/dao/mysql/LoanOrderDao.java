@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author : Duke
@@ -302,4 +303,13 @@ public interface LoanOrderDao {
      * @return
      */
     List<LoanOrderEntity> findOrderListByUserIdAndStatusAndOrderByField(String userId, @Param("array") Integer[] status, String field, String sequence);
+
+    /**
+     * 查询用户指定产品最后一笔订单
+     *
+     * @param userId
+     * @param productIds
+     * @return
+     */
+    List<LoanOrderEntity> findUserLastOrderByProductIn(String userId, @Param("productIds") Set<String> productIds);
 }

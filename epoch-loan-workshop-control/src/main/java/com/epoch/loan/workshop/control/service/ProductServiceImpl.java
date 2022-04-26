@@ -352,7 +352,81 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         /*新建且开量产品*/
         extracted(newCreateProductList, userId, productMap, OrderStatus.CREATE);
 
-        //
+        // 查询无订单产品
+        List<LoanProductEntity> withoutUserOrderProductList = loanProductDao.findProductWithoutUserOrder(userId);
+        for (LoanProductEntity loanProduct : withoutUserOrderProductList) {
+            String productId = loanProduct.getId();
+            LoanProductEntity loanProductEntity = productMap.get(productId);
+            if (ObjectUtils.isEmpty(loanProductEntity)){
+                continue;
+            }
+
+            // 封装
+            ProductList productList = new ProductList();
+            BeansUtil.copyProperties(loanProductEntity,productList);
+            list.add(productList);
+
+            // 新贷开量产品
+            if (loanProductEntity.getIsOpen() == 1){
+                productList.setButton(OrderUtils.button(OrderStatus.CREATE));
+                productList.setOrderStatus(OrderStatus.CREATE);
+                newLoanAndOpenProductList.add(productList);
+                continue;
+            }
+
+            // 关量产品
+            if (loanProductEntity.getIsOpen() == 0){
+                productList.setButton("Full");
+                productList.setOrderStatus(OrderStatus.CREATE);
+                closeProductList.add(productList);
+                continue;
+            }
+        }
+
+        // 查询剩余产品 最后一笔订单
+        Set<String> productIds = productMap.keySet();
+        if (CollectionUtils.isNotEmpty(productIds)){
+            List<LoanOrderEntity> lastOrderList = loanOrderDao.findUserLastOrderByProductIn(userId, productIds);
+            for (LoanOrderEntity loanOrderEntity : lastOrderList) {
+                Integer status = loanOrderEntity.getStatus();
+                String productId = loanOrderEntity.getProductId();
+                LoanProductEntity loanProductEntity = productMap.get(productId);
+                if (ObjectUtils.isEmpty(loanProductEntity)){
+                    continue;
+                }
+
+                // 封装
+                ProductList productList = new ProductList();
+                BeansUtil.copyProperties(loanProductEntity,productList);
+
+                // 续贷
+                if (status == OrderStatus.COMPLETE || status == OrderStatus.DUE_COMPLETE){
+                    productList.setButton(OrderUtils.button(status));
+                    productList.setOrderStatus(status);
+                    reloanOrderProductList.add(productList);
+                    continue;
+                }
+
+                // 被拒
+                if (status == OrderStatus.EXAMINE_FAIL){
+                    // TODO 冷却期
+                    examineFailOrderProductList.add(productList);
+                    continue;
+                }
+            }
+        }
+
+        // 剩余产品认为是关量产品
+        for (Map.Entry<String, LoanProductEntity> entry : productMap.entrySet()) {
+            ProductList productList = new ProductList();
+            BeansUtil.copyProperties(entry.getValue(),productList);
+            productList.setButton("Full");
+            productList.setOrderStatus(OrderStatus.CREATE);
+            closeProductList.add(productList);
+        }
+
+
+        // 组装列表
         list.addAll(waitRepaymentOrderProductList);
         list.addAll(reloanOrderProductList);
         list.addAll(examinePassOrderProductList);
