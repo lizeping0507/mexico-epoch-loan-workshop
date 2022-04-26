@@ -359,7 +359,9 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         List<LoanProductEntity> products = loanProductDao.findAll();
         Map<String, LoanProductEntity> productMap = new HashMap<>();
         products.forEach(product -> {
-            productMap.put(product.getId(), product);
+            if (product.getStatus() == 1){
+                productMap.put(product.getId(), product);
+            }
         });
 
         // 查询其他包承接盘
