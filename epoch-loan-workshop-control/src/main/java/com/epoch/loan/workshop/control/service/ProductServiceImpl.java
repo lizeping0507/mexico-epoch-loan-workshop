@@ -405,6 +405,8 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 productList.setButton(OrderUtils.button(OrderStatus.CREATE));
                 productList.setOrderStatus(OrderStatus.CREATE);
                 newLoanAndOpenProductList.add(productList);
+                // 移除
+                productMap.remove(productId);
                 continue;
             }
 
@@ -413,11 +415,11 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 productList.setButton("Full");
                 productList.setOrderStatus(OrderStatus.CREATE);
                 closeProductList.add(productList);
+                // 移除
+                productMap.remove(productId);
                 continue;
             }
 
-            // 移除
-            productMap.remove(productId);
         }
         LogUtil.sysInfo("productMap : {}", JSONObject.toJSONString(productMap));
 
