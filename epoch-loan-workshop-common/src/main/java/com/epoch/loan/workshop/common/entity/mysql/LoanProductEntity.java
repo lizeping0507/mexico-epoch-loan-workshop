@@ -135,4 +135,9 @@ public class LoanProductEntity {
      * 冷却天数
      */
     private Integer passRate;
+
+    /**
+     * 状态 1有效
+     */
+    private Integer status;
 }
