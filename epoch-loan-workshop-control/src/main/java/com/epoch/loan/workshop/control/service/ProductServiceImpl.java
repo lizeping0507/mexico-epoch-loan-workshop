@@ -2,14 +2,12 @@ package com.epoch.loan.workshop.control.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.constant.*;
-import com.epoch.loan.workshop.common.dao.mysql.LoanOrderDao;
 import com.epoch.loan.workshop.common.entity.mysql.*;
 import com.epoch.loan.workshop.common.lock.UserProductDetailLock;
 import com.epoch.loan.workshop.common.params.User;
 import com.epoch.loan.workshop.common.params.params.BaseParams;
 import com.epoch.loan.workshop.common.params.params.request.AppMaskModelParams;
 import com.epoch.loan.workshop.common.params.params.request.ProductDetailParams;
-import com.epoch.loan.workshop.common.params.params.request.ProductListParams;
 import com.epoch.loan.workshop.common.params.params.request.ProductRecommendListParams;
 import com.epoch.loan.workshop.common.params.params.result.*;
 import com.epoch.loan.workshop.common.params.params.result.model.ProductList;
