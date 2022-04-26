@@ -24,6 +24,7 @@ import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
@@ -825,27 +826,22 @@ public class HttpUtils {
         }
 
         // 创建一个多参数的builder
-        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-
-        // 设置基本参数
-        builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
-        builder.setBoundary(boundary);
-        builder.setContentType(ContentType.MULTIPART_FORM_DATA);
-        builder.setCharset(UTF_8);
+        MultipartEntity multipartEntity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE,
+                "----------ThIs_Is_tHe_bouNdaRY_$", Charset.defaultCharset());
 
         // 设置form表单参数
         for (Entry<String, String> entry : params.entrySet()) {
-            builder.addPart(entry.getKey(), new StringBody(entry.getValue(), ContentType.TEXT_PLAIN.withCharset(UTF_8)));
+            multipartEntity.addPart(entry.getKey(), new StringBody(entry.getValue(), ContentType.TEXT_PLAIN.withCharset(UTF_8)));
         }
 
         // 设置文件参数
         for (Entry<String, File> entry : files.entrySet()) {
             File temp = entry.getValue();
-            builder.addPart(entry.getKey(), new FileBody(temp));
+            multipartEntity.addPart(entry.getKey(), new FileBody(temp));
         }
 
         // 设置参数
-        post.setEntity(builder.build());
+        post.setEntity(multipartEntity);
 
         return post;
     }
