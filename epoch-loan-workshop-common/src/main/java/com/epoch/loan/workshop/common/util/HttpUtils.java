@@ -570,16 +570,18 @@ public class HttpUtils {
     /**
      * 以HTTP方式POST发送键值对及二进制文件
      *
-     * @param url
-     * @param params
-     * @param heardMap
+     * @param url 请求地址
+     * @param params 参数
+     * @param heardMap 标题头
+     * @param files 文件map
+     * @param charset  需要特别注意，UTF-8会报错， utf-8正确
      * @return
      * @throws URISyntaxException
      * @throws ClientProtocolException
      * @throws IOException
      */
-    public static String POST_WITH_HEADER_FORM_FILE(String url, Map<String, String> params, Map<String, String> heardMap, Map<String, File> files) throws Exception {
-        return paramsWithHeaderFilesPostInvoke(url, params, heardMap, files, CONTENT_CHARSET);
+    public static String POST_WITH_HEADER_FORM_FILE(String url, Map<String, String> params, Map<String, String> heardMap, Map<String, File> files,String charset) throws Exception {
+        return paramsWithHeaderFilesPostInvoke(url, params, heardMap, files, charset);
     }
 
 
@@ -807,12 +809,12 @@ public class HttpUtils {
      * @return
      * @throws Exception
      */
-    public static HttpPost buildHttpWithHeaderParamFilePost(String url, Map<String, String> params, Map<String, String> heardMap, Map<String, File> files)
+    public static HttpPost buildHttpWithHeaderParamFilePost(String url, Map<String, String> params,Map<String, String> heardMap, Map<String, File> files)
             throws Exception {
         HttpPost post = new HttpPost(url);
 
         // Httpbody体 boundary分隔符
-        String boundary = "----------ThIs_Is_tHe_bouNdaRY_$";
+        String boundary = "----" + System.currentTimeMillis() + "----";
 
         // 设置超时时间
         post.setConfig(buildRequestConfig());
@@ -824,24 +826,31 @@ public class HttpUtils {
                 post.setHeader(key, heardMap.get(key));
             }
         }
+        post.setHeader(HTTP.USER_AGENT, USER_AGENT);
 
         // 创建一个多参数的builder
-        MultipartEntity multipartEntity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE,
-                "----------ThIs_Is_tHe_bouNdaRY_$", Charset.defaultCharset());
+        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+
+        // 设置基本参数
+        builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
+        builder.setBoundary(boundary);
+        builder.setContentType(ContentType.MULTIPART_FORM_DATA);
+        builder.setCharset(UTF_8);
+
 
         // 设置form表单参数
         for (Entry<String, String> entry : params.entrySet()) {
-            multipartEntity.addPart(entry.getKey(), new StringBody(entry.getValue(), Charset.forName("UTF-8")));
+            builder.addPart(entry.getKey(), new StringBody(entry.getValue(), ContentType.TEXT_PLAIN.withCharset(UTF_8)));
         }
 
         // 设置文件参数
         for (Entry<String, File> entry : files.entrySet()) {
             File temp = entry.getValue();
-            multipartEntity.addPart(entry.getKey(), new FileBody(temp));
+            builder.addPart(entry.getKey(), new FileBody(temp, ContentType.APPLICATION_OCTET_STREAM, temp.getName()));
         }
 
         // 设置参数
-        post.setEntity(multipartEntity);
+        post.setEntity(builder.build());
 
         return post;
     }
