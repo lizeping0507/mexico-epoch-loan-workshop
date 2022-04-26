@@ -4,7 +4,6 @@ import com.epoch.loan.workshop.api.annotated.Authentication;
 import com.epoch.loan.workshop.common.config.URL;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
 import com.epoch.loan.workshop.common.params.params.BaseParams;
-import com.epoch.loan.workshop.common.params.params.request.AppMaskModelParams;
 import com.epoch.loan.workshop.common.params.params.request.ProductDetailParams;
 import com.epoch.loan.workshop.common.params.params.request.ProductRecommendListParams;
 import com.epoch.loan.workshop.common.params.params.result.*;
@@ -60,7 +59,7 @@ public class ProductController extends BaseController {
      */
     @Authentication
     @PostMapping(URL.APP_MASK_MODEL)
-    public Result<AppMaskModelResult> appMaskModel(AppMaskModelParams params) {
+    public Result<AppMaskModelResult> appMaskModel(BaseParams params) {
         // 结果集
         Result<AppMaskModelResult> result = new Result<>();
 
