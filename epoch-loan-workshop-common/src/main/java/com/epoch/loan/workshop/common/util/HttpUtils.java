@@ -34,6 +34,7 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.net.ssl.*;
 import java.io.*;
@@ -840,7 +841,7 @@ public class HttpUtils {
         // 设置文件参数
         for (Entry<String, File> entry : files.entrySet()) {
             File temp = entry.getValue();
-            builder.addPart(entry.getKey(), new FileBody(temp, ContentType.MULTIPART_FORM_DATA, temp.getName()));
+            builder.addPart(entry.getKey(), new FileBody(temp));
         }
 
         // 设置参数
