@@ -53,26 +53,6 @@ public class UserBasicInfoParams extends BaseParams {
      */
     private String loanPurpose;
 
-    /**
-     * 父亲名字
-     */
-    private String customFatherName;
-
-    /**
-     * 全名
-     */
-    private String customFullName;
-
-    /**
-     * 母亲名字
-     */
-    private String customMotherName;
-
-    /**
-     * 姓名
-     */
-    private String customName;
-
 
     /**
      * 月收入 字段校验
@@ -149,46 +129,6 @@ public class UserBasicInfoParams extends BaseParams {
      */
     public boolean isLoanPurposeLegal() {
         if (StringUtils.isBlank(this.loanPurpose)) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * 父亲名字 字段校验
-     */
-    public boolean isCustomFatherNameLegal() {
-        if (StringUtils.isBlank(this.customFatherName)) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * 全名 字段校验
-     */
-    public boolean isCustomFullNameLegal() {
-        if (StringUtils.isBlank(this.customFullName)) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * 母亲名字 字段校验
-     */
-    public boolean isCustomMotherNameLegal() {
-        if (StringUtils.isBlank(this.customMotherName)) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * 姓名 字段校验
-     */
-    public boolean isCustomNameLegal() {
-        if (StringUtils.isBlank(this.customName)) {
             return false;
         }
         return true;

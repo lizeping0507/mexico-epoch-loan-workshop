@@ -130,4 +130,9 @@ public class LoanProductEntity {
      * 冷却天数
      */
     private Integer cdDays;
+
+    /**
+     * 冷却天数
+     */
+    private Integer passRate;
 }
