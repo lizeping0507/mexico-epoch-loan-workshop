@@ -1,15 +1,15 @@
 package com.epoch.loan.workshop.control.service;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.constant.*;
 import com.epoch.loan.workshop.common.entity.mysql.*;
 import com.epoch.loan.workshop.common.lock.UserProductDetailLock;
 import com.epoch.loan.workshop.common.params.User;
-import com.epoch.loan.workshop.common.params.params.BaseParams;
-import com.epoch.loan.workshop.common.params.params.request.*;
+import com.epoch.loan.workshop.common.params.params.request.AppMaskModelParams;
+import com.epoch.loan.workshop.common.params.params.request.ProductDetailParams;
+import com.epoch.loan.workshop.common.params.params.request.ProductListParams;
+import com.epoch.loan.workshop.common.params.params.request.ProductRecommendListParams;
 import com.epoch.loan.workshop.common.params.params.result.*;
-import com.epoch.loan.workshop.common.params.params.result.model.PayH5Result;
 import com.epoch.loan.workshop.common.params.params.result.model.ProductList;
 import com.epoch.loan.workshop.common.service.ProductService;
 import com.epoch.loan.workshop.common.util.*;
@@ -61,6 +61,23 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             result.setReturnCode(ResultEnum.NO_EXITS.code());
             result.setMessage(ResultEnum.NO_EXITS.message());
             return result;
+        }
+
+        // 判断该产品最后一笔被拒订单是否在冷却期内
+        Integer[] status = new Integer[]{OrderStatus.EXAMINE_FAIL};
+        List<LoanOrderEntity> loanOrderEntityList = loanOrderDao.findOrderByUserIdAndStatus(userId, status);
+        if (CollectionUtils.isNotEmpty(loanOrderEntityList)) {
+            // 更新时间
+            Date updateTime = loanOrderEntityList.get(0).getUpdateTime();
+
+            // 格式化时间判断是否是当天的订单
+            String updateTimeStr = DateUtil.DateToString(updateTime, "yyyy-MM-dd");
+            if (DateUtil.getIntervalDays(DateUtil.StringToDate(updateTimeStr, "yyyy-MM-dd"), DateUtil.StringToDate(DateUtil.getDefault(), "yyyy-MM-dd")) > 7) {
+                // 封装结果
+                result.setReturnCode(ResultEnum.COOLING_PERIOD.code());
+                result.setMessage(ResultEnum.COOLING_PERIOD.message());
+                return result;
+            }
         }
 
         // 订单审核模型
@@ -666,11 +683,9 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                     return loanOrderEntityList.get(0).getId();
                 }
 
-
                 // 查询用户指定状态订单
                 status = new Integer[]{OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE};
                 loanOrderEntityList = loanOrderDao.findOrderByUserAndProductIdAndStatus(userId, productId, status);
-
 
                 // 是否复贷
                 Integer reloan = 0;

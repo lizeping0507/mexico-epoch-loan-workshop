@@ -1,5 +1,6 @@
 package com.epoch.loan.workshop.control.service;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.constant.OcrChannelConfigStatus;
 import com.epoch.loan.workshop.common.constant.OcrField;
@@ -104,8 +105,10 @@ public class OcrServiceImpl extends BaseService implements OcrService {
         param.put(OcrField.ADVANCE_APP_ID_KEY, appPackageName);
         param.put(OcrField.ADVANCE_LICENSE_EFFECTIVE_SECONDS, OcrField.ADVANCE_LICENSE_SECONDS);
 
+        LogUtil.sysInfo("advance发送请求：url:{} param:{} , hearder:{}",licenseUrl,param.toString(),headers.toString());
+
         // 发送请求
-        String response = HttpUtils.POST_WITH_HEADER(licenseUrl, param, headers);
+        String response = HttpUtils.POST_WITH_HEADER_NOCHARSET(licenseUrl, JSON.toJSONString(param), headers);
         LogUtil.sysInfo("advance响应结果：{}",response);
         if (StringUtils.isBlank(response)) {
             result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
@@ -124,8 +127,6 @@ public class OcrServiceImpl extends BaseService implements OcrService {
         livingDetectionLog.setUserId(userId);
         livingDetectionLog.setCreateTime(new Date());
         ocrLivingDetectionLogElasticDao.save(livingDetectionLog);
-
-        LogUtil.sysInfo("advance 日志上传");
 
         // 判断是否请求成功
         String code = licenseResult.getCode();
@@ -184,7 +185,7 @@ public class OcrServiceImpl extends BaseService implements OcrService {
         Map<String, String> headers = getAdvanceHeard(params.getAppName());
 
         // 发送请求
-        String responseStr = HttpUtils.POST_WITH_HEADER(scoreUrl, param, headers);
+        String responseStr = HttpUtils.POST_WITH_HEADER_NOCHARSET(scoreUrl, JSON.toJSONString(param), headers);
 
         // 处理响应结果
         if (StringUtils.isBlank(responseStr)) {
