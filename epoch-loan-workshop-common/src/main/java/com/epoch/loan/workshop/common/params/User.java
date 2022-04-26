@@ -203,7 +203,7 @@ public class User implements Serializable {
     /**
      * INE/IFE 年龄
      */
-    private String papersAge;
+    private Integer papersAge;
 
     /**
      * INE/IFE 出生日期

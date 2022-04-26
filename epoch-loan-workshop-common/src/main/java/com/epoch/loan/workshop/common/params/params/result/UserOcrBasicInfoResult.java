@@ -42,7 +42,7 @@ public class UserOcrBasicInfoResult implements Serializable {
     /**
      * 年龄
      */
-    private String age;
+    private Integer age;
 
     /**
      * 邮政编码

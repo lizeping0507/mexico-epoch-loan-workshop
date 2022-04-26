@@ -18,13 +18,4 @@ public class ProductDetailParams extends BaseParams {
      */
     private String productId;
 
-    /**
-     * 申请时的经纬度
-     */
-    private String gps;
-
-    /**
-     * 申请时的地址
-     */
-    private String gpsAddress;
 }

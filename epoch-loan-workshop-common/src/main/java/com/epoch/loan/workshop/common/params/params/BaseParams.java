@@ -50,6 +50,17 @@ public class BaseParams implements Serializable {
     public User user;
 
     /**
+     * 申请时的经纬度
+     */
+    private String gps;
+
+    /**
+     * 申请时的地址
+     */
+    private String gpsAddress;
+
+
+    /**
      * 验证 app名称 是否合法
      *
      * @return true或false
