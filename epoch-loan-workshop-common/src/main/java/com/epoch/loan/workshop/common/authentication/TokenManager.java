@@ -145,6 +145,7 @@ public class TokenManager {
         user.setBackPath(userInfoEntity.getBackPath());
         user.setFacePath(userInfoEntity.getFacePath());
         user.setRemittanceAccountAuth(true);
+        user.setCurp(userInfoEntity.getCurp());
 
         // 查询放款账户数量
         Integer remittanceAccountCount = loanRemittanceAccountDao.findUserRemittanceAccountCount(userId);

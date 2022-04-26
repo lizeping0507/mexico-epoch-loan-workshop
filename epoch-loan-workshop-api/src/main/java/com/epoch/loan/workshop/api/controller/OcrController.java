@@ -154,6 +154,49 @@ public class OcrController extends BaseController {
         Result<Object> result = new Result<>();
 
         try {
+            // 验证请求参数是否合法
+            if (!params.isFrontJsonLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":frontJson");
+                return result;
+            }
+
+            if (!params.isBackJsonLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":backJson");
+                return result;
+            }
+
+            if (!params.isNameLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":name");
+                return result;
+            }
+
+            if (!params.isFatherNameLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":fatherName");
+                return result;
+            }
+
+            if (!params.isMotherNameLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":motherName");
+                return result;
+            }
+
+            if (!params.isCurpLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":curp");
+                return result;
+            }
+
             MultipartResolver resolver = new StandardServletMultipartResolver();
             MultipartHttpServletRequest mRequest = resolver.resolveMultipart(request);
             Map<String, MultipartFile> fileMap = mRequest.getFileMap();
