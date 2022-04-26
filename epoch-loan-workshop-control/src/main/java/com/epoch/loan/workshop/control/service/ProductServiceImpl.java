@@ -355,7 +355,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         // 关量产品
         List<ProductList> closeProductList = new ArrayList<>();
 
-
+        // 用户id
         String userId = params.getUser().getId();
 
         // 查询所有产品
@@ -447,7 +447,6 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             if (status == OrderStatus.EXAMINE_FAIL) {
                 Integer cdDays = productEntity.getCdDays();
                 Date updateTime = lastOrder.getUpdateTime();
-                Date nowDate = new Date();
 
                 // 已过冷却期
                 if (OrderUtils.isCdWithTime(cdDays, updateTime)) {
