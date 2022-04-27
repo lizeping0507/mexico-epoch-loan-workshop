@@ -67,6 +67,6 @@ public class UserOcrBasicInfoResult implements Serializable {
     /**
      * 人脸照片访问地址
      */
-    private String livingImgUrl;
+    private String faceImgUrl;
 
 }

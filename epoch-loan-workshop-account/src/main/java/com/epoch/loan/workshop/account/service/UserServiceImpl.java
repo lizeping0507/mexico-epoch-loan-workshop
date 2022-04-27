@@ -498,11 +498,11 @@ public class UserServiceImpl extends BaseService implements UserService {
         }
         if (StringUtils.isNotBlank(info.getBackPath())) {
             String fileUrl = alibabaOssClient.getFileUrl(userFileBucketName, info.getBackPath(), null);
-            basicInfo.setFrontImgUrl(fileUrl);
+            basicInfo.setBackImgUrl(fileUrl);
         }
         if (StringUtils.isNotBlank(info.getFacePath())) {
             String fileUrl = alibabaOssClient.getFileUrl(userFileBucketName, info.getFacePath(), null);
-            basicInfo.setFrontImgUrl(fileUrl);
+            basicInfo.setFaceImgUrl(fileUrl);
         }
 
         // 封装结果
@@ -653,7 +653,6 @@ public class UserServiceImpl extends BaseService implements UserService {
         }
 
         // 保存 图片信息
-        userInfoById.setUserFileBucketName(userFileBucketName);
         userInfoById.setFrontPath(frontPath);
         userInfoById.setBackPath(backPath);
         userInfoById.setFacePath(facePath);

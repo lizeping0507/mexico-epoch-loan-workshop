@@ -81,11 +81,11 @@
                                   `custom_full_name` = #{loanUserInfoEntity.customFullName},
                                   `custom_mother_name` = #{loanUserInfoEntity.customMotherName},
                                   `custom_name` = #{loanUserInfoEntity.customName},
-                                  `user_file_bucket_name` = #{loanUserInfoEntity.userFileBucketName},
                                   `front_path` = #{loanUserInfoEntity.frontPath},
                                   `back_path` = #{loanUserInfoEntity.backPath},
                                   `face_path` = #{loanUserInfoEntity.facePath},
                                   `update_time` = #{loanUserInfoEntity.updateTime}
+                                  `curp` = #{loanUserInfoEntity.curp},
         where id = #{loanUserInfoEntity.id}
     </update>
     <update id="updateUserGpsMsg">

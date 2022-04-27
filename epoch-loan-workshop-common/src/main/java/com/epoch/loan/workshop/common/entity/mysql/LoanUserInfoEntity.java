@@ -215,11 +215,6 @@ public class LoanUserInfoEntity {
     private String customGenter;
 
     /**
-     * 用户图片文件保存桶名
-     */
-    private String userFileBucketName;
-
-    /**
      * 上传证件的正面图片路径
      */
     private String frontPath;
