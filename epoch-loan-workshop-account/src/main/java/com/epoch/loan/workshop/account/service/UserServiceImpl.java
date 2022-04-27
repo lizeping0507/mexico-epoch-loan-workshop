@@ -625,10 +625,8 @@ public class UserServiceImpl extends BaseService implements UserService {
         }
 
         // 上传证件正面图片
-        File frontFile = convertToFile(params.getIdFrontImgData());
         String frontPath = BusinessNameUtils.createUserIdTypeFileName(NameField.USR_ID, user.getUserInfoId(), NameField.FRONT_IMAGE_TYPE);
-        Boolean frontResult = alibabaOssClient.upload(userFileBucketName, frontPath, frontFile);
-        frontFile.deleteOnExit();
+        Boolean frontResult = alibabaOssClient.upload(userFileBucketName, frontPath, params.getIdFrontImgData());
         if (!frontResult) {
             result.setReturnCode(ResultEnum.KYC_UPLOAD_FILE_ERROR.code());
             result.setMessage(ResultEnum.KYC_UPLOAD_FILE_ERROR.message());
@@ -636,10 +634,8 @@ public class UserServiceImpl extends BaseService implements UserService {
         }
 
         //上传证件背面图片 并获取链接
-        File backFile = convertToFile(params.getIdBackImgData());
         String backPath = BusinessNameUtils.createUserIdTypeFileName(NameField.USR_ID, user.getUserInfoId(), NameField.BACK_IMAGE_TYPE);
-        Boolean backResult = alibabaOssClient.upload(userFileBucketName, backPath, backFile);
-        backFile.deleteOnExit();
+        Boolean backResult = alibabaOssClient.upload(userFileBucketName, backPath, params.getIdBackImgData());
         if (!backResult) {
             result.setReturnCode(ResultEnum.KYC_UPLOAD_FILE_ERROR.code());
             result.setMessage(ResultEnum.KYC_UPLOAD_FILE_ERROR.message());
@@ -647,10 +643,8 @@ public class UserServiceImpl extends BaseService implements UserService {
         }
 
         //上传人脸照片
-        File faceFile = convertToFile(params.getFaceImgData());
         String facePath = BusinessNameUtils.createUserIdTypeFileName(NameField.USR_ID, user.getUserInfoId(), NameField.FACE_IMAGE_TYPE);
-        Boolean faceResult = alibabaOssClient.upload(userFileBucketName, facePath, faceFile);
-        faceFile.deleteOnExit();
+        Boolean faceResult = alibabaOssClient.upload(userFileBucketName, facePath, params.getFaceImgData());
         if (!faceResult) {
             result.setReturnCode(ResultEnum.KYC_UPLOAD_FILE_ERROR.code());
             result.setMessage(ResultEnum.KYC_UPLOAD_FILE_ERROR.message());
