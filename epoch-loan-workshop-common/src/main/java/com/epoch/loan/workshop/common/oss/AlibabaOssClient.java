@@ -50,19 +50,28 @@ public class AlibabaOssClient {
         try {
             putObjectResult = ossClient.putObject(bucketName, objectName, new ByteArrayInputStream(imageData));
         } catch (OSSException oe) {
-            LogUtil.sysError("uploadFile oss上传出错", oe);
-            System.out.println("Host ID:" + oe.getHostId());
+            LogUtil.sysError("upload oss上传出错", oe);
         } catch (ClientException ce) {
-            LogUtil.sysError("uploadFile oss通信出错", ce);
+            LogUtil.sysError("upload oss通信出错", ce);
         } finally {
-            if (putObjectResult != null && putObjectResult.getCallbackResponseBody() != null) {
+            if (ObjectUtils.isNotEmpty(putObjectResult) &&  ObjectUtils.isNotEmpty(putObjectResult.getCallbackResponseBody())) {
                 try {
                     putObjectResult.getCallbackResponseBody().close();
                 } catch (IOException ignore) {
+                    LogUtil.sysError("upload putObjectResult关闭出错", ignore);
                 }
             }
         }
-        LogUtil.sysInfo("OSS UPLOAD" + putObjectResult.getResponse().isSuccessful());
+
+        if (ObjectUtils.isNotEmpty(putObjectResult)) {
+            LogUtil.sysInfo("upload putObjectResult不为空");
+        }
+        if (ObjectUtils.isNotEmpty(putObjectResult.getResponse())) {
+            LogUtil.sysInfo("upload putObjectResult.getResponse()不为空");
+        }
+
+        LogUtil.sysInfo("upload putObjectResult.getResponse().get: {}", putObjectResult.getResponse().getStatusCode());
+
         return putObjectResult.getResponse().isSuccessful();
     }
 
