@@ -45,35 +45,16 @@ public class AlibabaOssClient {
      * @return 上传是否成功
      */
     public Boolean upload(String bucketName, String objectName, byte[] imageData) {
+
         // 上传文件。
-        PutObjectResult putObjectResult = null;
-        try {
-            putObjectResult = ossClient.putObject(bucketName, objectName, new ByteArrayInputStream(imageData));
+        PutObjectResult putObjectResult = ossClient.putObject(bucketName, objectName, new ByteArrayInputStream(imageData));
 
-            if (ObjectUtils.isNotEmpty(putObjectResult)) {
-                LogUtil.sysInfo("upload putObjectResult不为空");
-            }
-            if (ObjectUtils.isNotEmpty(putObjectResult.getResponse())) {
-                LogUtil.sysInfo("upload putObjectResult.getResponse()不为空");
-            }
-
-            LogUtil.sysInfo("upload putObjectResult.getResponse().get: {}", putObjectResult.getResponse().getStatusCode());
-
-        } catch (OSSException oe) {
-            LogUtil.sysError("upload oss上传出错", oe);
-        } catch (ClientException ce) {
-            LogUtil.sysError("upload oss通信出错", ce);
-        } finally {
-            if (ObjectUtils.isNotEmpty(putObjectResult) &&  ObjectUtils.isNotEmpty(putObjectResult.getCallbackResponseBody())) {
-                try {
-                    putObjectResult.getCallbackResponseBody().close();
-                } catch (IOException ignore) {
-                    LogUtil.sysError("upload putObjectResult关闭出错", ignore);
-                }
-            }
+        // 上传成功response为空，上传失败,OOS服务端会响应状态码和错误信息
+        if (ObjectUtils.isNotEmpty(putObjectResult.getResponse())) {
+            return true;
         }
 
-        return putObjectResult.getResponse().isSuccessful();
+        return false;
     }
 
     /**
@@ -105,7 +86,7 @@ public class AlibabaOssClient {
      *
      * @param bucketName     桶名
      * @param objectName     上传路径
-     * @param imageData  文件二进制
+     * @param imageData      文件二进制
      * @param dateExpiration 过期时间
      * @return 预签
      */

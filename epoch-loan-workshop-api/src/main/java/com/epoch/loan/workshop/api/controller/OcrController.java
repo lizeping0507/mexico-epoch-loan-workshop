@@ -205,8 +205,11 @@ public class OcrController extends BaseController {
             MultipartHttpServletRequest mRequest = resolver.resolveMultipart(request);
             Map<String, MultipartFile> fileMap = mRequest.getFileMap();
             params.setIdFrontImgData(fileMap.get("idFrontImage").getBytes());
+            params.setIdFrontImgType(fileMap.get("idFrontImage").getContentType());
             params.setIdBackImgData(fileMap.get("idBackImage").getBytes());
+            params.setIdBackImgType(fileMap.get("idBackImage").getContentType());
             params.setFaceImgData(fileMap.get("faceImage").getBytes());
+            params.setFaceImgType(fileMap.get("faceImage").getContentType());
 
             // 证件上传
             return userService.saveFile(params);

@@ -26,16 +26,18 @@ public class BusinessNameUtils {
      * 生成文件路径
      * @param path 用户图片存储基础路径
      * @param userInfoId 用户详情id
-     * @param type 类型
+     * @param type 图片种类
+     * @param imageType 图片类型
      * @return 文件路径
      */
-    public static String createUserIdTypeFileName(String path, String userInfoId, String type) {
+    public static String createUserIdTypeFileName(String path, String userInfoId, String type ,String imageType) {
         LocalDateTime now = LocalDateTime.now();
         long millis = now.until(LocalDate3000, ChronoUnit.MILLIS);
         StringBuilder fileName = new StringBuilder().append(path)
                 .append("/").append(userInfoId)
                 .append("/").append(type)
-                .append("/").append(millis);
+                .append("/").append(millis)
+                .append(".").append(imageType);
         return fileName.toString();
     }
 }

@@ -20,14 +20,29 @@ public class SaveFileParams extends BaseParams {
     private byte[] faceImgData;
 
     /**
+     * 活体照片类型
+     */
+    private String faceImgType;
+
+    /**
      * KFC卡正面
      */
     private byte[] idFrontImgData;
 
     /**
+     * KFC卡正面照片类型
+     */
+    private String idFrontImgType;
+
+    /**
      * KFC卡反面
      */
     private byte[] idBackImgData;
+
+    /**
+     * KFC卡反面照片类型
+     */
+    private String idBackImgType;
 
     /**
      * KFC卡正面 识别出来的信息
