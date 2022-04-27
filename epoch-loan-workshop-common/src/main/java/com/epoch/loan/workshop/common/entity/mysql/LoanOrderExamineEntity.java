@@ -23,6 +23,10 @@ public class LoanOrderExamineEntity {
      */
     private String orderId;
 
+    /**
+     * 用户id
+     */
+    private String userId;
 
     /**
      * 模型名称

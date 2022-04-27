@@ -344,4 +344,8 @@ public class Field {
      */
     public static final String PHONE = "phone";
 
+    /**
+     * 产品id
+     */
+    public static final String PRODUCT_ID = "productId";
 }

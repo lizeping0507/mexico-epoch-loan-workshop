@@ -1,13 +1,11 @@
 package com.epoch.loan.workshop.common.dao.mysql;
 
 import com.epoch.loan.workshop.common.entity.mysql.LoanOrderEntity;
-import com.epoch.loan.workshop.common.params.params.result.model.OrderDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author : Duke
@@ -240,22 +238,20 @@ public interface LoanOrderDao {
 
     /**
      * @param userId
-     * @param appName
      * @param status
      * @return
      */
-    Integer countUserOrderByAppInStatus(String userId, String appName, @Param("array") int[] status);
+    Integer countUserOrderByStatusIn(String userId, @Param("array") int[] status);
 
     /**
      * 查询用户在指定包|指定状态|指定产品的订单数量
      *
      * @param userId
      * @param productId
-     * @param appName
      * @param status
      * @return
      */
-    Integer countUserOrderByProductAndAppInStatus(String userId, String productId, String appName, @Param("array") int[] status);
+    Integer countUserOrderByProductAndStatusIn(String userId, String productId, @Param("array") int[] status);
 
     /**
      * 新增订单
@@ -312,4 +308,14 @@ public interface LoanOrderDao {
      * @return
      */
     LoanOrderEntity findUserLastOrderWithProduct(String userId, String productId);
+
+    /**
+     * 根据用户Id产品id订单状态，查询距离当前时间最近的一笔订单
+     *
+     * @param userId
+     * @param productId
+     * @param status
+     * @return
+     */
+    LoanOrderEntity findLatelyOrderByUserIdAndProductIdAndStatus(String userId, String productId, @Param("array") Integer[] status);
 }

@@ -157,11 +157,11 @@
             #{sts}
         </foreach>
     </select>
-    <select id="countUserOrderByAppInStatus" resultType="java.lang.Integer">
-        SELECT count(1) from loan_order WHERE app_name = #{appName} And user_id = #{userId}
+    <select id="countUserOrderByStatusIn" resultType="java.lang.Integer">
+        SELECT count(1) from loan_order WHERE user_id = #{userId}
         <foreach collection="array" item="statu" index="index" open="AND status IN(" close=")" separator=",">#{statu}</foreach>
     </select>
-    <select id="countUserOrderByProductAndAppInStatus" resultType="java.lang.Integer">
+    <select id="countUserOrderByProductAndStatusIn" resultType="java.lang.Integer">
         SELECT count(1) from loan_order WHERE app_name = #{appName} And user_id = #{userId} And product_id = #{productId}
         <foreach collection="array" item="statu" index="index" open="AND status IN(" close=")" separator=",">#{statu}</foreach>
     </select>
@@ -193,12 +193,32 @@
     <select id="findOrderListByUserIdAndStatusAndOrderByField"
             resultType="com.epoch.loan.workshop.common.entity.mysql.LoanOrderEntity">
         SELECT * FROM loan_order WHERE user_id = #{userId}
-        <foreach collection="array" item="statu" index="index" open="AND status IN(" close=")" separator=",">#{statu}</foreach>
+        <foreach collection="array" item="statu" index="index" open="AND status IN(" close=")" separator=",">#{statu}
+        </foreach>
         ORDER BY #{field} #{sequence}
     </select>
     <select id="findUserLastOrderWithProduct"
             resultType="com.epoch.loan.workshop.common.entity.mysql.LoanOrderEntity">
-        SELECT * FROM loan_order WHERE user_id = #{userId} AND product_id = #{productId} ORDER BY create_time DESC LIMIT 1
+        SELECT * FROM loan_order WHERE user_id = #{userId} AND product_id = #{productId} ORDER BY create_time DESC LIMIT
+        1
+    </select>
+    <select id="findLatelyOrderByUserIdAndProductIdAndStatus"
+            resultType="com.epoch.loan.workshop.common.entity.mysql.LoanOrderEntity">
+        SELECT
+        *
+        FROM
+        loan_order
+        WHERE
+        user_id = #{userId}
+        AND
+        product_id=#{productId}
+        AND
+        status in
+        <foreach collection="array" item="sts" index="index" open="(" close=")" separator=",">
+            #{sts}
+        </foreach>
+        ORDER BY create_time DESC
+        LIMIT 0,1
     </select>
 
 </mapper>

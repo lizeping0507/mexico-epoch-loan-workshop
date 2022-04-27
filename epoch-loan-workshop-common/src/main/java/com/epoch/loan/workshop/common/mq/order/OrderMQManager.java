@@ -76,8 +76,8 @@ public class OrderMQManager extends BaseMQ {
     /**
      * 风控V3TAG
      */
-    @Value("${rocket.order.riskModelV3.subExpression}")
-    private String riskModelV3orderDueSubExpression = "";
+    @Value("${rocket.order.riskModelMask.subExpression}")
+    private String riskModelMaskSubExpression = "";
 
     /**
      * 初始化
