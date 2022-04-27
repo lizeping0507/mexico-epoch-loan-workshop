@@ -149,7 +149,7 @@ public class OcrController extends BaseController {
      */
     @Authentication
     @PostMapping(URL.SAVE_FILE)
-    public Result<Object> uploadS3Images(UploadS3Params params, HttpServletRequest request) {
+    public Result<Object> saveFile(SaveFileParams params, HttpServletRequest request) {
         // 结果集
         Result<Object> result = new Result<>();
 
@@ -205,9 +205,9 @@ public class OcrController extends BaseController {
             params.setFaceImgData(fileMap.get("faceImage").getBytes());
 
             // 证件上传
-            return userService.uploadS3Images(params);
+            return userService.saveFile(params);
         } catch (Exception e) {
-            LogUtil.sysError("[UserController uploadS3Images]", e);
+            LogUtil.sysError("[UserController saveFile]", e);
 
             // 异常返回结果
             result.setEx(ThrowableUtils.throwableToString(e));

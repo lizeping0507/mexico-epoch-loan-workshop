@@ -7,12 +7,12 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * @author : Shangkunfeng
  * @packageName : com.epoch.loan.workshop.common.params.params.request;
- * @className : UploadS3Params
+ * @className : SaveFileParams
  * @createTime : 2022/3/31 14:34
  * @description : 用户OCR证件信息上传参数封装
  */
 @Data
-public class UploadS3Params extends BaseParams {
+public class SaveFileParams extends BaseParams {
 
     /**
      * 活体照片

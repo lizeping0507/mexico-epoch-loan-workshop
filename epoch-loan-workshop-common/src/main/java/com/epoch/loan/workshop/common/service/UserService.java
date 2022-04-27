@@ -83,7 +83,7 @@ public interface UserService {
      * @return Result<UploadS3Result>
      * @throws Exception 请求异常
      */
-    Result<Object> uploadS3Images(UploadS3Params params) throws Exception;
+    Result<Object> saveFile(SaveFileParams params) throws Exception;
 
     /**
      * 获取证件和人脸相似度

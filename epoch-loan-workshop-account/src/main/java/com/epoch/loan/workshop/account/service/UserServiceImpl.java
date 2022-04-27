@@ -519,7 +519,7 @@ public class UserServiceImpl extends BaseService implements UserService {
      * @return Result<PersonInfoResult>
      */
     @Override
-    public Result<Object> uploadS3Images(UploadS3Params params) {
+    public Result<Object> saveFile(SaveFileParams params) {
         // 结果集
         Result<Object> result = new Result<>();
 
@@ -619,7 +619,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         }
         JSONObject dataObject = riskObject.getJSONObject(Field.DATA);
         Integer dataCode = dataObject.getInteger(RiskField.RISK_DATA_ERROR_CODE);
-        if (code != RiskField.RISK_CURP_CHECK_PASS_CODE) {
+        if (dataCode != RiskField.RISK_CURP_CHECK_PASS_CODE) {
             String errMessage = dataObject.getString(RiskField.RISK_DATA_ERROR_MESSAGE);
             result.setReturnCode(dataCode);
             result.setMessage(errMessage);
