@@ -384,7 +384,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
         // 是否有过放款成功
         int[] statues = {OrderStatus.WAY,OrderStatus.DUE,OrderStatus.COMPLETE,OrderStatus.DUE_COMPLETE};
-        Integer integer = loanOrderDao.countUserOrderByAppInStatus(userId, params.getAppName(), statues);
+        Integer integer = loanOrderDao.countUserOrderByStatusIn(userId, statues);
         boolean hasPaymentOrder = integer > 0;
 
         // 查询所有产品
@@ -935,14 +935,14 @@ public class ProductServiceImpl extends BaseService implements ProductService {
     protected Integer userType(String userId, String productId, String appName) {
         // 用户在本包是否有还款
         int[] status = {OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE};
-        Integer count = loanOrderDao.countUserOrderByAppInStatus(userId, appName, status);
+        Integer count = loanOrderDao.countUserOrderByStatusIn(userId, status);
         // 无:2客群
         if (count == 0) {
             return 2;
         }
 
         // 本包本产品是否有还款
-        count = loanOrderDao.countUserOrderByProductAndAppInStatus(userId, productId, appName, status);
+        count = loanOrderDao.countUserOrderByProductAndStatusIn(userId, productId, status);
         // 无:1客群
         if (count == 0) {
             return 1;
