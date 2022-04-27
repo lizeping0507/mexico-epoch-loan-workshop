@@ -388,11 +388,10 @@ public class UserServiceImpl extends BaseService implements UserService {
 
         // 查询用户详细信息
         LoanUserInfoEntity userInfo = loanUserInfoDao.findUserInfoById(user.getId());
-        userInfo.setMonthlyIncome(params.getMonthlyIncome());
-        userInfo.setPayPeriod(params.getPayPeriod());
-        userInfo.setOccupation(params.getOccupation());
-        userInfo.setPayMethod(params.getPayMethod());
-        userInfo.setEmail(params.getEmail());
+        userInfo.setCustomDateOfBirth(params.getCustomDateOfBirth());
+        userInfo.setCustomGenter(params.getCustomGenter());
+        userInfo.setChildrenNumber(params.getChildrenNumber());
+        userInfo.setLiveType(params.getLiveType());
         userInfo.setEducation(params.getEducation());
         userInfo.setMarital(params.getMarital());
         userInfo.setLoanPurpose(params.getLoanPurpose());
@@ -429,9 +428,12 @@ public class UserServiceImpl extends BaseService implements UserService {
 
         // 查询用户详细信息
         LoanUserInfoEntity userInfo = loanUserInfoDao.findUserInfoById(user.getId());
+        userInfo.setMonthlyIncome(params.getMonthlyIncome());
+        userInfo.setPayPeriod(params.getPayPeriod());
+        userInfo.setOccupation(params.getOccupation());
+        userInfo.setPayMethod(params.getPayMethod());
+        userInfo.setEmail(params.getEmail());
         userInfo.setContacts(params.getContacts());
-        userInfo.setChildrenNumber(params.getChildrenNumber());
-        userInfo.setLiveType(params.getLiveType());
 
         // 更新
         loanUserInfoDao.update(userInfo);

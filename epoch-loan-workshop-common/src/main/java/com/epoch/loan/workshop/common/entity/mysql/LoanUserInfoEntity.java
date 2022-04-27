@@ -170,34 +170,49 @@ public class LoanUserInfoEntity {
     private String postalCode;
 
     /**
-     * rfc
+     * 税号
      */
     private String rfc;
-
-    /**
-     * 父亲名字
-     */
-    private String customFatherName;
-
-    /**
-     * 全名
-     */
-    private String customFullName;
-
-    /**
-     * 母亲名字
-     */
-    private String customMotherName;
-
-    /**
-     * 姓名
-     */
-    private String customName;
 
     /**
      * 身份证号
      */
     private String curp;
+
+    /**
+     * 用户填写 父亲姓氏
+     */
+    private String customFatherName;
+
+    /**
+     * 用户填写 姓名
+     */
+    private String customName;
+
+    /**
+     * 用户填写 母亲名字
+     */
+    private String customMotherName;
+
+    /**
+     * 用户填写 全名
+     */
+    private String customFullName;
+
+    /**
+     * 用户填写 生日
+     */
+    private String customDateOfBirth;
+
+    /**
+     * 用户填写 年龄
+     */
+    private String customAge;
+
+    /**
+     * 用户填写 性别
+     */
+    private String customGenter;
 
     /**
      * 用户图片文件保存桶名
@@ -228,5 +243,4 @@ public class LoanUserInfoEntity {
      * 创建时间
      */
     private Date createTime;
-
 }
