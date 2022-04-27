@@ -9,6 +9,7 @@ import com.epoch.loan.workshop.common.util.LogUtil;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.net.URL;
@@ -21,6 +22,7 @@ import java.util.Date;
  * @createTime : 2022/04/22 14:52
  * @Description: 阿里云OSS操作工具类
  */
+@Component
 public class OssClient implements InitializingBean {
 
     @Autowired
