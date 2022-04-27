@@ -52,8 +52,8 @@ public class SdkCatchDataSyncLogElasticEntity {
     /**
      * epoch抓取原始数据返回信息
      */
-    @Field(type = FieldType.Object)
-    private Object message;
+    @Field(type = FieldType.Text)
+    private String message;
 
     /**
      * 抓取类型：msg：短信 app: app img：相册 contact：通讯录 device：设备信息
