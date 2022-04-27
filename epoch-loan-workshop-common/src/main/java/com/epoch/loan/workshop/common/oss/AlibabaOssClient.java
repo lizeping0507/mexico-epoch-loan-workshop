@@ -1,6 +1,7 @@
 package com.epoch.loan.workshop.common.oss;
 
 import com.aliyun.oss.*;
+import com.aliyun.oss.model.ObjectMetadata;
 import com.aliyun.oss.model.PutObjectRequest;
 import com.aliyun.oss.model.PutObjectResult;
 import com.epoch.loan.workshop.common.util.LogUtil;
@@ -11,7 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.Date;
 
@@ -38,12 +41,27 @@ public class AlibabaOssClient {
      *
      * @param bucketName 桶名
      * @param objectName 上传路径
-     * @param file       文件
-     * @return
+     * @param imageData  文件二进制
+     * @return 上传是否成功
      */
-    public Boolean upload(String bucketName, String objectName, File file) {
+    public Boolean upload(String bucketName, String objectName, byte[] imageData) {
         // 上传文件。
-        PutObjectResult putObjectResult = ossClient.putObject(bucketName, objectName, file);
+        PutObjectResult putObjectResult = null;
+        try {
+            putObjectResult = ossClient.putObject(bucketName, objectName, new ByteArrayInputStream(imageData));
+        } catch (OSSException oe) {
+            LogUtil.sysError("uploadFile oss上传出错", oe);
+            System.out.println("Host ID:" + oe.getHostId());
+        } catch (ClientException ce) {
+            LogUtil.sysError("uploadFile oss通信出错", ce);
+        } finally {
+            if (putObjectResult != null && putObjectResult.getCallbackResponseBody() != null) {
+                try {
+                    putObjectResult.getCallbackResponseBody().close();
+                } catch (IOException ignore) {
+                }
+            }
+        }
         LogUtil.sysInfo("OSS UPLOAD" + putObjectResult.getResponse().isSuccessful());
         return putObjectResult.getResponse().isSuccessful();
     }
@@ -77,13 +95,13 @@ public class AlibabaOssClient {
      *
      * @param bucketName     桶名
      * @param objectName     上传路径
-     * @param file           文件
+     * @param imageData  文件二进制
      * @param dateExpiration 过期时间
      * @return 预签
      */
-    public String upload(String bucketName, String objectName, File file, Date dateExpiration) {
+    public String upload(String bucketName, String objectName, byte[] imageData, Date dateExpiration) {
         // 上传文件
-        boolean upload = upload(bucketName, objectName, file);
+        boolean upload = upload(bucketName, objectName, imageData);
         if (!upload) {
             return null;
         }

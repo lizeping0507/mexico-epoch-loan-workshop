@@ -2,7 +2,7 @@ package com.epoch.loan.workshop.common.service;
 
 import com.epoch.loan.workshop.common.params.params.request.RepaymentParams;
 import com.epoch.loan.workshop.common.params.params.request.UtrParams;
-import com.epoch.loan.workshop.common.params.params.request.YeahPayRepamentCallbackParam;
+import com.epoch.loan.workshop.common.params.params.request.PandaRepaymentCallbackParam;
 import com.epoch.loan.workshop.common.params.params.result.Result;
 
 /**
@@ -28,7 +28,7 @@ public interface RepaymentService {
      * @param params 回调参数
      * @return String
      */
-    String yeahPayCallback(YeahPayRepamentCallbackParam params);
+    String pandaPay(PandaRepaymentCallbackParam params);
 
     /**
      * 调支付提供的UTR接口

@@ -7,7 +7,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.constant.LoanRemittanceOrderRecordStatus;
 import com.epoch.loan.workshop.common.constant.LoanRemittancePaymentRecordStatus;
 import com.epoch.loan.workshop.common.constant.PaymentField;
+import com.epoch.loan.workshop.common.dao.mysql.LoanRemittanceBankDao;
 import com.epoch.loan.workshop.common.entity.mysql.LoanPaymentEntity;
+import com.epoch.loan.workshop.common.entity.mysql.LoanRemittanceBankEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanRemittanceOrderRecordEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanRemittancePaymentRecordEntity;
 import com.epoch.loan.workshop.common.mq.remittance.params.RemittanceParams;
@@ -184,13 +186,16 @@ public class PandaPay extends BaseRemittancePaymentMQListener implements Message
         Integer paymentAccountType = paymentConfig.getInteger(PaymentField.PANDAPAY_PAYMENT_ACCOUNT_TYPE);
         Integer paymentType = paymentConfig.getInteger(PaymentField.PANDAPAY_PAYMENT_TYPE);
         String payoutUrl = paymentConfig.getString(PaymentField.PANDAPAY_PAYOUT_URL);
+
         // 封装请求参数
         PandaPayPayoutParam param = new PandaPayPayoutParam();
         param.setClaveRastreo(paymentRecord.getId());
         param.setConceptoPago(orderRecord.getRemarks());
         param.setCuentaBeneficiario(orderRecord.getRemittanceAccount());
         param.setCuentaOrdenante(paymentBankAccount);
-        param.setInstitucionContraparte(orderRecord.getBank());
+        String bank = orderRecord.getBank();
+        LoanRemittanceBankEntity loanRemittanceBank = loanRemittanceBankDao.findByName(bank);
+        param.setInstitucionContraparte(loanRemittanceBank.getName());
         param.setInstitucionOperante(paymentBankCode);
         param.setMonto(df.format(orderRecord.getAmount()));
         param.setNombreBeneficiario(orderRecord.getName());
@@ -206,16 +211,17 @@ public class PandaPay extends BaseRemittancePaymentMQListener implements Message
         param.setTipoCuentaBeneficiario(orderRecord.getType() == 1 ? 40 : 3);
         param.setTipoCuentaOrdenante(paymentAccountType);
         param.setTipoPago(paymentType);
+
+        // 请求头
         Map<String,String> header = new HashMap<>();
         header.put("Content-Type", "application/json");
         header.put("Authorization", sign(JSONObject.toJSONString(param), key));
         header.put("AppId", appId);
-        /* 第三方请求处理 */
+
         String returnResult;
         try {
             // 发送第三方代付请求
             returnResult = HttpUtils.simplePostInvoke(payoutUrl, JSONObject.toJSONString(param), header);
-//            {"transactionId":"e7fa49e596c8455c9f4d199444980daa","resultado":{"id":110499733}}
         } catch (Exception e) {
             updateLoanRemittancePaymentRecordLog(paymentRecord.getId(), JSONObject.toJSONString(param), "异常");
             LogUtil.sysError("PANDAPAY发起放款异常", e);

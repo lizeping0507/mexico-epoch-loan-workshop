@@ -121,4 +121,12 @@ public interface LoanRemittancePaymentRecordDao {
      * @return
      */
     int countByRecordIdAndLatterThanStatus(int maxStatus, String recordId);
+
+    /**
+     * 通过业务Id查询
+     *
+     * @param businessId
+     * @return
+     */
+    LoanRemittancePaymentRecordEntity getByBusinessId(String businessId);
 }

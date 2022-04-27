@@ -6,4 +6,7 @@
             resultType="com.epoch.loan.workshop.common.entity.mysql.LoanRemittanceBankEntity">
         SELECT * FROM loan_remittance_bank
     </select>
+    <select id="findByName" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanRemittanceBankEntity">
+        SELECT * FROM loan_remittance_bank WHERE name = {name} LIMIT 1
+    </select>
 </mapper>

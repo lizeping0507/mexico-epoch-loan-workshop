@@ -2,7 +2,7 @@ package com.epoch.loan.workshop.api.controller;
 
 import com.epoch.loan.workshop.common.config.URL;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
-import com.epoch.loan.workshop.common.params.params.request.YeahPayRepamentCallbackParam;
+import com.epoch.loan.workshop.common.params.params.request.PandaRepaymentCallbackParam;
 import com.epoch.loan.workshop.common.params.params.result.Result;
 import com.epoch.loan.workshop.common.util.LogUtil;
 import com.epoch.loan.workshop.common.util.ThrowableUtils;
@@ -21,13 +21,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class RepaymentCallbackController extends BaseController {
 
 
-    @RequestMapping(URL.YEAHPAY)
-    public Object yeahPay(YeahPayRepamentCallbackParam params) {
+    @RequestMapping(URL.PANDA_PAY)
+    public Object pandaPay(PandaRepaymentCallbackParam params) {
         // 结果集
         Result<?> result = new Result<>();
 
         try {
-            return repaymentService.yeahPayCallback(params);
+            return repaymentService.pandaPay(params);
         } catch (Exception e) {
             LogUtil.sysError("[PaymentCallBackController yeahPay]", e);
 
