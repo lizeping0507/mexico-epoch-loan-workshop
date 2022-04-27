@@ -28,7 +28,7 @@ public interface RepaymentService {
      * @param params 回调参数
      * @return String
      */
-    String yeahPayCallback(YeahPayRepamentCallbackParam params);
+    String pandaPay(YeahPayRepamentCallbackParam params);
 
     /**
      * 调支付提供的UTR接口

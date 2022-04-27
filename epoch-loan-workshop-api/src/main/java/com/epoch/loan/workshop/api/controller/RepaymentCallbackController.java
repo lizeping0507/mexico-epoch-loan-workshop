@@ -21,13 +21,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class RepaymentCallbackController extends BaseController {
 
 
-    @RequestMapping(URL.YEAHPAY)
-    public Object yeahPay(YeahPayRepamentCallbackParam params) {
+    @RequestMapping(URL.PANDA_PAY)
+    public Object pandaPay(YeahPayRepamentCallbackParam params) {
         // 结果集
         Result<?> result = new Result<>();
 
         try {
-            return repaymentService.yeahPayCallback(params);
+            return repaymentService.pandaPay(params);
         } catch (Exception e) {
             LogUtil.sysError("[PaymentCallBackController yeahPay]", e);
 

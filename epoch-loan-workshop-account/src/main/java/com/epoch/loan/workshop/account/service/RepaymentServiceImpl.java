@@ -232,7 +232,7 @@ public class RepaymentServiceImpl extends BaseService implements RepaymentServic
     }
 
     @Override
-    public String yeahPayCallback(YeahPayRepamentCallbackParam params) {
+    public String pandaPay(YeahPayRepamentCallbackParam params) {
         LoanRepaymentPaymentRecordEntity paymentRecord = loanRepaymentPaymentRecordDao.findRepaymentPaymentRecordById(params.getOrderId());
         LoanPaymentEntity paymentEntity = loanPaymentDao.getById(paymentRecord.getPaymentId());
 
