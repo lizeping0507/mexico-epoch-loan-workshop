@@ -79,7 +79,6 @@ public interface LoanOrderExamineDao {
      */
     int updateOrderExamineStatusByOrderId(String orderId, String modelName, Integer status, Date updateTime);
 
-
     /**
      * 更改模型审核状态
      *

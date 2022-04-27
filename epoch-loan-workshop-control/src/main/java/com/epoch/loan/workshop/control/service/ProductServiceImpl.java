@@ -98,7 +98,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         Integer orderStatus = loanOrderEntity.getStatus();
         if (orderStatus == OrderStatus.CREATE) {
             // 如果订单状态处于创建状态，进行多投判断
-            boolean rejectionRule = rejectionRule(productId, params.getUser());
+            boolean rejectionRule = rejectionRule(loanOrderEntity, params.getUser());
 
             // 多投被拒返回
             if (!rejectionRule) {
@@ -650,12 +650,12 @@ public class ProductServiceImpl extends BaseService implements ProductService {
     /**
      * 多投限制
      *
-     * @param productId
+     * @param loanOrderEntity
      * @param user
      * @return
      * @throws Exception
      */
-    protected boolean rejectionRule(String productId, User user) throws Exception {
+    protected boolean rejectionRule(LoanOrderEntity loanOrderEntity, User user) throws Exception {
         // 用户id
         String userId = user.getId();
 
@@ -672,7 +672,10 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         Integer userChannelId = user.getChannelId();
 
         // 用户客群
-        Integer userType = userType(userId, productId, appName);
+        Integer userType = loanOrderEntity.getUserType();
+
+        // 订单id
+        String orderId = loanOrderEntity.getId();
 
         // 查询渠道信息
         PlatformChannelEntity platformChannelEntity = platformChannelDao.findChannel(userChannelId);
@@ -697,8 +700,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         // 创建审核记录
         String orderExamineId = ObjectIdUtil.getObjectId();
         LoanOrderExamineEntity loanOrderExamineEntity = new LoanOrderExamineEntity();
-        loanOrderExamineEntity.setOrderId("");
-        loanOrderExamineEntity.setUserId(userId);
+        loanOrderExamineEntity.setOrderId(orderId);
         loanOrderExamineEntity.setId(orderExamineId);
         loanOrderExamineEntity.setStatus(OrderExamineStatus.CREATE);
         loanOrderExamineEntity.setModelName("rejectionRule");
@@ -716,7 +718,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         params.put(Field.TIMESTAMP, String.valueOf(System.currentTimeMillis() / 1000));
         JSONObject bizData = new JSONObject();
         bizData.put(Field.TRANSACTION_ID, userId);
-        bizData.put(Field.BORROW_ID, "");
+        bizData.put(Field.BORROW_ID, orderId);
         bizData.put(Field.PROGRESS, 0);
         bizData.put(Field.REGISTER_ADDR, registerAddress);
         bizData.put(Field.CHANNEL_NAME, channelName);
@@ -868,7 +870,6 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 modelList.parallelStream().forEach(model -> {
                     LoanOrderExamineEntity loanOrderExamineEntity = new LoanOrderExamineEntity();
                     loanOrderExamineEntity.setOrderId(orderId);
-                    loanOrderExamineEntity.setUserId(userId);
                     loanOrderExamineEntity.setId(ObjectIdUtil.getObjectId());
                     loanOrderExamineEntity.setStatus(OrderExamineStatus.CREATE);
                     loanOrderExamineEntity.setModelName(model);

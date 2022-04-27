@@ -7,7 +7,6 @@
         (
         `id`,
         `order_id`,
-        `user_id`,
         `model_name`,
         `status`,
         `request`,
@@ -17,7 +16,6 @@
         ) VALUES (
         #{loanOrderExamineEntity.id},
         #{loanOrderExamineEntity.orderId},
-        #{loanOrderExamineEntity.userId},
         #{loanOrderExamineEntity.modelName},
         #{loanOrderExamineEntity.status},
         #{loanOrderExamineEntity.request},
