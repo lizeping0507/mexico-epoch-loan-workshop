@@ -851,17 +851,17 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 }
 
                 // 查询用户指定状态订单
-                status = new Integer[]{OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE};
-                loanOrderEntity = loanOrderDao.findLatelyOrderByUserIdAndProductIdAndStatus(userId, productId, status);
+                int[] statues = {OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE};
+                int count = loanOrderDao.countUserOrderByProductAndStatusIn(userId, productId, statues);
 
                 // 是否复贷
                 Integer reloan = 0;
-                if (ObjectUtils.isNotEmpty(loanOrderEntity)) {
+                if (count > 0) {
                     reloan = 1;
                 }
 
                 // 用户客群
-                Integer userType = userType(userId, productId, appName);
+                Integer userType = userType(userId, productId);
 
                 // 订单id
                 String orderId = ObjectIdUtil.getObjectId();
@@ -943,10 +943,9 @@ public class ProductServiceImpl extends BaseService implements ProductService {
      *
      * @param userId
      * @param productId
-     * @param appName
      * @return
      */
-    protected Integer userType(String userId, String productId, String appName) {
+    protected Integer userType(String userId, String productId) {
         // 用户在本包是否有还款
         int[] status = {OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE};
         Integer count = loanOrderDao.countUserOrderByStatusIn(userId, status);
