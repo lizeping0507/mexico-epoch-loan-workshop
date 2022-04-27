@@ -25,7 +25,6 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.http.protocol.HTTP;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
-import sun.rmi.runtime.Log;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -843,18 +842,14 @@ public class UserServiceImpl extends BaseService implements UserService {
         // 封装响应参数
         JSONObject jsonObject = ocrInfoResult.getData();
         if (OcrField.ADVANCE_USER_OCR_ID_FRONT.equals(imageType)) {
-            AdvanceOcrInfoResponse<AdvanceOcrFrontInfoResult> data
-                    = JSON.parseObject(jsonObject.toJSONString(), new TypeReference<AdvanceOcrInfoResponse<AdvanceOcrFrontInfoResult>>() {
-            });
+            AdvanceOcrInfoResponse<AdvanceOcrFrontInfoResult> data = JSON.parseObject(jsonObject.toJSONString(), new TypeReference<AdvanceOcrInfoResponse<AdvanceOcrFrontInfoResult>>() {});
             ocrResult.setType(data.getCardType());
             ocrResult.setInfo(JSONObject.toJSONString(data.getValues()));
             result.setReturnCode(ResultEnum.SUCCESS.code());
             result.setMessage(ResultEnum.SUCCESS.message());
             result.setData(ocrResult);
         } else if (OcrField.ADVANCE_USER_OCR_ID_BACK.equalsIgnoreCase(imageType)) {
-            AdvanceOcrInfoResponse<AdvanceOcrBackInfoResult> data
-                    = JSON.parseObject(jsonObject.toJSONString(), new TypeReference<AdvanceOcrInfoResponse<AdvanceOcrBackInfoResult>>() {
-            });
+            AdvanceOcrInfoResponse<AdvanceOcrBackInfoResult> data = JSON.parseObject(jsonObject.toJSONString(), new TypeReference<AdvanceOcrInfoResponse<AdvanceOcrBackInfoResult>>() {});
             ocrResult.setType(data.getCardType());
             ocrResult.setInfo(JSONObject.toJSONString(data.getValues()));
             result.setReturnCode(ResultEnum.SUCCESS.code());

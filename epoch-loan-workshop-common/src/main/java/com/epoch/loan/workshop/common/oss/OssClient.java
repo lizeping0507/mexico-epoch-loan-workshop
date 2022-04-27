@@ -1,6 +1,9 @@
 package com.epoch.loan.workshop.common.oss;
 
-import com.aliyun.oss.*;
+import com.aliyun.oss.ClientException;
+import com.aliyun.oss.HttpMethod;
+import com.aliyun.oss.OSS;
+import com.aliyun.oss.OSSException;
 import com.aliyun.oss.model.PutObjectRequest;
 import com.epoch.loan.workshop.common.util.LogUtil;
 import org.apache.commons.lang3.ObjectUtils;
@@ -18,7 +21,6 @@ import java.util.Date;
  * @createTime : 2022/04/22 14:52
  * @Description: 阿里云OSS操作工具类
  */
-//@Component TODO
 public class OssClient implements InitializingBean {
 
     @Autowired
