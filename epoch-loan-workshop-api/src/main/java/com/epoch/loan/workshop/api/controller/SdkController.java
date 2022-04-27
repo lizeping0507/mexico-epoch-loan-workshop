@@ -1,5 +1,6 @@
 package com.epoch.loan.workshop.api.controller;
 
+import com.epoch.loan.workshop.api.annotated.Authentication;
 import com.epoch.loan.workshop.common.config.URL;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
 import com.epoch.loan.workshop.common.params.params.request.SdkPushInfoParams;
@@ -29,6 +30,7 @@ public class SdkController extends BaseController {
      * @param params 入参
      * @return 上传结果
      */
+    @Authentication
     @PostMapping(URL.SDK_UPLOAD_CALLBACK)
     public Result<Object> sdkUploadCallBack(SdkUploadParams params) {
         // 结果集
