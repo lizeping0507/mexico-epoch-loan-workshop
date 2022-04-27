@@ -656,35 +656,57 @@ public class ProductServiceImpl extends BaseService implements ProductService {
      * @throws Exception
      */
     protected boolean rejectionRule(LoanOrderEntity loanOrderEntity, User user) throws Exception {
-        // 模型名称
-        String subExpression = "rejectionRule";
-
         // 用户id
-        String userId = loanOrderEntity.getUserId();
+        String userId = user.getId();
 
         // 注册地址
         String registerAddress = user.getRegisterAddress();
 
-        // 订单id
-        String orderId = loanOrderEntity.getId();
-
-        // 用户客群
-        Integer userType = loanOrderEntity.getUserType();
+        // app名称
+        String appName = user.getAppName();
 
         // 手机哈
         String mobile = user.getMobile();
 
-        // app名称
-        String appName = loanOrderEntity.getAppName();
-
         // 渠道ID
-        Integer userChannelId = loanOrderEntity.getUserChannelId();
+        Integer userChannelId = user.getChannelId();
+
+        // 用户客群
+        Integer userType = loanOrderEntity.getUserType();
+
+        // 订单id
+        String orderId = loanOrderEntity.getId();
 
         // 查询渠道信息
         PlatformChannelEntity platformChannelEntity = platformChannelDao.findChannel(userChannelId);
 
         // 渠道名称
         String channelName = platformChannelEntity.getChannelName();
+
+        // 单包在贷笔数
+        int singleQuantity = loanOrderDao.countProcessOrderNo(user.getAppName(), userId);
+
+        // 多包在贷笔数
+        int allQuantity = loanOrderDao.countProcessOrderNo(null, user.getId());
+
+        // 第一笔还款距今天数
+        LoanOrderBillEntity fistRepayOrder = loanOrderBillDao.findFistRepayOrder(userId, user.getAppName());
+        int intervalDays = 0;
+        if (ObjectUtils.isEmpty(fistRepayOrder)) {
+            Date actualRepaymentTime = fistRepayOrder.getActualRepaymentTime();
+            intervalDays = DateUtil.getIntervalDays(new Date(), actualRepaymentTime);
+        }
+
+        // 创建审核记录
+        String orderExamineId = ObjectIdUtil.getObjectId();
+        LoanOrderExamineEntity loanOrderExamineEntity = new LoanOrderExamineEntity();
+        loanOrderExamineEntity.setOrderId(orderId);
+        loanOrderExamineEntity.setId(orderExamineId);
+        loanOrderExamineEntity.setStatus(OrderExamineStatus.CREATE);
+        loanOrderExamineEntity.setModelName("rejectionRule");
+        loanOrderExamineEntity.setUpdateTime(new Date());
+        loanOrderExamineEntity.setCreateTime(new Date());
+        loanOrderExamineDao.insertOrderExamine(loanOrderExamineEntity);
 
         // 封装请求参数
         Map<String, String> params = new HashMap<>();
@@ -700,16 +722,9 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         bizData.put(Field.PROGRESS, 0);
         bizData.put(Field.REGISTER_ADDR, registerAddress);
         bizData.put(Field.CHANNEL_NAME, channelName);
-        int singleQuantity = loanOrderDao.countProcessOrderNo(user.getAppName(), userId);
-        int allQuantity = loanOrderDao.countProcessOrderNo(null, user.getId());
         bizData.put(Field.SINGLE_QUANTITY, singleQuantity);
         bizData.put(Field.ALL_QUANTITY, allQuantity);
-        LoanOrderBillEntity fistRepayOrder = loanOrderBillDao.findFistRepayOrder(userId, user.getAppName());
-        if (null != fistRepayOrder) {
-            Date actualRepaymentTime = fistRepayOrder.getActualRepaymentTime();
-            int intervalDays = DateUtil.getIntervalDays(new Date(), actualRepaymentTime);
-            bizData.put(Field.REPAYMENT_TIME, intervalDays);
-        }
+        bizData.put(Field.REPAYMENT_TIME, intervalDays);
         bizData.put(Field.USER_TYPE, userType);
         bizData.put(Field.PHONE, mobile);
         bizData.put(Field.APP_NAME, appName);
@@ -724,26 +739,25 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         String requestParams = JSONObject.toJSONString(params);
 
         // 更新节点请求数据
-        loanOrderExamineDao.updateOrderExamineRequest(loanOrderEntity.getId(), subExpression, requestParams, new Date());
+        loanOrderExamineDao.updateOrderExamineRequestById(orderExamineId, requestParams, new Date());
 
         // 发送请求
         String result = HttpUtils.POST_FORM(riskConfig.getRiskUrl(), requestParams);
-        LogUtil.sysInfo("requestParams: {} result:{}", requestParams, result);
-
         if (StringUtils.isEmpty(result)) {
             return false;
         }
 
         // 更新节点响应数据
-        loanOrderExamineDao.updateOrderExamineResponse(loanOrderEntity.getId(), subExpression, result, new Date());
+        loanOrderExamineDao.updateOrderExamineResponseById(orderExamineId, result, new Date());
 
         // 转换为JSON
         JSONObject resultJson = JSONObject.parseObject(result);
 
         // 返回码
         Integer code = resultJson.getInteger(Field.ERROR);
-
         if (code != 200) {
+            // 更新审核状态
+            loanOrderExamineDao.updateOrderExamineStatusById(orderExamineId, OrderExamineStatus.FAIL, new Date());
             return false;
         }
 
@@ -756,12 +770,12 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         // 未通过
         if (pass == 0) {
             // 更新审核状态
-            loanOrderExamineDao.updateOrderExamineStatus(orderId, subExpression, OrderExamineStatus.REFUSE, new Date());
+            loanOrderExamineDao.updateOrderExamineStatusById(orderExamineId, OrderExamineStatus.REFUSE, new Date());
             return false;
         }
 
-        // 通过
-        loanOrderExamineDao.updateOrderExamineStatus(orderId, subExpression, OrderExamineStatus.PASS, new Date());
+        // 更新审核状态
+        loanOrderExamineDao.updateOrderExamineStatusById(orderExamineId, OrderExamineStatus.PASS, new Date());
         return true;
     }
 
@@ -863,18 +877,6 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                     loanOrderExamineEntity.setCreateTime(new Date());
                     loanOrderExamineDao.insertOrderExamine(loanOrderExamineEntity);
                 });
-
-                // 判断当前初始化订单是什么类型
-                if (OrderType.LOAN == type) {
-                    LoanOrderExamineEntity loanOrderExamineEntity = new LoanOrderExamineEntity();
-                    loanOrderExamineEntity.setOrderId(orderId);
-                    loanOrderExamineEntity.setId(ObjectIdUtil.getObjectId());
-                    loanOrderExamineEntity.setStatus(OrderExamineStatus.CREATE);
-                    loanOrderExamineEntity.setModelName("rejectionRule");
-                    loanOrderExamineEntity.setUpdateTime(new Date());
-                    loanOrderExamineEntity.setCreateTime(new Date());
-                    loanOrderExamineDao.insertOrderExamine(loanOrderExamineEntity);
-                }
 
                 return orderId;
             }

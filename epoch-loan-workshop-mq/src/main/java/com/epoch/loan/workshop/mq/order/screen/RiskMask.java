@@ -253,7 +253,7 @@ public class RiskMask extends BaseOrderMQListener implements MessageListenerConc
             String requestParams = JSONObject.toJSONString(params);
 
             // 更新节点请求数据
-            loanOrderExamineDao.updateOrderExamineRequest(loanOrderEntity.getId(), subExpression(), requestParams, new Date());
+            loanOrderExamineDao.updateOrderExamineRequestByOrderId(loanOrderEntity.getId(), subExpression(), requestParams, new Date());
 
             // 发送请求
             String result = HttpUtils.POST_FORM(riskConfig.getRiskUrl(), requestParams);
@@ -262,7 +262,7 @@ public class RiskMask extends BaseOrderMQListener implements MessageListenerConc
             }
 
             // 更新节点响应数据
-            loanOrderExamineDao.updateOrderExamineResponse(loanOrderEntity.getId(), subExpression(), result, new Date());
+            loanOrderExamineDao.updateOrderExamineResponseByOrderId(loanOrderEntity.getId(), subExpression(), result, new Date());
 
             // 返回响应参数
             return JSONObject.parseObject(result);

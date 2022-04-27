@@ -342,7 +342,7 @@ public abstract class BaseOrderMQListener {
      * @param status    状态
      */
     public void updateModeExamine(String orderId, String modelName, int status) {
-        loanOrderExamineDao.updateOrderExamineStatus(orderId, modelName, status, new Date());
+        loanOrderExamineDao.updateOrderExamineStatusByOrderId(orderId, modelName, status, new Date());
     }
 
     /**
