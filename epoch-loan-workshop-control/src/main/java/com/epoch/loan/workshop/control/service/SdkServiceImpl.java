@@ -54,9 +54,6 @@ public class SdkServiceImpl extends BaseService implements SdkService {
         // 日志写入Elastic
         SdkCatchDataSyncLogElasticEntity syncLogElasticEntity = new SdkCatchDataSyncLogElasticEntity();
         BeanUtils.copyProperties(params, syncLogElasticEntity);
-        String message = params.getMessage();
-        JSONObject jsonObject = JSONObject.parseObject(message, JSONObject.class);
-        syncLogElasticEntity.setMessage(jsonObject);
         syncLogElasticEntity.setUserId(userId);
         sdkCatchDataSyncLogElasticDao.save(syncLogElasticEntity);
 
