@@ -732,7 +732,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         // 第一笔还款距今天数
         LoanOrderBillEntity fistRepayOrder = loanOrderBillDao.findFistRepayOrder(userId, user.getAppName());
         int intervalDays = 0;
-        if (ObjectUtils.isEmpty(fistRepayOrder)) {
+        if (ObjectUtils.isNotEmpty(fistRepayOrder)) {
             Date actualRepaymentTime = fistRepayOrder.getActualRepaymentTime();
             intervalDays = DateUtil.getIntervalDays(new Date(), actualRepaymentTime);
         }
