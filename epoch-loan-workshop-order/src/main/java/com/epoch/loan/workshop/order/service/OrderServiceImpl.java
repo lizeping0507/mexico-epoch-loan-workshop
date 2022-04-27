@@ -194,6 +194,7 @@ public class OrderServiceImpl extends BaseService implements OrderService {
         orderAllList.stream().forEach(loanOrderEntity -> {
             OrderDTO orderDTO = new OrderDTO();
             BeanUtils.copyProperties(loanOrderEntity, orderDTO);
+            orderDTO.setOrderNo(loanOrderEntity.getId());
             orderDTO.setOrderStatus(loanOrderEntity.getStatus());
             orderDTO.setOrderStatusStr(OrderUtils.button(loanOrderEntity.getStatus()));
             if (loanOrderEntity.getStatus() >= OrderStatus.WAY && loanOrderEntity.getStatus() != OrderStatus.ABANDONED) {
@@ -244,6 +245,7 @@ public class OrderServiceImpl extends BaseService implements OrderService {
         orderEntityList.stream().forEach(loanOrderEntity -> {
             OrderDTO orderDTO = new OrderDTO();
             BeanUtils.copyProperties(loanOrderEntity, orderDTO);
+            orderDTO.setOrderNo(loanOrderEntity.getId());
             orderDTO.setOrderStatus(loanOrderEntity.getStatus());
             orderDTO.setOrderStatusStr(OrderUtils.button(loanOrderEntity.getStatus()));
             orderDTOList.add(orderDTO);
@@ -279,6 +281,7 @@ public class OrderServiceImpl extends BaseService implements OrderService {
         orderEntityList.stream().forEach(loanOrderEntity -> {
             OrderDTO orderDTO = new OrderDTO();
             BeanUtils.copyProperties(loanOrderEntity, orderDTO);
+            orderDTO.setOrderNo(loanOrderEntity.getId());
             orderDTO.setOrderStatus(loanOrderEntity.getStatus());
             orderDTO.setOrderStatusStr(OrderUtils.button(loanOrderEntity.getStatus()));
             LoanOrderBillEntity lastOrderBill = loanOrderBillDao.findLastOrderBill(loanOrderEntity.getId());
