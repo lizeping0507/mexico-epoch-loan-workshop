@@ -27,6 +27,12 @@ import java.util.Date;
 public abstract class BaseRemittanceMQListener {
 
     /**
+     * 银行卡
+     */
+    @Autowired
+    public LoanRemittanceBankDao loanRemittanceBankDao;
+
+    /**
      * 支付分配
      */
     @Autowired

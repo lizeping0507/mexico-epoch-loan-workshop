@@ -21,4 +21,12 @@ public interface LoanRemittanceBankDao {
      * @return
      */
     List<LoanRemittanceBankEntity> findLoanRemittanceBankList();
+
+    /**
+     * 通过名称查询
+     *
+     * @param name
+     * @return
+     */
+    LoanRemittanceBankEntity findByName(String name);
 }

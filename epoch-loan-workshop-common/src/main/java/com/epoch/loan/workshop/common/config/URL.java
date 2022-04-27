@@ -89,66 +89,9 @@ public class URL {
      */
     public static final String HELP = "/help";
     /**
-     * InPay
-     */
-    public static final String INPAY = "/inpay";
-
-    /**
-     * YEAHPAY
-     */
-    public static final String YEAHPAY = "/yeahpay";
-
-    /**
-     * SUNFLOWERPAY
-     */
-    public static final String SUNFLOWERPAY = "/sunflowerpay";
-
-    /**
-     * OCEANPAY
-     */
-    public static final String OCEANPAY = "/oceanpay";
-
-    /**
-     * ACPAY
-     */
-    public static final String ACPAY = "/acpay";
-
-    /**
-     * INCASHPAY
-     */
-    public static final String INCASHPAY = "/incash";
-
-    /**
-     * INCASHXIDPAY
-     */
-    public static final String INCASHXJDPAY = "/incashxjd";
-
-    /**
-     * TRUSTPAY
-     */
-    public static final String TRUSTPAY = "/trust";
-
-    /**
-     * QEPAY
-     */
-    public static final String QEPAY = "/qe";
-    /**
-     * HRPAY
-     */
-    public static final String HRPAY = "/hr";
-    /**
      * utr接口
      */
     public static final String REPAY_UTR = "/repayUTR";
-
-    /**
-     * GLOBPAY
-     */
-    public static final String GLOBPAY = "/glob";
-    /**
-     * 合同
-     */
-    public static final String CONTRACT = "/contract";
 
     /**
      * 申请
@@ -197,11 +140,6 @@ public class URL {
     public static final String REMITTANCE_BANK_LIST = "/remittanceBankList";
 
     /**
-     * 多推-贷超模式-首页
-     */
-    public static final String MERGE_PUSH_HOME = "/mergePush/home";
-
-    /**
      * 产品列表
      */
     public static final String LIST = "/list";
@@ -211,36 +149,6 @@ public class URL {
      * 产品详情
      */
     public static final String PRODUCT_DETAIL = "/productDetail";
-
-    /**
-     * 产品详情
-     */
-    public static final String DETAIL = "/detail";
-
-    /**
-     * 产品详情页
-     */
-    public static final String VIEW_DETAIL = "/view/detail";
-
-    /**
-     * 产品是否续贷开量
-     */
-    public static final String ISRELOAN = "/isReloan";
-
-    /**
-     * 获取产品支付渠道
-     */
-    public static final String PAY_CHANNEL = "/payChannel";
-
-    /**
-     * 多推-贷超模式-首页
-     */
-    public static final String MERGE_PUSH_LIST = "/mergePush/list";
-
-    /**
-     * 多推-变身贷超模式
-     */
-    public static final String TURN_INTO_LOAN = "/turnIntoLoan";
 
     /**
      * 忘记密码
@@ -253,34 +161,9 @@ public class URL {
     public static final String MODIFY_PASSWORD = "/modifyPassword";
 
     /**
-     * 修改密码
-     */
-    public static final String EDIT_PASSWORD = "/editPassword";
-
-    /**
      * 我的个人中心
      */
     public static final String MINE = "/mine";
-
-    /**
-     * 新增基本信息
-     */
-    public static final String USER_INFO_ADD = "/addUserInfo";
-
-    /**
-     * 获取基本信息
-     */
-    public static final String USER_INFO_GET = "/getUserInfo";
-
-    /**
-     * 保存个人信息
-     */
-    public static final String PERSON_INFO_SAVE = "/savePersonalInfo";
-
-    /**
-     * 获取个人信息
-     */
-    public static final String PERSON_INFO_GET = "/getPersonalInfo";
 
     /**
      * 获取OCR认证聚道
@@ -303,21 +186,6 @@ public class URL {
     public static final String GET_USER_OCR_INFO = "/getOcrInfo";
 
     /**
-     * 获取银行支行信息
-     */
-    public static final String BANK_BRANCH = "/bankBranch";
-
-    /**
-     * 获取注册页banner
-     */
-    public static final String REGISTER_BANNER = "/registerBanner";
-
-    /**
-     * 获取产品 banner列表
-     */
-    public static final String PRODUCT_BANNER_LIST = "/bannerList";
-
-    /**
      * 产品 - 推荐列表
      */
     public static final String PRODUCT_RECOMMEND_LIST = "/recommendList";
@@ -336,16 +204,6 @@ public class URL {
      * 订单 - 待还款订单列表
      */
     public static final String ORDER_UN_REPAYMENT_LIST = "/unRepaymentOrderList";
-
-    /**
-     * 订单 - 申请放款
-     */
-    public static final String APPLYLOAN = "/applyLoan";
-
-    /**
-     * 订单 - 申请申请确认页
-     */
-    public static final String COMFIRM_APPLY = "/comfirmApply";
 
     /**
      * 多推订单 - 申请确认页
@@ -406,4 +264,9 @@ public class URL {
      * 发送验证码
      */
     public static final String SEND_SMSCODE = "/sendSmsCode";
+
+    /**
+     * pandaPay
+     */
+    public static final String PANDA_PAY = "/pandaPay";
 }
