@@ -83,7 +83,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         // 用户id
         String userId = params.getUser().getId();
 
-        /* 没有指定产品指定状态的订单最后生成一个订单（排除这几个状态都处于在途状态，在途状态不允许创建订单）*/
+        // 查询指定状态的订单
         Integer[] status = new Integer[]{OrderStatus.CREATE, OrderStatus.EXAMINE_WAIT, OrderStatus.EXAMINE_PASS, OrderStatus.EXAMINE_FAIL, OrderStatus.WAIT_PAY, OrderStatus.WAY, OrderStatus.DUE, OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE};
         LoanOrderEntity loanOrderEntity = loanOrderDao.findLatelyOrderByUserIdAndProductIdAndStatus(userId, productId, status);
 
@@ -108,6 +108,8 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             // 判断是否过了冷却期
             if (!OrderUtils.isCdWithTime(cdDays, updateTime)) {
                 // 封装结果
+                resData.setOrderId(loanOrderEntity.getId());
+                result.setData(resData);
                 result.setReturnCode(ResultEnum.COOLING_PERIOD.code());
                 result.setMessage(ResultEnum.COOLING_PERIOD.message());
                 return result;
