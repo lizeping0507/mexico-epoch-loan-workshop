@@ -491,15 +491,15 @@ public class UserServiceImpl extends BaseService implements UserService {
         basicInfo.setRfc(info.getRfc());
         basicInfo.setPostalCode(info.getPostalCode());
         if (StringUtils.isNotBlank(info.getFrontPath())) {
-            String fileUrl = ossClient.getFileUrl(userFileBucketName, info.getFrontPath(), null);
+            String fileUrl = alibabaOssClient.getFileUrl(userFileBucketName, info.getFrontPath(), null);
             basicInfo.setFrontImgUrl(fileUrl);
         }
         if (StringUtils.isNotBlank(info.getBackPath())) {
-            String fileUrl = ossClient.getFileUrl(userFileBucketName, info.getBackPath(), null);
+            String fileUrl = alibabaOssClient.getFileUrl(userFileBucketName, info.getBackPath(), null);
             basicInfo.setFrontImgUrl(fileUrl);
         }
         if (StringUtils.isNotBlank(info.getFacePath())) {
-            String fileUrl = ossClient.getFileUrl(userFileBucketName, info.getFacePath(), null);
+            String fileUrl = alibabaOssClient.getFileUrl(userFileBucketName, info.getFacePath(), null);
             basicInfo.setFrontImgUrl(fileUrl);
         }
 
@@ -627,7 +627,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         // 上传证件正面图片
         File frontFile = convertToFile(params.getIdFrontImgData());
         String frontPath = BusinessNameUtils.createUserIdTypeFileName(NameField.USR_ID, user.getUserInfoId(), NameField.FRONT_IMAGE_TYPE);
-        Boolean frontResult = ossClient.upload(userFileBucketName, frontPath, frontFile);
+        Boolean frontResult = alibabaOssClient.upload(userFileBucketName, frontPath, frontFile);
         frontFile.deleteOnExit();
         if (!frontResult) {
             result.setReturnCode(ResultEnum.KYC_UPLOAD_FILE_ERROR.code());
@@ -638,7 +638,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         //上传证件背面图片 并获取链接
         File backFile = convertToFile(params.getIdBackImgData());
         String backPath = BusinessNameUtils.createUserIdTypeFileName(NameField.USR_ID, user.getUserInfoId(), NameField.BACK_IMAGE_TYPE);
-        Boolean backResult = ossClient.upload(userFileBucketName, backPath, backFile);
+        Boolean backResult = alibabaOssClient.upload(userFileBucketName, backPath, backFile);
         backFile.deleteOnExit();
         if (!backResult) {
             result.setReturnCode(ResultEnum.KYC_UPLOAD_FILE_ERROR.code());
@@ -649,7 +649,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         //上传人脸照片
         File faceFile = convertToFile(params.getFaceImgData());
         String facePath = BusinessNameUtils.createUserIdTypeFileName(NameField.USR_ID, user.getUserInfoId(), NameField.FACE_IMAGE_TYPE);
-        Boolean faceResult = ossClient.upload(userFileBucketName, facePath, faceFile);
+        Boolean faceResult = alibabaOssClient.upload(userFileBucketName, facePath, faceFile);
         faceFile.deleteOnExit();
         if (!faceResult) {
             result.setReturnCode(ResultEnum.KYC_UPLOAD_FILE_ERROR.code());

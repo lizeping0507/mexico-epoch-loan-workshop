@@ -4,9 +4,11 @@ import com.aliyun.oss.*;
 import com.aliyun.oss.model.PutObjectRequest;
 import com.aliyun.oss.model.PutObjectResult;
 import com.epoch.loan.workshop.common.util.LogUtil;
+import lombok.Data;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -20,8 +22,10 @@ import java.util.Date;
  * @createTime : 2022/04/22 14:52
  * @Description: 阿里云OSS操作工具类
  */
+@RefreshScope
 @Component
-public class OssClient  {
+@Data
+public class AlibabaOssClient {
 
     /**
      * OSS连接池

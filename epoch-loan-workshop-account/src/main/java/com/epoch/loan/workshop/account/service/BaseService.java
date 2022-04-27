@@ -7,16 +7,12 @@ import com.epoch.loan.workshop.common.config.RiskConfig;
 import com.epoch.loan.workshop.common.dao.elastic.OcrLivingDetectionLogElasticDao;
 import com.epoch.loan.workshop.common.dao.mysql.*;
 import com.epoch.loan.workshop.common.entity.mysql.LoanRemittancePaymentRecordEntity;
-import com.epoch.loan.workshop.common.entity.mysql.LoanUserEntity;
-import com.epoch.loan.workshop.common.entity.mysql.LoanUserInfoEntity;
 import com.epoch.loan.workshop.common.mq.remittance.RemittanceMQManager;
 import com.epoch.loan.workshop.common.mq.remittance.params.RemittanceParams;
 import com.epoch.loan.workshop.common.mq.repayment.RepaymentMQManager;
-import com.epoch.loan.workshop.common.oss.OssClient;
-import com.epoch.loan.workshop.common.params.User;
+import com.epoch.loan.workshop.common.oss.AlibabaOssClient;
 import com.epoch.loan.workshop.common.redis.RedisClient;
 import com.epoch.loan.workshop.common.sms.SMSManager;
-import com.epoch.loan.workshop.common.util.LogUtil;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -138,7 +134,7 @@ public class BaseService {
      * OSS
      */
     @Autowired
-    public OssClient ossClient;
+    public AlibabaOssClient alibabaOssClient;
 
 
     /**
