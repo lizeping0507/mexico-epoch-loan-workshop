@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Date;
 
@@ -74,6 +75,12 @@ public class AlibabaOssClient {
 
         // 生成以GET方法访问的签名URL，访客可以直接通过浏览器访问相关内容。
         URL url = ossClient.generatePresignedUrl(bucketName, objectName, dateExpiration, HttpMethod.GET);
+        try {
+            LogUtil.sysInfo(objectName + " : {}" , url.toURI().toASCIIString());
+            LogUtil.sysInfo(objectName + " : {}" , url.toString());
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
         if (ObjectUtils.isNotEmpty(url)) {
             return url.toString();
         }
