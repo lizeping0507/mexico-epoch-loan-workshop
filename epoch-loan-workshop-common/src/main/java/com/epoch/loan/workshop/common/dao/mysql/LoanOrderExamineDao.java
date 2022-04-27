@@ -34,7 +34,18 @@ public interface LoanOrderExamineDao {
      * @param updateTime
      * @return
      */
-    int updateOrderExamineRequest(String orderId, String modelName, String request, Date updateTime);
+    int updateOrderExamineRequestByOrderId(String orderId, String modelName, String request, Date updateTime);
+
+
+    /**
+     * 更新模型审核请求参数
+     *
+     * @param id
+     * @param request
+     * @param updateTime
+     * @return
+     */
+    int updateOrderExamineRequestById(String id, String request, Date updateTime);
 
     /**
      * 更新模型审核响应参数
@@ -45,7 +56,17 @@ public interface LoanOrderExamineDao {
      * @param updateTime
      * @return
      */
-    int updateOrderExamineResponse(String orderId, String modelName, String response, Date updateTime);
+    int updateOrderExamineResponseByOrderId(String orderId, String modelName, String response, Date updateTime);
+
+    /**
+     * 更新模型审核响应参数
+     *
+     * @param id
+     * @param response
+     * @param updateTime
+     * @return
+     */
+    int updateOrderExamineResponseById(String id, String response, Date updateTime);
 
     /**
      * 更改模型审核状态
@@ -56,7 +77,18 @@ public interface LoanOrderExamineDao {
      * @param updateTime
      * @return
      */
-    int updateOrderExamineStatus(String orderId, String modelName, Integer status, Date updateTime);
+    int updateOrderExamineStatusByOrderId(String orderId, String modelName, Integer status, Date updateTime);
+
+
+    /**
+     * 更改模型审核状态
+     *
+     * @param id
+     * @param status
+     * @param updateTime
+     * @return
+     */
+    int updateOrderExamineStatusById(String id, Integer status, Date updateTime);
 
     /**
      * 根据modelName & status & datePoint 查询列表
@@ -82,6 +114,7 @@ public interface LoanOrderExamineDao {
      * 新增订单审核
      *
      * @param loanOrderExamineEntity
+     * @return
      */
-    void insertOrderExamine(@Param("loanOrderExamineEntity") LoanOrderExamineEntity loanOrderExamineEntity);
+    int insertOrderExamine(@Param("loanOrderExamineEntity") LoanOrderExamineEntity loanOrderExamineEntity);
 }
