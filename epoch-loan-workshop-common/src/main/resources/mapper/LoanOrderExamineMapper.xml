@@ -23,7 +23,7 @@
         #{loanOrderExamineEntity.request},
         #{loanOrderExamineEntity.response},
         #{loanOrderExamineEntity.updateTime},
-        #{loanOrderExamineEntity.createTime},
+        #{loanOrderExamineEntity.createTime}
         );
     </insert>
 
