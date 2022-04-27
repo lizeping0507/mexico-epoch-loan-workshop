@@ -25,7 +25,7 @@ import java.util.Date;
 @RefreshScope
 @Component
 @Data
-public class OssClient  {
+public class AlibabaOssClient {
 
     /**
      * OSS连接池
