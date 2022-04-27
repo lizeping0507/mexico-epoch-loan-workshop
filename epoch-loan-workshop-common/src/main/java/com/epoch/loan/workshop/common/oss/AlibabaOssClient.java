@@ -75,7 +75,7 @@ public class AlibabaOssClient {
         // 生成以GET方法访问的签名URL，访客可以直接通过浏览器访问相关内容。
         URL url = ossClient.generatePresignedUrl(bucketName, objectName, dateExpiration, HttpMethod.GET);
         if (ObjectUtils.isNotEmpty(url)) {
-            return url.getFile();
+            return url.toString();
         }
 
         return null;
