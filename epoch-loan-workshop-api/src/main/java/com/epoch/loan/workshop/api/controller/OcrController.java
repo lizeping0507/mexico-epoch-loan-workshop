@@ -11,6 +11,7 @@ import com.epoch.loan.workshop.common.params.params.request.UserOcrFullInfoParam
 import com.epoch.loan.workshop.common.params.params.result.*;
 import com.epoch.loan.workshop.common.util.LogUtil;
 import com.epoch.loan.workshop.common.util.ThrowableUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -203,13 +204,20 @@ public class OcrController extends BaseController {
             // 读取文件
             MultipartResolver resolver = new StandardServletMultipartResolver();
             MultipartHttpServletRequest mRequest = resolver.resolveMultipart(request);
+
+            // 获取文件二进制
             Map<String, MultipartFile> fileMap = mRequest.getFileMap();
             params.setIdFrontImgData(fileMap.get("idFrontImage").getBytes());
-            params.setIdFrontImgType(fileMap.get("idFrontImage").getContentType());
             params.setIdBackImgData(fileMap.get("idBackImage").getBytes());
-            params.setIdBackImgType(fileMap.get("idBackImage").getContentType());
             params.setFaceImgData(fileMap.get("faceImage").getBytes());
-            params.setFaceImgType(fileMap.get("faceImage").getContentType());
+
+            // 获取文件类型
+            String idFrontImgType = FilenameUtils.getExtension(fileMap.get("idFrontImage").getOriginalFilename());
+            String idBackImgType = FilenameUtils.getExtension(fileMap.get("idFrontImage").getOriginalFilename());
+            String faceImgType = FilenameUtils.getExtension(fileMap.get("idFrontImage").getOriginalFilename());
+            params.setIdFrontImgType(idFrontImgType);
+            params.setIdBackImgType(idBackImgType);
+            params.setFaceImgType(faceImgType);
 
             // 证件上传
             return userService.saveFile(params);

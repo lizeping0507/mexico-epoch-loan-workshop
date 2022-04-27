@@ -50,7 +50,7 @@ public class AlibabaOssClient {
         PutObjectResult putObjectResult = ossClient.putObject(bucketName, objectName, new ByteArrayInputStream(imageData));
 
         // 上传成功response为空，上传失败,OOS服务端会响应状态码和错误信息
-        if (ObjectUtils.isNotEmpty(putObjectResult.getResponse())) {
+        if (ObjectUtils.isEmpty(putObjectResult.getResponse())) {
             return true;
         }
 
