@@ -1,5 +1,6 @@
 package com.epoch.loan.workshop.api.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.config.URL;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
 import com.epoch.loan.workshop.common.params.params.request.*;
@@ -28,7 +29,9 @@ public class PaymentCallBackController extends BaseController {
      * @return String
      */
     @PostMapping(URL.PANDA_PAY)
-    public Object yeahPay(PandaPayCallBackParams params) {
+    public Object pandaPay(PandaPayCallBackParams params) {
+        LogUtil.sysInfo("pandaPay支付回调 请求参数：{}", JSONObject.toJSONString(params));
+
         // 结果集
         Result<?> result = new Result<>();
 

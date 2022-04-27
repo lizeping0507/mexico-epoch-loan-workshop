@@ -19,4 +19,29 @@ import java.util.Date;
 public class PandaPayCallBackParams implements Serializable {
     private static final long serialVersionUID = 116541653165465L;
 
+    /**
+     *
+     */
+    private String causaDevolucion;
+
+    /**
+     *
+     */
+    private String empresa;
+
+    /**
+     *
+     */
+    private String estado;
+
+    /**
+     *
+     */
+    private String folioOrigen;
+
+    /**
+     *
+     */
+    private String id;
+
 }

@@ -6,6 +6,7 @@ import com.epoch.loan.workshop.common.entity.mysql.LoanRemittancePaymentRecordEn
 import com.epoch.loan.workshop.common.mq.remittance.params.RemittanceParams;
 import com.epoch.loan.workshop.common.params.params.request.*;
 import com.epoch.loan.workshop.common.service.PaymentCallbackService;
+import com.epoch.loan.workshop.common.util.LogUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 
@@ -27,14 +28,13 @@ public class PaymentCallbackServiceImpl extends BaseService implements PaymentCa
     @Override
     public String pandaPay(PandaPayCallBackParams params) throws Exception {
         // 获取Id
-        String id = params.getMerchantPayoutId();
+        String id = params.getId();
 
-        // 判断队列 (YeahPay多个队列)
+        // 返库订单详情
         LoanRemittancePaymentRecordEntity paymentRecord = paymentRecordDao.getById(id);
-        LoanPaymentEntity loanPayment = loanPaymentDao.getById(paymentRecord.getPaymentId());
-        String name = loanPayment.getName();
+        // LoanRemittancePaymentRecordEntity paymentRecord = paymentRecordDao.getByBusinessId(id);
 
-        // 发送到yeahPay队列
+        // 发送队列
         String queueParam = paymentRecord.getQueueParam();
         RemittanceParams remittanceParams;
         if (StringUtils.isNotEmpty(queueParam)) {
@@ -44,9 +44,7 @@ public class PaymentCallbackServiceImpl extends BaseService implements PaymentCa
             remittanceParams.setGroupName("Weight");
             remittanceParams.setId(paymentRecord.getId());
         }
-        remittanceMQManagerProduct.sendMessage(remittanceParams, name);
-        remittanceParams.setGroupName("Weight");
-        remittanceParams.setId(paymentRecord.getId());
+        remittanceMQManagerProduct.sendMessage(remittanceParams, remittanceMQManagerProduct.getInPaySubExpression());
 
         return "success";
     }

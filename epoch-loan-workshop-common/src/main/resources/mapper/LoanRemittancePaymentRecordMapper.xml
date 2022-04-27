@@ -90,4 +90,7 @@
         SELECT count(1) FROM loan_remittance_payment_record WHERE remittance_order_record_id = #{recordId} AND status
         &lt; #{maxStatus}
     </select>
+    <select id="getByBusinessId" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanRemittancePaymentRecordEntity">
+        SELECT * FROM loan_remittance_payment_record where business_id = #{businessId}
+    </select>
 </mapper>
