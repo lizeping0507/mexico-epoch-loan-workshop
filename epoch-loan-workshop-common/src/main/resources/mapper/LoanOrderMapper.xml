@@ -193,12 +193,32 @@
     <select id="findOrderListByUserIdAndStatusAndOrderByField"
             resultType="com.epoch.loan.workshop.common.entity.mysql.LoanOrderEntity">
         SELECT * FROM loan_order WHERE user_id = #{userId}
-        <foreach collection="array" item="statu" index="index" open="AND status IN(" close=")" separator=",">#{statu}</foreach>
+        <foreach collection="array" item="statu" index="index" open="AND status IN(" close=")" separator=",">#{statu}
+        </foreach>
         ORDER BY #{field} #{sequence}
     </select>
     <select id="findUserLastOrderWithProduct"
             resultType="com.epoch.loan.workshop.common.entity.mysql.LoanOrderEntity">
-        SELECT * FROM loan_order WHERE user_id = #{userId} AND product_id = #{productId} ORDER BY create_time DESC LIMIT 1
+        SELECT * FROM loan_order WHERE user_id = #{userId} AND product_id = #{productId} ORDER BY create_time DESC LIMIT
+        1
+    </select>
+    <select id="findLatelyOrderByUserIdAndProductIdAndStatus"
+            resultType="com.epoch.loan.workshop.common.entity.mysql.LoanOrderEntity">
+        SELECT
+        *
+        FROM
+        loan_order
+        WHERE
+        user_id = #{userId}
+        AND
+        product_id=#{productId}
+        AND
+        status in
+        <foreach collection="array" item="sts" index="index" open="(" close=")" separator=",">
+            #{sts}
+        </foreach>
+        ORDER BY create_time DESC
+        LIMIT 0,1
     </select>
 
 </mapper>

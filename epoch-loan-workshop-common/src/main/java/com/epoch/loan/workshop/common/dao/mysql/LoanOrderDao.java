@@ -1,13 +1,11 @@
 package com.epoch.loan.workshop.common.dao.mysql;
 
 import com.epoch.loan.workshop.common.entity.mysql.LoanOrderEntity;
-import com.epoch.loan.workshop.common.params.params.result.model.OrderDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author : Duke
@@ -312,4 +310,14 @@ public interface LoanOrderDao {
      * @return
      */
     LoanOrderEntity findUserLastOrderWithProduct(String userId, String productId);
+
+    /**
+     * 根据用户Id产品id订单状态，查询距离当前时间最近的一笔订单
+     *
+     * @param userId
+     * @param productId
+     * @param status
+     * @return
+     */
+    LoanOrderEntity findLatelyOrderByUserIdAndProductIdAndStatus(String userId, String productId, @Param("array") Integer[] status);
 }

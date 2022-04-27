@@ -12,7 +12,6 @@ import com.epoch.loan.workshop.common.params.params.result.*;
 import com.epoch.loan.workshop.common.params.params.result.model.ProductList;
 import com.epoch.loan.workshop.common.service.ProductService;
 import com.epoch.loan.workshop.common.util.*;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -40,18 +39,10 @@ public class ProductServiceImpl extends BaseService implements ProductService {
     public Result<ProductDetailResult> productDetail(ProductDetailParams params) throws Exception {
         // 结果集
         Result<ProductDetailResult> result = new Result<>();
+        ProductDetailResult resData = new ProductDetailResult();
 
         // 产品id
         String productId = params.getProductId();
-
-        // app版本
-        String appVersion = params.getAppVersion();
-
-        // app名称
-        String appName = params.getAppName();
-
-        // 用户id
-        String userId = params.getUser().getId();
 
         // 查询产品详情
         LoanProductEntity loanProductEntity = loanProductDao.findProduct(productId);
@@ -62,17 +53,60 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             return result;
         }
 
-        // 判断该产品最后一笔被拒订单是否在冷却期内
-        Integer[] status = new Integer[]{OrderStatus.EXAMINE_FAIL};
-        List<LoanOrderEntity> loanOrderEntityList = loanOrderDao.findOrderByUserIdAndStatus(userId, status);
-        if (CollectionUtils.isNotEmpty(loanOrderEntityList)) {
+        // 产品信息
+        resData.setArrivalRange(loanProductEntity.getArrivalRange());
+        resData.setInterestRange(loanProductEntity.getInterestRange());
+        resData.setRepaymentRange(loanProductEntity.getRepaymentRange());
+        resData.setServiceFeeRange(loanProductEntity.getServiceFeeRange());
+        resData.setAmount(loanProductEntity.getAmountRange());
+
+        // 用户认证状态
+        resData.setIdFlag(params.getUser().isIdentityAuth() ? 1 : 0);
+        resData.setBaseInfoFlag(params.getUser().isBasicInfoAuth() ? 1 : 0);
+        resData.setAddInfoFlag(params.getUser().isAddInfoAuth() ? 1 : 0);
+
+        // 判断用户认证是否通过
+        if (!params.getUser().isIdentityAuth() || !params.getUser().isBasicInfoAuth() || !params.getUser().isAddInfoAuth()) {
+            resData.setOrderId("");
+            result.setData(resData);
+            result.setReturnCode(ResultEnum.SUCCESS.code());
+            result.setMessage(ResultEnum.SUCCESS.message());
+            return result;
+        }
+
+        // app版本
+        String appVersion = params.getAppVersion();
+
+        // app名称
+        String appName = params.getAppName();
+
+        // 用户id
+        String userId = params.getUser().getId();
+
+        /* 没有指定产品指定状态的订单最后生成一个订单（排除这几个状态都处于在途状态，在途状态不允许创建订单）*/
+        Integer[] status = new Integer[]{OrderStatus.CREATE, OrderStatus.EXAMINE_WAIT, OrderStatus.EXAMINE_PASS, OrderStatus.EXAMINE_FAIL, OrderStatus.WAIT_PAY, OrderStatus.WAY, OrderStatus.DUE, OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE};
+        LoanOrderEntity loanOrderEntity = loanOrderDao.findLatelyOrderByUserIdAndProductIdAndStatus(userId, productId, status);
+
+        /* 判断最后一条订单是否不处于结清和被拒（排除这三个状态的订单后，说明这条订单是在途状态） */
+        if (ObjectUtils.isNotEmpty(loanOrderEntity) && loanOrderEntity.getStatus() != OrderStatus.DUE_COMPLETE && loanOrderEntity.getStatus() != OrderStatus.COMPLETE && loanOrderEntity.getStatus() == OrderStatus.EXAMINE_FAIL) {
+            // 封装结果集
+            resData.setOrderId(loanOrderEntity.getId());
+            result.setData(resData);
+            result.setReturnCode(ResultEnum.SUCCESS.code());
+            result.setMessage(ResultEnum.SUCCESS.message());
+            return result;
+        }
+
+        /*判断最后一条订单是否是被拒订单*/
+        if (loanOrderEntity.getStatus() == OrderStatus.EXAMINE_FAIL) {
             // 更新时间
-            Date updateTime = loanOrderEntityList.get(0).getUpdateTime();
+            Date updateTime = loanOrderEntity.getUpdateTime();
 
             // 产品冷却期
-            Integer cdDays = loanProductEntity.getCdDays();
+            int cdDays = loanProductEntity.getCdDays();
 
-            if (OrderUtils.isCdWithTime(cdDays, updateTime)) {
+            // 判断是否过了冷却期
+            if (!OrderUtils.isCdWithTime(cdDays, updateTime)) {
                 // 封装结果
                 result.setReturnCode(ResultEnum.COOLING_PERIOD.code());
                 result.setMessage(ResultEnum.COOLING_PERIOD.message());
@@ -80,11 +114,12 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             }
         }
 
+        /*生成订单*/
         // 订单审核模型
         String orderModelGroup = loanProductEntity.getOrderModelGroup();
 
         // 初始化订单
-        LoanOrderEntity loanOrderEntity = initOrder(params.getUser(), OrderType.LOAN, appVersion, appName, orderModelGroup, loanProductEntity);
+        loanOrderEntity = initOrder(params.getUser(), OrderType.LOAN, appVersion, appName, orderModelGroup, loanProductEntity);
 
         // 订单是否创建成功
         if (ObjectUtils.isEmpty(loanOrderEntity)) {
@@ -94,31 +129,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             return result;
         }
 
-        // 订单状态
-        Integer orderStatus = loanOrderEntity.getStatus();
-        if (orderStatus == OrderStatus.CREATE) {
-            // 如果订单状态处于创建状态，进行多投判断
-            boolean rejectionRule = rejectionRule(loanOrderEntity, params.getUser());
-
-            // 多投被拒返回
-            if (!rejectionRule) {
-                // 封装结果
-                result.setReturnCode(ResultEnum.DELIVERY_REJECTED_ERROR.code());
-                result.setMessage(ResultEnum.DELIVERY_REJECTED_ERROR.message());
-                return result;
-            }
-        }
-
         // 封装结果集
-        ProductDetailResult resData = new ProductDetailResult();
-        resData.setArrivalRange(loanProductEntity.getArrivalRange());
-        resData.setInterestRange(loanProductEntity.getInterestRange());
-        resData.setRepaymentRange(loanProductEntity.getRepaymentRange());
-        resData.setServiceFeeRange(loanProductEntity.getServiceFeeRange());
-        resData.setAmount(loanProductEntity.getAmountRange());
-        resData.setIdFlag(params.getUser().isIdentityAuth() ? 1 : 0);
-        resData.setBaseInfoFlag(params.getUser().isBasicInfoAuth() ? 1 : 0);
-        resData.setAddInfoFlag(params.getUser().isAddInfoAuth() ? 1 : 0);
         resData.setOrderId(loanOrderEntity.getId());
         result.setData(resData);
         result.setReturnCode(ResultEnum.SUCCESS.code());
@@ -178,7 +189,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             appMaskModelResult.setRemittanceAccountAuth(1);
         }
 
-        // 查询四项认证是否都通过
+        // 查询三项认证是否都通过
         if (!params.getUser().isIdentityAuth() || !params.getUser().isBasicInfoAuth() || !params.getUser().isAddInfoAuth()) {
             // 没有通过 返回结果
             appMaskModelResult.setMaskModel(3);
@@ -199,39 +210,21 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             return result;
         }
 
-        // 没有指定状态的订单就生成一个订单
-        Integer[] status = new Integer[]{OrderStatus.CREATE, OrderStatus.EXAMINE_WAIT, OrderStatus.EXAMINE_PASS, OrderStatus.WAIT_PAY, OrderStatus.WAY, OrderStatus.DUE, OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE};
-        List<LoanOrderEntity> loanOrderEntityList = loanOrderDao.findOrderByUserIdAndStatus(userId, status);
-        if (CollectionUtils.isEmpty(loanOrderEntityList)) {
-            /*查询订单是否全部被拒*/
-            status = new Integer[]{OrderStatus.EXAMINE_FAIL};
-            loanOrderEntityList = loanOrderDao.findOrderByUserIdAndStatus(userId, status);
-            if (CollectionUtils.isNotEmpty(loanOrderEntityList)) {
-                // 更新时间
-                Date updateTime = loanOrderEntityList.get(0).getUpdateTime();
+        // 查询A阈值的承接盘
+        LoanMaskEntity loanMaskEntity = loanMaskDao.findLoanMaskByAppNameAndLevel(appName, "A");
 
-                // 产品冷却期
-                int cdDays = 1;
+        // 产品id
+        String productId = loanMaskEntity.getProductId();
 
-                if (OrderUtils.isCdWithTime(cdDays, updateTime)) {
-                    // 未过冷却期订单不允许再次进行申请
-                    appMaskModelResult.setMaskModel(2);
-                    appMaskModelResult.setButton(OrderUtils.button(OrderStatus.EXAMINE_FAIL));
-                    appMaskModelResult.setStatusDescription(OrderUtils.statusDescription(OrderStatus.EXAMINE_FAIL));
-                    result.setData(appMaskModelResult);
-                    return result;
-                }
-            }
+        // 查询承接盘详细信息
+        LoanProductEntity loanProductEntity = loanProductDao.findProduct(productId);
 
-            /*生成新的订单*/
-            // 查询A阈值的承接盘
-            LoanMaskEntity loanMaskEntity = loanMaskDao.findLoanMaskByAppNameAndLevel(appName, "A");
-
-            // 查询承接盘详细信息
-            LoanProductEntity loanProductEntity = loanProductDao.findProduct(loanMaskEntity.getProductId());
-
+        // 没有指定产品指定状态的订单最后生成一个订单
+        Integer[] status = new Integer[]{OrderStatus.CREATE, OrderStatus.EXAMINE_WAIT, OrderStatus.EXAMINE_PASS, OrderStatus.EXAMINE_FAIL, OrderStatus.WAIT_PAY, OrderStatus.WAY, OrderStatus.DUE, OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE};
+        LoanOrderEntity loanOrderEntity = loanOrderDao.findLatelyOrderByUserIdAndProductIdAndStatus(userId, productId, status);
+        if (ObjectUtils.isEmpty(loanOrderEntity)) {
             // 生成订单
-            LoanOrderEntity loanOrderEntity = initOrder(params.getUser(), OrderType.MASK, appVersion, appName, "MASK", loanProductEntity);
+            loanOrderEntity = initOrder(params.getUser(), OrderType.MASK, appVersion, appName, "MASK", loanProductEntity);
 
             // 订单是否创建成功
             if (ObjectUtils.isEmpty(loanOrderEntity)) {
@@ -254,16 +247,13 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             return result;
         }
 
-        // 获取订单
-        LoanOrderEntity loanOrderEntity = loanOrderEntityList.get(0);
-
         // 订单编号
         String orderId = loanOrderEntity.getId();
 
         // 订单状态
         Integer orderStatus = loanOrderEntity.getStatus();
 
-        // 判断订单状态是否已经结清
+        /* 判断订单状态是否已经结清*/
         if (orderStatus == OrderStatus.DUE_COMPLETE || orderStatus == OrderStatus.COMPLETE) {
             // 返回结果
             appMaskModelResult.setMaskModel(1);
@@ -271,10 +261,50 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             return result;
         }
 
-        // 查询承接盘
-        String productId = loanOrderEntity.getProductId();
-        LoanMaskEntity loanMaskEntity = loanMaskDao.findLoanMaskByAppNameAndProductId(appName, productId);
+        /*判断最后一条订单是否是被拒订单*/
+        if (orderStatus == OrderStatus.EXAMINE_FAIL) {
+            // 更新时间
+            Date updateTime = loanOrderEntity.getUpdateTime();
 
+            // 产品冷却期
+            int cdDays = 1;
+
+            // 判断是否过了冷却期
+            if (!OrderUtils.isCdWithTime(cdDays, updateTime)) {
+                // 未过冷却期订单不允许再次进行申请
+                appMaskModelResult.setMaskModel(2);
+                appMaskModelResult.setButton(OrderUtils.button(OrderStatus.EXAMINE_FAIL));
+                appMaskModelResult.setStatusDescription(OrderUtils.statusDescription(OrderStatus.EXAMINE_FAIL));
+                result.setData(appMaskModelResult);
+                return result;
+            }
+
+            /*冷却期结束生成新的订单*/
+            // 生成订单
+            loanOrderEntity = initOrder(params.getUser(), OrderType.MASK, appVersion, appName, "MASK", loanProductEntity);
+
+            // 订单是否创建成功
+            if (ObjectUtils.isEmpty(loanOrderEntity)) {
+                // 封装结果
+                result.setReturnCode(ResultEnum.SYNCHRONIZATION_ERROR.code());
+                result.setMessage(ResultEnum.SYNCHRONIZATION_ERROR.message());
+                return result;
+            }
+
+            // 订单状态
+            orderStatus = loanOrderEntity.getStatus();
+
+            // 返回结果集
+            appMaskModelResult.setMaskModel(0);
+            appMaskModelResult.setButton(OrderUtils.button(orderStatus));
+            appMaskModelResult.setStatusDescription(OrderUtils.statusDescription(orderStatus));
+            appMaskModelResult.setOrderId(loanOrderEntity.getId());
+            appMaskModelResult.setOrderStatus(orderStatus);
+            result.setData(appMaskModelResult);
+            return result;
+        }
+
+        /*已经有在途订单*/
         // 如果阈值为A在途订单就进入贷超模式
         if (loanMaskEntity.getLevel().equals("A") && orderStatus >= OrderStatus.WAY) {
             // 返回结果
@@ -650,12 +680,12 @@ public class ProductServiceImpl extends BaseService implements ProductService {
     /**
      * 多投限制
      *
-     * @param loanOrderEntity
+     * @param productId
      * @param user
      * @return
      * @throws Exception
      */
-    protected boolean rejectionRule(LoanOrderEntity loanOrderEntity, User user) throws Exception {
+    protected boolean rejectionRule(String productId, User user) throws Exception {
         // 用户id
         String userId = user.getId();
 
@@ -670,12 +700,6 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
         // 渠道ID
         Integer userChannelId = user.getChannelId();
-
-        // 用户客群
-        Integer userType = loanOrderEntity.getUserType();
-
-        // 订单id
-        String orderId = loanOrderEntity.getId();
 
         // 查询渠道信息
         PlatformChannelEntity platformChannelEntity = platformChannelDao.findChannel(userChannelId);
@@ -700,7 +724,8 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         // 创建审核记录
         String orderExamineId = ObjectIdUtil.getObjectId();
         LoanOrderExamineEntity loanOrderExamineEntity = new LoanOrderExamineEntity();
-        loanOrderExamineEntity.setOrderId(orderId);
+        loanOrderExamineEntity.setOrderId("");
+        loanOrderExamineEntity.setUserId(userId);
         loanOrderExamineEntity.setId(orderExamineId);
         loanOrderExamineEntity.setStatus(OrderExamineStatus.CREATE);
         loanOrderExamineEntity.setModelName("rejectionRule");
@@ -718,14 +743,14 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         params.put(Field.TIMESTAMP, String.valueOf(System.currentTimeMillis() / 1000));
         JSONObject bizData = new JSONObject();
         bizData.put(Field.TRANSACTION_ID, userId);
-        bizData.put(Field.BORROW_ID, orderId);
+        bizData.put(Field.BORROW_ID, "");
+        bizData.put(Field.PRODUCT_ID, productId);
         bizData.put(Field.PROGRESS, 0);
         bizData.put(Field.REGISTER_ADDR, registerAddress);
         bizData.put(Field.CHANNEL_NAME, channelName);
         bizData.put(Field.SINGLE_QUANTITY, singleQuantity);
         bizData.put(Field.ALL_QUANTITY, allQuantity);
         bizData.put(Field.REPAYMENT_TIME, intervalDays);
-        bizData.put(Field.USER_TYPE, userType);
         bizData.put(Field.PHONE, mobile);
         bizData.put(Field.APP_NAME, appName);
         params.put(Field.BIZ_DATA, bizData.toJSONString());
@@ -804,18 +829,18 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
                 // 查询用户是否有已经创建且未完结的订单
                 Integer[] status = new Integer[]{OrderStatus.CREATE, OrderStatus.EXAMINE_WAIT, OrderStatus.EXAMINE_PASS, OrderStatus.WAIT_PAY, OrderStatus.WAY, OrderStatus.DUE};
-                List<LoanOrderEntity> loanOrderEntityList = loanOrderDao.findOrderByUserAndProductIdAndStatus(userId, productId, status);
-                if (CollectionUtils.isNotEmpty(loanOrderEntityList)) {
-                    return loanOrderEntityList.get(0).getId();
+                LoanOrderEntity loanOrderEntity = loanOrderDao.findLatelyOrderByUserIdAndProductIdAndStatus(userId, productId, status);
+                if (ObjectUtils.isNotEmpty(loanOrderEntity)) {
+                    return loanOrderEntity.getId();
                 }
 
                 // 查询用户指定状态订单
                 status = new Integer[]{OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE};
-                loanOrderEntityList = loanOrderDao.findOrderByUserAndProductIdAndStatus(userId, productId, status);
+                loanOrderEntity = loanOrderDao.findLatelyOrderByUserIdAndProductIdAndStatus(userId, productId, status);
 
                 // 是否复贷
                 Integer reloan = 0;
-                if (CollectionUtils.isNotEmpty(loanOrderEntityList)) {
+                if (ObjectUtils.isNotEmpty(loanOrderEntity)) {
                     reloan = 1;
                 }
 
@@ -826,7 +851,6 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 String orderId = ObjectIdUtil.getObjectId();
 
                 // 新增订单
-                LoanOrderEntity loanOrderEntity = new LoanOrderEntity();
                 loanOrderEntity = new LoanOrderEntity();
                 loanOrderEntity.setId(orderId);
                 loanOrderEntity.setUserId(userId);
@@ -870,6 +894,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 modelList.parallelStream().forEach(model -> {
                     LoanOrderExamineEntity loanOrderExamineEntity = new LoanOrderExamineEntity();
                     loanOrderExamineEntity.setOrderId(orderId);
+                    loanOrderExamineEntity.setUserId(userId);
                     loanOrderExamineEntity.setId(ObjectIdUtil.getObjectId());
                     loanOrderExamineEntity.setStatus(OrderExamineStatus.CREATE);
                     loanOrderExamineEntity.setModelName(model);

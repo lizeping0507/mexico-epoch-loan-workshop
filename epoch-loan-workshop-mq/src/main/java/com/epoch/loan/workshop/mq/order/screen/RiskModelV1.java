@@ -201,6 +201,9 @@ public class RiskModelV1 extends BaseOrderMQListener implements MessageListenerC
             // 是否复贷
             Integer reloan = loanOrderEntity.getReloan();
 
+            // 产品id
+            String productId = loanOrderEntity.getProductId();
+
             // app名称
             String appName = loanOrderEntity.getAppName();
 
@@ -228,6 +231,7 @@ public class RiskModelV1 extends BaseOrderMQListener implements MessageListenerC
             bizData.put("transactionId", userId);
             bizData.put("borrowId", orderId);
             bizData.put("age", age);
+            bizData.put("productId", productId);
             bizData.put("isReloan", reloan);
             bizData.put("phone", mobile);
             bizData.put("appName", appName);

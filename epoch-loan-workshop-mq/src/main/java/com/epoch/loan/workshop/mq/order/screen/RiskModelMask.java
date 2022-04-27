@@ -33,14 +33,14 @@ import java.util.Map;
 /**
  * @author : Duke
  * @packageName : com.epoch.loan.workshop.mq.order
- * @className : RiskMask
+ * @className : RiskModelMask
  * @createTime : 2021/11/16 18:02
  * @description : 风控V3
  */
 @RefreshScope
 @Component
 @Data
-public class RiskMask extends BaseOrderMQListener implements MessageListenerConcurrently {
+public class RiskModelMask extends BaseOrderMQListener implements MessageListenerConcurrently {
     /**
      * 消息监听器
      */
@@ -184,10 +184,10 @@ public class RiskMask extends BaseOrderMQListener implements MessageListenerConc
                     // 异常,重试
                     retry(orderParams, subExpression());
                 } catch (Exception exception) {
-                    LogUtil.sysError("[RiskMask]", exception);
+                    LogUtil.sysError("[RiskModelMask]", exception);
                 }
 
-                LogUtil.sysError("[RiskMask]", e);
+                LogUtil.sysError("[RiskModelMask]", e);
             }
         }
         return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
@@ -207,6 +207,9 @@ public class RiskMask extends BaseOrderMQListener implements MessageListenerConc
 
             // 订单id
             String orderId = loanOrderEntity.getId();
+
+            // 产品id
+            String productId = loanOrderEntity.getProductId();
 
             // 是否复贷
             Integer reloan = loanOrderEntity.getReloan();
@@ -238,6 +241,7 @@ public class RiskMask extends BaseOrderMQListener implements MessageListenerConc
             bizData.put("transactionId", userId);
             bizData.put("borrowId", orderId);
             bizData.put("age", age);
+            bizData.put("productId", productId);
             bizData.put("isReloan", reloan);
             bizData.put("phone", mobile);
             bizData.put("appName", appName);
@@ -267,7 +271,7 @@ public class RiskMask extends BaseOrderMQListener implements MessageListenerConc
             // 返回响应参数
             return JSONObject.parseObject(result);
         } catch (Exception e) {
-            LogUtil.sysError("[RiskMask sendRiskV1Request]", e);
+            LogUtil.sysError("[RiskModelMask sendRiskV1Request]", e);
             return null;
         }
     }
