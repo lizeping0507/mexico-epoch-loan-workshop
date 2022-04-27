@@ -1,6 +1,5 @@
 package com.epoch.loan.workshop.account.repayment.panda;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -27,36 +26,33 @@ import java.util.*;
  */
 @Component("PandaPay")
 public class PandaPay extends BaseRepayment{
-    /**
-     * 参数签名
-     */
-    public static String sign(String param, String key) {
-        String firstMd5 = SecureUtil.md5(param);
-        String authorization = SecureUtil.md5(firstMd5 + key);
-        return authorization;
-    }
 
     /**
      * 发起代收
      *
      * @param loanRepaymentPaymentRecordEntity 支付详情
      * @param payment                          支付渠道
+     * @param params
      * @return 付款页面
      */
-//    @Override
-    public String startRepayment(LoanRepaymentPaymentRecordEntity loanRepaymentPaymentRecordEntity, LoanPaymentEntity payment) {
-//        获取支付方式
-        String paymentType = "OXXO";
-        String result = "";
+    @Override
+    public String startRepayment(LoanRepaymentPaymentRecordEntity loanRepaymentPaymentRecordEntity,
+                                 LoanPaymentEntity payment,
+                                 com.epoch.loan.workshop.common.params.params.request.RepaymentParams params) {
+        // 获取支付方式
+        String paymentType = params.getPayType();
+        String result = null;
+
         if(PaymentField.PAY_TYPE_SPEI.equals(paymentType)){
-            result = SPEIRepayment(loanRepaymentPaymentRecordEntity, payment);
+            result = speiRepayment(loanRepaymentPaymentRecordEntity, payment);
         }else if(PaymentField.PAY_TYPE_OXXO.equals(paymentType)){
-            result = OXXORepayment(loanRepaymentPaymentRecordEntity, payment);
+            result = oxxoRepayment(loanRepaymentPaymentRecordEntity, payment);
         }
+
         return result;
     }
 
-    public String SPEIRepayment(LoanRepaymentPaymentRecordEntity loanRepaymentPaymentRecordEntity, LoanPaymentEntity payment) {
+    public String speiRepayment(LoanRepaymentPaymentRecordEntity loanRepaymentPaymentRecordEntity, LoanPaymentEntity payment) {
         String clabe = "";
         // 获取渠道配置信息
         JSONObject paymentConfig = JSONObject.parseObject(payment.getConfig());
@@ -129,7 +125,7 @@ public class PandaPay extends BaseRepayment{
         return clabe;
     }
 
-    public String OXXORepayment(LoanRepaymentPaymentRecordEntity loanRepaymentPaymentRecordEntity, LoanPaymentEntity payment) {
+    public String oxxoRepayment(LoanRepaymentPaymentRecordEntity loanRepaymentPaymentRecordEntity, LoanPaymentEntity payment) {
         String barcodeUrl = "";
         // 获取渠道配置信息
         JSONObject paymentConfig = JSONObject.parseObject(payment.getConfig());
@@ -211,5 +207,12 @@ public class PandaPay extends BaseRepayment{
         return barcodeUrl;
     }
 
-
+    /**
+     * 参数签名
+     */
+    public static String sign(String param, String key) {
+        String firstMd5 = SecureUtil.md5(param);
+        String authorization = SecureUtil.md5(firstMd5 + key);
+        return authorization;
+    }
 }

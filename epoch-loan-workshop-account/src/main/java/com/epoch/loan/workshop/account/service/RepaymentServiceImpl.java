@@ -151,7 +151,7 @@ public class RepaymentServiceImpl extends BaseService implements RepaymentServic
             LogUtil.sysInfo("repaymentUtil:{}", repaymentUtil);
 
             // 发起还款
-            payUrl = repaymentUtil.startRepayment(loanRepaymentPaymentRecordEntity, payment);
+            payUrl = repaymentUtil.startRepayment(loanRepaymentPaymentRecordEntity, payment, params);
             LogUtil.sysInfo("payUrl:{}", payUrl);
         } else {
             // 策略无效
