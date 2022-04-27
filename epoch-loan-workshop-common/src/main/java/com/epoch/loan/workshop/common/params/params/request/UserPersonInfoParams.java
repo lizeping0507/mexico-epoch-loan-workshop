@@ -13,46 +13,95 @@ import org.apache.commons.lang3.StringUtils;
  */
 @Data
 public class UserPersonInfoParams extends BaseParams {
+
     /**
-     * 紧急联系人信息(JSON)
+     * 月收入
+     */
+    private String monthlyIncome;
+
+    /**
+     * 发薪周期
+     */
+    private String payPeriod;
+
+    /**
+     * 职业
+     */
+    private String occupation;
+
+    /**
+     * 工资发放方式
+     */
+    private String payMethod;
+
+    /**
+     * 邮箱
+     */
+    private String email;
+
+    /**
+     * 紧急联系人信息
      */
     private String contacts;
-    /**
-     * 孩子数量
-     */
-    private String childrenNumber;
-    /**
-     * 居住类型
-     */
-    private String liveType;
 
 
     /**
-     * 紧急联系人信息 字段校验
+     * 字段校验-月收入
      */
-    public boolean isContactsLegal() {
-        if (StringUtils.isBlank(this.contacts)) {
-            return false;
-        }
-        return true;
-    }
-    /**
-     * 孩子数量 字段校验
-     */
-    public boolean isChildrenNumberLegal() {
-        if (StringUtils.isBlank(this.childrenNumber)) {
-            return false;
-        }
-        return true;
-    }
-    /**
-     * 居住类型 字段校验
-     */
-    public boolean isLiveTypeLegal() {
-        if (StringUtils.isBlank(this.liveType)) {
+    public boolean isMonthlyIncomeLegal() {
+        if (StringUtils.isEmpty(this.monthlyIncome)) {
             return false;
         }
         return true;
     }
 
+    /**
+     * 字段校验-发薪周期
+     */
+    public boolean isPayPeriodLegal(){
+        if (StringUtils.isEmpty(this.payPeriod)){
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * 字段校验-职业
+     */
+    public boolean isOccupationLegal(){
+        if (StringUtils.isEmpty(this.occupation)){
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * 字段校验-工资发放方式
+     */
+    public boolean isPayMethodLegal(){
+        if (StringUtils.isEmpty(this.payMethod)){
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * 字段校验-邮箱
+     */
+    public boolean isEmailLegal(){
+        if (StringUtils.isEmpty(this.email)){
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * 字段校验-紧急联系人信息
+     */
+    public boolean isContactsLegal(){
+        if (StringUtils.isEmpty(this.contacts)){
+            return false;
+        }
+        return true;
+    }
 }

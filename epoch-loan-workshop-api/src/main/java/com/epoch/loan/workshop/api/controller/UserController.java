@@ -306,52 +306,46 @@ public class UserController extends BaseController {
         Result<SaveUserInfoResult> result = new Result<>();
 
         try {
-            if (!params.isMonthlyIncomeLegal()) {
+            if (!params.isCustomDateOfBirthLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":MonthlyIncome");
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":CustomDateOfBirthL");
                 return result;
             }
-            if (!params.isPayPeriodLegal()) {
+            if (!params.isCustomGenterLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":PayPeriod");
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":CustomGenterL");
                 return result;
             }
-            if (!params.isOccupationLegal()) {
+            if (!params.isChildrenNumberLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":Occupation");
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":ChildrenNumberL");
                 return result;
             }
-            if (!params.isPayMethodLegal()) {
+            if (!params.isLiveTypeLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":PayMethod");
-                return result;
-            }
-            if (!params.isEmailLegal()) {
-                // 异常返回结果
-                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":Email");
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":LiveTypeL");
                 return result;
             }
             if (!params.isEducationLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":Education");
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":EducationL");
                 return result;
             }
             if (!params.isMaritalLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":Marital");
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":MaritalL");
                 return result;
             }
             if (!params.isLoanPurposeLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":LoanPurpose");
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":LoanPurposeL");
                 return result;
             }
             // 获取个人信息
@@ -381,24 +375,40 @@ public class UserController extends BaseController {
 
         try {
 
+            if (!params.isMonthlyIncomeLegal() ) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() +":MonthlyIncome");
+                return result;
+            }
+            if (!params.isPayPeriodLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":PayPeriodL");
+                return result;
+            }
+            if (!params.isOccupationLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":OccupationL");
+                return result;
+            }
+            if (!params.isPayMethodLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":PayMethodL");
+                return result;
+            }
+            if (!params.isEmailLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":EmailL");
+                return result;
+            }
             if (!params.isContactsLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":Contacts");
-                return result;
-            }
-
-            if (!params.isChildrenNumberLegal()) {
-                // 异常返回结果
-                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":ChildrenNumber");
-                return result;
-            }
-
-            if (!params.isLiveTypeLegal()) {
-                // 异常返回结果
-                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":LiveType");
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":ContactsL");
                 return result;
             }
             // 保存个人信息

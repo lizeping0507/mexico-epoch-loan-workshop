@@ -140,7 +140,6 @@ public class TokenManager {
         user.setCustomName(userInfoEntity.getCustomName());
         user.setCustomMotherName(userInfoEntity.getCustomMotherName());
         user.setCustomFullName(userInfoEntity.getCustomFullName());
-        user.setUserFileBucketName(userInfoEntity.getUserFileBucketName());
         user.setFrontPath(userInfoEntity.getFrontPath());
         user.setBackPath(userInfoEntity.getBackPath());
         user.setFacePath(userInfoEntity.getFacePath());

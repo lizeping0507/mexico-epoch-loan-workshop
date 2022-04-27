@@ -346,15 +346,15 @@ public class UserServiceImpl extends BaseService implements UserService {
         data.setPhoneNumber(loginName.substring(0, 3) + "****" + loginName.substring(7));
 
         // 未完成的订单
-        Integer uncompletedOrder = loanOrderDao.findUserBetweenSpecificStatusOrderNum(userCache.getId(), OrderStatus.WAIT_PAY , OrderStatus.DUE);
+        Integer uncompletedOrder = loanOrderDao.findUserBetweenSpecificStatusOrderNum(userCache.getId(), OrderStatus.WAIT_PAY, OrderStatus.DUE);
         data.setUncompletedOrder(uncompletedOrder);
 
         // 待还款订单数量-
-        Integer noCompleteNum = loanOrderDao.findUserBetweenSpecificStatusOrderNum(userCache.getId(), OrderStatus.WAY , OrderStatus.DUE);
+        Integer noCompleteNum = loanOrderDao.findUserBetweenSpecificStatusOrderNum(userCache.getId(), OrderStatus.WAY, OrderStatus.DUE);
         data.setPenRepaymentOrder(noCompleteNum - uncompletedOrder);
 
         // 用户所有状态的订单数量
-        Integer allOrderNum = loanOrderDao.findUserBetweenSpecificStatusOrderNum(userCache.getId(), null , null);
+        Integer allOrderNum = loanOrderDao.findUserBetweenSpecificStatusOrderNum(userCache.getId(), null, null);
         data.setAllRepaymentOrder(allOrderNum);
 
         // 帮助中心地址 TODO 待确认
@@ -388,11 +388,10 @@ public class UserServiceImpl extends BaseService implements UserService {
 
         // 查询用户详细信息
         LoanUserInfoEntity userInfo = loanUserInfoDao.findUserInfoById(user.getId());
-        userInfo.setMonthlyIncome(params.getMonthlyIncome());
-        userInfo.setPayPeriod(params.getPayPeriod());
-        userInfo.setOccupation(params.getOccupation());
-        userInfo.setPayMethod(params.getPayMethod());
-        userInfo.setEmail(params.getEmail());
+        userInfo.setCustomDateOfBirth(params.getCustomDateOfBirth());
+        userInfo.setCustomGenter(params.getCustomGenter());
+        userInfo.setChildrenNumber(params.getChildrenNumber());
+        userInfo.setLiveType(params.getLiveType());
         userInfo.setEducation(params.getEducation());
         userInfo.setMarital(params.getMarital());
         userInfo.setLoanPurpose(params.getLoanPurpose());
@@ -429,9 +428,12 @@ public class UserServiceImpl extends BaseService implements UserService {
 
         // 查询用户详细信息
         LoanUserInfoEntity userInfo = loanUserInfoDao.findUserInfoById(user.getId());
+        userInfo.setMonthlyIncome(params.getMonthlyIncome());
+        userInfo.setPayPeriod(params.getPayPeriod());
+        userInfo.setOccupation(params.getOccupation());
+        userInfo.setPayMethod(params.getPayMethod());
+        userInfo.setEmail(params.getEmail());
         userInfo.setContacts(params.getContacts());
-        userInfo.setChildrenNumber(params.getChildrenNumber());
-        userInfo.setLiveType(params.getLiveType());
 
         // 更新
         loanUserInfoDao.update(userInfo);
@@ -496,11 +498,11 @@ public class UserServiceImpl extends BaseService implements UserService {
         }
         if (StringUtils.isNotBlank(info.getBackPath())) {
             String fileUrl = alibabaOssClient.getFileUrl(userFileBucketName, info.getBackPath(), null);
-            basicInfo.setFrontImgUrl(fileUrl);
+            basicInfo.setBackImgUrl(fileUrl);
         }
         if (StringUtils.isNotBlank(info.getFacePath())) {
             String fileUrl = alibabaOssClient.getFileUrl(userFileBucketName, info.getFacePath(), null);
-            basicInfo.setFrontImgUrl(fileUrl);
+            basicInfo.setFaceImgUrl(fileUrl);
         }
 
         // 封装结果
@@ -527,7 +529,6 @@ public class UserServiceImpl extends BaseService implements UserService {
         User user = params.getUser();
         LoanUserInfoEntity userInfoById = loanUserInfoDao.findUserInfoById(user.getId());
         AdvanceOcrFrontInfoResult frontInfo = JSON.parseObject(params.getFrontJson(), AdvanceOcrFrontInfoResult.class);
-        AdvanceOcrBackInfoResult backInfo = JSON.parseObject(params.getBackJson(), AdvanceOcrBackInfoResult.class);
         String idNumber = frontInfo.getIdNumber();
 
         // curp校验
@@ -625,7 +626,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         }
 
         // 上传证件正面图片
-        String frontPath = BusinessNameUtils.createUserIdTypeFileName(NameField.USR_ID, user.getUserInfoId(), NameField.FRONT_IMAGE_TYPE);
+        String frontPath = BusinessNameUtils.createUserIdTypeFileName(NameField.USR_ID, user.getUserInfoId(), NameField.FRONT_IMAGE_TYPE, params.getIdFrontImgType());
         Boolean frontResult = alibabaOssClient.upload(userFileBucketName, frontPath, params.getIdFrontImgData());
         if (!frontResult) {
             result.setReturnCode(ResultEnum.KYC_UPLOAD_FILE_ERROR.code());
@@ -634,7 +635,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         }
 
         //上传证件背面图片 并获取链接
-        String backPath = BusinessNameUtils.createUserIdTypeFileName(NameField.USR_ID, user.getUserInfoId(), NameField.BACK_IMAGE_TYPE);
+        String backPath = BusinessNameUtils.createUserIdTypeFileName(NameField.USR_ID, user.getUserInfoId(), NameField.BACK_IMAGE_TYPE, params.getIdBackImgType());
         Boolean backResult = alibabaOssClient.upload(userFileBucketName, backPath, params.getIdBackImgData());
         if (!backResult) {
             result.setReturnCode(ResultEnum.KYC_UPLOAD_FILE_ERROR.code());
@@ -643,7 +644,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         }
 
         //上传人脸照片
-        String facePath = BusinessNameUtils.createUserIdTypeFileName(NameField.USR_ID, user.getUserInfoId(), NameField.FACE_IMAGE_TYPE);
+        String facePath = BusinessNameUtils.createUserIdTypeFileName(NameField.USR_ID, user.getUserInfoId(), NameField.FACE_IMAGE_TYPE, params.getFaceImgType());
         Boolean faceResult = alibabaOssClient.upload(userFileBucketName, facePath, params.getFaceImgData());
         if (!faceResult) {
             result.setReturnCode(ResultEnum.KYC_UPLOAD_FILE_ERROR.code());
@@ -652,10 +653,9 @@ public class UserServiceImpl extends BaseService implements UserService {
         }
 
         // 保存 图片信息
-        userInfoById.setUserFileBucketName(userFileBucketName);
         userInfoById.setFrontPath(frontPath);
         userInfoById.setBackPath(backPath);
-        userInfoById.setBackPath(facePath);
+        userInfoById.setFacePath(facePath);
 
         // 处理扫描识别的证件信息和RFC，保存用户基本信息
         if (ObjectUtils.isNotEmpty(frontInfo)) {
@@ -669,6 +669,7 @@ public class UserServiceImpl extends BaseService implements UserService {
             userInfoById.setPapersVoterId(frontInfo.getVoterId());
             userInfoById.setRfc(rfc);
             userInfoById.setPapersAge(frontInfo.getAge());
+            userInfoById.setPapersGender(frontInfo.getGender());
             userInfoById.setPapersDateOfBirth(frontInfo.getBirthday());
             userInfoById.setCustomName(params.getName());
             userInfoById.setCustomFatherName(params.getFatherName());
@@ -835,14 +836,16 @@ public class UserServiceImpl extends BaseService implements UserService {
         // 封装响应参数
         JSONObject jsonObject = ocrInfoResult.getData();
         if (OcrField.ADVANCE_USER_OCR_ID_FRONT.equals(imageType)) {
-            AdvanceOcrInfoResponse<AdvanceOcrFrontInfoResult> data = JSON.parseObject(jsonObject.toJSONString(), new TypeReference<AdvanceOcrInfoResponse<AdvanceOcrFrontInfoResult>>() {});
+            AdvanceOcrInfoResponse<AdvanceOcrFrontInfoResult> data = JSON.parseObject(jsonObject.toJSONString(), new TypeReference<AdvanceOcrInfoResponse<AdvanceOcrFrontInfoResult>>() {
+            });
             ocrResult.setType(data.getCardType());
             ocrResult.setInfo(JSONObject.toJSONString(data.getValues()));
             result.setReturnCode(ResultEnum.SUCCESS.code());
             result.setMessage(ResultEnum.SUCCESS.message());
             result.setData(ocrResult);
         } else if (OcrField.ADVANCE_USER_OCR_ID_BACK.equalsIgnoreCase(imageType)) {
-            AdvanceOcrInfoResponse<AdvanceOcrBackInfoResult> data = JSON.parseObject(jsonObject.toJSONString(), new TypeReference<AdvanceOcrInfoResponse<AdvanceOcrBackInfoResult>>() {});
+            AdvanceOcrInfoResponse<AdvanceOcrBackInfoResult> data = JSON.parseObject(jsonObject.toJSONString(), new TypeReference<AdvanceOcrInfoResponse<AdvanceOcrBackInfoResult>>() {
+            });
             ocrResult.setType(data.getCardType());
             ocrResult.setInfo(JSONObject.toJSONString(data.getValues()));
             result.setReturnCode(ResultEnum.SUCCESS.code());
@@ -949,7 +952,7 @@ public class UserServiceImpl extends BaseService implements UserService {
                 return null;
             }
 
-            LogUtil.sysInfo("风控CURP校验结果：{}", riskResult );
+            LogUtil.sysInfo("风控CURP校验结果：{}", riskResult);
             // 返回响应参数
             return JSONObject.parseObject(riskResult);
         } catch (Exception e) {
