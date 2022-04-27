@@ -126,6 +126,7 @@ public class OcrController extends BaseController {
      * @param params 获取用户OCR保存信息请求参数封装类
      * @return 保存成功与否
      */
+    @Authentication
     @PostMapping(URL.GET_USER_OCR_INFO)
     public Result<UserOcrBasicInfoResult> getOcrInfo(BaseParams params) {
         // 结果集
