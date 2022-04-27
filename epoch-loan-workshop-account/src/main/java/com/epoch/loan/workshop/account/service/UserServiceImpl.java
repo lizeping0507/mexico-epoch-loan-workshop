@@ -25,6 +25,7 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.http.protocol.HTTP;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
+import sun.rmi.runtime.Log;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -960,6 +961,7 @@ public class UserServiceImpl extends BaseService implements UserService {
                 return null;
             }
 
+            LogUtil.sysInfo("风控CURP校验结果：{}", riskResult );
             // 返回响应参数
             return JSONObject.parseObject(riskResult);
         } catch (Exception e) {
