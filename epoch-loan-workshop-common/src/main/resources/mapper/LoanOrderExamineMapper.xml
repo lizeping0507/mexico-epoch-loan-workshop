@@ -7,6 +7,7 @@
         (
         `id`,
         `order_id`,
+        `user_id`,
         `model_name`,
         `status`,
         `request`,
@@ -16,6 +17,7 @@
         ) VALUES (
         #{loanOrderExamineEntity.id},
         #{loanOrderExamineEntity.orderId},
+        #{loanOrderExamineEntity.userId},
         #{loanOrderExamineEntity.modelName},
         #{loanOrderExamineEntity.status},
         #{loanOrderExamineEntity.request},
@@ -25,7 +27,7 @@
         );
     </insert>
 
-    <update id="updateOrderExamineRequest">
+    <update id="updateOrderExamineRequestByOrderId">
         UPDATE
         loan_order_examine
         SET
@@ -36,7 +38,7 @@
         AND
         model_name=#{modelName}
     </update>
-    <update id="updateOrderExamineResponse">
+    <update id="updateOrderExamineResponseByOrderId">
         UPDATE
         loan_order_examine
         SET
@@ -47,15 +49,43 @@
         AND
         model_name=#{modelName}
     </update>
-    <update id="updateOrderExamineStatus">
+    <update id="updateOrderExamineStatusByOrderId">
         UPDATE
         loan_order_examine
         SET
         status=#{status}
         WHERE
-        order_id=#{orderId}
+        order_id=#{orderId},
+        update_time=#{updateTime}
         AND
         model_name=#{modelName}
+    </update>
+    <update id="updateOrderExamineRequestById">
+        UPDATE
+        loan_order_examine
+        SET
+        request=#{request},
+        update_time=#{updateTime}
+        WHERE
+        id=#{id}
+    </update>
+    <update id="updateOrderExamineResponseById">
+        UPDATE
+        loan_order_examine
+        SET
+        response=#{response},
+        update_time=#{updateTime}
+        WHERE
+        id=#{id}
+    </update>
+    <update id="updateOrderExamineStatusById">
+        UPDATE
+        loan_order_examine
+        SET
+        status=#{status},
+        update_time=#{updateTime}
+        WHERE
+        id=#{id}
     </update>
     <select id="findOrderExamineStatus" resultType="java.lang.Integer">
         SELECT status FROM loan_order_examine WHERE order_id=#{orderId} AND model_name=#{modelName}
