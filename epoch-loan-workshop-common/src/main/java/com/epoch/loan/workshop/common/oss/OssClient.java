@@ -91,48 +91,6 @@ public class OssClient implements InitializingBean {
         return fileUrl;
     }
 
-    /**
-     * 文件上传并获取临时链接
-     *
-     * @param bucketName     桶名
-     * @param objectName     上传路径
-     * @param file           文件
-     * @param dateExpiration 过期时间
-     * @return 预签
-     */
-    public static String uploadFileAndGetUrl(String bucketName, String objectName, File file, Date dateExpiration) {
-        String fileUrl = null;
-        try {
-
-            // 创建PutObjectRequest对象。
-            PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, objectName, file);
-
-            // 上传文件。
-            ossClientStatic.putObject(putObjectRequest);
-
-
-            // 设置签名URL过期时间
-            if (ObjectUtils.isEmpty(dateExpiration)) {
-
-                // 指定过期时间为10分钟。
-                dateExpiration = new Date(System.currentTimeMillis() + 3600 * 1000);
-            }
-
-            // 生成以GET方法访问的签名URL，访客可以直接通过浏览器访问相关内容。
-            URL signedUrl = ossClientStatic.generatePresignedUrl(bucketName, objectName, dateExpiration, HttpMethod.GET);
-
-            if (ObjectUtils.isNotEmpty(signedUrl)) {
-                fileUrl = signedUrl.getFile();
-            }
-        } catch (OSSException oe) {
-            LogUtil.sysError("uploadFile oss上传出错", oe);
-        } catch (ClientException ce) {
-            LogUtil.sysError("uploadFile oss通信出错", ce);
-        }
-        return fileUrl;
-    }
-
-
     @Override
     public void afterPropertiesSet() throws Exception {
         OssClient.ossClientStatic = this.ossClient;

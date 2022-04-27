@@ -628,9 +628,9 @@ public class UserServiceImpl extends BaseService implements UserService {
         // 上传证件正面图片
         File frontFile = convertToFile(params.getIdFrontImgData());
         String frontPath = BusinessNameUtils.createUserIdTypeFileName(NameField.USR_ID, user.getUserInfoId(), NameField.FRONT_IMAGE_TYPE);
-        String frontImageUrl = OssClient.uploadFileAndGetUrl(userFileBucketName, frontPath, frontFile, null);
+        Boolean frontResult = OssClient.uploadFile(userFileBucketName, frontPath, frontFile);
         frontFile.deleteOnExit();
-        if (StringUtils.isBlank(frontImageUrl)) {
+        if (!frontResult) {
             result.setReturnCode(ResultEnum.KYC_UPLOAD_FILE_ERROR.code());
             result.setMessage(ResultEnum.KYC_UPLOAD_FILE_ERROR.message());
             return result;
@@ -639,9 +639,9 @@ public class UserServiceImpl extends BaseService implements UserService {
         //上传证件背面图片 并获取链接
         File backFile = convertToFile(params.getIdBackImgData());
         String backPath = BusinessNameUtils.createUserIdTypeFileName(NameField.USR_ID, user.getUserInfoId(), NameField.BACK_IMAGE_TYPE);
-        String backImageUrl = OssClient.uploadFileAndGetUrl(userFileBucketName, backPath, backFile, null);
+        Boolean backResult = OssClient.uploadFile(userFileBucketName, backPath, backFile);
         backFile.deleteOnExit();
-        if (StringUtils.isBlank(backImageUrl)) {
+        if (!backResult) {
             result.setReturnCode(ResultEnum.KYC_UPLOAD_FILE_ERROR.code());
             result.setMessage(ResultEnum.KYC_UPLOAD_FILE_ERROR.message());
             return result;
@@ -650,9 +650,9 @@ public class UserServiceImpl extends BaseService implements UserService {
         //上传人脸照片
         File faceFile = convertToFile(params.getFaceImgData());
         String facePath = BusinessNameUtils.createUserIdTypeFileName(NameField.USR_ID, user.getUserInfoId(), NameField.FACE_IMAGE_TYPE);
-        String faceImageUrl = OssClient.uploadFileAndGetUrl(userFileBucketName, facePath, faceFile, null);
+        Boolean faceResult = OssClient.uploadFile(userFileBucketName, facePath, faceFile);
         faceFile.deleteOnExit();
-        if (StringUtils.isBlank(faceImageUrl)) {
+        if (!faceResult) {
             result.setReturnCode(ResultEnum.KYC_UPLOAD_FILE_ERROR.code());
             result.setMessage(ResultEnum.KYC_UPLOAD_FILE_ERROR.message());
             return result;
