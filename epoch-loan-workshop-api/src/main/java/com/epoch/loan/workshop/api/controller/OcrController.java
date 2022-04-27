@@ -4,7 +4,7 @@ import com.epoch.loan.workshop.api.annotated.Authentication;
 import com.epoch.loan.workshop.common.config.URL;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
 import com.epoch.loan.workshop.common.params.params.BaseParams;
-import com.epoch.loan.workshop.common.params.params.request.UploadS3Params;
+import com.epoch.loan.workshop.common.params.params.request.SaveFileParams;
 import com.epoch.loan.workshop.common.params.params.request.UserFaceComparisonParams;
 import com.epoch.loan.workshop.common.params.params.request.UserLivenessScoreParams;
 import com.epoch.loan.workshop.common.params.params.request.UserOcrFullInfoParams;
