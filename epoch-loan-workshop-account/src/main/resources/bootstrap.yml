@@ -46,8 +46,8 @@ spring:
         # 动态配置
         enabled: true
         #读取配置文件
-        shared-dataids: epoch-loan-workshop-platform.yml,epoch-loan-workshop-mysql.yml,epoch-loan-workshop-redis.yml,epoch-loan-workshop-rocket.yml,epoch-loan-workshop-risk.yml,epoch-loan-workshop-elasticsearch.yml,epoch-loan-workshop-zookeeper.yml
-        refreshable-dataids: epoch-loan-workshop-platform.yml,epoch-loan-workshop-mysql.yml,epoch-loan-workshop-redis.yml,epoch-loan-workshop-rocket.yml,epoch-loan-workshop-risk.yml,epoch-loan-workshop-elasticsearch.yml,epoch-loan-workshop-zookeeper.yml
+        shared-dataids: epoch-loan-workshop-platform.yml,epoch-loan-workshop-mysql.yml,epoch-loan-workshop-redis.yml,epoch-loan-workshop-rocket.yml,epoch-loan-workshop-risk.yml,epoch-loan-workshop-elasticsearch.yml,epoch-loan-workshop-zookeeper.yml,epoch-loan-workshop-oss.yml
+        refreshable-dataids: epoch-loan-workshop-platform.yml,epoch-loan-workshop-mysql.yml,epoch-loan-workshop-redis.yml,epoch-loan-workshop-rocket.yml,epoch-loan-workshop-risk.yml,epoch-loan-workshop-elasticsearch.yml,epoch-loan-workshop-zookeeper.yml,epoch-loan-workshop-oss.yml
         # 服务中心
         server-addr: loan-1:8848
         # 配置中心命名空间ID

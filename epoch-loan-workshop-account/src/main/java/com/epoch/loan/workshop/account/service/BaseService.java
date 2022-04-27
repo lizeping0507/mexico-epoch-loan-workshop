@@ -12,6 +12,7 @@ import com.epoch.loan.workshop.common.entity.mysql.LoanUserInfoEntity;
 import com.epoch.loan.workshop.common.mq.remittance.RemittanceMQManager;
 import com.epoch.loan.workshop.common.mq.remittance.params.RemittanceParams;
 import com.epoch.loan.workshop.common.mq.repayment.RepaymentMQManager;
+import com.epoch.loan.workshop.common.oss.OssClient;
 import com.epoch.loan.workshop.common.params.User;
 import com.epoch.loan.workshop.common.redis.RedisClient;
 import com.epoch.loan.workshop.common.sms.SMSManager;
@@ -63,16 +64,7 @@ public class BaseService {
      */
     @Autowired
     public PlatformUserDao platformUserDao;
-    /**
-     * 用户
-     */
-    @Autowired
-    public PlatformOrderDao platformOrderDao;
-    /**
-     * 银行卡
-     */
-//    @Autowired
-//    public PlatformUserBankCardDao platformUserBankCardDao;
+
     /**
      * 基础信息
      */
@@ -124,21 +116,17 @@ public class BaseService {
      */
     @Autowired
     public OcrLivingDetectionLogElasticDao ocrLivingDetectionLogElasticDao;
-    /**
-     * 订单放款记录
-     */
-    @Autowired
-    LoanRemittanceOrderRecordDao orderRecordDao;
+
     /**
      * 贷超相关配置
      */
     @Autowired
-    PlatformConfig platformConfig;
+    public  PlatformConfig platformConfig;
     /**
      * 支付放款记录
      */
     @Autowired
-    LoanRemittancePaymentRecordDao paymentRecordDao;
+    public  LoanRemittancePaymentRecordDao paymentRecordDao;
 
     /**
      * 风控配置
@@ -147,10 +135,11 @@ public class BaseService {
     public RiskConfig riskConfig;
 
     /**
-     * 放款账户
+     * OSS
      */
     @Autowired
-    LoanRemittanceAccountDao loanRemittanceAccountDao;
+    public OssClient ossClient;
+
 
     /**
      * 发送队列
