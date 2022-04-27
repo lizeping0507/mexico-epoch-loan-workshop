@@ -98,7 +98,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         }
 
         /*判断最后一条订单是否是被拒订单*/
-        if (loanOrderEntity.getStatus() == OrderStatus.EXAMINE_FAIL) {
+        if (ObjectUtils.isNotEmpty(loanOrderEntity) && loanOrderEntity.getStatus() == OrderStatus.EXAMINE_FAIL) {
             // 更新时间
             Date updateTime = loanOrderEntity.getUpdateTime();
 
