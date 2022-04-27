@@ -116,6 +116,20 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             }
         }
 
+        /*多投校验*/
+        // 如果订单状态处于创建状态，进行多投判断
+        boolean rejectionRule = rejectionRule(productId, params.getUser());
+
+        // 多投被拒返回
+        if (!rejectionRule) {
+            // 封装结果
+            resData.setOrderId("");
+            result.setData(resData);
+            result.setReturnCode(ResultEnum.DELIVERY_REJECTED_ERROR.code());
+            result.setMessage(ResultEnum.DELIVERY_REJECTED_ERROR.message());
+            return result;
+        }
+
         /*生成订单*/
         // 订单审核模型
         String orderModelGroup = loanProductEntity.getOrderModelGroup();
