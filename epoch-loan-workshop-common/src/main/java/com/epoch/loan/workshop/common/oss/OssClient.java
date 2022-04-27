@@ -31,7 +31,7 @@ public class OssClient  {
      * OSS连接池
      */
     @Autowired
-    public OSS ossClient;
+    public OSSClient ossClient;
 
     /**
      * 文件上传
