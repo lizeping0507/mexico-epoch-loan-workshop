@@ -527,7 +527,6 @@ public class UserServiceImpl extends BaseService implements UserService {
         User user = params.getUser();
         LoanUserInfoEntity userInfoById = loanUserInfoDao.findUserInfoById(user.getId());
         AdvanceOcrFrontInfoResult frontInfo = JSON.parseObject(params.getFrontJson(), AdvanceOcrFrontInfoResult.class);
-        AdvanceOcrBackInfoResult backInfo = JSON.parseObject(params.getBackJson(), AdvanceOcrBackInfoResult.class);
         String idNumber = frontInfo.getIdNumber();
 
         // curp校验
@@ -655,7 +654,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         userInfoById.setUserFileBucketName(userFileBucketName);
         userInfoById.setFrontPath(frontPath);
         userInfoById.setBackPath(backPath);
-        userInfoById.setBackPath(facePath);
+        userInfoById.setFacePath(facePath);
 
         // 处理扫描识别的证件信息和RFC，保存用户基本信息
         if (ObjectUtils.isNotEmpty(frontInfo)) {
@@ -669,6 +668,7 @@ public class UserServiceImpl extends BaseService implements UserService {
             userInfoById.setPapersVoterId(frontInfo.getVoterId());
             userInfoById.setRfc(rfc);
             userInfoById.setPapersAge(frontInfo.getAge());
+            userInfoById.setPapersGender(frontInfo.getGender());
             userInfoById.setPapersDateOfBirth(frontInfo.getBirthday());
             userInfoById.setCustomName(params.getName());
             userInfoById.setCustomFatherName(params.getFatherName());
