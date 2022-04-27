@@ -49,6 +49,16 @@ public class AlibabaOssClient {
         PutObjectResult putObjectResult = null;
         try {
             putObjectResult = ossClient.putObject(bucketName, objectName, new ByteArrayInputStream(imageData));
+
+            if (ObjectUtils.isNotEmpty(putObjectResult)) {
+                LogUtil.sysInfo("upload putObjectResult不为空");
+            }
+            if (ObjectUtils.isNotEmpty(putObjectResult.getResponse())) {
+                LogUtil.sysInfo("upload putObjectResult.getResponse()不为空");
+            }
+
+            LogUtil.sysInfo("upload putObjectResult.getResponse().get: {}", putObjectResult.getResponse().getStatusCode());
+
         } catch (OSSException oe) {
             LogUtil.sysError("upload oss上传出错", oe);
         } catch (ClientException ce) {
@@ -62,15 +72,6 @@ public class AlibabaOssClient {
                 }
             }
         }
-
-        if (ObjectUtils.isNotEmpty(putObjectResult)) {
-            LogUtil.sysInfo("upload putObjectResult不为空");
-        }
-        if (ObjectUtils.isNotEmpty(putObjectResult.getResponse())) {
-            LogUtil.sysInfo("upload putObjectResult.getResponse()不为空");
-        }
-
-        LogUtil.sysInfo("upload putObjectResult.getResponse().get: {}", putObjectResult.getResponse().getStatusCode());
 
         return putObjectResult.getResponse().isSuccessful();
     }
