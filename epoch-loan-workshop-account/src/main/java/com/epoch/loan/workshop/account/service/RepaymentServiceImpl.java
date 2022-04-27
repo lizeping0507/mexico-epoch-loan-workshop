@@ -10,7 +10,7 @@ import com.epoch.loan.workshop.common.constant.ResultEnum;
 import com.epoch.loan.workshop.common.entity.mysql.*;
 import com.epoch.loan.workshop.common.params.params.request.RepaymentParams;
 import com.epoch.loan.workshop.common.params.params.request.UtrParams;
-import com.epoch.loan.workshop.common.params.params.request.YeahPayRepamentCallbackParam;
+import com.epoch.loan.workshop.common.params.params.request.PandaRepaymentCallbackParam;
 import com.epoch.loan.workshop.common.params.params.result.Result;
 import com.epoch.loan.workshop.common.service.RepaymentService;
 import com.epoch.loan.workshop.common.util.HttpUtils;
@@ -170,15 +170,6 @@ public class RepaymentServiceImpl extends BaseService implements RepaymentServic
     }
 
     /**
-     * 更新渠道信息
-     *
-     * @param id        id
-     * @param paymentId 渠道
-     */
-    private void updateRepaymentOrderRecordPayment(String id, String paymentId) {
-    }
-
-    /**
      * 根据权重 递归 挑选渠道
      *
      * @param loanRepaymentDistributions 渠道权重列表
@@ -231,9 +222,15 @@ public class RepaymentServiceImpl extends BaseService implements RepaymentServic
         return res;
     }
 
+    /**
+     * 回调处理
+     *
+     * @param params 回调参数
+     * @return String
+     */
     @Override
-    public String pandaPay(YeahPayRepamentCallbackParam params) {
-        LoanRepaymentPaymentRecordEntity paymentRecord = loanRepaymentPaymentRecordDao.findRepaymentPaymentRecordById(params.getOrderId());
+    public String pandaPay(PandaRepaymentCallbackParam params) {
+        LoanRepaymentPaymentRecordEntity paymentRecord = loanRepaymentPaymentRecordDao.findRepaymentPaymentRecordById(params.getId());
         LoanPaymentEntity paymentEntity = loanPaymentDao.getById(paymentRecord.getPaymentId());
 
         com.epoch.loan.workshop.common.mq.repayment.params.RepaymentParams repaymentParams = new com.epoch.loan.workshop.common.mq.repayment.params.RepaymentParams();

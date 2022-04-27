@@ -2,7 +2,7 @@ package com.epoch.loan.workshop.api.controller;
 
 import com.epoch.loan.workshop.common.config.URL;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
-import com.epoch.loan.workshop.common.params.params.request.YeahPayRepamentCallbackParam;
+import com.epoch.loan.workshop.common.params.params.request.PandaRepaymentCallbackParam;
 import com.epoch.loan.workshop.common.params.params.result.Result;
 import com.epoch.loan.workshop.common.util.LogUtil;
 import com.epoch.loan.workshop.common.util.ThrowableUtils;
@@ -22,7 +22,7 @@ public class RepaymentCallbackController extends BaseController {
 
 
     @RequestMapping(URL.PANDA_PAY)
-    public Object pandaPay(YeahPayRepamentCallbackParam params) {
+    public Object pandaPay(PandaRepaymentCallbackParam params) {
         // 结果集
         Result<?> result = new Result<>();
 
