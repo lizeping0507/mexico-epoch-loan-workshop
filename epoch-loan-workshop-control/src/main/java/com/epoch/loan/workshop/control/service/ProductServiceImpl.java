@@ -55,7 +55,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
         // 产品信息
         resData.setArrivalRange(loanProductEntity.getArrivalRange());
-        resData.setInterestRange(loanProductEntity.getInterestRange());
+        resData.setInterestRange(loanProductEntity.getInterestRange()); // TODO
         resData.setRepaymentRange(loanProductEntity.getRepaymentRange());
         resData.setServiceFeeRange(loanProductEntity.getServiceFeeRange());
         resData.setAmount(loanProductEntity.getAmountRange());
@@ -88,7 +88,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         LoanOrderEntity loanOrderEntity = loanOrderDao.findLatelyOrderByUserIdAndProductIdAndStatus(userId, productId, status);
 
         /* 判断最后一条订单是否不处于结清和被拒（排除这三个状态的订单后，说明这条订单是在途状态） */
-        if (ObjectUtils.isNotEmpty(loanOrderEntity) && loanOrderEntity.getStatus() != OrderStatus.DUE_COMPLETE && loanOrderEntity.getStatus() != OrderStatus.COMPLETE && loanOrderEntity.getStatus() == OrderStatus.EXAMINE_FAIL) {
+        if (ObjectUtils.isNotEmpty(loanOrderEntity) && loanOrderEntity.getStatus() != OrderStatus.DUE_COMPLETE && loanOrderEntity.getStatus() != OrderStatus.COMPLETE && loanOrderEntity.getStatus() != OrderStatus.EXAMINE_FAIL) {
             // 封装结果集
             resData.setOrderId(loanOrderEntity.getId());
             result.setData(resData);
