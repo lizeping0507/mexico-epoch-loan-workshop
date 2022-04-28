@@ -1,6 +1,7 @@
 package com.epoch.loan.workshop.order;
 
 import com.epoch.loan.workshop.common.config.StartConfig;
+import com.epoch.loan.workshop.common.mq.order.OrderMQManager;
 import com.epoch.loan.workshop.common.zookeeper.ZookeeperClient;
 import org.apache.dubbo.config.spring.context.annotation.EnableDubbo;
 import org.mybatis.spring.annotation.MapperScan;
@@ -37,6 +38,12 @@ public class Application {
     public ZookeeperClient zookeeperClient;
 
     /**
+     * 订单队列组件
+     */
+    @Autowired
+    OrderMQManager orderMQManager;
+
+    /**
      * 启动类
      *
      * @param args
@@ -56,5 +63,6 @@ public class Application {
     @PostConstruct
     public void startJob() throws Exception {
         zookeeperClient.init();
+        orderMQManager.init();
     }
 }
