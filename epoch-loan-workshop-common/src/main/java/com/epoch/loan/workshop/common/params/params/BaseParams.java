@@ -59,6 +59,11 @@ public class BaseParams implements Serializable {
      */
     private String gpsAddress;
 
+    /**
+     * Af推广id
+     */
+    private String gaid;
+
 
     /**
      * 验证 app名称 是否合法
