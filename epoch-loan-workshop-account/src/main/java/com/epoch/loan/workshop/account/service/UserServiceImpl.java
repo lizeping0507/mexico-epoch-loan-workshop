@@ -952,7 +952,6 @@ public class UserServiceImpl extends BaseService implements UserService {
                 return null;
             }
 
-            LogUtil.sysInfo("风控CURP校验结果：{}", riskResult);
             // 返回响应参数
             return JSONObject.parseObject(riskResult);
         } catch (Exception e) {
