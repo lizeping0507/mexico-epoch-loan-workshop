@@ -11,6 +11,7 @@ import com.epoch.loan.workshop.common.params.params.result.model.LoanRepaymentRe
 import com.epoch.loan.workshop.common.params.params.result.model.OrderDTO;
 import com.epoch.loan.workshop.common.service.OrderService;
 import com.epoch.loan.workshop.common.util.HttpUtils;
+import com.epoch.loan.workshop.common.util.LogUtil;
 import com.epoch.loan.workshop.common.util.OrderUtils;
 import com.epoch.loan.workshop.common.util.PlatformUtil;
 import org.apache.commons.collections.CollectionUtils;
@@ -103,6 +104,7 @@ public class OrderServiceImpl extends BaseService implements OrderService {
             public String execute() throws Exception {
                 // 查询订单
                 LoanOrderEntity loanOrderEntity = loanOrderDao.findOrder(orderId);
+                LogUtil.sysInfo("loanOrderEntity: {}",loanOrderEntity);
 
                 // 订单审核队列
                 String orderModelGroup = loanOrderEntity.getOrderModelGroup();
@@ -128,14 +130,17 @@ public class OrderServiceImpl extends BaseService implements OrderService {
                     return "FAIL";
                 }
 
+                LogUtil.sysInfo("loanOrderEntity: {}",loanOrderEntity);
                 // 修改订单状态
                 int updateOrderStatus = loanOrderDao.updateOrderStatus(orderId, OrderStatus.EXAMINE_WAIT, new Date());
+                LogUtil.sysInfo("updateOrderStatus: {}",updateOrderStatus);
                 if (updateOrderStatus != 0) {
                     // 更新申请时间
                     loanOrderDao.updateOrderApplyTime(orderId, new Date(), new Date());
 
                     // 查询审核模型列表
-                    List<String> orderModelList = orderModelDao.findNamesByGroup(orderModelGroup);
+                    List<String> orderModelList = orderModelDao.findNamesByGroup(orderModelGroup);;
+                    LogUtil.sysInfo("orderModelList: {}",updateOrderStatus);
 
                     // 发送订单审核队列
                     OrderParams orderParams = new OrderParams();
@@ -143,6 +148,7 @@ public class OrderServiceImpl extends BaseService implements OrderService {
                     orderParams.setGroupName(orderModelGroup);
                     orderParams.setModelList(orderModelList);
                     orderMQManager.sendMessage(orderParams, orderModelList.get(0));
+                    LogUtil.sysInfo("SUCCESS: {}",SUCCESS);
 
                     // 成功
                     return "SUCCESS";
