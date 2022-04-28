@@ -71,10 +71,7 @@ public class AlibabaOssClient {
         URL url = ossClient.generatePresignedUrl(bucketName, objectName, dateExpiration, HttpMethod.GET);
 
         if (ObjectUtils.isNotEmpty(url)) {
-
-            // 原始路径为 ip:port/bucketName/objectName?OSS自带参数，
-            // 截取后只保留 ip:port/bucketName/objectName
-            return url.toString().split("\\?")[0];
+            return url.toString();
         }
 
         return null;
