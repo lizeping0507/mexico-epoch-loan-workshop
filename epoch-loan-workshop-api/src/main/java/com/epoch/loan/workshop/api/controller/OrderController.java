@@ -29,6 +29,7 @@ public class OrderController extends BaseController {
      * @param bindRemittanceAccountParams
      * @return
      */
+    @Authentication
     @PostMapping(URL.BIND_REMITTANCE_ACCOUNT)
     public Result bindRemittanceAccount(BindRemittanceAccountParams bindRemittanceAccountParams) {
         // 结果集
@@ -69,6 +70,7 @@ public class OrderController extends BaseController {
      * @param applyParams
      * @return
      */
+    @Authentication
     @PostMapping(URL.APPLY)
     public Result apply(ApplyParams applyParams) {
         // 结果集
