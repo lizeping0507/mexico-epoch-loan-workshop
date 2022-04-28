@@ -1,8 +1,10 @@
 package com.epoch.loan.workshop.order;
 
 import com.epoch.loan.workshop.common.config.StartConfig;
+import com.epoch.loan.workshop.common.zookeeper.ZookeeperClient;
 import org.apache.dubbo.config.spring.context.annotation.EnableDubbo;
 import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
@@ -27,6 +29,13 @@ import javax.annotation.PostConstruct;
 @EnableElasticsearchRepositories(basePackages = "com.epoch.loan.workshop.common.dao.elastic")
 @EnableAspectJAutoProxy(exposeProxy = true)
 public class Application {
+
+    /**
+     * Zookeeper工具类
+     */
+    @Autowired
+    public ZookeeperClient zookeeperClient;
+
     /**
      * 启动类
      *
@@ -46,5 +55,6 @@ public class Application {
      */
     @PostConstruct
     public void startJob() throws Exception {
+        zookeeperClient.init();
     }
 }
