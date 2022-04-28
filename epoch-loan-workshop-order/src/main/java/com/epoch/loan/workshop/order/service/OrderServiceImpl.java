@@ -148,7 +148,7 @@ public class OrderServiceImpl extends BaseService implements OrderService {
                     orderParams.setGroupName(orderModelGroup);
                     orderParams.setModelList(orderModelList);
                     orderMQManager.sendMessage(orderParams, orderModelList.get(0));
-                    LogUtil.sysInfo("SUCCESS: {}",SUCCESS);
+                    LogUtil.sysInfo("SUCCESS: {}","SUCCESS");
 
                     // 成功
                     return "SUCCESS";
