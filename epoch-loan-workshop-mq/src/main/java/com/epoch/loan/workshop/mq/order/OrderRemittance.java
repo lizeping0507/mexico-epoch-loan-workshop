@@ -150,6 +150,7 @@ public class OrderRemittance extends BaseOrderMQListener implements MessageListe
 
                     // 放入队列等待放款成功
                     retry(orderParams, subExpression());
+                    continue;
                 }
 
                 // 查询支付状态

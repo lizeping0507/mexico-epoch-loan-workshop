@@ -6,7 +6,6 @@ import com.epoch.loan.workshop.common.constant.OrderExamineStatus;
 import com.epoch.loan.workshop.common.constant.OrderStatus;
 import com.epoch.loan.workshop.common.entity.mysql.LoanOrderBillEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanOrderEntity;
-import com.epoch.loan.workshop.common.entity.mysql.PlatformReceiveOrderApproveFeedbackEntity;
 import com.epoch.loan.workshop.common.mq.order.params.OrderParams;
 import com.epoch.loan.workshop.common.util.LogUtil;
 import com.epoch.loan.workshop.common.util.ObjectIdUtil;
@@ -20,7 +19,6 @@ import org.apache.rocketmq.common.message.MessageExt;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -116,6 +114,12 @@ public class OrderExaminePass extends BaseOrderMQListener implements MessageList
                 // 每期应还利息
                 double stagesInterestAmount = interestAmount / loanOrderEntity.getStages();
 
+                // 更新还款金额
+                loanOrderDao.updateOrderEstimatedRepaymentAmount(orderId, estimatedRepaymentAmount, new Date());
+
+                // 更新通过时间
+                loanOrderDao.updateOrderExaminePassTime(orderId, new Date(), new Date());
+
                 // 初始化订单账单
                 for (int i = 1; i <= loanOrderEntity.getStages(); i++) {
                     LoanOrderBillEntity loanOrderBillEntity = new LoanOrderBillEntity();
@@ -136,14 +140,8 @@ public class OrderExaminePass extends BaseOrderMQListener implements MessageList
                     loanOrderBillDao.insertOrderBill(loanOrderBillEntity);
                 }
 
-                // 更新还款金额
-                loanOrderDao.updateOrderEstimatedRepaymentAmount(orderId, estimatedRepaymentAmount, new Date());
-
                 // 修改订单状态为审核通过
                 updateOrderStatus(orderId, OrderStatus.EXAMINE_PASS);
-
-                // 更新通过时间
-                loanOrderDao.updateOrderExaminePassTime(orderId, new Date(), new Date());
 
                 // 修改审核状态
                 updateModeExamine(orderId, subExpression(), OrderExamineStatus.PASS);
