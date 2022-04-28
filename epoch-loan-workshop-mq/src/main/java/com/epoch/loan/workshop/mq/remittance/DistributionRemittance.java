@@ -62,6 +62,7 @@ public class DistributionRemittance extends BaseRemittanceMQListener implements 
             try {
                 // 获取消息对象
                 distributionRemittanceParams = getMessage(msg, DistributionRemittanceParams.class);
+                LogUtil.sysInfo("distributionRemittanceParams : {}", distributionRemittanceParams);
                 if (ObjectUtils.isEmpty(distributionRemittanceParams)) {
                     continue;
                 }
@@ -89,6 +90,7 @@ public class DistributionRemittance extends BaseRemittanceMQListener implements 
                     paymentFilter = new ArrayList<>();
                 }
 
+                LogUtil.sysInfo("loanRemittanceDistributions : {}", loanRemittanceDistributions);
                 // 备选渠道判空
                 if (CollectionUtils.isEmpty(loanRemittanceDistributions)) {
                     // 修改状态
@@ -98,12 +100,14 @@ public class DistributionRemittance extends BaseRemittanceMQListener implements 
 
                 // 查询挑选策略
                 LoanProductRemittanceConfigEntity config = loanProductRemittanceConfigDao.findByGroupName(groupName);
+                LogUtil.sysInfo("config : {}", config);
 
                 // 根据策略挑选渠道
                 LoanRemittanceDistributionEntity selectedRemittanceDistribution = null;
                 if (config.getStrategyName().equals(PayStrategy.WEIGHT)) {
                     // 根据权重策略选择渠道
                     selectedRemittanceDistribution = chooseByWeight(loanRemittanceDistributions);
+                    LogUtil.sysInfo("挑选渠道结果 selectedRemittanceDistribution : {}", selectedRemittanceDistribution);
                     if (ObjectUtils.isEmpty(selectedRemittanceDistribution)) {
                         // 修改状态
                         updateRemittanceOrderRecordStatus(remittanceOrderRecordId, LoanRemittanceOrderRecordStatus.FAILED);
