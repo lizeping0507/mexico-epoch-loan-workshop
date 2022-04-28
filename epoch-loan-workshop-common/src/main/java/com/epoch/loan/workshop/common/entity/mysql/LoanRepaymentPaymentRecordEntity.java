@@ -65,11 +65,6 @@ public class LoanRepaymentPaymentRecordEntity {
     private String name;
 
     /**
-     * 支付utr
-     */
-    private String utr;
-
-    /**
      * 支付事件
      */
     private String event;
