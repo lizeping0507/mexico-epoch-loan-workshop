@@ -127,4 +127,7 @@
     <select id="findLastUserInfoByMobile" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanUserInfoEntity">
         SELECT * FROM loan_user_info where mobile = #{mobile} AND  rfc IS NOT NULL AND papers_id IS NOT NULL order by update_time limit 1
     </select>
+    <select id="findUserIdByMobile" resultType="java.lang.String">
+        SELECT user_id FROM loan_user_info where mobile = #{mobile}
+    </select>
 </mapper>

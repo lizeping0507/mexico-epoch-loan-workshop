@@ -264,11 +264,10 @@ public interface LoanOrderDao {
     /**
      * 查询用户进行中订单数量
      *
-     * @param appName App名称 不填就是所有包
-     * @param userId  用户Id
+     * @param userIdList  用户Id
      * @return
      */
-    int countProcessOrderNo(String appName, String userId);
+    int countProcessOrderNo(@Param("userIdList") List<String> userIdList);
 
     /**
      * 小于指定状态的订单数量

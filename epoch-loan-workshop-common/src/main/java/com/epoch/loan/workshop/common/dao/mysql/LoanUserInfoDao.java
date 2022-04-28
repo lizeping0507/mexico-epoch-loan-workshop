@@ -88,4 +88,11 @@ public interface LoanUserInfoDao {
      * @param gpsAddress
      */
     void updateUserGpsMsg(String id, String gps, String gpsAddress, Date updateTime);
+
+    /**
+     * 查询手机号对应的所有包UserId
+     * @param mobile
+     * @return
+     */
+    List<String> findUserIdByMobile(String mobile);
 }

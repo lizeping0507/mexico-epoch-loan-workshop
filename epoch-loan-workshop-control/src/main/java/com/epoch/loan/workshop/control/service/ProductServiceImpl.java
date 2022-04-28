@@ -723,11 +723,14 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         // 渠道名称
         String channelName = platformChannelEntity.getChannelName();
 
+        List<String> userIdList = new ArrayList<>();
+        userIdList.add(userId);
         // 单包在贷笔数
-        int singleQuantity = loanOrderDao.countProcessOrderNo(user.getAppName(), userId);
+        int singleQuantity = loanOrderDao.countProcessOrderNo(userIdList);
 
         // 多包在贷笔数
-        int allQuantity = loanOrderDao.countProcessOrderNo(null, user.getId());
+        userIdList = loanUserInfoDao.findUserIdByMobile(mobile);
+        int allQuantity = loanOrderDao.countProcessOrderNo(userIdList);
 
         // 第一笔还款距今天数
         LoanOrderBillEntity fistRepayOrder = loanOrderBillDao.findFistRepayOrder(userId, user.getAppName());
