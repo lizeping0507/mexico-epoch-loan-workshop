@@ -1,21 +1,14 @@
 package com.epoch.loan.workshop.common.oss;
 
 import com.aliyun.oss.*;
-import com.aliyun.oss.model.ObjectMetadata;
-import com.aliyun.oss.model.PutObjectRequest;
 import com.aliyun.oss.model.PutObjectResult;
-import com.epoch.loan.workshop.common.util.LogUtil;
 import lombok.Data;
 import org.apache.commons.lang3.ObjectUtils;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Date;
 
@@ -69,18 +62,14 @@ public class AlibabaOssClient {
     public String getFileUrl(String bucketName, String objectName, Date dateExpiration) {
         // 设置签名URL过期时间
         if (ObjectUtils.isEmpty(dateExpiration)) {
+
             // 指定过期时间为10分钟。
             dateExpiration = new Date(System.currentTimeMillis() + 1000 * 60 * 10);
         }
 
         // 生成以GET方法访问的签名URL，访客可以直接通过浏览器访问相关内容。
         URL url = ossClient.generatePresignedUrl(bucketName, objectName, dateExpiration, HttpMethod.GET);
-        try {
-            LogUtil.sysInfo(objectName + " : {}" , url.toURI().toASCIIString());
-            LogUtil.sysInfo(objectName + " : {}" , url.toString());
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
+
         if (ObjectUtils.isNotEmpty(url)) {
             return url.toString();
         }

@@ -53,10 +53,11 @@
         UPDATE
         loan_order_examine
         SET
-        status=#{status}
-        WHERE
-        order_id=#{orderId},
+        status=#{status},
         update_time=#{updateTime}
+        WHERE
+        order_id=#{orderId}
+
         AND
         model_name=#{modelName}
     </update>

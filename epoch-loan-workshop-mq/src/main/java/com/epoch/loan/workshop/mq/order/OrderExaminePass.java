@@ -139,23 +139,11 @@ public class OrderExaminePass extends BaseOrderMQListener implements MessageList
                 // 更新还款金额
                 loanOrderDao.updateOrderEstimatedRepaymentAmount(orderId, estimatedRepaymentAmount, new Date());
 
-                // 插入审批结果反馈表  FIXME 老表
-                PlatformReceiveOrderApproveFeedbackEntity approveFeedbackEntity = new PlatformReceiveOrderApproveFeedbackEntity();
-                approveFeedbackEntity.setOrderNo(orderId);
-                approveFeedbackEntity.setApprovalAmount(BigDecimal.valueOf(loanOrderEntity.getApprovalAmount()));
-                Double orderEstimatedRepaymentAmount = loanOrderEntity.getEstimatedRepaymentAmount();
-                approveFeedbackEntity.setPayAmount(orderEstimatedRepaymentAmount == null ? null : BigDecimal.valueOf(orderEstimatedRepaymentAmount));
-                approveFeedbackEntity.setReceiveAmount(BigDecimal.valueOf(realAmount));
-                approveFeedbackEntity.setConclusion(10);
-                receiveOrderApproveFeedbackDao.save(approveFeedbackEntity);
-
-                // 修改订单状态为审核通过 FIXME 新老表
+                // 修改订单状态为审核通过
                 updateOrderStatus(orderId, OrderStatus.EXAMINE_PASS);
-                platformOrderDao.updateOrderStatus(orderId, 115, new Date());
 
-                // 更新通过时间 FIXME 新老表
+                // 更新通过时间
                 loanOrderDao.updateOrderExaminePassTime(orderId, new Date(), new Date());
-                platformOrderDao.updateOrderApprovalTime(orderId, new Date(), new Date());
 
                 // 修改审核状态
                 updateModeExamine(orderId, subExpression(), OrderExamineStatus.PASS);

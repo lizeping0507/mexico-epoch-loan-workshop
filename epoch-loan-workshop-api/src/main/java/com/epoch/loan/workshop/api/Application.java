@@ -8,6 +8,7 @@ import com.epoch.loan.workshop.common.dao.mysql.LoanDynamicRequestDao;
 import com.epoch.loan.workshop.common.entity.mysql.LoanDynamicRequestEntity;
 import com.epoch.loan.workshop.common.mq.log.LogMQManager;
 import com.epoch.loan.workshop.common.util.LogUtil;
+import com.epoch.loan.workshop.common.zookeeper.ZookeeperClient;
 import org.apache.dubbo.config.spring.context.annotation.DubboComponentScan;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +51,12 @@ public class Application {
     private LogMQManager logMQManager;
 
     /**
+     * Zookeeper工具类
+     */
+    @Autowired
+    public ZookeeperClient zookeeperClient;
+
+    /**
      * 启动类
      *
      * @param args
@@ -63,6 +70,7 @@ public class Application {
 
     @PostConstruct
     public void startJob() throws Exception {
+        zookeeperClient.init();
         // 初始化动态地址配置
         loadDynamicRequestConfig();
 
