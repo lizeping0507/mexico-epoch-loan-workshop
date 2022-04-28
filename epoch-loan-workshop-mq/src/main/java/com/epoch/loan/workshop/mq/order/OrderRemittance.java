@@ -7,6 +7,7 @@ import com.epoch.loan.workshop.common.entity.mysql.LoanOrderEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanRemittanceAccountEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanRemittanceOrderRecordEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanUserInfoEntity;
+import com.epoch.loan.workshop.common.lock.OrderRemittanceLock;
 import com.epoch.loan.workshop.common.mq.order.params.OrderParams;
 import com.epoch.loan.workshop.common.mq.remittance.params.DistributionRemittanceParams;
 import com.epoch.loan.workshop.common.util.LogUtil;
@@ -89,82 +90,96 @@ public class OrderRemittance extends BaseOrderMQListener implements MessageListe
                 // 查询当前模型处理状态
                 int status = getModelStatus(orderId, subExpression());
 
-                // 账户
-                String accountId = loanOrderEntity.getBankCardId();
-
-                // 判断模型状态
+                // 判断是否是创建状态
                 if (status == OrderExamineStatus.CREATE) {
-                    // 查询用户信息
-                    LoanUserInfoEntity loanUserInfoEntity = loanUserInfoDao.findUserInfoById(userId);
+                    // 使用分布式锁进行新增放款
+                    zookeeperClient.lock(new OrderRemittanceLock<String>(orderId) {
+                        @Override
+                        public String execute() throws Exception {
+                            // 查询当前模型处理状态
+                            int status = getModelStatus(orderId, subExpression());
 
-                    // 查询银行卡信息
-                    LoanRemittanceAccountEntity loanRemittanceAccountEntity = loanRemittanceAccountDao.findRemittanceAccount(accountId);
+                            // 账户
+                            String accountId = loanOrderEntity.getBankCardId();
 
-                    // 新增支付账单
-                    String id = ObjectIdUtil.getObjectId();
-                    LoanRemittanceOrderRecordEntity loanRemittanceOrderRecordEntity = new LoanRemittanceOrderRecordEntity();
-                    loanRemittanceOrderRecordEntity.setId(id);
-                    loanRemittanceOrderRecordEntity.setOrderId(orderId);
-                    loanRemittanceOrderRecordEntity.setPaymentId("");
-                    loanRemittanceOrderRecordEntity.setAmount(loanOrderEntity.getActualAmount());
-                    loanRemittanceOrderRecordEntity.setName(loanUserInfoEntity.getPapersName());
-                    loanRemittanceOrderRecordEntity.setRemarks(loanUserInfoEntity.getPapersName() + " remittance");
-                    loanRemittanceOrderRecordEntity.setRemittanceAccount(loanRemittanceAccountEntity.getAccountNumber());
-                    loanRemittanceOrderRecordEntity.setBank(loanRemittanceAccountEntity.getBank());
-                    loanRemittanceOrderRecordEntity.setType(loanRemittanceAccountEntity.getType());
-                    loanRemittanceOrderRecordEntity.setRfc(loanUserInfoEntity.getRfc());
-                    loanRemittanceOrderRecordEntity.setCurp(loanUserInfoEntity.getPapersVoterId());
-                    loanRemittanceOrderRecordEntity.setStatus(LoanRemittanceOrderRecordStatus.CREATE);
-                    loanRemittanceOrderRecordEntity.setProcessRemittancePaymentRecordId("");
-                    loanRemittanceOrderRecordEntity.setSuccessRemittancePaymentRecordId("");
-                    loanRemittanceOrderRecordEntity.setCreateTime(new Date());
-                    loanRemittanceOrderRecordEntity.setUpdateTime(new Date());
-                    loanRemittanceOrderRecordDao.insert(loanRemittanceOrderRecordEntity);
+                            // 判断模型状态
+                            if (status != OrderExamineStatus.CREATE) {
+                                return null;
+                            }
+                            // 查询用户信息
+                            LoanUserInfoEntity loanUserInfoEntity = loanUserInfoDao.findUserInfoById(userId);
 
-                    // 更新订单状态为等待放款
-                    updateOrderStatus(orderId, OrderStatus.WAIT_PAY);
+                            // 查询银行卡信息
+                            LoanRemittanceAccountEntity loanRemittanceAccountEntity = loanRemittanceAccountDao.findRemittanceAccount(accountId);
 
-                    // 发送放款请求
-                    DistributionRemittanceParams distributionRemittanceParams = new DistributionRemittanceParams();
-                    distributionRemittanceParams.setId(id);
-                    distributionRemittanceParams.setGroupName(loanOrderEntity.getRemittanceDistributionGroup());
-                    sendDistribution(distributionRemittanceParams);
+                            // 新增支付账单
+                            String id = ObjectIdUtil.getObjectId();
+                            LoanRemittanceOrderRecordEntity loanRemittanceOrderRecordEntity = new LoanRemittanceOrderRecordEntity();
+                            loanRemittanceOrderRecordEntity.setId(id);
+                            loanRemittanceOrderRecordEntity.setOrderId(orderId);
+                            loanRemittanceOrderRecordEntity.setPaymentId("");
+                            loanRemittanceOrderRecordEntity.setAmount(loanOrderEntity.getActualAmount());
+                            loanRemittanceOrderRecordEntity.setName(loanUserInfoEntity.getPapersName());
+                            loanRemittanceOrderRecordEntity.setRemarks(loanUserInfoEntity.getPapersName() + " remittance");
+                            loanRemittanceOrderRecordEntity.setRemittanceAccount(loanRemittanceAccountEntity.getAccountNumber());
+                            loanRemittanceOrderRecordEntity.setBank(loanRemittanceAccountEntity.getBank());
+                            loanRemittanceOrderRecordEntity.setType(loanRemittanceAccountEntity.getType());
+                            loanRemittanceOrderRecordEntity.setRfc(loanUserInfoEntity.getRfc());
+                            loanRemittanceOrderRecordEntity.setCurp(loanUserInfoEntity.getPapersVoterId());
+                            loanRemittanceOrderRecordEntity.setStatus(LoanRemittanceOrderRecordStatus.CREATE);
+                            loanRemittanceOrderRecordEntity.setProcessRemittancePaymentRecordId("");
+                            loanRemittanceOrderRecordEntity.setSuccessRemittancePaymentRecordId("");
+                            loanRemittanceOrderRecordEntity.setCreateTime(new Date());
+                            loanRemittanceOrderRecordEntity.setUpdateTime(new Date());
+                            loanRemittanceOrderRecordDao.insert(loanRemittanceOrderRecordEntity);
 
-                    // 更改模型审核状态为等待
-                    updateModeExamine(orderId, subExpression(), OrderExamineStatus.WAIT);
+                            // 更新订单状态为等待放款
+                            updateOrderStatus(orderId, OrderStatus.WAIT_PAY);
+
+                            // 发送放款请求
+                            DistributionRemittanceParams distributionRemittanceParams = new DistributionRemittanceParams();
+                            distributionRemittanceParams.setId(id);
+                            distributionRemittanceParams.setGroupName(loanOrderEntity.getRemittanceDistributionGroup());
+                            sendDistribution(distributionRemittanceParams);
+
+                            // 更改模型审核状态为等待
+                            updateModeExamine(orderId, subExpression(), OrderExamineStatus.WAIT);
+                            return null;
+                        }
+                    });
 
                     // 放入队列等待放款成功
                     retry(orderParams, subExpression());
+                }
+
+                // 查询支付状态
+                Integer loanRemittanceOrderRecordStatus = loanRemittanceOrderRecordDao.findLoanRemittanceOrderRecordStatusByOrderId(orderId);
+
+                // 判断支付状态是否合法
+                if (loanRemittanceOrderRecordStatus == null) {
+                    // 更改模型审核状态为等待
+                    updateModeExamine(orderId, subExpression(), OrderExamineStatus.CREATE);
+
+                    // 放入队列等待放款成功
+                    retry(orderParams, subExpression());
+                } else if (loanRemittanceOrderRecordStatus == LoanRemittanceOrderRecordStatus.SUCCESS) {
+                    // 更新对应模型审核状态
+                    updateModeExamine(orderId, subExpression(), OrderExamineStatus.PASS);
+
+                    // 更新放款时间
+                    updateLoanTime(orderId);
+
+                    // 发送下一模型
+                    sendNextModel(orderParams, subExpression());
+                } else if (loanRemittanceOrderRecordStatus == LoanRemittanceOrderRecordStatus.THOROUGHLY_FAILED) {
+                    // 异常状况 此订单放款彻底失败  流程结束
+                    updateModeExamine(orderId, subExpression(), OrderExamineStatus.FAIL);
+
+                    // 更改新表订单状态 : 废弃
+                    updateOrderStatus(orderId, OrderStatus.ABANDONED);
                 } else {
-                    // 查询支付状态
-                    Integer loanRemittanceOrderRecordStatus = loanRemittanceOrderRecordDao.findLoanRemittanceOrderRecordStatusByOrderId(orderId);
-
-                    // 判断支付状态是否合法
-                    if (loanRemittanceOrderRecordStatus == null) {
-                        // 更改模型审核状态为等待
-                        updateModeExamine(orderId, subExpression(), OrderExamineStatus.CREATE);
-
-                        // 放入队列等待放款成功
-                        retry(orderParams, subExpression());
-                    } else if (loanRemittanceOrderRecordStatus == LoanRemittanceOrderRecordStatus.SUCCESS) {
-                        // 更新对应模型审核状态
-                        updateModeExamine(orderId, subExpression(), OrderExamineStatus.PASS);
-
-                        // 更新放款时间
-                        updateLoanTime(orderId);
-
-                        // 发送下一模型
-                        sendNextModel(orderParams, subExpression());
-                    } else if (loanRemittanceOrderRecordStatus == LoanRemittanceOrderRecordStatus.THOROUGHLY_FAILED) {
-                        // 异常状况 此订单放款彻底失败  流程结束
-                        updateModeExamine(orderId, subExpression(), OrderExamineStatus.FAIL);
-
-                        // 更改新表订单状态 : 废弃
-                        updateOrderStatus(orderId, OrderStatus.ABANDONED);
-                    } else {
-                        // 放入队列等待放款成功
-                        retry(orderParams, subExpression());
-                    }
+                    // 放入队列等待放款成功
+                    retry(orderParams, subExpression());
                 }
             } catch (Exception e) {
                 try {
