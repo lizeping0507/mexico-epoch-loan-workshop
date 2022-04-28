@@ -9,6 +9,7 @@ import com.epoch.loan.workshop.common.constant.PaymentField;
 import com.epoch.loan.workshop.common.entity.mysql.LoanPaymentEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanRepaymentPaymentRecordEntity;
 import com.epoch.loan.workshop.common.mq.repayment.params.RepaymentParams;
+import com.epoch.loan.workshop.common.params.params.request.PreRepaymentParams;
 import com.epoch.loan.workshop.common.util.HttpUtils;
 import com.epoch.loan.workshop.common.util.LogUtil;
 import org.apache.commons.lang3.ObjectUtils;
@@ -38,7 +39,7 @@ public class PandaPay extends BaseRepayment{
     @Override
     public String startRepayment(LoanRepaymentPaymentRecordEntity loanRepaymentPaymentRecordEntity,
                                  LoanPaymentEntity payment,
-                                 com.epoch.loan.workshop.common.params.params.request.RepaymentParams params) {
+                                 PreRepaymentParams params) {
         // 获取支付方式
         String paymentType = params.getPayType();
         String result = null;

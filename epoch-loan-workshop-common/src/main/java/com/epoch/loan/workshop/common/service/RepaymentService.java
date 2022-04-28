@@ -1,5 +1,6 @@
 package com.epoch.loan.workshop.common.service;
 
+import com.epoch.loan.workshop.common.params.params.request.PreRepaymentParams;
 import com.epoch.loan.workshop.common.params.params.request.RepaymentParams;
 import com.epoch.loan.workshop.common.params.params.request.UtrParams;
 import com.epoch.loan.workshop.common.params.params.request.PandaRepaymentCallbackParam;
@@ -20,7 +21,7 @@ public interface RepaymentService {
      * @param params 放款参数
      * @return 支付地址
      */
-    String repayment(RepaymentParams params);
+    String repayment(PreRepaymentParams params);
 
     /**
      * 回调处理

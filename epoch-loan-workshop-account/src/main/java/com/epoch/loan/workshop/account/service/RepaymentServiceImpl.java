@@ -9,6 +9,7 @@ import com.epoch.loan.workshop.common.constant.PlatformUrl;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
 import com.epoch.loan.workshop.common.entity.mysql.*;
 import com.epoch.loan.workshop.common.params.params.request.PandaRepaymentCallbackParam;
+import com.epoch.loan.workshop.common.params.params.request.PreRepaymentParams;
 import com.epoch.loan.workshop.common.params.params.request.RepaymentParams;
 import com.epoch.loan.workshop.common.params.params.request.UtrParams;
 import com.epoch.loan.workshop.common.params.params.result.Result;
@@ -38,7 +39,7 @@ public class RepaymentServiceImpl extends BaseService implements RepaymentServic
     String errorPageUrl;
 
     @Override
-    public String repayment(RepaymentParams params) {
+    public String repayment(PreRepaymentParams params) {
         LogUtil.sysInfo("params : {}", JSONObject.toJSONString(params));
         // 查询还款记录
         String orderBillId = params.getId();
@@ -74,7 +75,7 @@ public class RepaymentServiceImpl extends BaseService implements RepaymentServic
     private String repayment(List<LoanRepaymentDistributionEntity> loanRepaymentDistributions,
                              LoanProductRepaymentConfigEntity config,
                              LoanOrderBillEntity orderBill,
-                             RepaymentParams params) {
+                             PreRepaymentParams params) {
         LogUtil.sysInfo("repayment start ... ");
 
         String payUrl = null;

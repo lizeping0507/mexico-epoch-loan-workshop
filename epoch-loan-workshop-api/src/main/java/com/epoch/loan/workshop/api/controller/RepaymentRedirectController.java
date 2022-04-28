@@ -3,6 +3,7 @@ package com.epoch.loan.workshop.api.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.config.URL;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
+import com.epoch.loan.workshop.common.params.params.request.PreRepaymentParams;
 import com.epoch.loan.workshop.common.params.params.request.RepaymentParams;
 import com.epoch.loan.workshop.common.params.params.result.Result;
 import com.epoch.loan.workshop.common.util.LogUtil;
@@ -30,7 +31,7 @@ public class RepaymentRedirectController extends BaseController {
      * @return String
      */
     @GetMapping(value = URL.PREPAY)
-    public Object redirectPage(RepaymentParams params, HttpServletResponse response) {
+    public Object redirectPage(PreRepaymentParams params, HttpServletResponse response) {
 
         LogUtil.sysInfo(URL.REPAYMENT + URL.PREPAY + " params : {}", JSONObject.toJSONString(params));
 

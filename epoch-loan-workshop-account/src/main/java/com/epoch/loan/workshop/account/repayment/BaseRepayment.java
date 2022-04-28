@@ -4,6 +4,7 @@ import com.epoch.loan.workshop.common.dao.mysql.LoanRepaymentPaymentRecordDao;
 import com.epoch.loan.workshop.common.entity.mysql.LoanPaymentEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanRepaymentPaymentRecordEntity;
 import com.epoch.loan.workshop.common.mq.repayment.RepaymentMQManager;
+import com.epoch.loan.workshop.common.params.params.request.PreRepaymentParams;
 import com.epoch.loan.workshop.common.params.params.request.RepaymentParams;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -40,7 +41,7 @@ public abstract class BaseRepayment {
      * @param params
      * @return 付款页面
      */
-    public abstract String startRepayment(LoanRepaymentPaymentRecordEntity loanRepaymentPaymentRecordEntity, LoanPaymentEntity payment, RepaymentParams params);
+    public abstract String startRepayment(LoanRepaymentPaymentRecordEntity loanRepaymentPaymentRecordEntity, LoanPaymentEntity payment, PreRepaymentParams params);
 
     /**
      * 存储业务所需id
