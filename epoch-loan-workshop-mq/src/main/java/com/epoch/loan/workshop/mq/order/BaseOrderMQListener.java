@@ -13,6 +13,7 @@ import com.epoch.loan.workshop.common.mq.repayment.RepaymentMQManager;
 import com.epoch.loan.workshop.common.mq.repayment.params.DistributionRepaymentParams;
 import com.epoch.loan.workshop.common.redis.RedisClient;
 import com.epoch.loan.workshop.common.util.DateUtil;
+import com.epoch.loan.workshop.common.zookeeper.ZookeeperClient;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -162,6 +163,12 @@ public abstract class BaseOrderMQListener {
      */
     @Autowired
     public LoanRemittanceAccountDao loanRemittanceAccountDao;
+
+    /**
+     * zookeeper工具类
+     */
+    @Autowired
+    public ZookeeperClient zookeeperClient;
 
     /**
      * 获取子类消息监听
