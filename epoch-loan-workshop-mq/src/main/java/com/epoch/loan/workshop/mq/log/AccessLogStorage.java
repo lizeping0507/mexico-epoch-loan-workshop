@@ -76,7 +76,7 @@ public class AccessLogStorage extends BaseLogStorageMQListener implements Messag
                 accessLogElasticEntity.setEx(accessLogParams.getEx());
                 accessLogElasticDao.save(accessLogElasticEntity);
             } catch (Exception e) {
-                LogUtil.sysError("[RequestLogStorage]", e);
+                LogUtil.sysError("[RequestLogStorage]" + JSON.toJSONString(accessLogParams), e);
             }
         }
 
