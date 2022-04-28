@@ -4,10 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.constant.Field;
 import com.epoch.loan.workshop.common.constant.OrderExamineStatus;
 import com.epoch.loan.workshop.common.constant.OrderStatus;
-import com.epoch.loan.workshop.common.entity.mysql.LoanMaskEntity;
-import com.epoch.loan.workshop.common.entity.mysql.LoanOrderEntity;
-import com.epoch.loan.workshop.common.entity.mysql.LoanOrderExamineEntity;
-import com.epoch.loan.workshop.common.entity.mysql.LoanUserInfoEntity;
+import com.epoch.loan.workshop.common.entity.mysql.*;
 import com.epoch.loan.workshop.common.mq.order.params.OrderParams;
 import com.epoch.loan.workshop.common.util.DateUtil;
 import com.epoch.loan.workshop.common.util.HttpUtils;
@@ -25,10 +22,7 @@ import org.apache.rocketmq.common.message.MessageExt;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author : Duke
@@ -206,11 +200,9 @@ public class RiskModelMask extends BaseOrderMQListener implements MessageListene
             // 订单id
             String orderId = loanOrderEntity.getId();
 
+
             // 产品id
             String productId = loanOrderEntity.getProductId();
-
-            // 是否复贷
-            Integer reloan = loanOrderEntity.getReloan();
 
             // app名称
             String appName = loanOrderEntity.getAppName();
@@ -227,6 +219,27 @@ public class RiskModelMask extends BaseOrderMQListener implements MessageListene
             // 手机号
             String mobile = loanUserInfoEntity.getMobile();
 
+            // 单包在贷笔数
+            List<String> userIdList = new ArrayList<>();
+            userIdList.add(userId);
+            int singleQuantity = loanOrderDao.countProcessOrderNo(userIdList);
+
+            // 多包在贷笔数
+            userIdList = loanUserInfoDao.findUserIdByMobile(mobile);
+            int allQuantity = loanOrderDao.countProcessOrderNo(userIdList);
+
+            // 第一笔还款距今天数
+            LoanOrderBillEntity fistRepayOrder = loanOrderBillDao.findFistRepayOrder(userId, appName);
+            int intervalDays = 0;
+            if (ObjectUtils.isNotEmpty(fistRepayOrder)) {
+                Date actualRepaymentTime = fistRepayOrder.getActualRepaymentTime();
+                intervalDays = DateUtil.getIntervalDays(new Date(), actualRepaymentTime);
+            }
+
+            // 查找该产品最后一笔还款订单
+            Integer[] status = new Integer[]{OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE};
+            LoanOrderEntity LatelyLoanOrderEntity = loanOrderDao.findLatelyOrderByUserIdAndProductIdAndStatus(userId, productId, status);
+
             // 封装请求参数
             Map<String, String> params = new HashMap<>();
             params.put(Field.METHOD, "riskmanagement.mexico.decision.model.dc");
@@ -240,10 +253,15 @@ public class RiskModelMask extends BaseOrderMQListener implements MessageListene
             bizData.put("borrowId", orderId);
             bizData.put("age", age);
             bizData.put("productId", productId);
-            bizData.put("isReloan", reloan);
+            bizData.put("repaymentTime", intervalDays);
+            bizData.put("currentOrder", singleQuantity);
+            bizData.put("allOrder", allQuantity);
+            bizData.put("productNumber", productId);
+            bizData.put("productSort", 1);
+            bizData.put("approvalAmount", LatelyLoanOrderEntity.getApprovalAmount());
             bizData.put("phone", mobile);
             bizData.put("appName", appName);
-            bizData.put("channelCode", String.valueOf(userChannelId));
+            bizData.put("channelCode", userChannelId);
             params.put(Field.BIZ_DATA, bizData.toJSONString());
 
             // 生成签名
@@ -269,9 +287,8 @@ public class RiskModelMask extends BaseOrderMQListener implements MessageListene
             // 返回响应参数
             return JSONObject.parseObject(result);
         } catch (Exception e) {
-            LogUtil.sysError("[RiskModelMask sendRiskV1Request]", e);
+            LogUtil.sysError("[RiskModelV1 sendRiskV1Request]", e);
             return null;
         }
     }
-
 }
