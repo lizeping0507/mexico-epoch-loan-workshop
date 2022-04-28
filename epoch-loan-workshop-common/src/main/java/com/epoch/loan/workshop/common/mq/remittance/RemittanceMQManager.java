@@ -59,86 +59,9 @@ public class RemittanceMQManager extends BaseMQ {
     /**
      * YeahPay支付标签
      */
-    @Value("${rocket.remittance.yeahPay.subExpression}")
-    private String yeahPaySubExpression;
+    @Value("${rocket.remittance.pandaPay.subExpression}")
+    private String pandaPaySubExpression;
 
-    /**
-     * InPay支付标签
-     */
-    @Value("${rocket.remittance.inPay.subExpression}")
-    private String inPaySubExpression;
-
-    /**
-     * SunFlowerPay支付标签
-     */
-    @Value("${rocket.remittance.sunFlowerPay.subExpression}")
-    private String sunFlowerPaySubExpression;
-
-    /**
-     * OceanPay支付标签
-     */
-    @Value("${rocket.remittance.oceanPay.subExpression}")
-    private String oceanPaySubExpression;
-
-    /**
-     * AcPay支付标签
-     */
-    @Value("${rocket.remittance.acPay.subExpression}")
-    private String acPaySubExpression;
-
-    /**
-     * IncashPay支付标签
-     */
-    @Value("${rocket.remittance.inCashPay.subExpression}")
-    private String incashPaySubExpression;
-
-    /**
-     * IncashPay支付标签
-     */
-    @Value("${rocket.remittance.inCashXjdPay.subExpression}")
-    private String incashXjdPaySubExpression;
-
-    /**
-     * TrustPay支付标签
-     */
-    @Value("${rocket.remittance.trustPay.subExpression}")
-    private String trustPaySubExpression;
-
-    /**
-     * QePay支付标签
-     */
-    @Value("${rocket.remittance.qePay.subExpression}")
-    private String qePaySubExpression;
-
-    /**
-     * HrPay支付标签
-     */
-    @Value("${rocket.remittance.hrPay.subExpression}")
-    private String hrPaySubExpression;
-
-    /**
-     * GlobPay支付标签
-     */
-    @Value("${rocket.remittance.globPay.subExpression}")
-    private String globPaySubExpression;
-
-    /**
-     * FastPay支付标签
-     */
-    @Value("${rocket.remittance.fastPay.subExpression}")
-    private String fastPaySubExpression;
-
-    /**
-     * YeahPa1支付标签
-     */
-    @Value("${rocket.remittance.yeahPay1.subExpression}")
-    private String yeahPay1SubExpression;
-
-    /**
-     * YeahPa1支付标签
-     */
-    @Value("${rocket.remittance.yeahPay1.subExpression}")
-    private String yeahPay2SubExpression;
 
     /**
      * 分配队列标签

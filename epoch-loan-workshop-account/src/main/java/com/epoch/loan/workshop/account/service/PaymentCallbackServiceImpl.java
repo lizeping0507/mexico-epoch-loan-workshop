@@ -44,7 +44,7 @@ public class PaymentCallbackServiceImpl extends BaseService implements PaymentCa
             remittanceParams.setGroupName("Weight");
             remittanceParams.setId(paymentRecord.getId());
         }
-        remittanceMQManagerProduct.sendMessage(remittanceParams, remittanceMQManagerProduct.getInPaySubExpression());
+        remittanceMQManagerProduct.sendMessage(remittanceParams, remittanceMQManagerProduct.getPandaPaySubExpression());
 
         return "success";
     }
