@@ -269,4 +269,14 @@ public class URL {
      * pandaPay
      */
     public static final String PANDA_PAY = "/pandaPay";
+
+    /**
+     * pandaPay 验证用户
+     */
+    public static final String PANDA_PAY_VERIFY_USER = "/pandaPay/verifyUser";
+
+    /**
+     * pandaPay 验证用户
+     */
+    public static final String PANDA_PAY_AUTHORIZE = "/pandaPay/authorize";
 }

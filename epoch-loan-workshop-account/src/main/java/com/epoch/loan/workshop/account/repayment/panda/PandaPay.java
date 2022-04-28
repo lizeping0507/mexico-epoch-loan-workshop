@@ -79,8 +79,6 @@ public class PandaPay extends BaseRepayment{
         String result;
         try {
             result = HttpUtils.simplePostInvoke(url, JSONObject.toJSONString(params), header);
-//            {"transactionId":"f89846d1a618416c9442f5c7864777bf","resultado":{"clabe":"646180130900000011","externalId":"P0016215e5265cf805ef0bd1e614"}}
-//            {"transactionId":"9c87a5716b204a6fab7f323ddec7d0b5","resultado":{"clabe":"646180130900000011","externalId":"P0016215e5265cf805ef0bd1e614"}}
             LogUtil.sysInfo("result : {}", result);
         } catch (Exception e) {
             LogUtil.sysError("[PandaPay]", e);
