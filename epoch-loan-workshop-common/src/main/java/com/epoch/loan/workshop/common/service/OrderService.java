@@ -1,5 +1,6 @@
 package com.epoch.loan.workshop.common.service;
 
+import com.epoch.loan.workshop.common.params.params.BaseParams;
 import com.epoch.loan.workshop.common.params.params.request.*;
 import com.epoch.loan.workshop.common.params.params.result.*;
 
@@ -33,7 +34,7 @@ public interface OrderService {
      * @param params 请求参数
      * @return Result 订单列表
      */
-    Result<OrderListResult> listAll(OrderListParams params);
+    Result<OrderListResult> listAll(BaseParams params);
 
     /**
      * 未完成订单列表
@@ -41,7 +42,7 @@ public interface OrderService {
      * @param params 请求参数
      * @return Result 订单列表
      */
-    Result<OrderListResult> unfinishedOrderList(OrderListParams params);
+    Result<OrderListResult> unfinishedOrderList(BaseParams params);
 
     /**
      * 未还款订单列表
@@ -49,7 +50,7 @@ public interface OrderService {
      * @param params 请求参数
      * @return Result 订单列表
      */
-    public Result<OrderListResult> unRepaymentOrderList(OrderListParams params);
+    public Result<OrderListResult> unRepaymentOrderList(BaseParams params);
 
     /**
      * 订单详情
