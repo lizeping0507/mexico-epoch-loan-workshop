@@ -26,6 +26,11 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class BaseService {
     /**
+     * 放款账户
+     */
+    @Autowired
+    public LoanRemittanceAccountDao loanRemittanceAccountDao;
+    /**
      * Redis工具类
      */
     @Autowired

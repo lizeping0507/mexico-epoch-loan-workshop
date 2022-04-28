@@ -8,9 +8,9 @@ import com.epoch.loan.workshop.common.constant.PayStrategy;
 import com.epoch.loan.workshop.common.constant.PlatformUrl;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
 import com.epoch.loan.workshop.common.entity.mysql.*;
+import com.epoch.loan.workshop.common.params.params.request.PandaRepaymentCallbackParam;
 import com.epoch.loan.workshop.common.params.params.request.RepaymentParams;
 import com.epoch.loan.workshop.common.params.params.request.UtrParams;
-import com.epoch.loan.workshop.common.params.params.request.PandaRepaymentCallbackParam;
 import com.epoch.loan.workshop.common.params.params.result.Result;
 import com.epoch.loan.workshop.common.service.RepaymentService;
 import com.epoch.loan.workshop.common.util.HttpUtils;
@@ -109,16 +109,16 @@ public class RepaymentServiceImpl extends BaseService implements RepaymentServic
             LogUtil.sysInfo("order:{}", order);
 
             // 用户信息
-            PlatformUserEntity user = platformUserDao.findUser(order.getUserId());
+            LoanUserEntity user = loanUserDao.findById(order.getUserId());
             LogUtil.sysInfo("user:{}", user);
 
             // 用户基本信息
-            PlatformUserBasicInfoEntity userBasicInfo = platformUserBasicInfoDao.findUserBasicInfo(order.getUserId());
+            LoanUserInfoEntity userBasicInfo = loanUserInfoDao.findUserInfoById(order.getUserId());
             LogUtil.sysInfo("userBasicInfo:{}", userBasicInfo);
 
-            // 查询用户银行卡
-            PlatformUserBankCardEntity platformUserBankCardEntity = null;// TODO = platformUserBankCardDao.findUserBankCardById(order.getBankCardId());
-            LogUtil.sysInfo("platformUserBankCardEntity:{}", platformUserBankCardEntity);
+            // 用户放款账户信息
+            LoanRemittanceAccountEntity remittanceAccount = loanRemittanceAccountDao.findRemittanceAccount(order.getBankCardId());
+            LogUtil.sysInfo("remittanceAccount:{}", remittanceAccount);
 
             // 创建订单详情记录
             LoanRepaymentPaymentRecordEntity loanRepaymentPaymentRecordEntity = new LoanRepaymentPaymentRecordEntity();
@@ -132,9 +132,9 @@ public class RepaymentServiceImpl extends BaseService implements RepaymentServic
             loanRepaymentPaymentRecordEntity.setOrderBillId(orderBill.getId());
             loanRepaymentPaymentRecordEntity.setAmount(orderBill.getRepaymentAmount() - orderBill.getReceivedAmount());
             loanRepaymentPaymentRecordEntity.setActualAmount(0D);
-            loanRepaymentPaymentRecordEntity.setPhone(user.getPhoneNumber());
+            loanRepaymentPaymentRecordEntity.setPhone(userBasicInfo.getMobile());
             loanRepaymentPaymentRecordEntity.setEmail(userBasicInfo.getEmail());
-            loanRepaymentPaymentRecordEntity.setName(platformUserBankCardEntity.getUserName());
+            loanRepaymentPaymentRecordEntity.setName(remittanceAccount.getName());
             loanRepaymentPaymentRecordEntity.setEvent("OrderCompere");
             LogUtil.sysInfo("loanRepaymentPaymentRecordEntity:{}", loanRepaymentPaymentRecordEntity);
 
