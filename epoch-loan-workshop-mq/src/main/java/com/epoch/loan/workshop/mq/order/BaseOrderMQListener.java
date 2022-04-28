@@ -63,36 +63,6 @@ public abstract class BaseOrderMQListener {
     public LoanOrderDao loanOrderDao;
 
     /**
-     * 订单
-     */
-    @Autowired
-    public PlatformOrderPushRepaymentDao platformOrderPushRepaymentDao;
-
-    /**
-     * 订单
-     */
-    @Autowired
-    public PlatfromOrderPushRepaymentPlanDao platfromOrderPushRepaymentPlanDao;
-
-    /**
-     * 用户Ocr信息
-     */
-    @Autowired
-    public PlatformUserOcrBasicInfoDao platformUserOcrBasicInfoDao;
-
-    /**
-     * 用户基本信息
-     */
-    @Autowired
-    public PlatformUserBasicInfoDao platformUserBasicInfoDao;
-
-    /**
-     * 用户
-     */
-    @Autowired
-    public PlatformUserDao platformUserDao;
-
-    /**
      * 订单模型审核
      */
     @Autowired
@@ -105,22 +75,10 @@ public abstract class BaseOrderMQListener {
     public LoanOrderBillDao loanOrderBillDao;
 
     /**
-     * 订单
-     */
-    @Autowired
-    public PlatformOrderDao platformOrderDao;
-
-    /**
      * 订单模型
      */
     @Autowired
     public LoanOrderModelDao loanOrderModelDao;
-
-    /**
-     * 审批结果反馈
-     */
-    @Autowired
-    public PlatformReceiveOrderApproveFeedbackDao receiveOrderApproveFeedbackDao;
 
     /**
      * 订单支付记录
@@ -381,70 +339,4 @@ public abstract class BaseOrderMQListener {
         loanOrderDao.updateLoanTime(orderId, new Date(), new Date());
     }
 
-
-    /**
-     * 新增还款计划
-     *
-     * @param loanOrderEntity     订单
-     * @param loanOrderBillEntity 账单
-     * @param punishmentAmount    罚息 没有填0
-     */
-    protected void addrepaymentPlan(LoanOrderEntity loanOrderEntity, LoanOrderBillEntity loanOrderBillEntity, double punishmentAmount) {
-        String orderId = loanOrderEntity.getId();
-        String orderBillId = loanOrderBillEntity.getId();
-        // 应还款时间
-        Date repaymentTime = loanOrderBillEntity.getRepaymentTime();
-        // 当前时间
-        Date now = new Date();
-        // 逾期天数
-        int intervalDays = DateUtil.getIntervalDays(now, repaymentTime);
-
-        // 还款金额
-        double repayment = loanOrderBillEntity.getRepaymentAmount();
-
-        // 根据订单账单ID查询已经实际支付金额
-        Double receivedAmount = loanRepaymentPaymentRecordDao.sumRepaymentRecordActualAmount(orderBillId);
-        receivedAmount = receivedAmount == null ? 0D : receivedAmount;
-
-        // 计算未还金额
-        double nonArrivalAmount = repayment - receivedAmount;
-
-        PlatformOrderPushRepaymentEntity orderPushRepayment = new PlatformOrderPushRepaymentEntity();
-        orderPushRepayment.setId(platformOrderPushRepaymentDao.getMaxId() + 1);
-        orderPushRepayment.setOrderNo(orderId);
-
-        PlatformUserBankCardEntity userBankCard = null;// TODO platformUserBankCardDao.findUserBankCardById(loanOrderEntity.getBankCardId());
-
-        orderPushRepayment.setBankCard(userBankCard.getBankCard());
-        orderPushRepayment.setOpenBank(userBankCard.getOpenBank());
-        // orderPushRepayment.setCanPrepay("1");
-        // orderPushRepayment.setCanPrepayTime();
-        orderPushRepayment.setCreateTime(new Date());
-
-        // 插入
-        platformOrderPushRepaymentDao.insert(orderPushRepayment);
-
-        // 还款计划子表
-        PlatfromOrderPushRepaymentPlanEntity orderPushRepaymentPlanEntity = new PlatfromOrderPushRepaymentPlanEntity();
-        orderPushRepaymentPlanEntity.setId(platfromOrderPushRepaymentPlanDao.getMaxId() + 1);
-        orderPushRepaymentPlanEntity.setRepaymentId(orderPushRepayment.getId());
-        orderPushRepaymentPlanEntity.setOrderNo(orderId);
-        orderPushRepaymentPlanEntity.setDueTime(loanOrderBillEntity.getRepaymentTime().getTime() / 1000);
-        orderPushRepaymentPlanEntity.setAmount(BigDecimal.valueOf(nonArrivalAmount));
-        orderPushRepaymentPlanEntity.setPaidAmount(BigDecimal.valueOf(receivedAmount));
-        orderPushRepaymentPlanEntity.setIsAbleDefer(0);
-        orderPushRepaymentPlanEntity.setPeriodNo(1);
-        orderPushRepaymentPlanEntity.setPayType(1);
-        if (intervalDays > 0) {
-            orderPushRepaymentPlanEntity.setRemark("amount:₹" + nonArrivalAmount + ",fee&interest:₹" + loanOrderBillEntity.getInterestAmount() + ",overdue:₹" + punishmentAmount);
-        } else {
-            orderPushRepaymentPlanEntity.setRemark("amount:₹" + nonArrivalAmount + ",fee&interest:₹" + loanOrderBillEntity.getInterestAmount());
-        }
-        orderPushRepaymentPlanEntity.setCanRepayTime(System.currentTimeMillis() / 1000);
-        orderPushRepaymentPlanEntity.setSuccessTime(System.currentTimeMillis() / 1000);
-        orderPushRepaymentPlanEntity.setBillStatus(intervalDays > 0 ? 3 : 1);
-
-        // 插入
-        platfromOrderPushRepaymentPlanDao.insert(orderPushRepaymentPlanEntity);
-    }
 }
