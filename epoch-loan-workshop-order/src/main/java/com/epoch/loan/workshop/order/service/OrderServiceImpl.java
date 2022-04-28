@@ -5,6 +5,7 @@ import com.epoch.loan.workshop.common.constant.*;
 import com.epoch.loan.workshop.common.entity.mysql.*;
 import com.epoch.loan.workshop.common.lock.UserApplyDetailLock;
 import com.epoch.loan.workshop.common.mq.order.params.OrderParams;
+import com.epoch.loan.workshop.common.params.params.BaseParams;
 import com.epoch.loan.workshop.common.params.params.request.*;
 import com.epoch.loan.workshop.common.params.params.result.*;
 import com.epoch.loan.workshop.common.params.params.result.model.LoanRepaymentRecordDTO;
@@ -180,7 +181,7 @@ public class OrderServiceImpl extends BaseService implements OrderService {
      * @return Result 订单列表
      */
     @Override
-    public Result<OrderListResult> listAll(OrderListParams params) {
+    public Result<OrderListResult> listAll(BaseParams params) {
         // 结果集
         Result<OrderListResult> result = new Result<>();
         result.setReturnCode(ResultEnum.SUCCESS.code());
@@ -220,7 +221,7 @@ public class OrderServiceImpl extends BaseService implements OrderService {
      * @return Result 订单列表
      */
     @Override
-    public Result<OrderListResult> unfinishedOrderList(OrderListParams params) {
+    public Result<OrderListResult> unfinishedOrderList(BaseParams params) {
         // 结果集
         Result<OrderListResult> result = new Result<>();
         result.setReturnCode(ResultEnum.SUCCESS.code());
@@ -267,7 +268,7 @@ public class OrderServiceImpl extends BaseService implements OrderService {
      * @return Result 订单列表
      */
     @Override
-    public Result<OrderListResult> unRepaymentOrderList(OrderListParams params) {
+    public Result<OrderListResult> unRepaymentOrderList(BaseParams params) {
         // 结果集
         Result<OrderListResult> result = new Result<>();
         result.setReturnCode(ResultEnum.SUCCESS.code());

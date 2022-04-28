@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.api.annotated.Authentication;
 import com.epoch.loan.workshop.common.config.URL;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
+import com.epoch.loan.workshop.common.params.params.BaseParams;
 import com.epoch.loan.workshop.common.params.params.request.*;
 import com.epoch.loan.workshop.common.params.params.result.*;
 import com.epoch.loan.workshop.common.util.LogUtil;
@@ -107,18 +108,11 @@ public class OrderController extends BaseController {
      */
     @Authentication
     @PostMapping(URL.ORDER_LIST_ALL)
-    public Result<OrderListResult> listAll(OrderListParams params) {
+    public Result<OrderListResult> listAll(BaseParams params) {
         // 结果集
         Result<OrderListResult> result = new Result<>();
 
         try {
-            // 验证请求参数是否合法
-            if (!params.isOrderQueryReqLegal()) {
-                // 异常返回结果
-                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":orderQueryReq");
-                return result;
-            }
 
             // 订单列表
             return orderService.listAll(params);
@@ -141,18 +135,11 @@ public class OrderController extends BaseController {
      */
     @Authentication
     @PostMapping(URL.ORDER_UN_FINISHED_LIST)
-    public Result<OrderListResult> unfinishedOrderList(OrderListParams params) {
+    public Result<OrderListResult> unfinishedOrderList(BaseParams params) {
         // 结果集
         Result<OrderListResult> result = new Result<>();
 
         try {
-            // 验证请求参数是否合法
-            if (!params.isOrderQueryReqLegal()) {
-                // 异常返回结果
-                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":orderQueryReq");
-                return result;
-            }
 
             // 订单列表
             return orderService.unfinishedOrderList(params);
@@ -175,18 +162,11 @@ public class OrderController extends BaseController {
      */
     @Authentication
     @PostMapping(URL.ORDER_UN_REPAYMENT_LIST)
-    public Result<OrderListResult> unRepaymentOrderList(OrderListParams params) {
+    public Result<OrderListResult> unRepaymentOrderList(BaseParams params) {
         // 结果集
         Result<OrderListResult> result = new Result<>();
 
         try {
-            // 验证请求参数是否合法
-            if (!params.isOrderQueryReqLegal()) {
-                // 异常返回结果
-                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":orderQueryReq");
-                return result;
-            }
 
             // 订单列表
             return orderService.unRepaymentOrderList(params);
