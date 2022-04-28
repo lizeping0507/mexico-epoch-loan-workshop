@@ -2,38 +2,42 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.epoch.loan.workshop.common.dao.mysql.LoanRemittanceOrderRecordDao">
     <insert id="insert">
-        INSERT INTO loan_remittance_order_record (id,
-        order_id,
-        payment_id,
-        amount,
-        phone,
-        add_card,
-        pan_card,
-        email,
-        name,
-        bank_card,
-        ifsc,
-        status,
-        process_remittance_payment_record_id,
-        success_remittance_payment_record_id,
-        update_time,
-        create_time)
-        VALUES (#{loanRemittanceOrderRecordEntity.id},
-        #{loanRemittanceOrderRecordEntity.orderId},
-        #{loanRemittanceOrderRecordEntity.paymentId},
-        #{loanRemittanceOrderRecordEntity.amount},
-        #{loanRemittanceOrderRecordEntity.phone},
-        #{loanRemittanceOrderRecordEntity.addCard},
-        #{loanRemittanceOrderRecordEntity.panCard},
-        #{loanRemittanceOrderRecordEntity.email},
-        #{loanRemittanceOrderRecordEntity.name},
-        #{loanRemittanceOrderRecordEntity.bankCard},
-        #{loanRemittanceOrderRecordEntity.ifsc},
-        #{loanRemittanceOrderRecordEntity.status},
-        #{loanRemittanceOrderRecordEntity.processRemittancePaymentRecordId},
-        #{loanRemittanceOrderRecordEntity.successRemittancePaymentRecordId},
-        #{loanRemittanceOrderRecordEntity.updateTime},
-        #{loanRemittanceOrderRecordEntity.createTime})
+        INSERT INTO loan_remittance_order_record (
+            id,
+            order_id,
+            payment_id,
+            amount,
+            name,
+            remarks,
+            remittance_account,
+            bank,
+            rfc,
+            curp,
+            type,
+            status,
+            process_remittance_payment_record_id,
+            success_remittance_payment_record_id,
+            update_time,
+            create_time
+        )
+        VALUES (
+               #{loanRemittanceOrderRecordEntity.id},
+               #{loanRemittanceOrderRecordEntity.orderId},
+               #{loanRemittanceOrderRecordEntity.paymentId},
+               #{loanRemittanceOrderRecordEntity.amount},
+               #{loanRemittanceOrderRecordEntity.name},
+               #{loanRemittanceOrderRecordEntity.remarks},
+               #{loanRemittanceOrderRecordEntity.remittanceAccount},
+               #{loanRemittanceOrderRecordEntity.bank},
+               #{loanRemittanceOrderRecordEntity.rfc},
+               #{loanRemittanceOrderRecordEntity.curp},
+               #{loanRemittanceOrderRecordEntity.type},
+               #{loanRemittanceOrderRecordEntity.status},
+               #{loanRemittanceOrderRecordEntity.processRemittancePaymentRecordId},
+               #{loanRemittanceOrderRecordEntity.successRemittancePaymentRecordId},
+               #{loanRemittanceOrderRecordEntity.updateTime},
+               #{loanRemittanceOrderRecordEntity.createTime}
+        )
     </insert>
     <update id="updateStatus">
         update loan_remittance_order_record set status = #{status} , update_time = #{updateTime} where id = #{id}
