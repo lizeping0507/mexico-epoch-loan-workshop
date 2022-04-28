@@ -9,6 +9,7 @@ import com.epoch.loan.workshop.mq.log.AccessLogStorage;
 import com.epoch.loan.workshop.mq.order.*;
 import com.epoch.loan.workshop.mq.order.screen.RiskModelV1;
 import com.epoch.loan.workshop.mq.remittance.DistributionRemittance;
+import com.epoch.loan.workshop.mq.remittance.payment.panda.PandaPay;
 import com.epoch.loan.workshop.mq.repayment.DistributionRepayment;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -111,6 +112,16 @@ public class Application {
      */
     @Autowired
     private AccessLogStorage accessLogStorage;
+    /**
+     * 响应日志
+     */
+    @Autowired
+    private PandaPay pandaPayPayment;
+    /**
+     * 响应日志
+     */
+    @Autowired
+    private com.epoch.loan.workshop.mq.repayment.panda.PandaPay pandaPayRePayment;
 
     /**
      * 启动类
@@ -145,5 +156,7 @@ public class Application {
         distributionRemittance.start();
         accessLogStorage.start();
         distributionRepayment.start();
+        pandaPayRePayment.start();
+        pandaPayPayment.start();
     }
 }

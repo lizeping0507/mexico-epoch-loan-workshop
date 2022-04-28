@@ -75,6 +75,7 @@ public class PandaPay extends BaseRemittancePaymentMQListener implements Message
             try {
                 // 获取消息对象
                 remittanceParams = getMessage(msg, RemittanceParams.class);
+                LogUtil.sysInfo("PandaPay remittanceParams : {}", remittanceParams);
                 if (ObjectUtils.isEmpty(remittanceParams)) {
                     continue;
                 }
@@ -83,6 +84,7 @@ public class PandaPay extends BaseRemittancePaymentMQListener implements Message
 
                 // 查询放款详情记录
                 LoanRemittancePaymentRecordEntity paymentRecord = loanRemittancePaymentRecordDao.getById(id);
+                LogUtil.sysInfo("PandaPay paymentRecord : {}", paymentRecord);
                 if (ObjectUtils.isEmpty(paymentRecord)) {
                     continue;
                 }
@@ -95,12 +97,14 @@ public class PandaPay extends BaseRemittancePaymentMQListener implements Message
 
                 // 查询放款记录
                 LoanRemittanceOrderRecordEntity orderRecord = loanRemittanceOrderRecordDao.getById(paymentRecord.getRemittanceOrderRecordId());
+                LogUtil.sysInfo("PandaPay orderRecord : {}", orderRecord);
                 if (ObjectUtils.isEmpty(orderRecord)) {
                     continue;
                 }
 
                 // 查询渠道信息
                 LoanPaymentEntity loanPayment = loanPaymentDao.getById(paymentRecord.getPaymentId());
+                LogUtil.sysInfo("PandaPay loanPayment : {}", loanPayment);
                 if (ObjectUtils.isEmpty(loanPayment)) {
                     continue;
                 }
@@ -115,6 +119,7 @@ public class PandaPay extends BaseRemittancePaymentMQListener implements Message
                 if (paymentRecord.getStatus().equals(LoanRemittancePaymentRecordStatus.CREATE)) {
                     // 创建状态 发起放款
                     Integer payoutResult = payout(loanPayment, orderRecord, paymentRecord);
+                    LogUtil.sysInfo("PandaPay payoutResult : {}", payoutResult);
 
                     // 判断支付状态
                     if (payoutResult.equals(PaymentField.PAYOUT_SUCCESS)) {
@@ -131,6 +136,7 @@ public class PandaPay extends BaseRemittancePaymentMQListener implements Message
                 } else if (paymentRecord.getStatus().equals(LoanRemittancePaymentRecordStatus.PROCESS)) {
                     // 进行中状态 查询放款结果
                     int res = queryOrder(orderRecord, paymentRecord, loanPayment);
+                    LogUtil.sysInfo("PandaPay res : {}", res);
 
                     // 判断支付状态
                     if (res == PaymentField.PAYOUT_SUCCESS) {
@@ -156,9 +162,9 @@ public class PandaPay extends BaseRemittancePaymentMQListener implements Message
                     // 异常,重试
                     retryRemittance(remittanceParams, subExpression());
                 } catch (Exception exception) {
-                    LogUtil.sysError("[InPay]", exception);
+                    LogUtil.sysError("[PandaPay]", exception);
                 }
-                LogUtil.sysError("[InPay]", e);
+                LogUtil.sysError("[PandaPay]", e);
             }
         }
         return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
