@@ -2,6 +2,8 @@ package com.epoch.loan.workshop.common.params.params.request;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * @author : Shangkunfeng
  * @packageName : com.epoch.loan.workshop.common.params.params.request;
@@ -10,7 +12,7 @@ import lombok.Data;
  * @description : 发起还款接口参数
  */
 @Data
-public class PreRepaymentParams {
+public class PreRepaymentParams implements Serializable {
 
     /**
      * 账单Id
