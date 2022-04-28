@@ -113,9 +113,8 @@ public class RiskModelV1 extends BaseOrderMQListener implements MessageListenerC
                         // 更新对应模型审核状态 ：拒绝
                         updateModeExamine(orderId, subExpression(), OrderExamineStatus.REFUSE);
 
-                        // 更改订单状态 FIXME 新老表
+                        // 更改订单状态
                         this.updateOrderStatus(orderId, OrderStatus.EXAMINE_FAIL);
-                        platformOrderDao.updateOrderStatus(orderId, 110, new Date());
                         continue;
                     }
 
@@ -152,9 +151,8 @@ public class RiskModelV1 extends BaseOrderMQListener implements MessageListenerC
                         // 更新对应模型审核状态
                         updateModeExamine(orderId, subExpression(), OrderExamineStatus.REFUSE);
 
-                        // 更改订单状态 FIXME 新老表
+                        // 更改订单状态
                         this.updateOrderStatus(orderId, OrderStatus.EXAMINE_FAIL);
-                        platformOrderDao.updateOrderStatus(orderId, 110, new Date());
                         continue;
                     }
                 } else {

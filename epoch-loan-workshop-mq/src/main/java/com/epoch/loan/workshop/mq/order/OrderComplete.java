@@ -114,7 +114,6 @@ public class OrderComplete extends BaseOrderMQListener implements MessageListene
 
                 // 如果未偿还金额大于0
                 if (nonArrivalAmount > 0) {
-                    addrepaymentPlan(loanOrderEntity, loanOrderBillEntity, 0);
                     continue;
                 }
 
