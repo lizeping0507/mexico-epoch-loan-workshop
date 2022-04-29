@@ -55,6 +55,7 @@ public class PaymentField {
     public static final String PANDAPAY_OXXO_PAY_URL = "oxxoPayUrl";
     public static final String PANDAPAY_QUERY_URL = "queryUrl";
     public static final String PANDAPAY_IN_QUERY_URL = "payinqueryUrl";
+    public static final String PANDAPAY_IN_OXXO_QUERY_URL = "oxxoPayinqueryUrl";
     public static final String PANDAPAY_NOTIFY_URL = "notifyUrl";
     // 请求字段
 

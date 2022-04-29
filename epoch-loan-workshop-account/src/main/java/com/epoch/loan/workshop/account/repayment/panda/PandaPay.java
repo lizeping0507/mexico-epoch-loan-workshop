@@ -26,8 +26,7 @@ import java.util.*;
  * @description : PandaPay代收发起
  */
 @Component("PandaPay")
-public class PandaPay extends BaseRepayment{
-
+public class PandaPay extends BaseRepayment {
     /**
      * 发起代收
      *
@@ -60,7 +59,6 @@ public class PandaPay extends BaseRepayment{
         String appId = paymentConfig.getString(PaymentField.PANDAPAY_APPID);
         String key = paymentConfig.getString(PaymentField.PANDAPAY_KEY);
         String url = paymentConfig.getString(PaymentField.PANDAPAY_PAY_URL);
-        String notifyUrl = paymentConfig.getString(PaymentField.PANDAPAY_NOTIFY_URL);
 
         // 参数封装
         PandaPayParams params = new PandaPayParams();
@@ -133,7 +131,6 @@ public class PandaPay extends BaseRepayment{
         String paymentSourcesType = paymentConfig.getString(PaymentField.PANDAPAY_PAYMENT_SOURCES_TYPE);
         String cpmpanyId = paymentConfig.getString(PaymentField.PANDAPAY_PAYMENT_COMPANY_ID);
         String url = paymentConfig.getString(PaymentField.PANDAPAY_OXXO_PAY_URL);
-        String notifyUrl = paymentConfig.getString(PaymentField.PANDAPAY_NOTIFY_URL);
 
         // 参数封装
         OxxoPandaPayParams params = new OxxoPandaPayParams();
@@ -159,6 +156,7 @@ public class PandaPay extends BaseRepayment{
         try {
             result = HttpUtils.simplePostInvoke(url, JSONObject.toJSONString(params), header);
 //            {"transactionId":"7813700adad843b199808e3b1b1a8bb3","resultado":{"id":-1,"descripcionError":"invalid token"}}
+//            {"transactionId":"0208603cabda44789a8cf3c53753d1dd","resultado":{"result":{"metadata":{"company_id":"P001","external_id":"P0016215e5265cf805ef0bd1e615"},"livemode":false,"phone":"9012000002","corporate":false,"name":"Mr  GAJENDRA RAVINDR","created_at":1651202265,"id":"cus_2ripD7xN3ob3kY7Vo","email":"cvvb@qq.com","custom_reference":"","payment_sources":{"total":1,"data":[{"reference":"99000003834928","barcode_url":"https://s3.amazonaws.com/cash_payment_barcodes/sandbox_reference.png","expires_at":0,"provider":"Oxxo","parent_id":"cus_2ripD7xN3ob3kY7Vo","created_at":1651202265,"id":"off_ref_2ripD7xN3ob3kY7Vp","type":"oxxo_recurrent","barcode":"99000003834928","object":"payment_source"}],"has_more":false,"object":"list"},"object":"customer"}}}
             LogUtil.sysInfo("result : {}", result);
         } catch (Exception e) {
             LogUtil.sysError("[oxxoPandaPay]", e);
@@ -202,7 +200,6 @@ public class PandaPay extends BaseRepayment{
         } catch (Exception e) {
             LogUtil.sysError("[repayment oxxoPandaPay]", e);
         }
-
         return barcodeUrl;
     }
 
