@@ -172,11 +172,11 @@
         </foreach>
     </select>
     <select id="findUserBetweenSpecificStatusOrderNum" resultType="java.lang.Integer">
-        Select * from loan_order where user_id = #{userId}
-        <if test="end != null and end != ''">
+        Select count(1) from loan_order where user_id = #{userId}
+        <if test="end != null">
             and status &lt;= #{end}
         </if>
-        <if test="start != null and start != ''">
+        <if test="start != null">
             and status &gt;= #{start}
         </if>
     </select>
