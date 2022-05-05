@@ -62,16 +62,8 @@ public class AccessLogStorage extends BaseLogStorageMQListener implements Messag
                 accessLogElasticEntity.setApplicationName(accessLogParams.getApplicationName());
                 accessLogElasticEntity.setServerIp(accessLogParams.getServerIp());
                 accessLogElasticEntity.setPort(accessLogParams.getPort());
-                accessLogElasticEntity.setRequest(JSON.toJSON(accessLogParams.getRequest()));
-
-                // 判断响应结果是否是JSON
-                if (isjson(JSONObject.toJSONString(accessLogParams.getResponse()))) {
-                    accessLogElasticEntity.setResponse(JSON.toJSON(accessLogParams.getResponse()));
-                } else {
-                    JSONObject jsonObject = new JSONObject();
-                    jsonObject.put(Field.MESSAGE, accessLogParams.getResponse());
-                    accessLogElasticEntity.setResponse(jsonObject);
-                }
+                accessLogElasticEntity.setRequest(JSON.toJSONString(accessLogParams.getRequest()));
+                accessLogElasticEntity.setResponse(JSON.toJSONString(accessLogParams.getResponse()));
                 accessLogElasticEntity.setAccessSpend(accessLogParams.getAccessSpend());
                 accessLogElasticEntity.setEx(accessLogParams.getEx());
                 accessLogElasticDao.save(accessLogElasticEntity);
