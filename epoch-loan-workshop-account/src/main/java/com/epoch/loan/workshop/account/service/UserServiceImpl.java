@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.epoch.loan.workshop.common.constant.*;
 import com.epoch.loan.workshop.common.entity.elastic.OcrLivingDetectionLogElasticEntity;
+import com.epoch.loan.workshop.common.entity.mysql.LoanAppControlEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanUserEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanUserInfoEntity;
 import com.epoch.loan.workshop.common.params.User;
@@ -851,6 +852,38 @@ public class UserServiceImpl extends BaseService implements UserService {
             result.setMessage(ResultEnum.SUCCESS.message());
             result.setData(ocrResult);
         }
+
+        return result;
+    }
+
+    /**
+     * 版本检查
+     * @param params
+     * @return
+     */
+    @Override
+    public Result<VersionResult> checkVersion(BaseParams params){
+        //结果集
+        Result<VersionResult> result = new Result<>();
+        VersionResult versionResult = new VersionResult();
+        result.setData(versionResult);
+
+        // 参数
+        String appName = params.getAppName();
+        String appVersion = params.getAppVersion();
+
+        // 查询
+        LoanAppControlEntity loanAppControlEntity = loanAppControlDao.findByAppNameAndAppVersion(appName, appVersion);
+
+        // 封装
+        if (ObjectUtils.isEmpty(loanAppControlEntity) || loanAppControlEntity.getStatus() != 1){
+            versionResult.setStatus(0);
+        }else {
+            versionResult.setStatus(1);
+        }
+
+        result.setReturnCode(ResultEnum.SUCCESS.code());
+        result.setMessage(ResultEnum.SUCCESS.message());
 
         return result;
     }

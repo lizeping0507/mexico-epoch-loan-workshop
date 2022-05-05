@@ -279,4 +279,8 @@ public class URL {
      * pandaPay 验证用户
      */
     public static final String PANDA_PAY_AUTHORIZE = "/pandaPay/authorize";
+    /**
+     * 版本检查
+     */
+    public static final String CHECK_VERSION = "/checkVersion";
 }

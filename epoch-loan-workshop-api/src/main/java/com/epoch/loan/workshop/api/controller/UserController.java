@@ -449,4 +449,26 @@ public class UserController extends BaseController {
             return result;
         }
     }
+
+    /**
+     * 版本控制
+     */
+    @PostMapping(URL.CHECK_VERSION)
+    public Result<VersionResult> checkVersion(BaseParams params) {
+        // 结果集
+        Result<VersionResult> result = new Result<>();
+
+        try {
+            // 获取个人信息
+            return userService.checkVersion(params);
+        } catch (Exception e) {
+            LogUtil.sysError("[UserController getUserInfo]", e);
+
+            // 异常返回结果
+            result.setEx(ThrowableUtils.throwableToString(e));
+            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
+            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
+            return result;
+        }
+    }
 }
