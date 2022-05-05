@@ -53,5 +53,5 @@ public interface ProductService {
      * @param params
      * @return
      */
-    Result<Integer> getUserType(UserTypeParams params);
+    Result<UserTypeResult> getUserType(UserTypeParams params);
 }

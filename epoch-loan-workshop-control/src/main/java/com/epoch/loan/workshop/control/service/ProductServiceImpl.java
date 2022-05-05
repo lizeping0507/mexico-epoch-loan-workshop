@@ -979,12 +979,14 @@ public class ProductServiceImpl extends BaseService implements ProductService {
      * @return
      */
     @Override
-    public Result<Integer> getUserType(UserTypeParams params){
-        Result<Integer> result = new Result<>();
+    public Result<UserTypeResult> getUserType(UserTypeParams params){
+        Result<UserTypeResult> result = new Result<>();
 
-        Integer integer = userType(params.getUserId(), params.getUserId());
+        Integer type = userType(params.getUserId(), params.getUserId());
+        UserTypeResult userTypeResult = new UserTypeResult();
+        userTypeResult.setUserType(type);
 
-        result.setData(integer);
+        result.setData(userTypeResult);
         result.setReturnCode(ResultEnum.SUCCESS.code());
         result.setMessage(ResultEnum.SUCCESS.message());
         return result;

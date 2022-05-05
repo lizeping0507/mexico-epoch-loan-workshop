@@ -6,6 +6,7 @@ import com.epoch.loan.workshop.common.constant.ResultEnum;
 import com.epoch.loan.workshop.common.params.params.request.ApplyParams;
 import com.epoch.loan.workshop.common.params.params.request.UserTypeParams;
 import com.epoch.loan.workshop.common.params.params.result.Result;
+import com.epoch.loan.workshop.common.params.params.result.UserTypeResult;
 import com.epoch.loan.workshop.common.util.LogUtil;
 import com.epoch.loan.workshop.common.util.ThrowableUtils;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,7 +26,7 @@ public class InternalController extends BaseController {
      * @return
      */
     @PostMapping(URL.USER_TYPE)
-    public Result<Integer> userType(UserTypeParams params) {
+    public Result<UserTypeResult> userType(UserTypeParams params) {
         // 结果集
         Result result = new Result();
 
