@@ -485,6 +485,8 @@ public class UserServiceImpl extends BaseService implements UserService {
         }
 
         basicInfo.setRealName(info.getPapersName());
+        basicInfo.setFatherName(info.getPapersFatherName());
+        basicInfo.setMotherName(info.getPapersMotherName());
         basicInfo.setDateOfBirth(info.getPapersDateOfBirth());
         basicInfo.setGender(info.getPapersGender());
         basicInfo.setAge(info.getPapersAge());

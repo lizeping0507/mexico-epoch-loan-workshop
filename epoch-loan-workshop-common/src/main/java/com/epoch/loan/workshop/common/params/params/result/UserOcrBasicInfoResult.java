@@ -15,9 +15,19 @@ import java.io.Serializable;
 public class UserOcrBasicInfoResult implements Serializable {
 
     /**
+     * 父亲姓氏
+     */
+    private String fatherName;
+
+    /**
      * 用户真实姓名
      */
     private String realName;
+
+    /**
+     * 母亲姓氏
+     */
+    private String motherName;
 
     /**
      * 证件编号
