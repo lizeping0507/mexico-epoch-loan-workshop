@@ -8,6 +8,7 @@ import com.epoch.loan.workshop.common.params.User;
 import com.epoch.loan.workshop.common.params.params.BaseParams;
 import com.epoch.loan.workshop.common.params.params.request.ProductDetailParams;
 import com.epoch.loan.workshop.common.params.params.request.ProductRecommendListParams;
+import com.epoch.loan.workshop.common.params.params.request.UserTypeParams;
 import com.epoch.loan.workshop.common.params.params.result.*;
 import com.epoch.loan.workshop.common.params.params.result.model.ProductList;
 import com.epoch.loan.workshop.common.service.ProductService;
@@ -970,5 +971,22 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         }
 
         return 0;
+    }
+
+    /**
+     * 获取用户客群
+     * @param params
+     * @return
+     */
+    @Override
+    public Result<Integer> getUserType(UserTypeParams params){
+        Result<Integer> result = new Result<>();
+
+        Integer integer = userType(params.getUserId(), params.getUserId());
+
+        result.setData(integer);
+        result.setReturnCode(ResultEnum.SUCCESS.code());
+        result.setMessage(ResultEnum.SUCCESS.message());
+        return result;
     }
 }

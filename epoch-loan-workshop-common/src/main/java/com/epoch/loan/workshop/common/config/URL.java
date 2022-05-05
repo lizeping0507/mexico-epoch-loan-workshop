@@ -19,6 +19,11 @@ public class URL {
     public static final String PAYMENT_CALL_BACK = API + "/paymentCallBack";
 
     /**
+     * 支付回调
+     */
+    public static final String INTERNAL = API + "/internal";
+
+    /**
      * 还款回调
      */
     public static final String REPAYMENT_CALL_BACK = API + "/repaymentCallBack";
@@ -283,4 +288,8 @@ public class URL {
      * 版本检查
      */
     public static final String CHECK_VERSION = "/checkVersion";
+    /**
+     * 用户客群
+     */
+    public static final String USER_TYPE = "/user/type";
 }
