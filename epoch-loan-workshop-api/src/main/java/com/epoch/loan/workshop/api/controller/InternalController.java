@@ -37,7 +37,7 @@ public class InternalController extends BaseController {
             // 获取用户客群
             return productService.getUserType(params);
         } catch (Exception e) {
-            LogUtil.sysError("[OrderController apply]", e);
+            LogUtil.sysError("[InternalController userType]", e);
 
             // 异常返回结果
             result.setEx(ThrowableUtils.throwableToString(e));
