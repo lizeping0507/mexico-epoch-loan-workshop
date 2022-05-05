@@ -125,4 +125,11 @@ public interface UserService {
      * @return
      */
     Result<SaveUserInfoResult> saveUserPersonInfo(UserPersonInfoParams params);
+
+    /**
+     * 版本检查
+     * @param params
+     * @return
+     */
+    Result<VersionResult> checkVersion(BaseParams params);
 }

@@ -141,6 +141,12 @@ public class BaseService {
     @Autowired
     public AlibabaOssClient alibabaOssClient;
 
+    /**
+     * OSS
+     */
+    @Autowired
+    public LoanAppControlDao loanAppControlDao;
+
 
     /**
      * 发送队列

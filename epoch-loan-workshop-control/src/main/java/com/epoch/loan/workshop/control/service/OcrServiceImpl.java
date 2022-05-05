@@ -211,7 +211,7 @@ public class OcrServiceImpl extends BaseService implements OcrService {
         }
 
         // 获取响应分数
-        UserLivenessScoreResult data = result.getData();
+        UserLivenessScoreResult data = scoreResult.getData();
         String livenessScore = data.getLivenessScore();
         if (ObjectUtils.isEmpty(livenessScore)) {
             result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
