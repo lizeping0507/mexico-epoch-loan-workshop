@@ -369,8 +369,7 @@ public class OrderServiceImpl extends BaseService implements OrderService {
         LoanOrderBillEntity lastOrderBill = loanOrderBillDao.findLastOrderBill(orderId);
 
         // 已还款
-        if (orderEntity.getStatus() == OrderStatus.COMPLETE
-                || orderEntity.getStatus() == OrderStatus.DUE_COMPLETE) {
+        if (orderEntity.getStatus() == OrderStatus.COMPLETE   || orderEntity.getStatus() == OrderStatus.DUE_COMPLETE) {
             detailResult.setActualRepaymentTime(lastOrderBill.getActualRepaymentTime());
 
             // 封装结果

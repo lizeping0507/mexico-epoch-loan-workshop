@@ -21,18 +21,4 @@ public interface SdkService {
      * @return 上传结果
      */
     Result<Object> sdkUploadCallBack(SdkUploadParams params);
-
-    /**
-     * 是否推送基本信息
-     * <p>
-     * 1、判断当前产品是否是a、b公司，如果是a、b公司，通知ape调用银行卡列表接口。
-     * 2、如果当前产品非a、b公司，判断当前是否推送基本信息，如果推送，通知app调用银行卡列表接口；
-     * 如果未推送，去缓存获取用户模型分及客群，满足进件的条件推送基本信息，并且通知app调用银行卡列表接口，
-     * 不满足条件或者缓存中没有数据，通知app调用推荐产品列表接口（展示a、b公司产品）。
-     *
-     * @param params 入参
-     * @return 跳转推荐列表还是银行卡列表
-     * @throws Exception 请求异常
-     */
-    Result<SdkPushInfoResult> sdkIsPushInfo(SdkPushInfoParams params) throws Exception;
 }
