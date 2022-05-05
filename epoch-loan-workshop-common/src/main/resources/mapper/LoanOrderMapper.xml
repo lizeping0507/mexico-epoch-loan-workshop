@@ -176,7 +176,7 @@
         <if test="end != null and end != ''">
             and status &lt;= #{end}
         </if>
-        <if test="appName != null and appName != ''">
+        <if test="start != null and start != ''">
             and status &gt;= #{start}
         </if>
     </select>
