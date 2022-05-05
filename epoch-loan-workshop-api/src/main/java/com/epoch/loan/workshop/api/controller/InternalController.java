@@ -1,5 +1,6 @@
 package com.epoch.loan.workshop.api.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.api.annotated.Authentication;
 import com.epoch.loan.workshop.common.config.URL;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
@@ -27,6 +28,7 @@ public class InternalController extends BaseController {
      */
     @PostMapping(URL.USER_TYPE)
     public Result<UserTypeResult> userType(UserTypeParams params) {
+        LogUtil.sysInfo("UserTypeParams: {}", JSONObject.toJSONString(params));
         // 结果集
         Result result = new Result();
 
