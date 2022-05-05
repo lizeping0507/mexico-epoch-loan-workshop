@@ -47,4 +47,11 @@ public interface ProductService {
      * @throws Exception 请求异常
      */
     Result<ProductRecommendResult> recommendList(ProductRecommendListParams params) throws Exception;
+
+    /**
+     * 获取用户客群
+     * @param params
+     * @return
+     */
+    Result<UserTypeResult> getUserType(UserTypeParams params);
 }
