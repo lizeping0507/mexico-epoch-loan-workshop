@@ -163,6 +163,7 @@ public class OrderRemittance extends BaseOrderMQListener implements MessageListe
 
                     // 放入队列等待放款成功
                     retry(orderParams, subExpression());
+                    continue;
                 } else if (loanRemittanceOrderRecordStatus == LoanRemittanceOrderRecordStatus.SUCCESS) {
                     // 更新对应模型审核状态
                     updateModeExamine(orderId, subExpression(), OrderExamineStatus.PASS);
@@ -172,6 +173,7 @@ public class OrderRemittance extends BaseOrderMQListener implements MessageListe
 
                     // 发送下一模型
                     sendNextModel(orderParams, subExpression());
+                    continue;
                 } else if (loanRemittanceOrderRecordStatus == LoanRemittanceOrderRecordStatus.THOROUGHLY_FAILED) {
                     // 异常状况 此订单放款彻底失败  流程结束
                     updateModeExamine(orderId, subExpression(), OrderExamineStatus.FAIL);
@@ -181,6 +183,7 @@ public class OrderRemittance extends BaseOrderMQListener implements MessageListe
                 } else {
                     // 放入队列等待放款成功
                     retry(orderParams, subExpression());
+                    continue;
                 }
             } catch (Exception e) {
                 try {
