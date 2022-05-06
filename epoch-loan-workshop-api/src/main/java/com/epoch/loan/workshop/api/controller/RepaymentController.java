@@ -2,6 +2,7 @@ package com.epoch.loan.workshop.api.controller;
 
 import com.epoch.loan.workshop.common.config.URL;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
+import com.epoch.loan.workshop.common.params.params.request.PandaPayH5Params;
 import com.epoch.loan.workshop.common.params.params.request.UtrParams;
 import com.epoch.loan.workshop.common.params.params.result.Result;
 import com.epoch.loan.workshop.common.util.LogUtil;
@@ -36,6 +37,31 @@ public class RepaymentController extends BaseController {
             return repaymentService.repayUtr(params);
         } catch (Exception e) {
             LogUtil.sysError("[RepaymentController repayUtr]", e);
+
+            // 异常返回结果
+            result.setEx(ThrowableUtils.throwableToString(e));
+            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
+            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
+            result.setEx(e.getMessage());
+            return result;
+        }
+    }
+
+    /**
+     * pandaPay OXXO方式H5回调
+     *
+     * @param params UTR入参
+     * @return String
+     */
+    @PostMapping(URL.REPAY_UTR)
+    public Result<Object> pandaPayOxxoH5(PandaPayH5Params params) {
+        // 结果集
+        Result<Object> result = new Result<>();
+
+        try {
+            return repaymentService.pandaPayOxxoH5(params);
+        } catch (Exception e) {
+            LogUtil.sysError("[RepaymentController pandaPayOxxoH5]", e);
 
             // 异常返回结果
             result.setEx(ThrowableUtils.throwableToString(e));

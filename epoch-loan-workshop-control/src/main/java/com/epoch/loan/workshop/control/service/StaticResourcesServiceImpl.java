@@ -106,8 +106,8 @@ public class StaticResourcesServiceImpl implements StaticResourcesService {
     private String splicingAppDoamin(String appName) {
         // app顶级域名判断
         switch (appName) {
-            case "paisaStar":
-                return STATIC_DOMAIN_TEMPLATE + "paisastar.in";
+            case "creditopeso":
+                return STATIC_DOMAIN_TEMPLATE + "creditopeso.com";
             default:
                 return null;
         }

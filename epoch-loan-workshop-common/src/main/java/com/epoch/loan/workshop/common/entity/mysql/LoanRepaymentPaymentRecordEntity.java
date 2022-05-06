@@ -42,12 +42,12 @@ public class LoanRepaymentPaymentRecordEntity {
     /**
      * 发起支付金额
      */
-    private double amount;
+    private Double amount;
 
     /**
      * 实际支付金额
      */
-    private double actualAmount;
+    private Double actualAmount;
 
     /**
      * 手机号

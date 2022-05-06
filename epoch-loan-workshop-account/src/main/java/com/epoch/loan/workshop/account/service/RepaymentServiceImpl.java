@@ -8,10 +8,8 @@ import com.epoch.loan.workshop.common.constant.PayStrategy;
 import com.epoch.loan.workshop.common.constant.PlatformUrl;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
 import com.epoch.loan.workshop.common.entity.mysql.*;
-import com.epoch.loan.workshop.common.params.params.request.PandaRepaymentCallbackParam;
-import com.epoch.loan.workshop.common.params.params.request.PreRepaymentParams;
-import com.epoch.loan.workshop.common.params.params.request.RepaymentParams;
-import com.epoch.loan.workshop.common.params.params.request.UtrParams;
+import com.epoch.loan.workshop.common.params.params.request.*;
+import com.epoch.loan.workshop.common.params.params.result.PandaPayH5Result;
 import com.epoch.loan.workshop.common.params.params.result.Result;
 import com.epoch.loan.workshop.common.service.RepaymentService;
 import com.epoch.loan.workshop.common.util.HttpUtils;
@@ -290,4 +288,26 @@ public class RepaymentServiceImpl extends BaseService implements RepaymentServic
         return result;
     }
 
+    /**
+     * pandaPay OXXO方式H5回调
+     *
+     * @param params
+     * @return
+     */
+    @Override
+    public Result<Object> pandaPayOxxoH5(PandaPayH5Params params){
+        Result<Object> result = new Result<>();
+
+        String id = params.getId();
+        LoanRepaymentPaymentRecordEntity record = loanRepaymentPaymentRecordDao.findRepaymentPaymentRecordById(id);
+        String businessId = record.getBusinessId();
+        Double amount = record.getAmount();
+
+        PandaPayH5Result data = new PandaPayH5Result();
+        data.setCode(businessId);
+        data.setAmount(amount.toString());
+        result.setData(data);
+
+        return result;
+    }
 }

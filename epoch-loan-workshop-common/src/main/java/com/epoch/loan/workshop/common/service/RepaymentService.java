@@ -1,9 +1,6 @@
 package com.epoch.loan.workshop.common.service;
 
-import com.epoch.loan.workshop.common.params.params.request.PreRepaymentParams;
-import com.epoch.loan.workshop.common.params.params.request.RepaymentParams;
-import com.epoch.loan.workshop.common.params.params.request.UtrParams;
-import com.epoch.loan.workshop.common.params.params.request.PandaRepaymentCallbackParam;
+import com.epoch.loan.workshop.common.params.params.request.*;
 import com.epoch.loan.workshop.common.params.params.result.Result;
 
 /**
@@ -39,4 +36,12 @@ public interface RepaymentService {
      * @throws Exception
      */
     Result<Object> repayUtr(UtrParams params) throws Exception;
+
+    /**
+     * pandaPay OXXO方式H5回调
+     *
+     * @param params
+     * @return
+     */
+    Result<Object> pandaPayOxxoH5(PandaPayH5Params params);
 }
