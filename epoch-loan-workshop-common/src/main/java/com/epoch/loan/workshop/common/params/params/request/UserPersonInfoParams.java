@@ -35,11 +35,6 @@ public class UserPersonInfoParams extends BaseParams {
     private String payMethod;
 
     /**
-     * 邮箱
-     */
-    private String email;
-
-    /**
      * 紧急联系人信息
      */
     private String contacts;
@@ -85,15 +80,6 @@ public class UserPersonInfoParams extends BaseParams {
         return true;
     }
 
-    /**
-     * 字段校验-邮箱
-     */
-    public boolean isEmailLegal(){
-        if (StringUtils.isEmpty(this.email)){
-            return false;
-        }
-        return true;
-    }
 
     /**
      * 字段校验-紧急联系人信息

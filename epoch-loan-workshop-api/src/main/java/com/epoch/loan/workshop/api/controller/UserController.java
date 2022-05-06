@@ -399,12 +399,6 @@ public class UserController extends BaseController {
                 result.setMessage(ResultEnum.PARAM_ERROR.message() + ":PayMethodL");
                 return result;
             }
-            if (!params.isEmailLegal()) {
-                // 异常返回结果
-                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":EmailL");
-                return result;
-            }
             if (!params.isContactsLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
