@@ -17,7 +17,7 @@ public class StaticResourcesServiceImpl implements StaticResourcesService {
     /**
      * 注册页地址命名规则
      */
-    private static final String STATIC_DOMAIN_TEMPLATE = "http://static.";
+    private static final String STATIC_DOMAIN_TEMPLATE = "https://static.";
 
     /**
      * 注册页地址命名规则
