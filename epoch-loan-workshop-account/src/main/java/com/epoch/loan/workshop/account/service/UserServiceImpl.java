@@ -432,7 +432,6 @@ public class UserServiceImpl extends BaseService implements UserService {
         userInfo.setPayPeriod(params.getPayPeriod());
         userInfo.setOccupation(params.getOccupation());
         userInfo.setPayMethod(params.getPayMethod());
-        userInfo.setEmail(params.getEmail());
         userInfo.setContacts(params.getContacts());
 
         // 更新
