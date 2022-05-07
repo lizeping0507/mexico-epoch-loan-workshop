@@ -8,11 +8,13 @@ import com.epoch.loan.workshop.common.constant.LoanRepaymentPaymentRecordStatus;
 import com.epoch.loan.workshop.common.constant.PaymentField;
 import com.epoch.loan.workshop.common.dao.mysql.LoanOrderDao;
 import com.epoch.loan.workshop.common.dao.mysql.LoanUserInfoDao;
+import com.epoch.loan.workshop.common.entity.mysql.LoanOrderEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanPaymentEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanRepaymentPaymentRecordEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanUserInfoEntity;
 import com.epoch.loan.workshop.common.mq.repayment.params.RepaymentParams;
 import com.epoch.loan.workshop.common.params.params.request.PreRepaymentParams;
+import com.epoch.loan.workshop.common.util.AppDomainUtil;
 import com.epoch.loan.workshop.common.util.HttpUtils;
 import com.epoch.loan.workshop.common.util.LogUtil;
 import org.apache.commons.lang3.ObjectUtils;
@@ -122,6 +124,10 @@ public class PandaPay extends BaseRepayment {
                 RepaymentParams repaymentParams = new RepaymentParams();
                 repaymentParams.setId(record.getId());
                 repaymentMQManager.sendMessage(repaymentParams, payment.getName());
+
+                // 拼接H5路径
+                LoanOrderEntity order = loanOrderDao.findOrder(record.getOrderId());
+                return AppDomainUtil.splicingPandapaySPEIRepaymentH5Url(order.getAppName(), record.getId());
             }
         } catch (Exception e) {
             LogUtil.sysError("[repayment pandaPay]", e);
@@ -202,11 +208,15 @@ public class PandaPay extends BaseRepayment {
                 // 存储支付方订单号
                 updatePamentRecordBussinesId(record.getId(), payOrderId);
                 // 存储clabe和条形码
-                updatePaymentRecordClabeAndBarCode(record.getId(),clabe,barcodeUrl);
+                updatePaymentRecordClabeAndBarCode(record.getId(), clabe, barcodeUrl);
                 // 发送到队列
                 RepaymentParams repaymentParams = new RepaymentParams();
                 repaymentParams.setId(record.getId());
                 repaymentMQManager.sendMessage(repaymentParams, payment.getName());
+
+                // 拼接H5路径
+                LoanOrderEntity order = loanOrderDao.findOrder(record.getOrderId());
+                return AppDomainUtil.splicingPandapayOXXORepaymentH5Url(order.getAppName(), record.getId());
             }
         } catch (Exception e) {
             LogUtil.sysError("[repayment oxxoPandaPay]", e);

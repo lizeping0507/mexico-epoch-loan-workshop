@@ -2,6 +2,7 @@ package com.epoch.loan.workshop.control.service;
 
 import com.epoch.loan.workshop.common.params.params.request.StaticResourcesParam;
 import com.epoch.loan.workshop.common.service.StaticResourcesService;
+import com.epoch.loan.workshop.common.util.AppDomainUtil;
 import org.apache.dubbo.config.annotation.DubboService;
 
 /**
@@ -53,7 +54,7 @@ public class StaticResourcesServiceImpl implements StaticResourcesService {
     @Override
     public String getRegisterPageUrl(String appName) {
         // 拼接隐私协议地址
-        return splicingAppDoamin(appName) + String.format(REGISTER_PAGE_TEMPLATE, appName);
+        return AppDomainUtil.splicingAppResourceDoamin(appName) + String.format(REGISTER_PAGE_TEMPLATE, appName);
     }
 
     /**
@@ -65,7 +66,7 @@ public class StaticResourcesServiceImpl implements StaticResourcesService {
     @Override
     public String getHelpPageUrl(String appName) {
         // 拼接隐私协议地址
-        return splicingAppDoamin(appName) + String.format(HELP_PAGE_TEMPLATE, appName);
+        return AppDomainUtil.splicingAppResourceDoamin(appName) + String.format(HELP_PAGE_TEMPLATE, appName);
     }
 
     /**
@@ -77,7 +78,7 @@ public class StaticResourcesServiceImpl implements StaticResourcesService {
     @Override
     public String getPrivacyPageUrl(String appName) {
         // 拼接隐私协议地址
-        return splicingAppDoamin(appName) + String.format(PRIVACY_PAGE_TEMPLATE, appName);
+        return AppDomainUtil.splicingAppResourceDoamin(appName) + String.format(PRIVACY_PAGE_TEMPLATE, appName);
     }
 
     /**
@@ -88,28 +89,11 @@ public class StaticResourcesServiceImpl implements StaticResourcesService {
      */
     @Override
     public String contractPage(StaticResourcesParam params) {
-        return splicingAppDoamin(params.getAppName()) + CONTRACT_PAGE_TEMPLATE + params.getOrderNo();
+        return AppDomainUtil.splicingAppResourceDoamin(params.getAppName()) + CONTRACT_PAGE_TEMPLATE + params.getOrderNo();
     }
 
     @Override
     public String getVideoUtrPageUrl(String appName) {
-        return splicingAppDoamin(appName) + String.format(UTR_PAGE_TEMPLATE, appName);
-    }
-
-
-    /**
-     * 拼接app请求域名
-     *
-     * @param appName app名称
-     * @return app请求域名
-     */
-    private String splicingAppDoamin(String appName) {
-        // app顶级域名判断
-        switch (appName) {
-            case "CreditPeso":
-                return STATIC_DOMAIN_TEMPLATE + "creditopesos.com";
-            default:
-                return null;
-        }
+        return AppDomainUtil.splicingAppResourceDoamin(appName) + String.format(UTR_PAGE_TEMPLATE, appName);
     }
 }
