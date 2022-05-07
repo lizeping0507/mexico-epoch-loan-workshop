@@ -16,6 +16,7 @@ import java.util.List;
 public class PandaPayH5Result implements Serializable {
 
     private String code;
+    private List<String> spiltCode;
     private String amount;
 
 }

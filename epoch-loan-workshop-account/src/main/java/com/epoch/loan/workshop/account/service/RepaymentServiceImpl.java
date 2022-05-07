@@ -300,14 +300,33 @@ public class RepaymentServiceImpl extends BaseService implements RepaymentServic
 
         String id = params.getId();
         LoanRepaymentPaymentRecordEntity record = loanRepaymentPaymentRecordDao.findRepaymentPaymentRecordById(id);
+        // TODO 结果校验
+
         String businessId = record.getBusinessId();
         Double amount = record.getAmount();
 
+        // 拆分
+        List<String> spiltCodes = new ArrayList<>();
+        spiltCodes.add(businessId.substring(0,3));
+        spiltCodes.add(businessId.substring(3,6));
+        spiltCodes.add(businessId.substring(6,9));
+        spiltCodes.add(businessId.substring(9,12));
+        spiltCodes.add(businessId.substring(12,15));
+        spiltCodes.add(businessId.substring(15));
+
+
+
         PandaPayH5Result data = new PandaPayH5Result();
+        data.setSpiltCode(spiltCodes);
         data.setCode(businessId);
         data.setAmount(amount.toString());
         result.setData(data);
 
         return result;
+    }
+
+    public static void main(String[] args) {
+        String s = "646180130900000024";
+        System.out.println(s.substring(0,3));
     }
 }
