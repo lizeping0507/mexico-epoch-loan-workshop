@@ -157,11 +157,11 @@ public class TokenManager {
         }
         // 用户信息认证状况
         if (StringUtils.isNotEmpty(user.getChildrenNumber())){
-            user.setBasicInfoAuth(true);
+            user.setAddInfoAuth(true);
         }
         // 基本信息认证状况
         if (StringUtils.isNotEmpty(user.getMonthlyIncome())){
-            user.setAddInfoAuth(true);
+            user.setBasicInfoAuth(true);
         }
 
         redisClient.set(RedisKeyField.USER_CACHE + user.getId(), JSONObject.toJSONString(user));

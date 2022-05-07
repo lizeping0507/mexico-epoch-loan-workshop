@@ -253,12 +253,12 @@ public class URL {
     /**
      * 保存用户基本信息
      */
-    public static final String SAVE_BASIC_INFO = "/basicInfo/save";
+    public static final String SAVE_ADD_INFO = "/addInfo/save";
 
     /**
      * 保存用户个人信息
      */
-    public static final String SAVE_PERSON_INFO = "/personInfo/save";
+    public static final String SAVE_BASIC_INFO = "/basicInfo/save";
 
     /**
      * 保存用户信息

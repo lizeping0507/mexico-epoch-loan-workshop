@@ -9,111 +9,83 @@ import org.apache.commons.lang3.StringUtils;
  * @packageName : com.epoch.loan.workshop.common.params.params.request;
  * @className : UserBasicInfoParams
  * @createTime : 2022/3/29 16:08
- * @description : 用户基本信息请求参数
+ * @description : 用户个人信息请求参数
  */
 @Data
 public class UserBasicInfoParams extends BaseParams {
-    /**
-     * 用户填写生日
-     */
-    private String customDateOfBirth;
 
     /**
-     * 用户填写性别
+     * 月收入
      */
-    private String customGenter;
+    private String monthlyIncome;
 
     /**
-     * 孩子数量
+     * 发薪周期
      */
-    private String childrenNumber ;
+    private String payPeriod;
 
     /**
-     * 居住类型
+     * 职业
      */
-    private String liveType ;
+    private String occupation;
 
     /**
-     * 学历
+     * 工资发放方式
      */
-    private String education ;
+    private String payMethod;
 
     /**
-     * 婚姻状况
+     * 紧急联系人信息
      */
-    private String marital ;
-
-    /**
-     * 借款目的
-     */
-    private String loanPurpose ;
+    private String contacts;
 
 
     /**
-     * 字段校验-用户填写生日
+     * 字段校验-月收入
      */
-    public boolean isCustomDateOfBirthLegal(){
-        if (StringUtils.isEmpty(this.customDateOfBirth)){
+    public boolean isMonthlyIncomeLegal() {
+        if (StringUtils.isEmpty(this.monthlyIncome)) {
             return false;
         }
         return true;
     }
 
     /**
-     * 字段校验-用户填写性别
+     * 字段校验-发薪周期
      */
-    public boolean isCustomGenterLegal(){
-        if (StringUtils.isEmpty(this.customGenter)){
+    public boolean isPayPeriodLegal(){
+        if (StringUtils.isEmpty(this.payPeriod)){
             return false;
         }
         return true;
     }
 
     /**
-     * 字段校验-孩子数量
+     * 字段校验-职业
      */
-    public boolean isChildrenNumberLegal(){
-        if (StringUtils.isEmpty(this.childrenNumber)){
+    public boolean isOccupationLegal(){
+        if (StringUtils.isEmpty(this.occupation)){
             return false;
         }
         return true;
     }
 
     /**
-     * 字段校验-居住类型
+     * 字段校验-工资发放方式
      */
-    public boolean isLiveTypeLegal(){
-        if (StringUtils.isEmpty(this.liveType)){
+    public boolean isPayMethodLegal(){
+        if (StringUtils.isEmpty(this.payMethod)){
             return false;
         }
         return true;
     }
 
-    /**
-     * 字段校验-学历
-     */
-    public boolean isEducationLegal(){
-        if (StringUtils.isEmpty(this.education)){
-            return false;
-        }
-        return true;
-    }
 
     /**
-     * 字段校验-婚姻状况
+     * 字段校验-紧急联系人信息
      */
-    public boolean isMaritalLegal(){
-        if (StringUtils.isEmpty(this.marital)){
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * 字段校验-借款目的
-     */
-    public boolean isLoanPurposeLegal(){
-        if (StringUtils.isEmpty(this.loanPurpose)){
+    public boolean isContactsLegal(){
+        if (StringUtils.isEmpty(this.contacts)){
             return false;
         }
         return true;

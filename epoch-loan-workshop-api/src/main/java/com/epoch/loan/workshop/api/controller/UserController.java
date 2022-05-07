@@ -306,6 +306,63 @@ public class UserController extends BaseController {
         Result<SaveUserInfoResult> result = new Result<>();
 
         try {
+
+            if (!params.isMonthlyIncomeLegal() ) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() +":MonthlyIncome");
+                return result;
+            }
+            if (!params.isPayPeriodLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":PayPeriodL");
+                return result;
+            }
+            if (!params.isOccupationLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":OccupationL");
+                return result;
+            }
+            if (!params.isPayMethodLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":PayMethodL");
+                return result;
+            }
+            if (!params.isContactsLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":ContactsL");
+                return result;
+            }
+            // 保存个人信息
+            return userService.saveUserBasicInfo(params);
+        } catch (Exception e) {
+            LogUtil.sysError("[UserController saveUserPersonInfo]", e);
+
+            // 异常返回结果
+            result.setEx(ThrowableUtils.throwableToString(e));
+            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
+            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
+            return result;
+        }
+    }
+
+    /**
+     * 保存用户补充信息
+     *
+     * @param params 入参
+     * @return 个人信息
+     */
+    @Authentication(auth = true)
+    @PostMapping(URL.SAVE_ADD_INFO)
+    public Result<SaveUserInfoResult> saveUserAddInfo(UserAddInfoParams params) {
+        // 结果集
+        Result<SaveUserInfoResult> result = new Result<>();
+
+        try {
             if (!params.isCustomDateOfBirthLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
@@ -349,7 +406,7 @@ public class UserController extends BaseController {
                 return result;
             }
             // 获取个人信息
-            return userService.saveUserBasicInfo(params);
+            return userService.saveUserAddInfo(params);
         } catch (Exception e) {
             LogUtil.sysError("[UserController saveUserBasicInfo]", e);
 
@@ -361,62 +418,6 @@ public class UserController extends BaseController {
         }
     }
 
-    /**
-     * 保存用户个人信息
-     *
-     * @param params 入参
-     * @return 个人信息
-     */
-    @Authentication(auth = true)
-    @PostMapping(URL.SAVE_PERSON_INFO)
-    public Result<SaveUserInfoResult> saveUserPersonInfo(UserPersonInfoParams params) {
-        // 结果集
-        Result<SaveUserInfoResult> result = new Result<>();
-
-        try {
-
-            if (!params.isMonthlyIncomeLegal() ) {
-                // 异常返回结果
-                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() +":MonthlyIncome");
-                return result;
-            }
-            if (!params.isPayPeriodLegal()) {
-                // 异常返回结果
-                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":PayPeriodL");
-                return result;
-            }
-            if (!params.isOccupationLegal()) {
-                // 异常返回结果
-                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":OccupationL");
-                return result;
-            }
-            if (!params.isPayMethodLegal()) {
-                // 异常返回结果
-                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":PayMethodL");
-                return result;
-            }
-            if (!params.isContactsLegal()) {
-                // 异常返回结果
-                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":ContactsL");
-                return result;
-            }
-            // 保存个人信息
-            return userService.saveUserPersonInfo(params);
-        } catch (Exception e) {
-            LogUtil.sysError("[UserController saveUserPersonInfo]", e);
-
-            // 异常返回结果
-            result.setEx(ThrowableUtils.throwableToString(e));
-            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
-            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
-            return result;
-        }
-    }
 
     /**
      * 获取用户信息

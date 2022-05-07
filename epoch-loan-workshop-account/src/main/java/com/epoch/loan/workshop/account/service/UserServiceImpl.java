@@ -367,13 +367,13 @@ public class UserServiceImpl extends BaseService implements UserService {
     }
 
     /**
-     * 保存用户基本信息
+     * 保存用户补充信息
      *
      * @param params
      * @return
      */
     @Override
-    public Result<SaveUserInfoResult> saveUserBasicInfo(UserBasicInfoParams params) {
+    public Result<SaveUserInfoResult> saveUserAddInfo(UserAddInfoParams params) {
         // 结果集
         Result<SaveUserInfoResult> result = new Result<>();
 
@@ -408,13 +408,13 @@ public class UserServiceImpl extends BaseService implements UserService {
     }
 
     /**
-     * 保存用户个人信息
+     * 保存用户基本信息
      *
      * @param params
      * @return
      */
     @Override
-    public Result<SaveUserInfoResult> saveUserPersonInfo(UserPersonInfoParams params) {
+    public Result<SaveUserInfoResult> saveUserBasicInfo(UserBasicInfoParams params) {
         Result<SaveUserInfoResult> result = new Result<>();
 
         // 查询用户
