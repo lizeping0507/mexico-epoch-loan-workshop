@@ -162,7 +162,7 @@
         <foreach collection="array" item="statu" index="index" open="AND status IN(" close=")" separator=",">#{statu}</foreach>
     </select>
     <select id="countUserOrderByProductAndStatusIn" resultType="java.lang.Integer">
-        SELECT count(1) from loan_order WHERE app_name = #{appName} And user_id = #{userId} And product_id = #{productId}
+        SELECT count(1) from loan_order WHERE user_id = #{userId} And product_id = #{productId}
         <foreach collection="array" item="statu" index="index" open="AND status IN(" close=")" separator=",">#{statu}</foreach>
     </select>
     <select id="countProcessOrderNo" resultType="java.lang.Integer">
