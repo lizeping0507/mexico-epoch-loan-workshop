@@ -130,7 +130,7 @@ public class PandaPay extends BaseRepayment {
         return clabe;
     }
 
-    public String oxxoRepayment(LoanRepaymentPaymentRecordEntity loanRepaymentPaymentRecordEntity, LoanPaymentEntity payment) {
+    public String oxxoRepayment(LoanRepaymentPaymentRecordEntity record, LoanPaymentEntity payment) {
         String barcodeUrl = "";
         // 获取渠道配置信息
         JSONObject paymentConfig = JSONObject.parseObject(payment.getConfig());
@@ -145,13 +145,13 @@ public class PandaPay extends BaseRepayment {
         List<JSONObject> paymentSources = new ArrayList<>();
         JSONObject metadata = new JSONObject();
         metadata.put("company_id", cpmpanyId);
-        metadata.put("external_id", loanRepaymentPaymentRecordEntity.getId());
+        metadata.put("external_id", record.getId());
         JSONObject source = new JSONObject();
         source.put("type",paymentSourcesType);
         paymentSources.add(source);
-        params.setName(loanRepaymentPaymentRecordEntity.getName());
-        params.setEmail(loanRepaymentPaymentRecordEntity.getEmail());
-        params.setPhone(loanRepaymentPaymentRecordEntity.getPhone());
+        params.setName(record.getName());
+        params.setEmail(record.getEmail());
+        params.setPhone(record.getPhone());
         params.setPayment_sources(paymentSources);
         params.setMetadata(metadata);
         Map<String,String> header = new HashMap<>();
@@ -169,17 +169,17 @@ public class PandaPay extends BaseRepayment {
         } catch (Exception e) {
             LogUtil.sysError("[oxxoPandaPay]", e);
             // 请求失败
-            updatePaymentRecordStatus(loanRepaymentPaymentRecordEntity.getId(), LoanRepaymentPaymentRecordStatus.FAILED);
+            updatePaymentRecordStatus(record.getId(), LoanRepaymentPaymentRecordStatus.FAILED);
             return null;
         }
 
         // 更新请求响应数据
-        updatePaymentRecordRequestAndResponse(loanRepaymentPaymentRecordEntity.getId(), JSONObject.toJSONString(params), result);
+        updatePaymentRecordRequestAndResponse(record.getId(), JSONObject.toJSONString(params), result);
 
         // 结果集判空
         if (StringUtils.isEmpty(result)) {
             // 请求失败
-            updatePaymentRecordStatus(loanRepaymentPaymentRecordEntity.getId(), LoanRepaymentPaymentRecordStatus.FAILED);
+            updatePaymentRecordStatus(record.getId(), LoanRepaymentPaymentRecordStatus.FAILED);
             return null;
         }
 
@@ -190,19 +190,22 @@ public class PandaPay extends BaseRepayment {
             String payOrderId = returnObject.getString(PaymentField.PANDAPAY_TRANSACTIONID);
             if (ObjectUtils.isNotEmpty(descripcionError)) {
                 // 请求失败
-                updatePaymentRecordStatus(loanRepaymentPaymentRecordEntity.getId(), LoanRepaymentPaymentRecordStatus.FAILED);
+                updatePaymentRecordStatus(record.getId(), LoanRepaymentPaymentRecordStatus.FAILED);
                 return null;
             } else{
                 JSONArray data = returnObject.getJSONObject("resultado").getJSONObject("result").getJSONObject("payment_sources").getJSONArray("data");
                 List<JSONObject> dataJson = data.toJavaList(JSONObject.class);
                 barcodeUrl = dataJson.get(0).getString("barcode_url");
+                String clabe = dataJson.get(0).getString("barcode");
                 // 发起成功 修改状态
-                updatePaymentRecordStatus(loanRepaymentPaymentRecordEntity.getId(), LoanRepaymentPaymentRecordStatus.PROCESS);
+                updatePaymentRecordStatus(record.getId(), LoanRepaymentPaymentRecordStatus.PROCESS);
                 // 存储支付方订单号
-                updatePamentRecordBussinesId(loanRepaymentPaymentRecordEntity.getId(), payOrderId);
+                updatePamentRecordBussinesId(record.getId(), payOrderId);
+                // 存储clabe和条形码
+                updatePaymentRecordClabeAndBarCode(record.getId(),clabe,barcodeUrl);
                 // 发送到队列
                 RepaymentParams repaymentParams = new RepaymentParams();
-                repaymentParams.setId(loanRepaymentPaymentRecordEntity.getId());
+                repaymentParams.setId(record.getId());
                 repaymentMQManager.sendMessage(repaymentParams, payment.getName());
             }
         } catch (Exception e) {
