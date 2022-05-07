@@ -440,8 +440,6 @@ public class UserServiceImpl extends BaseService implements UserService {
         // TODO 更新用户缓存
         tokenManager.updateUserCache(user.getId());
 
-        // TODO 更新用户认证信息
-
         result.setReturnCode(ResultEnum.SUCCESS.code());
         result.setMessage(ResultEnum.SUCCESS.message());
         return result;
