@@ -295,9 +295,5 @@ public class URL {
     /**
      * PANDAPAY_OXXO_H5
      */
-    public static final String PANDAPAY_OXXO_H5 = "/pandaPay/oxxo/h5";
-    /**
-     * PANDAPAY_SPEI_H5
-     */
-    public static final String PANDAPAY_SPEI_H5 = "/pandaPay/spei/h5";
+    public static final String PANDAPAY_H5 = "/pandaPay/h5";
 }

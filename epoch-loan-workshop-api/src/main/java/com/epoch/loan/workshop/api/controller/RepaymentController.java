@@ -53,13 +53,13 @@ public class RepaymentController extends BaseController {
      * @param params UTR入参
      * @return String
      */
-    @PostMapping(URL.PANDAPAY_OXXO_H5)
-    public Result<Object> pandaPayOxxoH5(PandaPayH5Params params) {
+    @PostMapping(URL.PANDAPAY_H5)
+    public Result<Object> pandaPayH5(PandaPayH5Params params) {
         // 结果集
         Result<Object> result = new Result<>();
 
         try {
-            return repaymentService.pandaPayOxxoH5(params);
+            return repaymentService.pandaPayH5(params);
         } catch (Exception e) {
             LogUtil.sysError("[RepaymentController pandaPayOxxoH5]", e);
 

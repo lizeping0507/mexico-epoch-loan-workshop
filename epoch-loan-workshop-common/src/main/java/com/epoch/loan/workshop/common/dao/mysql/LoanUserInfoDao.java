@@ -95,4 +95,11 @@ public interface LoanUserInfoDao {
      * @return
      */
     List<String> findUserIdByMobile(String mobile);
+
+    /**
+     * 查询订单用户详情
+     * @param orderId
+     * @return
+     */
+    LoanUserInfoEntity findUserInfoByOrderId(String orderId);
 }

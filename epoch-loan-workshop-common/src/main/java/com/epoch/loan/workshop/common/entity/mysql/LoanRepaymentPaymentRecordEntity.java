@@ -100,6 +100,16 @@ public class LoanRepaymentPaymentRecordEntity {
     private Integer type;
 
     /**
+     * clabe
+     */
+    private String clabe;
+
+    /**
+     * 条形码
+     */
+    private String barCode;
+
+    /**
      * 创建时间
      */
     private Date createTime;

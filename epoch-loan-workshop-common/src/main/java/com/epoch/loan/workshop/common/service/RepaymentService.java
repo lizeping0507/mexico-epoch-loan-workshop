@@ -43,5 +43,5 @@ public interface RepaymentService {
      * @param params
      * @return
      */
-    Result<Object> pandaPayOxxoH5(PandaPayH5Params params);
+    Result<Object> pandaPayH5(PandaPayH5Params params);
 }

@@ -295,30 +295,30 @@ public class RepaymentServiceImpl extends BaseService implements RepaymentServic
      * @return
      */
     @Override
-    public Result<Object> pandaPayOxxoH5(PandaPayH5Params params){
+    public Result<Object> pandaPayH5(PandaPayH5Params params){
         Result<Object> result = new Result<>();
 
         String id = params.getId();
         LoanRepaymentPaymentRecordEntity record = loanRepaymentPaymentRecordDao.findRepaymentPaymentRecordById(id);
         // TODO 结果校验
 
-        String businessId = record.getBusinessId();
+        String clabe = record.getClabe();
+        String barCode = record.getBarCode();
         Double amount = record.getAmount();
 
         // 拆分
         List<String> spiltCodes = new ArrayList<>();
-        spiltCodes.add(businessId.substring(0,3));
-        spiltCodes.add(businessId.substring(3,6));
-        spiltCodes.add(businessId.substring(6,9));
-        spiltCodes.add(businessId.substring(9,12));
-        spiltCodes.add(businessId.substring(12,15));
-        spiltCodes.add(businessId.substring(15));
-
-
+        spiltCodes.add(clabe.substring(0,3));
+        spiltCodes.add(clabe.substring(3,6));
+        spiltCodes.add(clabe.substring(6,9));
+        spiltCodes.add(clabe.substring(9,12));
+        spiltCodes.add(clabe.substring(12,15));
+        spiltCodes.add(clabe.substring(15));
 
         PandaPayH5Result data = new PandaPayH5Result();
         data.setSpiltCode(spiltCodes);
-        data.setCode(businessId);
+        data.setClabe(clabe);
+        data.setBarCode(barCode);
         data.setAmount(amount.toString());
         result.setData(data);
 

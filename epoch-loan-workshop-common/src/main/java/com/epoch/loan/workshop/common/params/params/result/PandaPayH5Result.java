@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * @author 魏玉强
+ * @author Shangkunfeng
  * @packagename : com.epoch.loan.workshop.common.params.result
  * @className : PandaPayH5Result
  * @createTime : 2022/03/29 15:32
@@ -15,8 +15,18 @@ import java.util.List;
 @Data
 public class PandaPayH5Result implements Serializable {
 
-    private String code;
+    private String clabe;
+    /**
+     * code拆分
+     */
     private List<String> spiltCode;
+    /**
+     * 金额
+     */
     private String amount;
+    /**
+     * 条形码
+     */
+    private String barCode;
 
 }

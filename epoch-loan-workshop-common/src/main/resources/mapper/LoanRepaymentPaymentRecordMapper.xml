@@ -63,6 +63,9 @@
         update loan_repayment_payment_record set actual_amount = #{actualAmount},update_time = #{updateTime} WHERE id =
         #{id}
     </update>
+    <update id="updatePaymentRecordClabeAndBarCode">
+        update loan_repayment_payment_record set clabe = #{clabe}, bar_code = #{barCode}, update_time = #{updateTime} WHERE id = #{id}
+    </update>
     <select id="findRepaymentPaymentRecordById"
             resultType="com.epoch.loan.workshop.common.entity.mysql.LoanRepaymentPaymentRecordEntity">
         SELECT * FROM loan_repayment_payment_record WHERE id=#{id}

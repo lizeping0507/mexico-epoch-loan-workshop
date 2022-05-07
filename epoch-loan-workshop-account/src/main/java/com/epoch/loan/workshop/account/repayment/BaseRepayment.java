@@ -1,6 +1,9 @@
 package com.epoch.loan.workshop.account.repayment;
 
+import com.epoch.loan.workshop.common.dao.mysql.LoanOrderDao;
 import com.epoch.loan.workshop.common.dao.mysql.LoanRepaymentPaymentRecordDao;
+import com.epoch.loan.workshop.common.dao.mysql.LoanUserDao;
+import com.epoch.loan.workshop.common.dao.mysql.LoanUserInfoDao;
 import com.epoch.loan.workshop.common.entity.mysql.LoanPaymentEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanRepaymentPaymentRecordEntity;
 import com.epoch.loan.workshop.common.mq.repayment.RepaymentMQManager;
@@ -20,6 +23,16 @@ import java.util.Date;
  * @description : 渠道发起放款基类
  */
 public abstract class BaseRepayment {
+    /**
+     * 订单
+     */
+    @Autowired
+    protected LoanOrderDao loanOrderDao;
+    /**
+     * 用户详情
+     */
+    @Autowired
+    protected LoanUserInfoDao loanUserInfoDao;
     /**
      * 放款流水
      */
@@ -51,6 +64,17 @@ public abstract class BaseRepayment {
      */
     protected void updatePamentRecordBussinesId(String id, String businessId) {
         loanRepaymentPaymentRecordDao.updateBussinesId(id, businessId, new Date());
+    }
+
+    /**
+     * 存储clabe和条形码
+     *
+     * @param id         id
+     * @param clabe clabe
+     * @param clabe 条形码地址
+     */
+    protected void updatePaymentRecordClabeAndBarCode(String id, String clabe, String barCode) {
+        loanRepaymentPaymentRecordDao.updatePaymentRecordClabeAndBarCode(id, clabe, barCode, new Date());
     }
 
     /**

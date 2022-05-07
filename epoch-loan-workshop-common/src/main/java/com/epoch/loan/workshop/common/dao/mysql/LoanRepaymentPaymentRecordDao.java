@@ -94,4 +94,14 @@ public interface LoanRepaymentPaymentRecordDao {
      * @return 还款成功记录
      */
     List<LoanRepaymentPaymentRecordEntity> findListRecordDTOByOrderIdAndStatus(String orderId, Integer status);
+
+    /**
+     * 存储clabe和条形码
+     *
+     * @param id
+     * @param clabe
+     * @param barCode
+     * @param updateTime
+     */
+    void updatePaymentRecordClabeAndBarCode(String id, String clabe, String barCode, Date updateTime);
 }

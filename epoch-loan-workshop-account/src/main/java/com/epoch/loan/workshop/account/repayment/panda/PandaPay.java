@@ -6,8 +6,11 @@ import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.account.repayment.BaseRepayment;
 import com.epoch.loan.workshop.common.constant.LoanRepaymentPaymentRecordStatus;
 import com.epoch.loan.workshop.common.constant.PaymentField;
+import com.epoch.loan.workshop.common.dao.mysql.LoanOrderDao;
+import com.epoch.loan.workshop.common.dao.mysql.LoanUserInfoDao;
 import com.epoch.loan.workshop.common.entity.mysql.LoanPaymentEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanRepaymentPaymentRecordEntity;
+import com.epoch.loan.workshop.common.entity.mysql.LoanUserInfoEntity;
 import com.epoch.loan.workshop.common.mq.repayment.params.RepaymentParams;
 import com.epoch.loan.workshop.common.params.params.request.PreRepaymentParams;
 import com.epoch.loan.workshop.common.util.HttpUtils;
@@ -52,7 +55,10 @@ public class PandaPay extends BaseRepayment {
         return result;
     }
 
-    public String speiRepayment(LoanRepaymentPaymentRecordEntity loanRepaymentPaymentRecordEntity, LoanPaymentEntity payment) {
+    public String speiRepayment(LoanRepaymentPaymentRecordEntity record, LoanPaymentEntity payment) {
+        String orderId = record.getOrderId();
+        LoanUserInfoEntity loanUserInfo = loanUserInfoDao.findUserInfoByOrderId(orderId);
+
         String clabe = "";
         // 获取渠道配置信息
         JSONObject paymentConfig = JSONObject.parseObject(payment.getConfig());
@@ -62,12 +68,12 @@ public class PandaPay extends BaseRepayment {
 
         // 参数封装
         PandaPayParams params = new PandaPayParams();
-        params.setExternalId(loanRepaymentPaymentRecordEntity.getId());
-        params.setName(loanRepaymentPaymentRecordEntity.getName());
-        params.setEmail(loanRepaymentPaymentRecordEntity.getEmail());
-        params.setPhone(loanRepaymentPaymentRecordEntity.getPhone());
-        params.setRfc("LSI210621Q16");
-        params.setCurp("TOVM740205HDFRLR01");
+        params.setExternalId(record.getId());
+        params.setName(record.getName());
+        params.setEmail(record.getEmail());
+        params.setPhone(record.getPhone());
+        params.setRfc(loanUserInfo.getRfc());
+        params.setCurp(loanUserInfo.getCurp());
         Map<String,String> header = new HashMap<>();
         header.put("Encoding","UTF-8");
         header.put("Content-Type","application/json");
@@ -81,17 +87,17 @@ public class PandaPay extends BaseRepayment {
         } catch (Exception e) {
             LogUtil.sysError("[PandaPay]", e);
             // 请求失败
-            updatePaymentRecordStatus(loanRepaymentPaymentRecordEntity.getId(), LoanRepaymentPaymentRecordStatus.FAILED);
+            updatePaymentRecordStatus(record.getId(), LoanRepaymentPaymentRecordStatus.FAILED);
             return null;
         }
 
         // 更新请求响应数据
-        updatePaymentRecordRequestAndResponse(loanRepaymentPaymentRecordEntity.getId(), JSONObject.toJSONString(params), result);
+        updatePaymentRecordRequestAndResponse(record.getId(), JSONObject.toJSONString(params), result);
 
         // 结果集判空
         if (StringUtils.isEmpty(result)) {
             // 请求失败
-            updatePaymentRecordStatus(loanRepaymentPaymentRecordEntity.getId(), LoanRepaymentPaymentRecordStatus.FAILED);
+            updatePaymentRecordStatus(record.getId(), LoanRepaymentPaymentRecordStatus.FAILED);
             return null;
         }
 
@@ -103,16 +109,18 @@ public class PandaPay extends BaseRepayment {
             String payOrderId = returnObject.getString(PaymentField.PANDAPAY_TRANSACTIONID);
             if (ObjectUtils.isEmpty(clabe)) {
                 // 请求失败
-                updatePaymentRecordStatus(loanRepaymentPaymentRecordEntity.getId(), LoanRepaymentPaymentRecordStatus.FAILED);
+                updatePaymentRecordStatus(record.getId(), LoanRepaymentPaymentRecordStatus.FAILED);
                 return null;
             } else{
                 // 发起成功 修改状态
-                updatePaymentRecordStatus(loanRepaymentPaymentRecordEntity.getId(), LoanRepaymentPaymentRecordStatus.PROCESS);
+                updatePaymentRecordStatus(record.getId(), LoanRepaymentPaymentRecordStatus.PROCESS);
                 // 存储支付方订单号
-                updatePamentRecordBussinesId(loanRepaymentPaymentRecordEntity.getId(), payOrderId);
+                updatePamentRecordBussinesId(record.getId(), payOrderId);
+                // 存储clabe和条形码
+                updatePaymentRecordClabeAndBarCode(record.getId(),clabe,null);
                 // 发送到队列
                 RepaymentParams repaymentParams = new RepaymentParams();
-                repaymentParams.setId(loanRepaymentPaymentRecordEntity.getId());
+                repaymentParams.setId(record.getId());
                 repaymentMQManager.sendMessage(repaymentParams, payment.getName());
             }
         } catch (Exception e) {

@@ -130,4 +130,9 @@
     <select id="findUserIdByMobile" resultType="java.lang.String">
         SELECT user_id FROM loan_user_info where mobile = #{mobile}
     </select>
+    <select id="findUserInfoByOrderId"
+            resultType="com.epoch.loan.workshop.common.entity.mysql.LoanUserInfoEntity">
+        select * from loan_user_info where user_id = (SELECT user_id from loan_order where id = #{order_id}) limit 1
+    </select>
+
 </mapper>
