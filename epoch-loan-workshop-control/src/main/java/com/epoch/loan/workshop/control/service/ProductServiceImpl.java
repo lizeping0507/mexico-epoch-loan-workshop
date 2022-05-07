@@ -207,7 +207,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         }
 
         // 查询三项认证是否都通过
-        if (!params.getUser().isIdentityAuth() || !params.getUser().isBasicInfoAuth() || !params.getUser().isAddInfoAuth()) {
+        if (!params.getUser().isIdentityAuth() ) {
             // 没有通过 返回结果
             appMaskModelResult.setMaskModel(3);
             appMaskModelResult.setButton(OrderUtils.button(OrderStatus.CREATE));
