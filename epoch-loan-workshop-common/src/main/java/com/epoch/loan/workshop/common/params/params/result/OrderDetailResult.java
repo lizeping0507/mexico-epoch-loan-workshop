@@ -28,6 +28,11 @@ public class OrderDetailResult implements Serializable {
     private String productId;
 
     /**
+     * 产品名称
+     */
+    private String productName;
+
+    /**
      * 订单状态
      */
     private Integer orderStatus;

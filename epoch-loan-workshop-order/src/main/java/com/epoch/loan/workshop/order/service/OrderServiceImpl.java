@@ -331,6 +331,8 @@ public class OrderServiceImpl extends BaseService implements OrderService {
         OrderDetailResult detailResult = new OrderDetailResult();
         detailResult.setOrderNo(orderEntity.getId());
         detailResult.setProductId(orderEntity.getProductId());
+        LoanProductEntity product = loanProductDao.findProduct(orderEntity.getProductId());
+        detailResult.setProductName(product.getProductName());
         detailResult.setOrderStatus(orderEntity.getStatus());
         detailResult.setApprovalAmount(orderEntity.getApprovalAmount());
         detailResult.setIncidentalAmount(orderEntity.getIncidentalAmount());
