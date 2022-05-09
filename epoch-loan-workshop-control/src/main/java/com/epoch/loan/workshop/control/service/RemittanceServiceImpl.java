@@ -17,6 +17,7 @@ import com.epoch.loan.workshop.common.service.RemittanceService;
 import com.epoch.loan.workshop.common.util.HttpUtils;
 import com.epoch.loan.workshop.common.util.ObjectIdUtil;
 import com.epoch.loan.workshop.common.util.RSAUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
@@ -45,6 +46,18 @@ public class RemittanceServiceImpl extends BaseService implements RemittanceServ
 
         // 查询最后一条放款成功订单
         LoanOrderEntity loanOrderEntity = loanOrderDao.findLastUserRemittanceSuccessOrder(userId);
+
+        //
+        if (ObjectUtils.isEmpty(loanOrderEntity)){
+            // 封装结果集
+            Result<RemittanceAccountListResult> result = new Result<>();
+            RemittanceAccountListResult remittanceAccountListResult = new RemittanceAccountListResult();
+            remittanceAccountListResult.setList(new ArrayList<>());
+            result.setData(remittanceAccountListResult);
+            result.setReturnCode(ResultEnum.SUCCESS.code());
+            result.setMessage(ResultEnum.SUCCESS.message());
+            return result;
+        }
 
         // 查询最后一条放款成功的订单的放款账户
         LoanRemittanceAccountEntity lastUserLoanRemittanceAccountEntity = loanRemittanceAccountDao.findRemittanceAccount(loanOrderEntity.getBankCardId());
