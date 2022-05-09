@@ -27,11 +27,6 @@ public class LoanProductEntity {
     private String productImgUrl;
 
     /**
-     * 产品Icon图片url
-     */
-    private String productIconUrl;
-
-    /**
      * 手续费
      */
     private Double processingFeeProportion;
@@ -117,7 +112,7 @@ public class LoanProductEntity {
     private String amountRange;
 
     /**
-     * 是否开量
+     * 产品Icon图片url
      */
     private String icon;
 

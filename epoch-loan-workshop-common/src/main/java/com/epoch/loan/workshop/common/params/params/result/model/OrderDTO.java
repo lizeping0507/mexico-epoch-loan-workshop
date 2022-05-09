@@ -36,7 +36,7 @@ public class OrderDTO implements Serializable {
     private Integer orderStatus;
 
     /**
-     * 申请时间
+     * 订单创建时间
      */
     private Date applyTime;
 
@@ -59,4 +59,14 @@ public class OrderDTO implements Serializable {
      * 按钮文案 pagado-还款 rechazado-被拒 vencido-逾期 completar
      */
     private String orderStatusStr;
+
+    /**
+     * 剩余还款金额
+     */
+    public Double repaymentAmount;
+
+    /**
+     * 产品logo的url
+     */
+    public String productIconImageUrl;
 }
