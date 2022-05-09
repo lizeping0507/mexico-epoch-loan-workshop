@@ -61,7 +61,7 @@ public class OrderDTO implements Serializable {
     private String orderStatusStr;
 
     /**
-     * 还款金额
+     * 剩余还款金额
      */
     public Double repaymentAmount;
 
