@@ -48,20 +48,8 @@ public class RemittanceServiceImpl extends BaseService implements RemittanceServ
         // 查询最后一条放款成功订单
         LoanOrderEntity loanOrderEntity = loanOrderDao.findLastUserRemittanceSuccessOrder(userId);
 
-        //
-        if (ObjectUtils.isEmpty(loanOrderEntity)){
-            // 封装结果集
-            Result<RemittanceAccountListResult> result = new Result<>();
-            RemittanceAccountListResult remittanceAccountListResult = new RemittanceAccountListResult();
-            remittanceAccountListResult.setList(new ArrayList<>());
-            result.setData(remittanceAccountListResult);
-            result.setReturnCode(ResultEnum.SUCCESS.code());
-            result.setMessage(ResultEnum.SUCCESS.message());
-            return result;
-        }
-
         // 查询最后一条放款成功的订单的放款账户
-        LoanRemittanceAccountEntity lastUserLoanRemittanceAccountEntity = loanRemittanceAccountDao.findRemittanceAccount(loanOrderEntity.getBankCardId());
+        LoanRemittanceAccountEntity lastUserLoanRemittanceAccountEntity = null;
 
         // 查询用户放款账户列表
         List<LoanRemittanceAccountEntity> loanRemittanceAccountEntityList = loanRemittanceAccountDao.findUserRemittanceAccountList(userId);
@@ -73,13 +61,20 @@ public class RemittanceServiceImpl extends BaseService implements RemittanceServ
         remittanceAccountLists.add(remittanceAccountList);
         for (LoanRemittanceAccountEntity loanRemittanceAccountEntity : loanRemittanceAccountEntityList) {
             // 判断是否是最后一次放款成功的订单放款账户
-            if (loanRemittanceAccountEntity.getId().equals(lastUserLoanRemittanceAccountEntity.getId())) {
+            if (ObjectUtils.isNotEmpty(loanOrderEntity) && loanRemittanceAccountEntity.getId().equals(loanOrderEntity.getBankCardId())) {
+                lastUserLoanRemittanceAccountEntity = loanRemittanceAccountEntity;
                 continue;
             }
 
             remittanceAccountList = new RemittanceAccountList();
             BeanUtils.copyProperties(loanRemittanceAccountEntity, remittanceAccountList);
             remittanceAccountLists.add(remittanceAccountList);
+        }
+
+        // 如果有最后一笔 插入到队首
+        if (ObjectUtils.isNotEmpty(lastUserLoanRemittanceAccountEntity)){
+            BeanUtils.copyProperties(lastUserLoanRemittanceAccountEntity, remittanceAccountList);
+            remittanceAccountLists.add(0, remittanceAccountList);
         }
 
         // 封装结果集
