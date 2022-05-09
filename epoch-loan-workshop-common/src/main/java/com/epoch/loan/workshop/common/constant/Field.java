@@ -348,4 +348,9 @@ public class Field {
      * 产品id
      */
     public static final String PRODUCT_ID = "productId";
+
+    /**
+     * 联系⼈原始数据
+     */
+    public final static String ORIGINALCONTACT = "originalContact";
 }

@@ -1,8 +1,11 @@
 package com.epoch.loan.workshop.common.util;
 
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 
+import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class MD5Utils {
 
@@ -34,5 +37,22 @@ public class MD5Utils {
             hexValue.append(Integer.toHexString(val));
         }
         return hexValue.toString();
+    }
+
+    /**
+     * 催收、提还获取验签码时，使用
+     * @param source
+     * @return
+     */
+    public static String SunMD5(String source) {
+        StringBuilder digest = new StringBuilder();
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            byte[] array = md.digest(source.getBytes("utf-8"));
+            digest.append(Hex.encodeHexString(array));
+        } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
+
+        }
+        return digest.toString();
     }
 }

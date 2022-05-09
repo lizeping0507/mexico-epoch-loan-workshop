@@ -20,179 +20,179 @@ public interface LoanOrderBillDao {
     /**
      * 查询结清-有逾期的订单账单数量
      *
-     * @param orderId
-     * @return
+     * @param orderId 订单id
+     * @return 结清-有逾期的订单账单数量
      */
     int findOrderDueCompleteCount(String orderId);
 
     /**
      * 查询未完成的订单账单数量
      *
-     * @param orderId
-     * @return
+     * @param orderId 订单id
+     * @return 订单账单数量
      */
     int findOrderNotCompleteCount(String orderId);
 
     /**
      * 查询已经完成订单还款总额
      *
-     * @param orderId
-     * @return
+     * @param orderId 订单id
+     * @return 订单已还款总额
      */
     double sumOrderCompleteRepaymentAmount(String orderId);
 
     /**
      * 计算总还款金额
      *
-     * @param orderId
-     * @return
+     * @param orderId 订单id
+     * @return 总还款金额
      */
     double sumOrderRepaymentAmount(String orderId);
 
     /**
      * 根据订单ID修改订单账单状态
      *
-     * @param orderId
-     * @param status
-     * @param updateTime
-     * @return
+     * @param orderId 订单id
+     * @param status 状态
+     * @param updateTime 修改时间
+     * @return 修改记录数
      */
     int updateOrderBillStatusByOrderId(String orderId, int status, Date updateTime);
 
     /**
      * 根据订单账单ID修改订单账单状态
      *
-     * @param id
-     * @param status
-     * @param updateTime
-     * @return
+     * @param id 账单id
+     * @param status 状态
+     * @param updateTime 修改时间
+     * @return 修改记录数
      */
     int updateOrderBillStatus(String id, int status, Date updateTime);
 
     /**
      * 更新还款金额
      *
-     * @param id
-     * @param repaymentAmount
-     * @param updateTime
-     * @return
+     * @param id 账单id
+     * @param repaymentAmount 还款金额
+     * @param updateTime 修改时间
+     * @return 修改记录数
      */
     int updateOrderBillRepaymentAmount(String id, double repaymentAmount, Date updateTime);
 
     /**
      * 更新还款时间
      *
-     * @param id
-     * @param repaymentTime
-     * @param updateTime
-     * @return
+     * @param id 账单id
+     * @param repaymentTime 还款时间
+     * @param updateTime 修改时间
+     * @return 修改记录数
      */
     int updateOrderBillRepaymentTime(String id, Date repaymentTime, Date updateTime);
 
     /**
      * 更新实际还款时间
      *
-     * @param id
-     * @param actualRepaymentTime
-     * @param updateTime
-     * @return
+     * @param id 账单id
+     * @param actualRepaymentTime 实际还款时间
+     * @param updateTime 修改时间
+     * @return 修改记录数
      */
     int updateOrderBillActualRepaymentTime(String id, Date actualRepaymentTime, Date updateTime);
 
     /**
      * 查询订单账单列表
      *
-     * @param orderId
-     * @return
+     * @param orderId 订单id
+     * @return 账单信息集合
      */
     List<LoanOrderBillEntity> findOrderBillByOrderId(String orderId);
 
     /**
      * 查询订单账单
      *
-     * @param id
-     * @return
+     * @param id 账单id
+     * @return 账单信息
      */
     LoanOrderBillEntity findOrderBill(String id);
 
     /**
      * 更新罚息金额
      *
-     * @param id
-     * @param punishmentAmount
-     * @param updateTime
-     * @return
+     * @param id 账单id
+     * @param punishmentAmount 罚息金额
+     * @param updateTime 修改时间
+     * @return 修改记录数
      */
     int updateOrderBillPunishmentAmount(String id, double punishmentAmount, Date updateTime);
 
     /**
      * 更新减免金额
      *
-     * @param id
-     * @param reductionAmount
-     * @param updateTime
-     * @return
+     * @param id 账单id
+     * @param reductionAmount 减免金额
+     * @param updateTime 修改时间
+     * @return 修改记录数
      */
     int updateOrderBillReductionAmount(String id, double reductionAmount, Date updateTime);
 
     /**
      * 更新实际付款金额
      *
-     * @param id
-     * @param receivedAmount
-     * @param updateTime
+     * @param id 账单id
+     * @param receivedAmount 实际付款金额
+     * @param updateTime 修改时间
      */
     void updateOrderBillReceivedAmount(String id, double receivedAmount, Date updateTime);
 
     /**
      * 查询所有指定状态及还款实际小于指定时间的订单账单
      *
-     * @param status
-     * @param repaymentTime
-     * @return
+     * @param status 状态
+     * @param repaymentTime 还款时间
+     * @return 订单账单集合
      */
     List<LoanOrderBillEntity> findOrderBillByStatusAndRepaymentTime(int status, Date repaymentTime);
 
     /**
      * 查询所有指定状态的订单账单
      *
-     * @param status
-     * @return
+     * @param status 订单状态
+     * @return 订单账单集合
      */
     List<LoanOrderBillEntity> findOrderBillByStatus(int status);
 
     /**
      * 薪资订单账单
      *
-     * @param loanOrderBillEntity
-     * @return
+     * @param loanOrderBillEntity 订单账单
+     * @return 保存记录数
      */
     int insertOrderBill(@Param("loanOrderBillEntity") LoanOrderBillEntity loanOrderBillEntity);
 
     /**
      * 更新类型
      *
-     * @param id
-     * @param type
-     * @param updateTime
+     * @param id 账单id
+     * @param type 订单类型
+     * @param updateTime 修改时间
      */
     void updateType(String id, int type, Date updateTime);
 
     /**
      * 更新附加费用
      *
-     * @param id
-     * @param incidentalAmount
-     * @param updateTime
+     * @param id 账单id
+     * @param incidentalAmount 附加费用金额
+     * @param updateTime 修改时间
      */
     void updateOrderBillIncidentalAmount(String id, double incidentalAmount, Date updateTime);
 
     /**
      * 更新本期应还利息
      *
-     * @param id
-     * @param interestAmount
-     * @param updateTime
+     * @param id 账单id
+     * @param interestAmount 应还利息金额
+     * @param updateTime 修改时间
      */
     void updateInterestAmount(String id, double interestAmount, Date updateTime);
 
@@ -200,49 +200,62 @@ public interface LoanOrderBillDao {
      * 按天查询
      *
      * @param createTime yyyy-MM-dd%
-     * @return
+     * @return 账单集合
      */
     List<LoanOrderBillEntity> findByDay(String createTime);
 
+    /**
+     * 修改本金
+     * @param id 账单id
+     * @param principalAmount 修改的本金金额
+     * @param updateTime 修改时间
+     */
     void updateOrderBillPrincipalAmount(String id, Double principalAmount, Date updateTime);
 
     /**
      * 查询第一笔还款订单
-     * @param userId
-     * @param appName
-     * @return
+     * @param userId 用户id
+     * @param appName app标识
+     * @return 订单账单信息
      */
     LoanOrderBillEntity findFistRepayOrder(String userId, String appName);
 
     /**
      * 计算总罚息
      *
-     * @param orderId
-     * @return
+     * @param orderId 订单号
+     * @return 总罚息
      */
     Double sumOrderPunishmentAmount(String orderId);
 
     /**
      * 计算总利息
-     * @param orderId
-     * @return
+     * @param orderId 订单号
+     * @return 总利息
      */
     Double sumOrderInterestAmount(String orderId);
 
     /**
+     * 计算总服务费
+     * @param orderId 订单号
+     * @return 总服务费
+     */
+    Double sumIncidentalAmount(String orderId);
+
+    /**
      * 查询订单最后一期账单
      *
-     * @param orderId
-     * @return
+     * @param orderId 订单号
+     * @return 最后一期账单信息
      */
     LoanOrderBillEntity findLastOrderBill(String orderId);
 
     /**
      * 查询指定状态订单并只返回最早的一期账单
      *
-     * @param orderId
-     * @param statusArray
-     * @return
+     * @param orderId 订单号
+     * @param statusArray 查询指定状态订单并只返回最早的一期账单信息
+     * @return 查询指定状态订单并只返回最早的一期账单
      */
     LoanOrderBillEntity findOrderBillFastStagesByStatusAndOrderId(String orderId, @Param("array") Integer[] statusArray);
 }

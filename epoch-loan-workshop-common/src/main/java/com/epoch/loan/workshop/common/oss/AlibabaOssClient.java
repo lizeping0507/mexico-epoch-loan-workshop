@@ -1,6 +1,7 @@
 package com.epoch.loan.workshop.common.oss;
 
 import com.aliyun.oss.*;
+import com.aliyun.oss.model.OSSObject;
 import com.aliyun.oss.model.PutObjectResult;
 import lombok.Data;
 import org.apache.commons.lang3.ObjectUtils;
@@ -95,5 +96,16 @@ public class AlibabaOssClient {
 
         // 获取文件访问地址
         return getFileUrl(bucketName, objectName, dateExpiration);
+    }
+
+    /**
+     * 获取文件全部信息
+     *
+     * @param bucketName     桶名
+     * @param objectName     上传路径
+     * @return 文件全部信息
+     */
+    public OSSObject getFileInfo(String bucketName, String objectName) {
+        return ossClient.getObject(bucketName, objectName);
     }
 }
