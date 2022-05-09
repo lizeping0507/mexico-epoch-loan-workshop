@@ -207,6 +207,21 @@ public class OrderServiceImpl extends BaseService implements OrderService {
             if (loanOrderEntity.getStatus() >= OrderStatus.WAY && loanOrderEntity.getStatus() != OrderStatus.ABANDONED) {
                 LoanOrderBillEntity lastOrderBill = loanOrderBillDao.findLastOrderBill(loanOrderEntity.getId());
                 orderDTO.setRepaymentTime(lastOrderBill.getRepaymentTime());
+
+                // 剩余还款金额
+                Double actualRepaymentAmount = loanOrderEntity.getActualRepaymentAmount();
+                if (ObjectUtils.isEmpty(actualRepaymentAmount)) {
+                    actualRepaymentAmount = 0.0;
+                }
+                Double estimatedRepaymentAmount = loanOrderEntity.getEstimatedRepaymentAmount();
+                if (ObjectUtils.isEmpty(estimatedRepaymentAmount)) {
+                    estimatedRepaymentAmount = 0.0;
+                }
+                Double repaymentAmount = new BigDecimal(estimatedRepaymentAmount).subtract(new BigDecimal(actualRepaymentAmount)).setScale(2).doubleValue();
+                orderDTO.setRepaymentAmount(repaymentAmount);
+
+                LoanProductEntity product = loanProductDao.findProduct(loanOrderEntity.getProductId());
+                orderDTO.setProductIconImageUrl(product.getIcon());
             }
             orderDTOList.add(orderDTO);
         });
@@ -293,6 +308,21 @@ public class OrderServiceImpl extends BaseService implements OrderService {
             orderDTO.setOrderStatusStr(OrderUtils.button(loanOrderEntity.getStatus()));
             LoanOrderBillEntity lastOrderBill = loanOrderBillDao.findLastOrderBill(loanOrderEntity.getId());
             orderDTO.setRepaymentTime(lastOrderBill.getRepaymentTime());
+
+            // 剩余还款金额
+            Double actualRepaymentAmount = loanOrderEntity.getActualRepaymentAmount();
+            if (ObjectUtils.isEmpty(actualRepaymentAmount)) {
+                actualRepaymentAmount = 0.0;
+            }
+            Double estimatedRepaymentAmount = loanOrderEntity.getEstimatedRepaymentAmount();
+            if (ObjectUtils.isEmpty(estimatedRepaymentAmount)) {
+                estimatedRepaymentAmount = 0.0;
+            }
+            Double repaymentAmount = new BigDecimal(estimatedRepaymentAmount).subtract(new BigDecimal(actualRepaymentAmount)).setScale(2).doubleValue();
+            orderDTO.setRepaymentAmount(repaymentAmount);
+
+            LoanProductEntity product = loanProductDao.findProduct(loanOrderEntity.getProductId());
+            orderDTO.setProductIconImageUrl(product.getIcon());
             orderDTOList.add(orderDTO);
         });
         result.setData(new OrderListResult(orderDTOList));
