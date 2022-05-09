@@ -44,6 +44,7 @@ public class SMSManager {
         // 发送短信验证码
         Situation situation = smsChannel().sendVerificationCode(code,
                 "0052" + mobile);
+        LogUtil.sysInfo("发送短信验证码 : {}",situation);
         if (!situation.isResult()) {
             LogUtil.sysError("[SMSManager sendVerificationCode]"+ situation.getResponse());
             return null;
