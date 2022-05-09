@@ -15,6 +15,7 @@ import com.epoch.loan.workshop.common.params.params.result.Result;
 import com.epoch.loan.workshop.common.params.params.result.model.RemittanceAccountList;
 import com.epoch.loan.workshop.common.service.RemittanceService;
 import com.epoch.loan.workshop.common.util.HttpUtils;
+import com.epoch.loan.workshop.common.util.LogUtil;
 import com.epoch.loan.workshop.common.util.ObjectIdUtil;
 import com.epoch.loan.workshop.common.util.RSAUtils;
 import org.apache.commons.lang3.ObjectUtils;
@@ -209,8 +210,9 @@ public class RemittanceServiceImpl extends BaseService implements RemittanceServ
 
         // 封装参数
         List<String> bankList = new ArrayList<>();
-        loanRemittanceBankList.parallelStream().forEach(loanRemittanceBankEntity -> {
+        loanRemittanceBankList.forEach(loanRemittanceBankEntity -> {
             bankList.add(loanRemittanceBankEntity.getName());
+            LogUtil.sysInfo(JSONObject.toJSONString(loanRemittanceBankEntity));
         });
 
         // 封装结果集
