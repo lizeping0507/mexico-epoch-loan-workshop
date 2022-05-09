@@ -80,7 +80,7 @@ public class RbplSMSChannel implements SMSChannel {
         params.put("callbackUrl", callbackUrl);
 
         // 发送请求
-        String result = HttpUtils.POST(url, params);
+        String result = HttpUtils.POST(url, JSONObject.toJSONString(params));
         LogUtil.sysInfo("请求发送验证码  请求参数：{} ，响应参数：{}",JSONObject.toJSONString(params), result);
 
         // 封装结果就
