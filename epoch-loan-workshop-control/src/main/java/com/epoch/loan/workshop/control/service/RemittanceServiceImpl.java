@@ -124,6 +124,7 @@ public class RemittanceServiceImpl extends BaseService implements RemittanceServ
 
         // 请求风控验卡
         JSONObject verifyRemittanceAccountJson = verifyRemittanceAccount(userId, mobile, accountNumber);
+        LogUtil.sysInfo("请求风控验卡 :{}", verifyRemittanceAccountJson);
 
         // 验证状态
         String status = verifyRemittanceAccountJson.getString("status");
