@@ -57,8 +57,6 @@ public class RemittanceServiceImpl extends BaseService implements RemittanceServ
         // 按照最后一条放款的账户在第一条进行排序
         List<RemittanceAccountList> remittanceAccountLists = new ArrayList<>();
         RemittanceAccountList remittanceAccountList = new RemittanceAccountList();
-        BeanUtils.copyProperties(lastUserLoanRemittanceAccountEntity, remittanceAccountList);
-        remittanceAccountLists.add(remittanceAccountList);
         for (LoanRemittanceAccountEntity loanRemittanceAccountEntity : loanRemittanceAccountEntityList) {
             // 判断是否是最后一次放款成功的订单放款账户
             if (ObjectUtils.isNotEmpty(loanOrderEntity) && loanRemittanceAccountEntity.getId().equals(loanOrderEntity.getBankCardId())) {
