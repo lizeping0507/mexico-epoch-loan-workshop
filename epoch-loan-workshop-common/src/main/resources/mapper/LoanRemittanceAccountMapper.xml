@@ -2,6 +2,25 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.epoch.loan.workshop.common.dao.mysql.LoanRemittanceAccountDao">
     <insert id="addRemittanceAccount">
+        INSERT INTO loan_remittance_account (
+                                             `id`,
+                                             `user_id`,
+                                             `account_number`,
+                                             `bank`,
+                                             `name`,
+                                             `type`,
+                                             `create_time`,
+                                             `update_time`)
+        VALUES (
+                #{loanRemittanceAccountEntity.id},
+                #{loanRemittanceAccountEntity.userId},
+                #{loanRemittanceAccountEntity.accountNumber},
+                #{loanRemittanceAccountEntity.bank},
+                #{loanRemittanceAccountEntity.name},
+                #{loanRemittanceAccountEntity.type},
+                #{loanRemittanceAccountEntity.createTime},
+                #{loanRemittanceAccountEntity.updateTime}
+               );
 
     </insert>
 
