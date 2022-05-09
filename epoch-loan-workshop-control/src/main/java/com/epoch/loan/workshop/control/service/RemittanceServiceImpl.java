@@ -18,6 +18,7 @@ import com.epoch.loan.workshop.common.util.HttpUtils;
 import com.epoch.loan.workshop.common.util.ObjectIdUtil;
 import com.epoch.loan.workshop.common.util.RSAUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 
 import java.util.*;
@@ -29,6 +30,7 @@ import java.util.*;
  * @createTime : 2022/4/21 14:55
  * @description : 放款
  */
+@DubboService(timeout = 5000)
 public class RemittanceServiceImpl extends BaseService implements RemittanceService {
     /**
      * 放款账户列表
