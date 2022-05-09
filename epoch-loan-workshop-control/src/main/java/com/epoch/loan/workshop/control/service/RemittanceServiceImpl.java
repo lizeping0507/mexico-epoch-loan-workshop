@@ -190,6 +190,7 @@ public class RemittanceServiceImpl extends BaseService implements RemittanceServ
 
         // 发送请求
         String result = HttpUtils.POST_FORM(riskConfig.getRiskUrl(), requestParams);
+        LogUtil.sysInfo("风控验卡 请求参数：{}， 响应参数：{}", requestParams,result);
         if (StringUtils.isEmpty(result)) {
             return null;
         }
