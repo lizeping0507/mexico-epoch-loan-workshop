@@ -195,7 +195,7 @@ public class RemittanceServiceImpl extends BaseService implements RemittanceServ
             return null;
         }
 
-        return JSONObject.parseObject(result).getJSONObject("biz_data");
+        return JSONObject.parseObject(result).getJSONObject("data");
     }
 
 
