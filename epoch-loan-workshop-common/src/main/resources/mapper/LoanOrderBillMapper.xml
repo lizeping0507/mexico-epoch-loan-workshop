@@ -115,7 +115,9 @@
     <select id="sumOrderInterestAmount" resultType="java.lang.Double">
         SELECT SUM(interest_amount) FROM loan_order_bill WHERE order_id=#{orderId}
     </select>
-
+    <select id="sumIncidentalAmount" resultType="java.lang.Double">
+        SELECT SUM(incidental_amount) FROM loan_order_bill WHERE order_id=#{orderId}
+    </select>
     <select id="findLastOrderBill" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanOrderBillEntity">
         SELECT * FROM loan_order_bill WHERE order_id=#{orderId} order by stages desc limit 0,1
     </select>

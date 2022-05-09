@@ -1,6 +1,7 @@
 package com.epoch.loan.workshop.timing.task;
 
 import com.epoch.loan.workshop.common.dao.mysql.*;
+import com.epoch.loan.workshop.common.mq.collection.CollectionMQManager;
 import com.epoch.loan.workshop.common.mq.order.OrderMQManager;
 import com.epoch.loan.workshop.common.mq.remittance.RemittanceMQManager;
 import com.epoch.loan.workshop.common.mq.repayment.RepaymentMQManager;
@@ -82,6 +83,12 @@ public class BaseTask {
      */
     @Autowired
     protected RemittanceMQManager remittanceMqManagerProduct;
+
+    /**
+     * 催收、提还队列管理
+     */
+    @Autowired
+    public CollectionMQManager collectionMQManager;
 
     /**
      * 获取定时任务参数（直接从数据库加载，获取最新的参数）

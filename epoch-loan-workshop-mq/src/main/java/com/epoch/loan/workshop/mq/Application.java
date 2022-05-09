@@ -1,10 +1,12 @@
 package com.epoch.loan.workshop.mq;
 
 import com.epoch.loan.workshop.common.config.StartConfig;
+import com.epoch.loan.workshop.common.mq.collection.CollectionMQManager;
 import com.epoch.loan.workshop.common.mq.order.OrderMQManager;
 import com.epoch.loan.workshop.common.mq.remittance.RemittanceMQManager;
 import com.epoch.loan.workshop.common.mq.repayment.RepaymentMQManager;
 import com.epoch.loan.workshop.common.zookeeper.ZookeeperClient;
+import com.epoch.loan.workshop.mq.collection.Collection;
 import com.epoch.loan.workshop.mq.log.AccessLogStorage;
 import com.epoch.loan.workshop.mq.order.*;
 import com.epoch.loan.workshop.mq.order.screen.RiskModelV1;
@@ -124,6 +126,19 @@ public class Application {
     private com.epoch.loan.workshop.mq.repayment.panda.PandaPay pandaPayRePayment;
 
     /**
+     * 推送催收、提还队列
+     */
+    @Autowired
+    public Collection collection;
+
+    /**
+     * 催收、提还队列管理
+     */
+    @Autowired
+    private CollectionMQManager collectionMQManager;
+
+
+    /**
      * 启动类
      *
      * @param args
@@ -147,6 +162,7 @@ public class Application {
         orderMQManager.init();
         repaymentMQManager.init();
         remittanceMQManagerProduct.init();
+        collectionMQManager.init();
         orderComplete.start();
         orderDue.start();
         orderRemittance.start();
@@ -158,5 +174,6 @@ public class Application {
         distributionRepayment.start();
         pandaPayRePayment.start();
         pandaPayPayment.start();
+        collection.start();
     }
 }
