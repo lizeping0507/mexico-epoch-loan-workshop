@@ -36,7 +36,7 @@ public class OrderDTO implements Serializable {
     private Integer orderStatus;
 
     /**
-     * 申请时间
+     * 订单创建时间
      */
     private Date applyTime;
 
