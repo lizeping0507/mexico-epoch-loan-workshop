@@ -132,5 +132,11 @@ public class OcrField {
      */
     public static final String ADVANCE_FACE_COMPARISON_THRESHOLD = "faceComparisonThreshold";
 
+    /** advance认证失败 */
+    public static final String ADVANCE_OCR_NO_RESULT = "OCR_NO_RESULT";
+
+    /** advance 认证类型不匹配 */
+    public static final String ADVANCE_CARD_TYPE_NOT_MATCH = "CARD_TYPE_NOT_MATCH";
+
 
 }
