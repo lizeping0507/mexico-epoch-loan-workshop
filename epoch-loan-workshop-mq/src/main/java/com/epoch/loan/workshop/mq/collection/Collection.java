@@ -519,9 +519,9 @@ public class Collection extends BaseCollectionMQ implements MessageListenerConcu
         OSSObject livingImgInfo = alibabaOssClient.getFileInfo(userOssBucketName, userInfoEntity.getFacePath());
 
         // 将照片上传至minio上
-        String adFrontUrl = miNioUtil.upload(userFileBucketName, userInfoEntity.getFrontPath(), frontImgInfo);
-        String adBackUrl = miNioUtil.upload(userFileBucketName, userInfoEntity.getBackPath(), backImgInfo);
-        String livingUrl = miNioUtil.upload(userFileBucketName, userInfoEntity.getFacePath(), livingImgInfo);
+        String adFrontUrl = loanMiNioClient.upload(userFileBucketName, userInfoEntity.getFrontPath(), frontImgInfo);
+        String adBackUrl = loanMiNioClient.upload(userFileBucketName, userInfoEntity.getBackPath(), backImgInfo);
+        String livingUrl = loanMiNioClient.upload(userFileBucketName, userInfoEntity.getFacePath(), livingImgInfo);
 
         // 添加minio图片链接
         userInfoParam.setAadFrontImg(adFrontUrl);
