@@ -138,6 +138,10 @@ public class UserServiceImpl extends BaseService implements UserService {
         LoanUserInfoEntity userInfo = new LoanUserInfoEntity();
         userInfo.setId(ObjectIdUtil.getObjectId());
         userInfo.setUserId(user.getId());
+        userInfo.setGps(params.getGps());
+        userInfo.setGpsAddress(params.getGpsAddress());
+        userInfo.setRegisterGps(params.getGps());
+        userInfo.setRegisterAddress(params.getGpsAddress());
         userInfo.setMobile(params.getMobile());
         userInfo.setUpdateTime(new Date());
         userInfo.setCreateTime(new Date());
