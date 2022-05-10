@@ -392,7 +392,8 @@ public class OrderServiceImpl extends BaseService implements OrderService {
         }
 
         // 预计还款时间
-        if (ObjectUtils.isNotEmpty(lastOrderBill.getRepaymentTime())) {
+        if (ObjectUtils.isNotEmpty(lastOrderBill) &&
+                ObjectUtils.isNotEmpty(lastOrderBill.getRepaymentTime())) {
             detailResult.setExpectedRepaymentTime(lastOrderBill.getRepaymentTime());
         } else {
             Date repaymentTimeStr = DateUtil.addDay(new Date(), 6 * orderEntity.getStages());
