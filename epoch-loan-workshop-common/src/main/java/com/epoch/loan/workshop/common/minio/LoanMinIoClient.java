@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 /**
  * @author zeping.li
  * @version 1.0
- * @className MiNioUtil
+ * @className LoanMinIoClient
  * @package com.epoch.call.centre.common.util
  * @description minio工具类
  * @since 2021/1/4 15:09
@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
 @RefreshScope
 @Component
 @Data
-public class LoanMiNioClient {
+public class LoanMinIoClient {
 
     @Autowired
     private MinioClient minioClient;
