@@ -98,7 +98,7 @@ public class OrderDetailResult implements Serializable {
     private String bankCardNo;
 
     /**
-     * 申请时间
+     * 有进入审核时间就用进入审核时间，如果没有，就用创建时间
      */
     private Date applyTime;
 

@@ -378,7 +378,11 @@ public class OrderServiceImpl extends BaseService implements OrderService {
         detailResult.setInterest(interestAmount);
         Double estimatedRepaymentAmount = orderEntity.getEstimatedRepaymentAmount();
         detailResult.setEstimatedRepaymentAmount(estimatedRepaymentAmount);
-        detailResult.setApplyTime(orderEntity.getApplyTime());
+        if (ObjectUtils.isNotEmpty(orderEntity.getApplyTime())) {
+            detailResult.setApplyTime(orderEntity.getApplyTime());
+        } else {
+            detailResult.setApplyTime(orderEntity.getCreateTime());
+        }
         if (orderEntity.getStatus() <= OrderStatus.EXAMINE_FAIL) {
             // 封装结果
             result.setReturnCode(ResultEnum.SUCCESS.code());
