@@ -376,7 +376,7 @@ public class OrderServiceImpl extends BaseService implements OrderService {
         } else {
             String serviceFeeRange = product.getServiceFeeRange();
             if (StringUtils.isNotBlank(serviceFeeRange) && serviceFeeRange.contains("-") && serviceFeeRange.split("-").length == 2) {
-                detailResult.setInterest(serviceFeeRange.split("-")[0]);
+                detailResult.setIncidentalAmount(serviceFeeRange.split("-")[0]);
             }
         }
 
