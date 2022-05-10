@@ -841,6 +841,10 @@ public class UserServiceImpl extends BaseService implements UserService {
         // 根据code值进行判定
         String code = ocrInfoResult.getCode();
         if (!OcrField.ADVANCE_SUCCESS_CODE.equalsIgnoreCase(code)) {
+            if (OcrField.ADVANCE_OCR_NO_RESULT.equalsIgnoreCase(code)
+                    || OcrField.ADVANCE_CARD_TYPE_NOT_MATCH.equalsIgnoreCase(code)) {
+                result.setMessage(ocrInfoResult.getMessage());
+            }
             return result;
         }
         UserOcrResult ocrResult = new UserOcrResult();
