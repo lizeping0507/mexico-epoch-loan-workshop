@@ -40,7 +40,7 @@ public class OrderDetailResult implements Serializable {
     /**
      * 申请额度
      */
-    private Double approvalAmount;
+    private String approvalAmount;
 
     /**
      * 服务费
@@ -65,7 +65,7 @@ public class OrderDetailResult implements Serializable {
     /**
      * 预计还款金额(总)
      */
-    private Double estimatedRepaymentAmount;
+    private String estimatedRepaymentAmount;
 
     /**
      * 实际还款金额(总)
@@ -98,7 +98,7 @@ public class OrderDetailResult implements Serializable {
     private String bankCardNo;
 
     /**
-     * 申请时间
+     * 有进入审核时间就用进入审核时间，如果没有，就用创建时间
      */
     private Date applyTime;
 

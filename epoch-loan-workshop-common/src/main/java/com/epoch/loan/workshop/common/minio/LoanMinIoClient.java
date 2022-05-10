@@ -1,6 +1,7 @@
-package com.epoch.loan.workshop.common.util;
+package com.epoch.loan.workshop.common.minio;
 
 import com.aliyun.oss.model.OSSObject;
+import com.epoch.loan.workshop.common.util.LogUtil;
 import io.minio.GetPresignedObjectUrlArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
@@ -13,7 +14,7 @@ import org.springframework.stereotype.Component;
 /**
  * @author zeping.li
  * @version 1.0
- * @className MiNioUtil
+ * @className LoanMinIoClient
  * @package com.epoch.call.centre.common.util
  * @description minio工具类
  * @since 2021/1/4 15:09
@@ -21,7 +22,7 @@ import org.springframework.stereotype.Component;
 @RefreshScope
 @Component
 @Data
-public class MiNioUtil {
+public class LoanMinIoClient {
 
     @Autowired
     private MinioClient minioClient;
