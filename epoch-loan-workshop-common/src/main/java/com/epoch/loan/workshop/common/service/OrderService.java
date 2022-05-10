@@ -61,6 +61,14 @@ public interface OrderService {
     Result<OrderDetailResult> detail(OrderDetailParams params);
 
     /**
+     * 申请确认页
+     *
+     * @param params 请求参数
+     * @return Result 订单详情
+     */
+   Result<OrderDetailResult> applyConfirmation(OrderDetailParams params);
+
+    /**
      * 多推--申请确认
      *
      * @param params 请求参数

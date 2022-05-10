@@ -221,6 +221,11 @@ public class URL {
     public static final String ORDER_DETAIL = "/detail";
 
     /**
+     * 订单 - 申请确认页
+     */
+    public static final String ORDER_APPLY_CONFIRMATION = "/applyConfirmation";
+
+    /**
      * SDK - SDK上传同步回调
      */
     public static final String SDK_UPLOAD_CALLBACK = "/sdkUploadCallBack";

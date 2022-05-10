@@ -216,6 +216,40 @@ public class OrderController extends BaseController {
     }
 
     /**
+     * 订单申请确认页
+     *
+     * @param params 请求参数
+     * @return Result
+     */
+    @Authentication
+    @PostMapping(URL.ORDER_APPLY_CONFIRMATION)
+    public Result<OrderDetailResult> applyConfirmation(OrderDetailParams params) {
+        // 结果集
+        Result<OrderDetailResult> result = new Result<>();
+
+        try {
+            // 验证请求参数是否合法
+            if (!params.isOrderIdLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":orderId");
+                return result;
+            }
+
+            // 获取申请确认页
+            return orderService.applyConfirmation(params);
+        } catch (Exception e) {
+            LogUtil.sysError("[OrderController applyConfirmation]", e);
+
+            // 异常返回结果
+            result.setEx(ThrowableUtils.throwableToString(e));
+            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
+            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
+            return result;
+        }
+    }
+
+    /**
      * 多推--申请确认
      *
      * @param params 请求参数

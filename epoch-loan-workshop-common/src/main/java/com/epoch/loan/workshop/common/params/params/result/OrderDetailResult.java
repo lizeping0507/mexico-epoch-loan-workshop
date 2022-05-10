@@ -45,7 +45,7 @@ public class OrderDetailResult implements Serializable {
     /**
      * 服务费
      */
-    private Double incidentalAmount;
+    private String incidentalAmount;
 
     /**
      * 实际到账金额
@@ -55,7 +55,7 @@ public class OrderDetailResult implements Serializable {
     /**
      * 利息
      */
-    private Double interest;
+    private String interest;
 
     /**
      * 罚息
