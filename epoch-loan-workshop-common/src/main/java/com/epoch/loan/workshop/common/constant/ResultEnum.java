@@ -43,7 +43,7 @@ public enum ResultEnum {
     /**
      * 需要登录
      */
-    NO_LOGIN(4005, "Please login again"),
+    NO_LOGIN(4005, "Por favor, inicie sesión de nuevo"),
     /**
      * 版本异常 需要升级
      */
@@ -59,7 +59,7 @@ public enum ResultEnum {
     /**
      * 密码不正确
      */
-    PASSWORD_INVALID(4009, "The password is incorrect，please try again"),
+    PASSWORD_INVALID(4009, "La contraseña es incorrecta, por favor, inténtelo de nuevo"),
     /**
      * 手机号已存在
      */
@@ -87,7 +87,7 @@ public enum ResultEnum {
     /**
      * 设备已注册过其他账户
      */
-    DEVICE_REGISTERED(4014, "The device has been registered"),
+    DEVICE_REGISTERED(4014, "The device you use has registered other phone numbers and cannot be registered."),
 
 
     // ======= 服务端错误 ========
