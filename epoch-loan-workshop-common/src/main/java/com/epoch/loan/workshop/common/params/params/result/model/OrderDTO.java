@@ -1,5 +1,6 @@
 package com.epoch.loan.workshop.common.params.params.result.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -38,6 +39,7 @@ public class OrderDTO implements Serializable {
     /**
      * 订单创建时间
      */
+    @JsonFormat(pattern = "MM-dd-yyyy")
     private Date applyTime;
 
     /**
@@ -48,11 +50,13 @@ public class OrderDTO implements Serializable {
     /**
      * 放款时间
      */
+    @JsonFormat(pattern = "MM-dd-yyyy")
     private Date loanTime;
 
     /**
      * 到期时间
      */
+    @JsonFormat(pattern = "MM-dd-yyyy")
     private Date repaymentTime;
 
     /**
