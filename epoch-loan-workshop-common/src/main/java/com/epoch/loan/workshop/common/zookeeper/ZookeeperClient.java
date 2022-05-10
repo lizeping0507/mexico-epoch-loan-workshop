@@ -24,7 +24,7 @@ public class ZookeeperClient {
     /**
      * 等待时间
      */
-    private static final int SLEEP_TIME = 5000;
+    private static final int SLEEP_TIME = 10000;
     /**
      * 最大次数
      */
