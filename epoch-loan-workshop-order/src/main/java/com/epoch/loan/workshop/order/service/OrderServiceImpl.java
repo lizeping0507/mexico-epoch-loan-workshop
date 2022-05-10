@@ -11,10 +11,7 @@ import com.epoch.loan.workshop.common.params.params.result.*;
 import com.epoch.loan.workshop.common.params.params.result.model.LoanRepaymentRecordDTO;
 import com.epoch.loan.workshop.common.params.params.result.model.OrderDTO;
 import com.epoch.loan.workshop.common.service.OrderService;
-import com.epoch.loan.workshop.common.util.HttpUtils;
-import com.epoch.loan.workshop.common.util.LogUtil;
-import com.epoch.loan.workshop.common.util.OrderUtils;
-import com.epoch.loan.workshop.common.util.PlatformUtil;
+import com.epoch.loan.workshop.common.util.*;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -369,20 +366,40 @@ public class OrderServiceImpl extends BaseService implements OrderService {
         LoanProductEntity product = loanProductDao.findProduct(orderEntity.getProductId());
         detailResult.setProductName(product.getProductName());
         detailResult.setOrderStatus(orderEntity.getStatus());
-        detailResult.setApprovalAmount(orderEntity.getApprovalAmount());
         detailResult.setIncidentalAmount(orderEntity.getIncidentalAmount());
         detailResult.setActualAmount(orderEntity.getActualAmount());
 
         // 总利息
         Double interestAmount = loanOrderBillDao.sumOrderInterestAmount(orderEntity.getId());
         detailResult.setInterest(interestAmount);
+
+        // 区分是否放款填充 预计还款时间、预计还款金额、申请时间、申请金额
+        LoanOrderBillEntity lastOrderBill = loanOrderBillDao.findLastOrderBill(orderId);
         Double estimatedRepaymentAmount = orderEntity.getEstimatedRepaymentAmount();
-        detailResult.setEstimatedRepaymentAmount(estimatedRepaymentAmount);
+        if (orderEntity.getStatus() <= OrderStatus.WAIT_PAY) {
+            detailResult.setApprovalAmount(product.getArrivalRange());
+            detailResult.setEstimatedRepaymentAmount(product.getRepaymentRange());
+        } else {
+            detailResult.setApprovalAmount(orderEntity.getApprovalAmount()+"");
+            detailResult.setEstimatedRepaymentAmount(estimatedRepaymentAmount+"");
+        }
+
+        // 申请时间
         if (ObjectUtils.isNotEmpty(orderEntity.getApplyTime())) {
             detailResult.setApplyTime(orderEntity.getApplyTime());
         } else {
-            detailResult.setApplyTime(orderEntity.getCreateTime());
+            detailResult.setApplyTime(new Date());
         }
+
+        // 预计还款时间
+        if (ObjectUtils.isNotEmpty(lastOrderBill.getRepaymentTime())) {
+            detailResult.setExpectedRepaymentTime(lastOrderBill.getRepaymentTime());
+        } else {
+            Date repaymentTimeStr = DateUtil.addDay(new Date(), 6 * orderEntity.getStages());
+            Date repaymentTime = DateUtil.StringToDate(DateUtil.DateToString(repaymentTimeStr, "yyyy-MM-dd") + " 23:59:59", "yyyy-MM-dd HH:mm:ss");
+            detailResult.setExpectedRepaymentTime(repaymentTime);
+        }
+
         if (orderEntity.getStatus() <= OrderStatus.EXAMINE_FAIL) {
             // 封装结果
             result.setReturnCode(ResultEnum.SUCCESS.code());
@@ -407,7 +424,6 @@ public class OrderServiceImpl extends BaseService implements OrderService {
             return result;
         }
         detailResult.setLoanTime(orderEntity.getLoanTime());
-        LoanOrderBillEntity lastOrderBill = loanOrderBillDao.findLastOrderBill(orderId);
 
         // 已还款
         if (orderEntity.getStatus() == OrderStatus.COMPLETE   || orderEntity.getStatus() == OrderStatus.DUE_COMPLETE) {
@@ -419,9 +435,6 @@ public class OrderServiceImpl extends BaseService implements OrderService {
             result.setData(detailResult);
             return result;
         }
-
-        // 预计还款时间
-        detailResult.setExpectedRepaymentTime(lastOrderBill.getRepaymentTime());
 
         // 总罚息
         Double punishmentAmount = loanOrderBillDao.sumOrderPunishmentAmount(orderEntity.getId());

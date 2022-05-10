@@ -102,7 +102,7 @@ public class LoanProductEntity {
     private String repaymentRange;
 
     /**
-     * 手续费范围
+     * 服务费范围
      */
     private String serviceFeeRange;
 

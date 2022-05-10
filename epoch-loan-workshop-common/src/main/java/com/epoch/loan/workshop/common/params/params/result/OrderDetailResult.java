@@ -40,7 +40,7 @@ public class OrderDetailResult implements Serializable {
     /**
      * 申请额度
      */
-    private Double approvalAmount;
+    private String approvalAmount;
 
     /**
      * 服务费
@@ -65,7 +65,7 @@ public class OrderDetailResult implements Serializable {
     /**
      * 预计还款金额(总)
      */
-    private Double estimatedRepaymentAmount;
+    private String estimatedRepaymentAmount;
 
     /**
      * 实际还款金额(总)
