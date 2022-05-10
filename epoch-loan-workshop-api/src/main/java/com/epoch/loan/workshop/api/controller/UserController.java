@@ -76,7 +76,6 @@ public class UserController extends BaseController {
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
                 result.setMessage(ResultEnum.PARAM_ERROR.message() + ":password");
                 return result;
-
             }
 
             if (!registerParams.isSmsCodeLegal()) {

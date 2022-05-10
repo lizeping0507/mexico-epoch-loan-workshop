@@ -84,6 +84,11 @@ public enum ResultEnum {
      */
     SMS_CODE_SEND_FAILED(4011, "smsCode send failed"),
 
+    /**
+     * 设备已注册过其他账户
+     */
+    DEVICE_REGISTERED(4014, "The device has been registered"),
+
 
     // ======= 服务端错误 ========
     /**

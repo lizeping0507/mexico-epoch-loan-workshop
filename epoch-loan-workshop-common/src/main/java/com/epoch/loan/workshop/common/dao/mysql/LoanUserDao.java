@@ -54,4 +54,12 @@ public interface LoanUserDao {
      * @return
      */
     LoanUserEntity findById(String id);
+
+    /**
+     *根据设备号和appName查询
+     * @param appName
+     * @param androidId
+     * @return
+     */
+    Integer exitByAppNameAndAndroidId(String appName, String androidId);
 }

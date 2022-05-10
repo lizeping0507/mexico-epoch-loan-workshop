@@ -40,6 +40,9 @@
     <select id="findById" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanUserEntity">
         SELECT * FROM `loan_user` WHERE id = #{id}
     </select>
+    <select id="exitByAppNameAndAndroidId" resultType="java.lang.Integer">
+        SELECT COUNT(1) FROM `loan_user` WHERE android_id = #{androidId} AND app_name = #{appName}
+    </select>
     <update id="updateAppVersion">
         UPDATE `loan_user` set app_version = #{appVersion} WHERE id = #{id}
     </update>
