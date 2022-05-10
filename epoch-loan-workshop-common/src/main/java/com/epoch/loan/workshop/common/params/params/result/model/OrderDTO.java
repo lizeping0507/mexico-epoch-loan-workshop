@@ -39,7 +39,7 @@ public class OrderDTO implements Serializable {
     /**
      * 订单创建时间
      */
-    @JsonFormat(pattern = "MM-dd-yyyy")
+    @JsonFormat(pattern = "M-d-yyyy")
     private Date applyTime;
 
     /**
@@ -50,13 +50,13 @@ public class OrderDTO implements Serializable {
     /**
      * 放款时间
      */
-    @JsonFormat(pattern = "MM-dd-yyyy")
+    @JsonFormat(pattern = "M-d-yyyy")
     private Date loanTime;
 
     /**
      * 到期时间
      */
-    @JsonFormat(pattern = "MM-dd-yyyy")
+    @JsonFormat(pattern = "M-d-yyyy")
     private Date repaymentTime;
 
     /**
