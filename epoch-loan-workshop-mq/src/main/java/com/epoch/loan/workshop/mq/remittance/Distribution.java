@@ -37,7 +37,7 @@ import java.util.Random;
  * @description : 支付分配
  */
 @RefreshScope
-@Component
+@Component("DistributionRemittance")
 @Data
 public class Distribution extends BaseRemittanceMQListener implements MessageListenerConcurrently {
     /**

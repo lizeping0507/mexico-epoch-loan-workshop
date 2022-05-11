@@ -28,7 +28,7 @@ import java.util.List;
  * @description : 支付分配
  */
 @RefreshScope
-@Component
+@Component("DistributionRepayment")
 @Data
 public class Distribution extends BaseRepaymentMQListener implements MessageListenerConcurrently {
     /**
