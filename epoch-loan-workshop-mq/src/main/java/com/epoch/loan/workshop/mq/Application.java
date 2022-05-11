@@ -9,6 +9,7 @@ import com.epoch.loan.workshop.common.zookeeper.ZookeeperClient;
 import com.epoch.loan.workshop.mq.collection.Collection;
 import com.epoch.loan.workshop.mq.log.AccessLogStorage;
 import com.epoch.loan.workshop.mq.order.*;
+import com.epoch.loan.workshop.mq.order.screen.RiskModelMask;
 import com.epoch.loan.workshop.mq.order.screen.RiskModelV1;
 import com.epoch.loan.workshop.mq.remittance.Distribution;
 import com.epoch.loan.workshop.mq.remittance.payment.panda.PandaPay;
@@ -119,6 +120,11 @@ public class Application {
     @Autowired
     private PandaPay pandaPayPayment;
     /**
+     * 风控
+     */
+    @Autowired
+    private RiskModelMask riskModelMask;
+    /**
      * 响应日志
      */
     @Autowired
@@ -162,6 +168,7 @@ public class Application {
         repaymentMQManager.init();
         remittanceMQManagerProduct.init();
         collectionMQManager.init();
+        riskModelMask.start();
         orderComplete.start();
         orderDue.start();
         orderRemittance.start();
