@@ -421,6 +421,7 @@ public class OrderServiceImpl extends BaseService implements OrderService {
         // 预计还款时间
         if (ObjectUtils.isNotEmpty(lastOrderBill) &&
                 ObjectUtils.isNotEmpty(lastOrderBill.getRepaymentTime())) {
+            detailResult.setOrderBillId(lastOrderBill.getId());
             detailResult.setExpectedRepaymentTime(lastOrderBill.getRepaymentTime());
         } else {
             Date repaymentTimeStr = DateUtil.addDay(new Date(), 6 * orderEntity.getStages());
@@ -479,7 +480,6 @@ public class OrderServiceImpl extends BaseService implements OrderService {
         List<LoanRepaymentPaymentRecordEntity> paymentRecordList = loanRepaymentPaymentRecordDao.findListRecordDTOByOrderIdAndStatus(orderId, LoanRepaymentPaymentRecordStatus.SUCCESS);
         paymentRecordList.stream().forEach(paymentRecord -> {
             LoanRepaymentRecordDTO recordDTO = new LoanRepaymentRecordDTO();
-            recordDTO.setOrderBillId(paymentRecord.getOrderBillId());
             recordDTO.setRepaymentAmount(paymentRecord.getAmount());
             recordDTO.setTotalAmount(paymentRecord.getActualAmount());
 

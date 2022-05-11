@@ -24,6 +24,11 @@ public class OrderDetailResult implements Serializable {
     private String orderNo;
 
     /**
+     * 账单id
+     */
+    private String orderBillId;
+
+    /**
      * 产品id
      */
     private String productId;

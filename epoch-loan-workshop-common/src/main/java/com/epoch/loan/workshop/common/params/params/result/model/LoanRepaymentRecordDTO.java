@@ -17,11 +17,6 @@ import java.util.Date;
 public class LoanRepaymentRecordDTO implements Serializable {
 
     /**
-     * 账单id
-     */
-    private String orderBillId;
-
-    /**
      * 还款总额
      */
     private Double totalAmount;
