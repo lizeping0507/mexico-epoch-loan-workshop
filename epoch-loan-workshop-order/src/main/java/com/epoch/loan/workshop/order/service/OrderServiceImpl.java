@@ -19,6 +19,7 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 /**
@@ -216,7 +217,7 @@ public class OrderServiceImpl extends BaseService implements OrderService {
                 if (ObjectUtils.isEmpty(estimatedRepaymentAmount)) {
                     estimatedRepaymentAmount = 0.0;
                 }
-                Double repaymentAmount = new BigDecimal(estimatedRepaymentAmount).subtract(new BigDecimal(actualRepaymentAmount)).setScale(2).doubleValue();
+                Double repaymentAmount = new BigDecimal(estimatedRepaymentAmount).subtract(new BigDecimal(actualRepaymentAmount)).setScale(2,RoundingMode.HALF_UP).doubleValue();
                 orderDTO.setRepaymentAmount(repaymentAmount);
             }
 
@@ -321,7 +322,7 @@ public class OrderServiceImpl extends BaseService implements OrderService {
             if (ObjectUtils.isEmpty(estimatedRepaymentAmount)) {
                 estimatedRepaymentAmount = 0.0;
             }
-            Double repaymentAmount = new BigDecimal(estimatedRepaymentAmount).subtract(new BigDecimal(actualRepaymentAmount)).setScale(2).doubleValue();
+            Double repaymentAmount = new BigDecimal(estimatedRepaymentAmount).subtract(new BigDecimal(actualRepaymentAmount)).setScale(2, RoundingMode.HALF_UP).doubleValue();
             orderDTO.setRepaymentAmount(repaymentAmount);
 
             LoanProductEntity product = loanProductDao.findProduct(loanOrderEntity.getProductId());
