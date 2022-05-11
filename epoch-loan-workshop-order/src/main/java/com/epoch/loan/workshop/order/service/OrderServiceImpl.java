@@ -479,6 +479,7 @@ public class OrderServiceImpl extends BaseService implements OrderService {
         List<LoanRepaymentPaymentRecordEntity> paymentRecordList = loanRepaymentPaymentRecordDao.findListRecordDTOByOrderIdAndStatus(orderId, LoanRepaymentPaymentRecordStatus.SUCCESS);
         paymentRecordList.stream().forEach(paymentRecord -> {
             LoanRepaymentRecordDTO recordDTO = new LoanRepaymentRecordDTO();
+            recordDTO.setOrderBillId(paymentRecord.getOrderBillId());
             recordDTO.setRepaymentAmount(paymentRecord.getAmount());
             recordDTO.setTotalAmount(paymentRecord.getActualAmount());
 
