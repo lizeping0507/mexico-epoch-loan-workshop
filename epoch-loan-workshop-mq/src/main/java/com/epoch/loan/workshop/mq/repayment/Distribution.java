@@ -30,7 +30,7 @@ import java.util.List;
 @RefreshScope
 @Component
 @Data
-public class DistributionRepayment extends BaseRepaymentMQListener implements MessageListenerConcurrently {
+public class Distribution extends BaseRepaymentMQListener implements MessageListenerConcurrently {
     /**
      * 消息监听器
      */

@@ -10,9 +10,8 @@ import com.epoch.loan.workshop.mq.collection.Collection;
 import com.epoch.loan.workshop.mq.log.AccessLogStorage;
 import com.epoch.loan.workshop.mq.order.*;
 import com.epoch.loan.workshop.mq.order.screen.RiskModelV1;
-import com.epoch.loan.workshop.mq.remittance.DistributionRemittance;
+import com.epoch.loan.workshop.mq.remittance.Distribution;
 import com.epoch.loan.workshop.mq.remittance.payment.panda.PandaPay;
-import com.epoch.loan.workshop.mq.repayment.DistributionRepayment;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -48,7 +47,7 @@ public class Application {
      * 还款队列生产
      */
     @Autowired
-    public DistributionRepayment distributionRepayment;
+    public com.epoch.loan.workshop.mq.repayment.Distribution distributionRepayment;
 
     /**
      * Zookeeper工具类
@@ -102,7 +101,7 @@ public class Application {
      * 汇款分配队列
      */
     @Autowired
-    private DistributionRemittance distributionRemittance;
+    private Distribution distributionRemittance;
 
     /**
      * 订单放款

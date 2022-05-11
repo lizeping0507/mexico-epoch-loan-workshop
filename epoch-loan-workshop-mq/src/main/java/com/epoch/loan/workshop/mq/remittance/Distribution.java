@@ -39,7 +39,7 @@ import java.util.Random;
 @RefreshScope
 @Component
 @Data
-public class DistributionRemittance extends BaseRemittanceMQListener implements MessageListenerConcurrently {
+public class Distribution extends BaseRemittanceMQListener implements MessageListenerConcurrently {
     /**
      * 消息监听器
      */
