@@ -161,6 +161,11 @@ public class User implements Serializable {
     private String liveType;
 
     /**
+     * INE/IFE州
+     */
+    private String papersState;
+
+    /**
      * INE/IFE地址
      */
     private String papersAddress;

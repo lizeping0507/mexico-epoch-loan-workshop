@@ -120,6 +120,11 @@ public class LoanUserInfoEntity {
     private String papersAddress;
 
     /**
+     * INE/IFE州
+     */
+    private String papersState;
+
+    /**
      * INE/IFE父亲姓氏
      */
     private String papersFatherName;

@@ -124,6 +124,7 @@ public class TokenManager {
         user.setChildrenNumber(userInfoEntity.getChildrenNumber());
         user.setLoanPurpose(userInfoEntity.getLoanPurpose());
         user.setLiveType(userInfoEntity.getLiveType());
+        user.setPapersState(userInfoEntity.getPapersState());
         user.setPapersAddress(userInfoEntity.getPapersAddress());
         user.setPapersFatherName(userInfoEntity.getPapersFatherName());
         user.setPapersName(userInfoEntity.getPapersName());

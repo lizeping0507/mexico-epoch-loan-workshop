@@ -83,7 +83,7 @@ public class CollectionField {
     /**
      * 邦地址
      */
-    public final static String[] province = {", Andaman and Nicobar Islands",", Andhra Pradesh",", Arunachal Pradesh",", Assam",", Bihar",", Chandigarh",", Chhattisgarh",", Dadra and Nagar Haveli",", Daman and Diu",", Delhi",", Goa",", Gujarat",", Haryana",", Himachal Pradesh",", Jammu and Kashmir",", Jharkhand",", Karnataka",", Kerala",", Lakshadweep",", Madhya Pradesh",", Maharashtra",", Manipur",", Meghalaya",", Mizoram",", Nagaland",", Odisha",", Pondicherry",", Punjab",", Rajasthan",", Sikkim",", Tamil Nadu",", Telangana",", Tripura",", Uttar Pradesh",", Uttarakhand",", West Bengal"};
+    public final static String[] province = {",AGS",",BC",",BCS",",CAM",",CHIS",",CHIH",",COAH",",COL",",CDMX",",DGO",",MEX",",GTO",",GRO",",HGO",",JAL",",MICH",",MOR",",NAY",",NL",",OAX",",PUE",",QRO",",Q ROO",",SLP",",SIN",",SON",",TAB",",TAMPS",",TLAX",",VER",",YUC",",ZAC",};
 
     /**
      * 催收语言

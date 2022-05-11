@@ -406,7 +406,11 @@ public class Collection extends BaseCollectionMQ implements MessageListenerConcu
 
         // 邦地址
         orderParam.setApplyProvince(getProvinceByList(userInfoEntity.getGpsAddress()));
-        orderParam.setIdProvince(getProvinceByList(userInfoEntity.getPapersAddress()));
+        if (StringUtils.isNotBlank(userInfoEntity.getPapersState())) {
+            orderParam.setIdProvince(userInfoEntity.getPapersState());
+        } else{
+            orderParam.setIdProvince(getProvinceByList(userInfoEntity.getPapersAddress()));
+        }
         orderParam.setRegProvince(getProvinceByList(userInfoEntity.getRegisterAddress()));
         orderParam.setUserType(orderEntity.getUserType() + "");
 

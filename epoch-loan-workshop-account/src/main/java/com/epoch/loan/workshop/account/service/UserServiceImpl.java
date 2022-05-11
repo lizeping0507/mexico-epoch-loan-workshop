@@ -672,6 +672,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         // 处理扫描识别的证件信息和RFC，保存用户基本信息
         if (ObjectUtils.isNotEmpty(frontInfo)) {
             userInfoById.setPostalCode(frontInfo.getPostalCode());
+            userInfoById.setPapersState(frontInfo.getState());
             userInfoById.setPapersAddress(frontInfo.getAddressAll());
             userInfoById.setPapersFatherName(frontInfo.getFatherLastName());
             userInfoById.setPapersName(frontInfo.getName());
