@@ -396,6 +396,11 @@ public class OrderServiceImpl extends BaseService implements OrderService {
         LoanOrderBillEntity lastOrderBill = loanOrderBillDao.findLastOrderBill(orderId);
         Double estimatedRepaymentAmount = orderEntity.getEstimatedRepaymentAmount();
 
+        // 账单id
+        if (ObjectUtils.isNotEmpty(lastOrderBill)) {
+            detailResult.setOrderBillId(lastOrderBill.getId());
+        }
+
         if (orderEntity.getStatus() <= OrderStatus.EXAMINE_WAIT) {
             String arrivalRange = product.getArrivalRange();
             String repaymentRange = product.getRepaymentRange();
@@ -421,7 +426,6 @@ public class OrderServiceImpl extends BaseService implements OrderService {
         // 预计还款时间
         if (ObjectUtils.isNotEmpty(lastOrderBill) &&
                 ObjectUtils.isNotEmpty(lastOrderBill.getRepaymentTime())) {
-            detailResult.setOrderBillId(lastOrderBill.getId());
             detailResult.setExpectedRepaymentTime(lastOrderBill.getRepaymentTime());
         } else {
             Date repaymentTimeStr = DateUtil.addDay(new Date(), 6 * orderEntity.getStages());
