@@ -1,6 +1,7 @@
 package com.epoch.loan.workshop.common.params.params.result;
 
 import com.epoch.loan.workshop.common.params.params.result.model.LoanRepaymentRecordDTO;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -100,20 +101,24 @@ public class OrderDetailResult implements Serializable {
     /**
      * 有进入审核时间就用进入审核时间，如果没有，就用创建时间
      */
+    @JsonFormat(pattern = "M-d-yyyy")
     private Date applyTime;
 
     /**
      * 放款时间
      */
+    @JsonFormat(pattern = "M-d-yyyy")
     private Date loanTime;
 
     /**
      * 预计还款时间
      */
+    @JsonFormat(pattern = "M-d-yyyy")
     private Date expectedRepaymentTime;
 
     /**
      * 还款时间
      */
+    @JsonFormat(pattern = "M-d-yyyy")
     private Date actualRepaymentTime;
 }
