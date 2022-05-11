@@ -34,7 +34,7 @@ public class LoanRepaymentRecordDTO implements Serializable {
     /**
      * 还款时间
      */
-    @JsonFormat(pattern = "M-d-yyyy")
+    @JsonFormat(pattern = "d-M-yyyy")
     private Date successTime;
 
     /**
