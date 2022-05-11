@@ -344,6 +344,9 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
             // 应还金额
             appMaskModelResult.setAmount(String.valueOf(loanOrderBillEntity.getRepaymentAmount() - loanOrderBillEntity.getReductionAmount()));
+        }else if (orderStatus > OrderStatus.CREATE){
+            // 还款时间
+            appMaskModelResult.setRepaymentTime(DateUtil.DateToString(DateUtil.addDay(new Date() , 7), "yyyy-MM-dd"));
         }
 
         // 返回结果
