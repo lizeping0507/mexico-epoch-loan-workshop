@@ -27,6 +27,11 @@ public class OrderDTO implements Serializable {
     private String productId;
 
     /**
+     * 产品名称
+     */
+    private String productName;
+
+    /**
      * 贷款金额
      */
     private String approvalAmount;

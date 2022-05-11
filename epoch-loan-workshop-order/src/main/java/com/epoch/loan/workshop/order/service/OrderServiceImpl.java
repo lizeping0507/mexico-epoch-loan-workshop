@@ -219,21 +219,20 @@ public class OrderServiceImpl extends BaseService implements OrderService {
                 }
                 Double repaymentAmount = new BigDecimal(estimatedRepaymentAmount).subtract(new BigDecimal(actualRepaymentAmount)).setScale(2,RoundingMode.HALF_UP).doubleValue();
                 orderDTO.setRepaymentAmount(repaymentAmount);
-
-                // 申请金额
-                LoanProductEntity product = loanProductDao.findProduct(loanOrderEntity.getProductId());
-                if (loanOrderEntity.getStatus() <= OrderStatus.EXAMINE_WAIT) {
-                    String arrivalRange = product.getArrivalRange();
-                    if (StringUtils.isNotBlank(arrivalRange) && arrivalRange.contains("-") && arrivalRange.split("-").length == 2) {
-                        orderDTO.setApprovalAmount(arrivalRange.split("-")[0]);
-                    }
-                } else {
-                    orderDTO.setApprovalAmount(loanOrderEntity.getApprovalAmount() + "");
-                }
             }
-
             LoanProductEntity product = loanProductDao.findProduct(loanOrderEntity.getProductId());
             orderDTO.setProductIconImageUrl(product.getIcon());
+            orderDTO.setProductName(product.getProductName());
+
+            // 申请金额
+            if (loanOrderEntity.getStatus() <= OrderStatus.EXAMINE_WAIT) {
+                String arrivalRange = product.getArrivalRange();
+                if (StringUtils.isNotBlank(arrivalRange) && arrivalRange.contains("-") && arrivalRange.split("-").length == 2) {
+                    orderDTO.setApprovalAmount(arrivalRange.split("-")[0]);
+                }
+            } else {
+                orderDTO.setApprovalAmount(loanOrderEntity.getApprovalAmount() + "");
+            }
             orderDTOList.add(orderDTO);
         });
         result.setData(new OrderListResult(orderDTOList));
@@ -285,6 +284,7 @@ public class OrderServiceImpl extends BaseService implements OrderService {
             orderDTO.setApplyTime(loanOrderEntity.getCreateTime());
             LoanProductEntity product = loanProductDao.findProduct(loanOrderEntity.getProductId());
             orderDTO.setProductIconImageUrl(product.getIcon());
+            orderDTO.setProductName(product.getProductName());
 
             // 申请金额
             if (loanOrderEntity.getStatus() <= OrderStatus.EXAMINE_WAIT) {
@@ -349,6 +349,18 @@ public class OrderServiceImpl extends BaseService implements OrderService {
 
             LoanProductEntity product = loanProductDao.findProduct(loanOrderEntity.getProductId());
             orderDTO.setProductIconImageUrl(product.getIcon());
+            orderDTO.setProductName(product.getProductName());
+
+            // 申请金额
+            if (loanOrderEntity.getStatus() <= OrderStatus.EXAMINE_WAIT) {
+                String arrivalRange = product.getArrivalRange();
+                if (StringUtils.isNotBlank(arrivalRange) && arrivalRange.contains("-") && arrivalRange.split("-").length == 2) {
+                    orderDTO.setApprovalAmount(arrivalRange.split("-")[0]);
+                }
+            } else {
+                orderDTO.setApprovalAmount(loanOrderEntity.getApprovalAmount() + "");
+            }
+
             orderDTOList.add(orderDTO);
         });
         result.setData(new OrderListResult(orderDTOList));
