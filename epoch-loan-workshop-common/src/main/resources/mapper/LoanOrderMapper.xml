@@ -166,7 +166,7 @@
         <foreach collection="array" item="statu" index="index" open="AND status IN(" close=")" separator=",">#{statu}</foreach>
     </select>
     <select id="countProcessOrderNo" resultType="java.lang.Integer">
-        SELECT COUNT(1) FROM loan_order WHERE status &gt;= 80 AND status &lt; 100 AND user_id = #{userId}
+        SELECT COUNT(1) FROM loan_order WHERE status &gt;= 80 AND status &lt; 100
         <foreach collection="userIdList" item="userId" index="index" open="AND user_id IN (" close=")" separator=",">
             #{userId}
         </foreach>
