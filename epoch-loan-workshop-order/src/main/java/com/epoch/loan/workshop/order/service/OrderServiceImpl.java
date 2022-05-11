@@ -431,11 +431,13 @@ public class OrderServiceImpl extends BaseService implements OrderService {
 
         // 添加银行卡信息
         String bankCardId = orderEntity.getBankCardId();
-        LoanRemittanceAccountEntity accountEntity = loanRemittanceAccountDao.findRemittanceAccount(bankCardId);
-        if (ObjectUtils.isNotEmpty(accountEntity)) {
-            detailResult.setBankCardName(accountEntity.getName());
-            detailResult.setBankCardNo(accountEntity.getAccountNumber());
-            detailResult.setReceiveWay(accountEntity.getType());
+        if (StringUtils.isNotBlank(bankCardId)) {
+            LoanRemittanceAccountEntity accountEntity = loanRemittanceAccountDao.findRemittanceAccount(bankCardId);
+            if (ObjectUtils.isNotEmpty(accountEntity)) {
+                detailResult.setBankCardName(accountEntity.getName());
+                detailResult.setBankCardNo(accountEntity.getAccountNumber());
+                detailResult.setReceiveWay(accountEntity.getType());
+            }
         }
 
         if (orderEntity.getStatus() <= OrderStatus.EXAMINE_FAIL) {
