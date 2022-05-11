@@ -771,8 +771,10 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         bizData.put(Field.PROGRESS, 0);
         bizData.put(Field.REGISTER_ADDR, registerAddress);
         bizData.put(Field.CHANNEL_NAME, channelName);
-        bizData.put(Field.SINGLE_QUANTITY, singleQuantity);
-        bizData.put(Field.ALL_QUANTITY, allQuantity);
+        bizData.put("channelCode", platformChannelEntity.getChannelCode());
+        bizData.put("currentOrder", singleQuantity);
+        bizData.put("allOrder", allQuantity);
+        bizData.put("address", user.getRegisterAddress());
         bizData.put(Field.REPAYMENT_TIME, intervalDays);
         bizData.put(Field.PHONE, mobile);
         bizData.put(Field.APP_NAME, appName);
