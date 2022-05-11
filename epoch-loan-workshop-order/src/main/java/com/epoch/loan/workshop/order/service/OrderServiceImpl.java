@@ -219,6 +219,17 @@ public class OrderServiceImpl extends BaseService implements OrderService {
                 }
                 Double repaymentAmount = new BigDecimal(estimatedRepaymentAmount).subtract(new BigDecimal(actualRepaymentAmount)).setScale(2,RoundingMode.HALF_UP).doubleValue();
                 orderDTO.setRepaymentAmount(repaymentAmount);
+
+                // 申请金额
+                LoanProductEntity product = loanProductDao.findProduct(loanOrderEntity.getProductId());
+                if (loanOrderEntity.getStatus() <= OrderStatus.EXAMINE_WAIT) {
+                    String arrivalRange = product.getArrivalRange();
+                    if (StringUtils.isNotBlank(arrivalRange) && arrivalRange.contains("-") && arrivalRange.split("-").length == 2) {
+                        orderDTO.setApprovalAmount(arrivalRange.split("-")[0]);
+                    }
+                } else {
+                    orderDTO.setApprovalAmount(loanOrderEntity.getApprovalAmount() + "");
+                }
             }
 
             LoanProductEntity product = loanProductDao.findProduct(loanOrderEntity.getProductId());
@@ -266,6 +277,7 @@ public class OrderServiceImpl extends BaseService implements OrderService {
         // 转换响应参数
         orderEntityList.stream().forEach(loanOrderEntity -> {
             OrderDTO orderDTO = new OrderDTO();
+
             BeanUtils.copyProperties(loanOrderEntity, orderDTO);
             orderDTO.setOrderNo(loanOrderEntity.getId());
             orderDTO.setOrderStatus(loanOrderEntity.getStatus());
@@ -273,6 +285,16 @@ public class OrderServiceImpl extends BaseService implements OrderService {
             orderDTO.setApplyTime(loanOrderEntity.getCreateTime());
             LoanProductEntity product = loanProductDao.findProduct(loanOrderEntity.getProductId());
             orderDTO.setProductIconImageUrl(product.getIcon());
+
+            // 申请金额
+            if (loanOrderEntity.getStatus() <= OrderStatus.EXAMINE_WAIT) {
+                String arrivalRange = product.getArrivalRange();
+                if (StringUtils.isNotBlank(arrivalRange) && arrivalRange.contains("-") && arrivalRange.split("-").length == 2) {
+                    orderDTO.setApprovalAmount(arrivalRange.split("-")[0]);
+                }
+            } else {
+                orderDTO.setApprovalAmount(loanOrderEntity.getApprovalAmount() + "");
+            }
             orderDTOList.add(orderDTO);
         });
         result.setData(new OrderListResult(orderDTOList));

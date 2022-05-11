@@ -135,8 +135,13 @@ public class OcrField {
     /** advance认证失败 */
     public static final String ADVANCE_OCR_NO_RESULT = "OCR_NO_RESULT";
 
+    /** advance认证失败 */
+    public static final String ADVANCE_OCR_NO_RESULT_MESSAGE = "El tipo de tarjeta no coincide";
+
     /** advance 认证类型不匹配 */
     public static final String ADVANCE_CARD_TYPE_NOT_MATCH = "CARD_TYPE_NOT_MATCH";
 
+    /** advance 认证类型不匹配 */
+    public static final String ADVANCE_CARD_TYPE_NOT_MATCH_MESSAGE = "CARD_TYPE_NOT_MATCH";
 
 }

@@ -29,7 +29,7 @@ public class OrderDTO implements Serializable {
     /**
      * 贷款金额
      */
-    private Double approvalAmount;
+    private String approvalAmount;
 
     /**
      * 订单状态
