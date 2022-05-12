@@ -38,7 +38,7 @@ public class ShortMessageController extends BaseController {
             if (!smsCodeParams.isMobileLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":mobile");
+                result.setMessage(ResultEnum.PARAM_ERROR.message());
                 return result;
             }
 
