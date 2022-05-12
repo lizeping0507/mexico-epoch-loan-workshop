@@ -123,14 +123,14 @@ public class OrderWay extends BaseOrderMQListener implements MessageListenerConc
                 updateOrderStatus(orderId, OrderStatus.WAY);
                 updateOrderBillStatusByOrderId(orderId, OrderBillStatus.WAY);
 
+                // 修改审核状态
+                updateModeExamine(orderId, subExpression(), OrderExamineStatus.PASS);
+
                 // 发送还款策略组分配队列计算还款策略
                 DistributionRepaymentParams distributionRepaymentParams = new DistributionRepaymentParams();
                 distributionRepaymentParams.setOrderId(orderId);
                 distributionRepaymentParams.setOrderBillId(orderBillEntity.getId());
                 sendRepaymentDistribution(distributionRepaymentParams);
-
-                // 修改审核状态
-                updateModeExamine(orderId, subExpression(), OrderExamineStatus.PASS);
 
                 // 推送催收
                 sendCollection(orderId, CollectionField.EVENT_CREATE);
