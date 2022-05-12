@@ -890,7 +890,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 loanOrderEntity.setReloan(reloan);
                 loanOrderEntity.setOrderModelGroup(orderModelGroup);
                 loanOrderEntity.setRemittanceDistributionGroup(productEntity.getRemittanceDistributionGroup());
-                loanOrderEntity.setRepaymentDistributionGroup("H6");
+                loanOrderEntity.setRepaymentDistributionGroup("");
                 loanOrderEntity.setUserType(userType);
                 loanOrderEntity.setStages(productEntity.getStages());
                 loanOrderEntity.setStagesDay(productEntity.getStagesDay());
