@@ -1,5 +1,6 @@
 package com.epoch.loan.workshop.common.config;
 
+import com.epoch.loan.workshop.common.util.LogUtil;
 import org.apache.http.HttpHost;
 import org.apache.http.impl.nio.reactor.IOReactorConfig;
 import org.elasticsearch.client.RestClient;
@@ -29,6 +30,8 @@ public class RestClientConfig extends AbstractElasticsearchConfiguration {
         final CredentialsProvider credentialsProvider=new BasicCredentialsProvider();
         credentialsProvider.setCredentials(AuthScope.ANY,new UsernamePasswordCredentials("",""));
         */
+
+        LogUtil.sysInfo("RestHighLevelClient install");
 
         // 重新构建ES
         RestClientBuilder restClientBuilder = RestClient.builder(new HttpHost("loan-es", 9200, "http")).setHttpClientConfigCallback(httpClientBuilder -> httpClientBuilder
