@@ -213,12 +213,14 @@ public enum ResultEnum {
      * 无可用聚道
      */
     CHANNEL_UN_DO_ERROR(10000, "No hay proveedores de servicios OCR disponibles para este canal "),
-    ;
 
     /**
      * 设备已注册过其他账户
      */
     ACCOUNT_BEEN_USED_ERRO(4014, "The bank card has been used by someone else."),
+    ;
+
+
 
 
     private Integer code;
