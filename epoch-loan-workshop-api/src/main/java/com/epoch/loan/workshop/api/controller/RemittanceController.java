@@ -76,21 +76,21 @@ public class RemittanceController extends BaseController {
             if (!addRemittanceAccountParams.isBankLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":bank");
+                result.setMessage(ResultEnum.PARAM_ERROR.message());
                 return result;
             }
 
             if (!addRemittanceAccountParams.isTypeLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":type");
+                result.setMessage(ResultEnum.PARAM_ERROR.message());
                 return result;
             }
 
             if (!addRemittanceAccountParams.isNameLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":name");
+                result.setMessage(ResultEnum.PARAM_ERROR.message());
                 return result;
             }
 
