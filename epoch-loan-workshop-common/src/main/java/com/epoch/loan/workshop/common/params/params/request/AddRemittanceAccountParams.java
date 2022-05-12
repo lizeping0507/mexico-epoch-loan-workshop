@@ -79,6 +79,9 @@ public class AddRemittanceAccountParams extends BaseParams {
         if (StringUtils.isEmpty(this.accountNumber)) {
             return false;
         }
+        if (this.accountNumber.length() < 16 || this.accountNumber.length()>18){
+            return false;
+        }
         return true;
     }
 }

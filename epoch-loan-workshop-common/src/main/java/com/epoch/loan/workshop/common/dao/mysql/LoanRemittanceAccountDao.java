@@ -46,4 +46,11 @@ public interface LoanRemittanceAccountDao {
      * @return
      */
     int addRemittanceAccount(@Param("loanRemittanceAccountEntity") LoanRemittanceAccountEntity loanRemittanceAccountEntity);
+
+    /**
+     * 通过卡号查询放款账户
+     * @param accountNumber
+     * @return
+     */
+    LoanRemittanceAccountEntity findByAccountNumber(String accountNumber);
 }

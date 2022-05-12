@@ -115,6 +115,14 @@ public class RemittanceServiceImpl extends BaseService implements RemittanceServ
         // 手机号
         String mobile = addRemittanceAccountParams.getUser().getMobile();
 
+        LoanRemittanceAccountEntity loanRemittanceAccount = loanRemittanceAccountDao.findByAccountNumber(accountNumber);
+        if (ObjectUtils.isNotEmpty(loanRemittanceAccount)){
+            // 卡号已存在
+            result.setMessage(ResultEnum.PARAM_ERROR.message());
+            result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+            return result;
+        }
+
         // 请求风控验卡
         JSONObject verifyRemittanceAccountJson = verifyRemittanceAccount(userId, mobile, accountNumber);
         LogUtil.sysInfo("请求风控验卡 :{}", verifyRemittanceAccountJson);

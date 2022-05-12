@@ -48,6 +48,21 @@ public class UserAddInfoParams extends BaseParams {
      */
     private String loanPurpose ;
 
+    /**
+     * 邮箱
+     */
+    private String email ;
+
+
+    /**
+     * 邮箱
+     */
+    public boolean isEmailLegal(){
+        if (StringUtils.isEmpty(this.email)){
+            return false;
+        }
+        return true;
+    }
 
     /**
      * 字段校验-用户填写生日

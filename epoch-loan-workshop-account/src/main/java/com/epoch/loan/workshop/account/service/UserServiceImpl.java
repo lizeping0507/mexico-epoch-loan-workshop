@@ -407,6 +407,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         userInfo.setLiveType(params.getLiveType());
         userInfo.setEducation(params.getEducation());
         userInfo.setMarital(params.getMarital());
+        userInfo.setEmail(params.getEmail());
         userInfo.setLoanPurpose(params.getLoanPurpose());
 
         // 更新
