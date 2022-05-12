@@ -1,6 +1,7 @@
 package com.epoch.loan.workshop.common.config;
 
 import com.epoch.loan.workshop.common.util.LogUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHost;
 import org.apache.http.impl.nio.reactor.IOReactorConfig;
 import org.elasticsearch.client.RestClient;
@@ -12,7 +13,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.elasticsearch.config.AbstractElasticsearchConfiguration;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,10 +53,12 @@ public class RestClientConfig extends AbstractElasticsearchConfiguration {
 
         list.forEach(node -> {
             try {
-                String[] parts = StringUtils.split(node, ":");
-                Assert.notNull(parts, "Must defined");
-                Assert.state(parts.length == 2, "Must be defined as 'host:port'");
-                httpHosts.add(new HttpHost(parts[0], Integer.parseInt(parts[1]), clusterSSL));
+                if (StringUtils.isNotBlank(node)) {
+                    String[] parts = StringUtils.split(node, ":");
+                    Assert.notNull(parts, "Must defined");
+                    Assert.state(parts.length == 2, "Must be defined as 'host:port'");
+                    httpHosts.add(new HttpHost(parts[0], Integer.parseInt(parts[1]), clusterSSL));
+                }
             } catch (Exception e) {
                 throw new IllegalStateException("Invalid ES nodes " + "property '" + node + "'", e);
             }
