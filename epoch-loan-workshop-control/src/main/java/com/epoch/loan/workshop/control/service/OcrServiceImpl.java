@@ -205,8 +205,8 @@ public class OcrServiceImpl extends BaseService implements OcrService {
         // 判断是否响应成功
         String code = scoreResult.getCode();
         if (!OcrField.ADVANCE_SUCCESS_CODE.equalsIgnoreCase(code)) {
-            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
-            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
+            result.setReturnCode(ResultEnum.KYC_Liveness_ERROR.code());
+            result.setMessage(ResultEnum.KYC_Liveness_ERROR.message());
             return result;
         }
 
@@ -214,15 +214,15 @@ public class OcrServiceImpl extends BaseService implements OcrService {
         UserLivenessScoreResult data = scoreResult.getData();
         String livenessScore = data.getLivenessScore();
         if (ObjectUtils.isEmpty(livenessScore)) {
-            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
-            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
+            result.setReturnCode(ResultEnum.KYC_Liveness_ERROR.code());
+            result.setMessage(ResultEnum.KYC_Liveness_ERROR.message());
             return result;
         }
 
         // 判断响应分数是否大于建议阀值
         if (new BigDecimal(livenessScore).compareTo(new BigDecimal(livenessThreshold)) <= 0) {
-            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
-            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
+            result.setReturnCode(ResultEnum.KYC_Liveness_ERROR.code());
+            result.setMessage(ResultEnum.KYC_Liveness_ERROR.message());
             return result;
         }
 
