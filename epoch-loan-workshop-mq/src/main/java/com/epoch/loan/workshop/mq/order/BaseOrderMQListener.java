@@ -4,7 +4,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.config.RiskConfig;
 import com.epoch.loan.workshop.common.constant.LoanOrderModelStatus;
 import com.epoch.loan.workshop.common.dao.mysql.*;
-import com.epoch.loan.workshop.common.entity.mysql.*;
+import com.epoch.loan.workshop.common.entity.mysql.LoanOrderModelEntity;
+import com.epoch.loan.workshop.common.mq.collection.CollectionMQManager;
+import com.epoch.loan.workshop.common.mq.collection.params.CollectionParams;
 import com.epoch.loan.workshop.common.mq.order.OrderMQManager;
 import com.epoch.loan.workshop.common.mq.order.params.OrderParams;
 import com.epoch.loan.workshop.common.mq.remittance.RemittanceMQManager;
@@ -12,7 +14,6 @@ import com.epoch.loan.workshop.common.mq.remittance.params.DistributionRemittanc
 import com.epoch.loan.workshop.common.mq.repayment.RepaymentMQManager;
 import com.epoch.loan.workshop.common.mq.repayment.params.DistributionRepaymentParams;
 import com.epoch.loan.workshop.common.redis.RedisClient;
-import com.epoch.loan.workshop.common.util.DateUtil;
 import com.epoch.loan.workshop.common.zookeeper.ZookeeperClient;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
@@ -23,7 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -127,6 +127,12 @@ public abstract class BaseOrderMQListener {
      */
     @Autowired
     public ZookeeperClient zookeeperClient;
+
+    /**
+     * 催收还提
+     */
+    @Autowired
+    public CollectionMQManager collectionMQManager;
 
     /**
      * 获取子类消息监听
@@ -267,6 +273,21 @@ public abstract class BaseOrderMQListener {
 
         // 发送下一个模型
         orderMQManager.sendMessage(orderParams, nextTag);
+    }
+
+    /**
+     * 推送催收
+     *
+     * @param orderId
+     * @param collectionEvent
+     * @throws Exception
+     */
+    public void sendCollection(String orderId, int collectionEvent) throws Exception {
+        // 推送催收参数
+        CollectionParams collection = new CollectionParams();
+        collection.setCollectionEvent(collectionEvent);
+        collection.setOrderId(orderId);
+        collectionMQManager.sendMessage(collection, "");
     }
 
     /**

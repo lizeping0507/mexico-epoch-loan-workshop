@@ -499,7 +499,7 @@ public class Collection extends BaseCollectionMQ implements MessageListenerConcu
         userInfoParam.setCompanyName("NA");
         userInfoParam.setPosition(userInfoEntity.getOccupation());
         userInfoParam.setSalary(userInfoEntity.getMonthlyIncome());
-        userInfoParam.setLanguage(getLanguage(userInfoEntity.getRegisterAddress(), userInfoEntity.getGpsAddress()));
+        userInfoParam.setLanguage(1);
         userInfoParam.setRegisterTime(userInfoEntity.getCreateTime());
 
         // 性别
@@ -674,42 +674,6 @@ public class Collection extends BaseCollectionMQ implements MessageListenerConcu
             }
         }
         return reslut;
-    }
-
-    /**
-     * 根据地区获取语音
-     *
-     * @param address     地址
-     * @param currentCity 城市
-     * @return 语言
-     */
-    public Integer getLanguage(String address, String currentCity) {
-        // 设置语言
-        String idAddr = StringUtils.isNotBlank(address) ? address.replace("\r\n", "") : "";
-        String liveDetailAddr = StringUtils.isNotBlank(currentCity) ? currentCity.replace("\r\n", "") : "";
-        int language = 1;
-        if (idAddr.contains(CollectionField.TAMIL)) {
-            language = 2;
-        } else if (idAddr.contains(CollectionField.TELANGANA) || idAddr.contains(CollectionField.TELUGU)
-                || idAddr.contains(CollectionField.ANDHRAPRADESH)) {
-            language = 3;
-        } else if (idAddr.contains(CollectionField.KARNATAKA) || idAddr.contains(CollectionField.KANNAD)) {
-            language = 5;
-        } else if (idAddr.contains(CollectionField.BENGAL) || idAddr.contains(CollectionField.BANGALI)) {
-            language = 4;
-        } else if (idAddr.contains(CollectionField.MALAYALAM) || idAddr.contains(CollectionField.KERALA)) {
-            language = 6;
-        } else if (liveDetailAddr.contains(CollectionField.TELANGANA) || liveDetailAddr.contains(CollectionField.TELUGU)
-                || liveDetailAddr.contains(CollectionField.ANDHRAPRADESH)) {
-            language = 3;
-        } else if (liveDetailAddr.contains(CollectionField.BENGAL) || liveDetailAddr.contains(CollectionField.BANGALI)) {
-            language = 4;
-        } else if (liveDetailAddr.contains(CollectionField.KARNATAKA) || liveDetailAddr.contains(CollectionField.KANNAD)) {
-            language = 5;
-        } else if (liveDetailAddr.contains(CollectionField.MALAYALAM) || liveDetailAddr.contains(CollectionField.KERALA)) {
-            language = 6;
-        }
-        return language;
     }
 
 }

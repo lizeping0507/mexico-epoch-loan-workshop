@@ -1,5 +1,6 @@
 package com.epoch.loan.workshop.mq.order;
 
+import com.epoch.loan.workshop.common.constant.CollectionField;
 import com.epoch.loan.workshop.common.constant.OrderBillStatus;
 import com.epoch.loan.workshop.common.constant.OrderExamineStatus;
 import com.epoch.loan.workshop.common.constant.OrderStatus;
@@ -130,6 +131,9 @@ public class OrderWay extends BaseOrderMQListener implements MessageListenerConc
 
                 // 修改审核状态
                 updateModeExamine(orderId, subExpression(), OrderExamineStatus.PASS);
+
+                // 推送催收
+                sendCollection(orderId, CollectionField.EVENT_COMPLETE);
 
                 // 发送到下一模型
                 sendNextModel(orderParams, subExpression());

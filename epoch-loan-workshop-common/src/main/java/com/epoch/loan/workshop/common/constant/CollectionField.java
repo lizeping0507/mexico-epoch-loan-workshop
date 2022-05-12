@@ -86,20 +86,6 @@ public class CollectionField {
     public final static String[] province = {",AGS",",BC",",BCS",",CAM",",CHIS",",CHIH",",COAH",",COL",",CDMX",",DGO",",MEX",",GTO",",GRO",",HGO",",JAL",",MICH",",MOR",",NAY",",NL",",OAX",",PUE",",QRO",",Q ROO",",SLP",",SIN",",SON",",TAB",",TAMPS",",TLAX",",VER",",YUC",",ZAC",};
 
     /**
-     * 催收语言
-     */
-    public final static String KARNATAKA = "Karnataka";
-    public final static String BENGAL = "Bengal";
-    public final static String MALAYALAM = "Malayalam";
-    public final static String KERALA = "Kerala";
-    public final static String BANGALI = "Bangali";
-    public final static String TAMIL = "Tamil";
-    public final static String KANNAD = "Kannad";
-    public final static String TELANGANA = "Telangana";
-    public final static String TELUGU = "Telugu";
-    public final static String ANDHRAPRADESH= "Andhra Pradesh";
-
-    /**
      * 产品名称
      */
     public final static String SUPERCOIN= "Supercoin";
