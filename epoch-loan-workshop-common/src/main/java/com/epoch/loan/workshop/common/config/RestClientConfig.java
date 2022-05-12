@@ -65,7 +65,7 @@ public class RestClientConfig extends AbstractElasticsearchConfiguration {
      * 重新构建ES
      * @return
      */
-    private static RestHighLevelClient getRestHighLevelClient(RestClientBuilder builder) {
+    private RestHighLevelClient getRestHighLevelClient(RestClientBuilder builder) {
         builder.setHttpClientConfigCallback(httpClientBuilder -> {
             httpClientBuilder.setDefaultIOReactorConfig(IOReactorConfig.custom()
                     .setSoKeepAlive(true)
