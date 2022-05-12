@@ -302,6 +302,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 // 未过冷却期订单不允许再次进行申请
                 appMaskModelResult.setMaskModel(2);
                 appMaskModelResult.setButton(OrderUtils.button(OrderStatus.EXAMINE_FAIL));
+                appMaskModelResult.setOrderId(loanOrderEntity.getId());
                 appMaskModelResult.setStatusDescription(OrderUtils.statusDescription(OrderStatus.EXAMINE_FAIL));
                 result.setData(appMaskModelResult);
                 return result;
