@@ -133,7 +133,7 @@ public class OrderWay extends BaseOrderMQListener implements MessageListenerConc
                 updateModeExamine(orderId, subExpression(), OrderExamineStatus.PASS);
 
                 // 推送催收
-                sendCollection(orderId, CollectionField.EVENT_COMPLETE);
+                sendCollection(orderId, CollectionField.EVENT_CREATE);
 
                 // 发送到下一模型
                 sendNextModel(orderParams, subExpression());
