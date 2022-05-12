@@ -94,6 +94,17 @@ public enum ResultEnum {
      */
     BANK_CART_NUMBER_ERROR(4012, " La tarjeta bancaria debe tener 16 dígitos,La de CLABE debe tener 18 dígitos"),
 
+    /**
+     * 银行卡已被绑定
+     *
+     */
+    BANK_BEEN_USED_ERRO(4014, "La tarjeta bancaria ha sido vinculada"),
+
+    /**
+     * clabe已被绑定
+     */
+    CLABE_BEEN_USED_ERRO(4014, "Este CLABE ha sido vinculada"),
+
     // ======= 服务端错误 ========
     /**
      * 服务端错误
@@ -213,11 +224,6 @@ public enum ResultEnum {
      * 无可用聚道
      */
     CHANNEL_UN_DO_ERROR(10000, "No hay proveedores de servicios OCR disponibles para este canal "),
-
-    /**
-     * 设备已注册过其他账户
-     */
-    ACCOUNT_BEEN_USED_ERRO(4014, "The bank card has been used by someone else."),
     ;
 
 
