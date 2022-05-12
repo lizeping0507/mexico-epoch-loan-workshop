@@ -124,9 +124,6 @@ public class RegisterParams extends BaseParams {
         if (StringUtils.isEmpty(this.password)) {
             return false;
         }
-        if (this.password.length() < 6 || this.password.length()>16){
-            return false;
-        }
         return true;
     }
 
