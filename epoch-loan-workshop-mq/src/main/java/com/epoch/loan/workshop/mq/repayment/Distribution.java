@@ -36,13 +36,6 @@ public class Distribution extends BaseRepaymentMQListener implements MessageList
      */
     private MessageListenerConcurrently messageListener = this;
 
-    public static void main(String[] args) {
-
-        System.out.println();
-
-
-    }
-
     /**
      * 消费任务
      *
