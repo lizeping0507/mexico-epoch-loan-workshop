@@ -28,7 +28,7 @@ import java.util.List;
 @Configuration
 public class RestClientConfig extends AbstractElasticsearchConfiguration {
 
-    @Value("${spring.elastic..rest.url}")
+    @Value("${spring.elasticsearch.rest.uris}")
     private String clusterNodes;
 
     private List<HttpHost> httpHosts = new ArrayList<>();
