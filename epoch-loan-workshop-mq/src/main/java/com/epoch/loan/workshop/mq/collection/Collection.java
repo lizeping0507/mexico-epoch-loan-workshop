@@ -99,9 +99,6 @@ public class Collection extends BaseCollectionMQ implements MessageListenerConcu
                 // 订单id
                 String orderId = collectionParams.getOrderId();
 
-                // 订单账单id
-                String orderBillId = collectionParams.getOrderBillId();
-
                 // 查询订单ID
                 LoanOrderEntity loanOrderEntity = loanOrderDao.findOrder(orderId);
                 if (ObjectUtils.isEmpty(loanOrderEntity)) {
@@ -109,8 +106,8 @@ public class Collection extends BaseCollectionMQ implements MessageListenerConcu
                 }
 
                 // 根据订单账单id查询账单
-                LoanOrderBillEntity loanOrderBillEntity = loanOrderBillDao.findOrderBill(orderBillId);
-                if (ObjectUtils.isEmpty(loanOrderBillEntity)) {
+                LoanOrderBillEntity lastOrderBill = loanOrderBillDao.findLastOrderBill(orderId);
+                if (ObjectUtils.isEmpty(lastOrderBill)) {
                     continue;
                 }
 
@@ -125,14 +122,14 @@ public class Collection extends BaseCollectionMQ implements MessageListenerConcu
                 if (collectionParams.getCollectionEvent() == CollectionField.EVENT_CREATE) {
 
                     // 订单成功放款-在催收提环系统创建案件
-                    int pushRes = pushOrder(loanOrderEntity, product);
+                    int pushRes = pushOrder(loanOrderEntity, product, lastOrderBill);
                     if (CollectionField.PUSH_SUCCESS != pushRes) {
                         retryCollection(collectionParams, subExpression());
                     }
                 } else if (collectionParams.getCollectionEvent() == CollectionField.EVENT_COMPLETE) {
 
                     // 订单还款-在催收提环系统更新案件
-                    int pushRes = pushRepay(loanOrderEntity, product, loanOrderBillEntity);
+                    int pushRes = pushRepay(loanOrderEntity, product, lastOrderBill);
                     if (CollectionField.PUSH_SUCCESS != pushRes) {
                         retryCollection(collectionParams, subExpression());
                     }
@@ -142,9 +139,9 @@ public class Collection extends BaseCollectionMQ implements MessageListenerConcu
                     if (CollectionField.PUSH_REMIND == product.getReactType()) {
                         continue;
                     }
-                    int pushRes = rePushOverdue(loanOrderEntity, product);
+                    int pushRes = rePushOverdue(loanOrderEntity, product, lastOrderBill);
                     if (CollectionField.PUSH_SUCCESS != pushRes) {
-                       retryCollection(collectionParams, subExpression());
+                        retryCollection(collectionParams, subExpression());
                     }
                 }
             } catch (Exception e) {
@@ -163,14 +160,12 @@ public class Collection extends BaseCollectionMQ implements MessageListenerConcu
     /**
      * 还款推送
      *
-     * @param orderEntity         订单实体类
-     * @param product             产品类
-     * @param loanOrderBillEntity 订单账单
+     * @param orderEntity   订单实体类
+     * @param product       产品类
+     * @param lastOrderBill 最后一期订单账单
      * @return 1--推送成功  0--推送失败
      */
-    public Integer pushRepay(LoanOrderEntity orderEntity, LoanProductEntity product, LoanOrderBillEntity loanOrderBillEntity) {
-
-        LoanOrderBillEntity lastOrderBill = loanOrderBillDao.findLastOrderBill(orderEntity.getId());
+    public Integer pushRepay(LoanOrderEntity orderEntity, LoanProductEntity product, LoanOrderBillEntity lastOrderBill) {
         CollectionRepayParam repayParam = new CollectionRepayParam();
 
         // 订单信息填充
@@ -200,7 +195,7 @@ public class Collection extends BaseCollectionMQ implements MessageListenerConcu
                 collectionRepayRecordParam.setReturnedPentaltyAmount(orderEntity.getPenaltyInterest());
                 collectionRepayRecordParam.setFundType(1);
                 collectionRepayRecordParam.setRepayTime(successRecord.getUpdateTime());
-                Double reductionAmount = loanOrderBillEntity.getReductionAmount();
+                Double reductionAmount = loanOrderBillDao.sumReductionAmount(orderEntity.getId());
                 if (ObjectUtils.isNotEmpty(reductionAmount) && new BigDecimal(reductionAmount).compareTo(BigDecimal.ZERO) > 0) {
                     collectionRepayRecordParam.setRepayType(2);
                 } else {
@@ -220,13 +215,12 @@ public class Collection extends BaseCollectionMQ implements MessageListenerConcu
     /**
      * 同步逾期费用
      *
-     * @param orderEntity 订单类
-     * @param product     产品类
+     * @param orderEntity   订单类
+     * @param product       产品类
+     * @param lastOrderBill 最后一期订单账单
      * @return 1--推送成功  0--推送失败
      */
-    public Integer rePushOverdue(LoanOrderEntity orderEntity, LoanProductEntity product) {
-
-        LoanOrderBillEntity lastOrderBill = loanOrderBillDao.findLastOrderBill(orderEntity.getId());
+    public Integer rePushOverdue(LoanOrderEntity orderEntity, LoanProductEntity product, LoanOrderBillEntity lastOrderBill) {
         CollectionOverdueParam param = new CollectionOverdueParam();
         param.setOrderNo(orderEntity.getId());
 
@@ -252,12 +246,11 @@ public class Collection extends BaseCollectionMQ implements MessageListenerConcu
     /**
      * 放款订单推送
      *
-     * @param orderEntity 订单信息
-     * @param product     产品信息
+     * @param orderEntity   订单信息
+     * @param product       产品信息
+     * @param lastOrderBill 最后一期账单信息
      */
-    public Integer pushOrder(LoanOrderEntity orderEntity, LoanProductEntity product) throws Exception {
-
-        LoanOrderBillEntity lastOrderBill = loanOrderBillDao.findLastOrderBill(orderEntity.getId());
+    public Integer pushOrder(LoanOrderEntity orderEntity, LoanProductEntity product, LoanOrderBillEntity lastOrderBill) throws Exception {
         if (lastOrderBill.getStatus() == OrderBillStatus.COMPLETE || lastOrderBill.getStatus() == OrderBillStatus.DUE_COMPLETE) {
             return CollectionField.PUSH_SUCCESS;
         }
@@ -344,9 +337,9 @@ public class Collection extends BaseCollectionMQ implements MessageListenerConcu
     /**
      * 封装推送订单时的 订单信息
      *
-     * @param orderEntity   订单信息
-     * @param lastOrderBill 订单最后一笔账单
-     * @param userInfoEntity  用户信息
+     * @param orderEntity    订单信息
+     * @param lastOrderBill  订单最后一笔账单
+     * @param userInfoEntity 用户信息
      * @return 封装的订单信息
      */
     public CollectionOrderParam getOrderParam(LoanOrderEntity orderEntity, LoanOrderBillEntity lastOrderBill, LoanUserInfoEntity userInfoEntity) {
@@ -408,7 +401,7 @@ public class Collection extends BaseCollectionMQ implements MessageListenerConcu
         orderParam.setApplyProvince(getProvinceByList(userInfoEntity.getGpsAddress()));
         if (StringUtils.isNotBlank(userInfoEntity.getPapersState())) {
             orderParam.setIdProvince(userInfoEntity.getPapersState());
-        } else{
+        } else {
             orderParam.setIdProvince(getProvinceByList(userInfoEntity.getPapersAddress()));
         }
         orderParam.setRegProvince(getProvinceByList(userInfoEntity.getRegisterAddress()));
@@ -452,19 +445,19 @@ public class Collection extends BaseCollectionMQ implements MessageListenerConcu
         authInfoParam.setBankAuthResult(1);
 
         // ocr认证状况
-        if (StringUtils.isNotEmpty(userInfoEntity.getPapersId())){
+        if (StringUtils.isNotEmpty(userInfoEntity.getPapersId())) {
             authInfoParam.setIdAuthResult(1);
         } else {
             authInfoParam.setIdAuthResult(0);
         }
         // 用户信息认证状况
-        if (StringUtils.isNotEmpty(userInfoEntity.getChildrenNumber())){
+        if (StringUtils.isNotEmpty(userInfoEntity.getChildrenNumber())) {
             authInfoParam.setContactAuthResult(1);
         } else {
             authInfoParam.setContactAuthResult(0);
         }
         // 基本信息认证状况
-        if (StringUtils.isNotEmpty(userInfoEntity.getMonthlyIncome())){
+        if (StringUtils.isNotEmpty(userInfoEntity.getMonthlyIncome())) {
             authInfoParam.setPersonalAuthResult(1);
         } else {
             authInfoParam.setPersonalAuthResult(0);
@@ -476,8 +469,8 @@ public class Collection extends BaseCollectionMQ implements MessageListenerConcu
     /**
      * 封装用户基本信息
      *
-     * @param orderEntity      订单信息
-     * @param userInfoEntity       用户信息
+     * @param orderEntity    订单信息
+     * @param userInfoEntity 用户信息
      * @return 封装的用户基本信息
      */
     public CollectionUserInfoParam getUserInfoParam(LoanOrderEntity orderEntity, LoanUserInfoEntity userInfoEntity) throws Exception {

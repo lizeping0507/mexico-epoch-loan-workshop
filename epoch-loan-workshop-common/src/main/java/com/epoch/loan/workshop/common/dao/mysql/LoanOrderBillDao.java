@@ -243,6 +243,13 @@ public interface LoanOrderBillDao {
     Double sumIncidentalAmount(String orderId);
 
     /**
+     * 计算总减免费用
+     * @param orderId
+     * @return 总减免费用
+     */
+    Double sumReductionAmount(String orderId);
+
+    /**
      * 查询订单最后一期账单
      *
      * @param orderId 订单号
