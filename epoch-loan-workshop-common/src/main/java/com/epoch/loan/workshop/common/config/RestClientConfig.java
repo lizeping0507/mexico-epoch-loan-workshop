@@ -39,43 +39,21 @@ public class RestClientConfig extends AbstractElasticsearchConfiguration {
      * @return
      */
     @Override
-    @Bean
-    @ConditionalOnMissingBean
     public RestHighLevelClient elasticsearchClient() {
-        if (clusterNodes.isEmpty() && clusterNodes.contains(";") && clusterNodes.split(";").length > 0) {
-            throw new RuntimeException("集群节点不允许为空");
-        }
+        /* 使用密码
+        final CredentialsProvider credentialsProvider=new BasicCredentialsProvider();
+        credentialsProvider.setCredentials(AuthScope.ANY,new UsernamePasswordCredentials("",""));
+        */
 
-        List<String> list = Arrays.asList(clusterNodes.split(";"));
-
-        list.forEach(node -> {
-            try {
-                String[] parts = StringUtils.split(node, ":");
-                Assert.notNull(parts, "Must defined");
-                Assert.state(parts.length == 2, "Must be defined as 'host:port'");
-                httpHosts.add(new HttpHost(parts[0], Integer.parseInt(parts[1]), "http"));
-            } catch (Exception e) {
-                throw new IllegalStateException("Invalid ES nodes " + "property '" + node + "'", e);
-            }
-        });
-        RestClientBuilder builder = RestClient.builder(httpHosts.toArray(new HttpHost[0]));
-        return getRestHighLevelClient(builder);
-    }
-
-    /**
-     * 重新构建ES
-     * @return
-     */
-    private RestHighLevelClient getRestHighLevelClient(RestClientBuilder builder) {
         LogUtil.sysInfo("RestHighLevelClient install");
-        builder.setHttpClientConfigCallback(httpClientBuilder -> {
-            httpClientBuilder.setDefaultIOReactorConfig(IOReactorConfig.custom()
-                    .setSoKeepAlive(true)
-                    .build());
-            // 3分钟
-            httpClientBuilder.setKeepAliveStrategy((response, context) -> 3 * 1000 * 60);
-            return httpClientBuilder;
-        });
-        return new RestHighLevelClient(builder);
+
+        // 重新构建ES
+        RestClientBuilder restClientBuilder = RestClient.builder(new HttpHost("loan-es", 9200, "http")).setHttpClientConfigCallback(httpClientBuilder -> httpClientBuilder
+                .setDefaultIOReactorConfig(IOReactorConfig.custom()
+                        .setSoKeepAlive(true)
+                        .build()).setKeepAliveStrategy((response, context) -> 3 * 1000 * 60));
+
+        // 构建高可用方式
+        return new RestHighLevelClient(restClientBuilder);
     }
 }
