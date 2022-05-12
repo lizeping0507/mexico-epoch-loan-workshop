@@ -227,19 +227,19 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             return result;
         }
 
-        // 查询A阈值的承接盘
-        LoanMaskEntity loanMaskEntity = loanMaskDao.findLoanMaskByAppNameAndLevel(appName, "A");
-
-        // 产品id
-        String maskProductId = loanMaskEntity.getProductId();
-
-        // 查询承接盘详细信息
-        LoanProductEntity maskLoanProductEntity = loanProductDao.findProduct(maskProductId);
-
         // 指定状态的订单最后生成一个订单
         Integer[] status = new Integer[]{OrderStatus.CREATE, OrderStatus.EXAMINE_WAIT, OrderStatus.EXAMINE_PASS, OrderStatus.EXAMINE_FAIL, OrderStatus.WAIT_PAY, OrderStatus.WAY, OrderStatus.DUE, OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE};
         LoanOrderEntity loanOrderEntity = loanOrderDao.findLatelyOrderByUserIdAndStatus(userId, status);
         if (ObjectUtils.isEmpty(loanOrderEntity)) {
+            // 查询A阈值的承接盘
+            LoanMaskEntity loanMaskEntity = loanMaskDao.findLoanMaskByAppNameAndLevel(appName, "A");
+
+            // 产品id
+            String maskProductId = loanMaskEntity.getProductId();
+
+            // 查询承接盘详细信息
+            LoanProductEntity maskLoanProductEntity = loanProductDao.findProduct(maskProductId);
+
             // 生成订单
             loanOrderEntity = initOrder(params.getUser(), OrderType.MASK, appVersion, appName, "MASK", maskLoanProductEntity);
 
@@ -300,6 +300,15 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             }
 
             /*冷却期结束生成新的订单*/
+            // 查询A阈值的承接盘
+            LoanMaskEntity loanMaskEntity = loanMaskDao.findLoanMaskByAppNameAndLevel(appName, "A");
+
+            // 产品id
+            String maskProductId = loanMaskEntity.getProductId();
+
+            // 查询承接盘详细信息
+            LoanProductEntity maskLoanProductEntity = loanProductDao.findProduct(maskProductId);
+
             // 生成订单
             loanOrderEntity = initOrder(params.getUser(), OrderType.MASK, appVersion, appName, "MASK", maskLoanProductEntity);
 
@@ -325,8 +334,8 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         }
 
         /*已经有在途订单*/
-        // 查询A阈值的承接盘
-        loanMaskEntity = loanMaskDao.findLoanMaskByAppNameAndProductId(appName, productId);
+        // 查询承接盘
+        LoanMaskEntity loanMaskEntity = loanMaskDao.findLoanMaskByAppNameAndProductId(appName, productId);
 
         // 如果阈值为A在途订单就进入贷超模式
         if (loanMaskEntity.getLevel().equals("A") && orderStatus >= OrderStatus.WAY) {
