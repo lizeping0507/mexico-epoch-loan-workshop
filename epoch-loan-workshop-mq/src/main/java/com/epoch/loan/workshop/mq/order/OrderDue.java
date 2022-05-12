@@ -1,5 +1,6 @@
 package com.epoch.loan.workshop.mq.order;
 
+import com.epoch.loan.workshop.common.constant.CollectionField;
 import com.epoch.loan.workshop.common.constant.OrderBillStatus;
 import com.epoch.loan.workshop.common.constant.OrderStatus;
 import com.epoch.loan.workshop.common.constant.RedisKeyField;
@@ -128,6 +129,9 @@ public class OrderDue extends BaseOrderMQListener implements MessageListenerConc
 
                 // 更新订单状态为逾期
                 updateOrderStatus(orderId, OrderStatus.DUE);
+
+                // 推送催收
+                sendCollection(orderId, CollectionField.EVENT_DUE);
 
                 // 删除计算标识
                 redisClient.del(RedisKeyField.ORDER_BILL_DUE_LOCK + orderId);

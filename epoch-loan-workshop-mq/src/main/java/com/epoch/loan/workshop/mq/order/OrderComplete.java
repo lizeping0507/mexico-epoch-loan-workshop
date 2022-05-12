@@ -1,5 +1,6 @@
 package com.epoch.loan.workshop.mq.order;
 
+import com.epoch.loan.workshop.common.constant.CollectionField;
 import com.epoch.loan.workshop.common.constant.OrderBillStatus;
 import com.epoch.loan.workshop.common.constant.OrderStatus;
 import com.epoch.loan.workshop.common.constant.RedisKeyField;
@@ -151,6 +152,9 @@ public class OrderComplete extends BaseOrderMQListener implements MessageListene
 
                     // 更新订单状态
                     updateOrderStatus(orderId, orderStatus);
+
+                    // 推送催收
+                    sendCollection(orderId, CollectionField.EVENT_COMPLETE);
                 }
             } catch (Exception e) {
                 try {
