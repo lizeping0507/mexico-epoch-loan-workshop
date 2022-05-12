@@ -28,11 +28,6 @@ import java.util.List;
 @Configuration
 public class RestClientConfig extends AbstractElasticsearchConfiguration {
 
-    @Value("${spring.elasticsearch.rest.uris}")
-    private String clusterNodes;
-
-    private List<HttpHost> httpHosts = new ArrayList<>();
-
     /**
      * 高可用构建
      *
@@ -51,7 +46,7 @@ public class RestClientConfig extends AbstractElasticsearchConfiguration {
         RestClientBuilder restClientBuilder = RestClient.builder(new HttpHost("loan-es", 9200, "http")).setHttpClientConfigCallback(httpClientBuilder -> httpClientBuilder
                 .setDefaultIOReactorConfig(IOReactorConfig.custom()
                         .setSoKeepAlive(true)
-                        .build()).setKeepAliveStrategy((response, context) -> 3 * 1000 * 60));
+                        .build()));
 
         // 构建高可用方式
         return new RestHighLevelClient(restClientBuilder);
