@@ -103,7 +103,7 @@ public class OcrController extends BaseController {
             if (!params.isLivenessIdLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":livenessId");
+                result.setMessage(ResultEnum.PARAM_ERROR.message());
                 return result;
             }
 

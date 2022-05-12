@@ -118,8 +118,8 @@ public class RemittanceServiceImpl extends BaseService implements RemittanceServ
         LoanRemittanceAccountEntity loanRemittanceAccount = loanRemittanceAccountDao.findByAccountNumber(accountNumber);
         if (ObjectUtils.isNotEmpty(loanRemittanceAccount)){
             // 卡号已存在
-            result.setMessage(ResultEnum.PARAM_ERROR.message());
-            result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+            result.setMessage(ResultEnum.ACCOUNT_BEEN_USED_ERRO.message());
+            result.setReturnCode(ResultEnum.ACCOUNT_BEEN_USED_ERRO.code());
             return result;
         }
 
