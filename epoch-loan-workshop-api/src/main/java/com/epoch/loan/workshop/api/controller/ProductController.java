@@ -61,6 +61,7 @@ public class ProductController extends BaseController {
     @Authentication
     @PostMapping(URL.APP_MASK_MODEL)
     public Result<AppMaskModelResult> appMaskModel(BaseParams params) {
+        LogUtil.sysInfo("获取App模式: {}", JSONObject.toJSONString(params));
         // 结果集
         Result<AppMaskModelResult> result = new Result<>();
 
