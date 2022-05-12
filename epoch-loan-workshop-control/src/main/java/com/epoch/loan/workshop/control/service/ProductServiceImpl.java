@@ -172,6 +172,14 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         // 用户id
         String userId = params.getUser().getId();
 
+        // 更新地址
+        String gps = params.getGps();
+        String gpsAddress = params.getGpsAddress();
+        if (StringUtils.isNotEmpty(gps) || StringUtils.isNotEmpty(gpsAddress)){
+            loanUserInfoDao.updateUserGpsMsg(userId, gps, gpsAddress, new Date());
+            tokenManager.updateUserCache(userId);
+        }
+
         // app名称
         String appName = params.getUser().getAppName();
 
