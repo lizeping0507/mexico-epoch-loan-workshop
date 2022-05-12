@@ -236,7 +236,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         // 查询承接盘详细信息
         LoanProductEntity maskLoanProductEntity = loanProductDao.findProduct(maskProductId);
 
-        // 没有指定产品指定状态的订单最后生成一个订单
+        // 指定状态的订单最后生成一个订单
         Integer[] status = new Integer[]{OrderStatus.CREATE, OrderStatus.EXAMINE_WAIT, OrderStatus.EXAMINE_PASS, OrderStatus.EXAMINE_FAIL, OrderStatus.WAIT_PAY, OrderStatus.WAY, OrderStatus.DUE, OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE};
         LoanOrderEntity loanOrderEntity = loanOrderDao.findLatelyOrderByUserIdAndStatus(userId, status);
         if (ObjectUtils.isEmpty(loanOrderEntity)) {
