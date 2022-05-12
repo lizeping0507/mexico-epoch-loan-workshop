@@ -368,6 +368,12 @@ public class UserController extends BaseController {
                 result.setMessage(ResultEnum.PARAM_ERROR.message() + ":CustomDateOfBirthL");
                 return result;
             }
+            if (!params.isEmailLegal()) {
+                // 异常返回结果
+                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
+                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":Email");
+                return result;
+            }
             if (!params.isCustomGenterLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
