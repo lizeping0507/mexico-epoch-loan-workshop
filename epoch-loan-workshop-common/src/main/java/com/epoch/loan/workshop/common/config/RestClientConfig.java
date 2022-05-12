@@ -1,5 +1,6 @@
 package com.epoch.loan.workshop.common.config;
 
+import com.epoch.loan.workshop.common.util.LogUtil;
 import org.apache.http.HttpHost;
 import org.apache.http.impl.nio.reactor.IOReactorConfig;
 import org.elasticsearch.client.RestClient;
@@ -66,6 +67,7 @@ public class RestClientConfig extends AbstractElasticsearchConfiguration {
      * @return
      */
     private RestHighLevelClient getRestHighLevelClient(RestClientBuilder builder) {
+        LogUtil.sysInfo("RestHighLevelClient install");
         builder.setHttpClientConfigCallback(httpClientBuilder -> {
             httpClientBuilder.setDefaultIOReactorConfig(IOReactorConfig.custom()
                     .setSoKeepAlive(true)
