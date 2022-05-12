@@ -231,17 +231,17 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         LoanMaskEntity loanMaskEntity = loanMaskDao.findLoanMaskByAppNameAndLevel(appName, "A");
 
         // 产品id
-        String productId = loanMaskEntity.getProductId();
+        String maskProductId = loanMaskEntity.getProductId();
 
         // 查询承接盘详细信息
-        LoanProductEntity loanProductEntity = loanProductDao.findProduct(productId);
+        LoanProductEntity maskLoanProductEntity = loanProductDao.findProduct(maskProductId);
 
         // 没有指定产品指定状态的订单最后生成一个订单
         Integer[] status = new Integer[]{OrderStatus.CREATE, OrderStatus.EXAMINE_WAIT, OrderStatus.EXAMINE_PASS, OrderStatus.EXAMINE_FAIL, OrderStatus.WAIT_PAY, OrderStatus.WAY, OrderStatus.DUE, OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE};
-        LoanOrderEntity loanOrderEntity = loanOrderDao.findLatelyOrderByUserIdAndProductIdAndStatus(userId, productId, status);
+        LoanOrderEntity loanOrderEntity = loanOrderDao.findLatelyOrderByUserIdAndStatus(userId, status);
         if (ObjectUtils.isEmpty(loanOrderEntity)) {
             // 生成订单
-            loanOrderEntity = initOrder(params.getUser(), OrderType.MASK, appVersion, appName, "MASK", loanProductEntity);
+            loanOrderEntity = initOrder(params.getUser(), OrderType.MASK, appVersion, appName, "MASK", maskLoanProductEntity);
 
             // 订单是否创建成功
             if (ObjectUtils.isEmpty(loanOrderEntity)) {
@@ -269,6 +269,9 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
         // 订单状态
         Integer orderStatus = loanOrderEntity.getStatus();
+
+        // 产品id
+        String productId = loanOrderEntity.getProductId();
 
         /* 判断订单状态是否已经结清*/
         if (orderStatus == OrderStatus.DUE_COMPLETE || orderStatus == OrderStatus.COMPLETE) {
@@ -298,7 +301,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
             /*冷却期结束生成新的订单*/
             // 生成订单
-            loanOrderEntity = initOrder(params.getUser(), OrderType.MASK, appVersion, appName, "MASK", loanProductEntity);
+            loanOrderEntity = initOrder(params.getUser(), OrderType.MASK, appVersion, appName, "MASK", maskLoanProductEntity);
 
             // 订单是否创建成功
             if (ObjectUtils.isEmpty(loanOrderEntity)) {
@@ -322,6 +325,9 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         }
 
         /*已经有在途订单*/
+        // 查询A阈值的承接盘
+        loanMaskEntity = loanMaskDao.findLoanMaskByAppNameAndProductId(appName, productId);
+
         // 如果阈值为A在途订单就进入贷超模式
         if (loanMaskEntity.getLevel().equals("A") && orderStatus >= OrderStatus.WAY) {
             // 返回结果
