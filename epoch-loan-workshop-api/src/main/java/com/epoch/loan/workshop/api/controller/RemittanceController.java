@@ -68,8 +68,8 @@ public class RemittanceController extends BaseController {
             // 验证请求参数是否合法
             if (!addRemittanceAccountParams.isAccountNumberLegal()) {
                 // 异常返回结果
-                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":accountNumber");
+                result.setReturnCode(ResultEnum.BANK_CART_NUMBER_ERROR.code());
+                result.setMessage(ResultEnum.BANK_CART_NUMBER_ERROR.message());
                 return result;
             }
 
