@@ -41,35 +41,35 @@ public class SdkController extends BaseController {
             if (!params.isOrderNoLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":orderNo");
+                result.setMessage(ResultEnum.PARAM_ERROR.message() );
                 return result;
             }
 
             if (!params.isReportStatusLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":reportStatus");
+                result.setMessage(ResultEnum.PARAM_ERROR.message()  );
                 return result;
             }
 
             if (!params.isCodeLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":code");
+                result.setMessage(ResultEnum.PARAM_ERROR.message() );
                 return result;
             }
 
             if (!params.isMessageLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":message");
+                result.setMessage(ResultEnum.PARAM_ERROR.message()  );
                 return result;
             }
 
             if (!params.isTypeLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":type");
+                result.setMessage(ResultEnum.PARAM_ERROR.message());
                 return result;
             }
 

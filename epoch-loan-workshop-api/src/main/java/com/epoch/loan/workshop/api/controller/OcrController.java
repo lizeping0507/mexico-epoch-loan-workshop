@@ -163,42 +163,42 @@ public class OcrController extends BaseController {
             if (!params.isFrontJsonLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":frontJson");
+                result.setMessage(ResultEnum.PARAM_ERROR.message());
                 return result;
             }
 
             if (!params.isBackJsonLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":backJson");
+                result.setMessage(ResultEnum.PARAM_ERROR.message());
                 return result;
             }
 
             if (!params.isNameLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":name");
+                result.setMessage(ResultEnum.PARAM_ERROR.message());
                 return result;
             }
 
             if (!params.isFatherNameLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":fatherName");
+                result.setMessage(ResultEnum.PARAM_ERROR.message());
                 return result;
             }
 
             if (!params.isMotherNameLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":motherName");
+                result.setMessage(ResultEnum.PARAM_ERROR.message() );
                 return result;
             }
 
             if (!params.isCurpLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":curp");
+                result.setMessage(ResultEnum.PARAM_ERROR.message() );
                 return result;
             }
 
@@ -284,7 +284,7 @@ public class OcrController extends BaseController {
             if (!params.isImageTypeLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":imageType");
+                result.setMessage(ResultEnum.PARAM_ERROR.message() );
                 return result;
             }
 
