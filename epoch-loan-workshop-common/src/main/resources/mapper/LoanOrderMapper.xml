@@ -220,5 +220,21 @@
         ORDER BY create_time DESC
         LIMIT 0,1
     </select>
+    <select id="findLatelyOrderByUserIdAndStatus"
+            resultType="com.epoch.loan.workshop.common.entity.mysql.LoanOrderEntity">
+        SELECT
+        *
+        FROM
+        loan_order
+        WHERE
+        user_id = #{userId}
+        AND
+        status in
+        <foreach collection="array" item="sts" index="index" open="(" close=")" separator=",">
+            #{sts}
+        </foreach>
+        ORDER BY create_time DESC
+        LIMIT 0,1
+    </select>
 
 </mapper>

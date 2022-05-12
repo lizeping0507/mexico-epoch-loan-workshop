@@ -317,4 +317,13 @@ public interface LoanOrderDao {
      * @return
      */
     LoanOrderEntity findLatelyOrderByUserIdAndProductIdAndStatus(String userId, String productId, @Param("array") Integer[] status);
+
+    /**
+     * 根据用户Id订单状态，查询距离当前时间最近的一笔订单
+     *
+     * @param userId
+     * @param status
+     * @return
+     */
+    LoanOrderEntity findLatelyOrderByUserIdAndStatus(String userId, @Param("array") Integer[] status);
 }
