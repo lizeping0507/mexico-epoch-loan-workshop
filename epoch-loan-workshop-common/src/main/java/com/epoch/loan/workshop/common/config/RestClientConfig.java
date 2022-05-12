@@ -34,53 +34,24 @@ public class RestClientConfig extends AbstractElasticsearchConfiguration {
     @Value("${spring.elasticsearch.rest.ssl}")
     private String clusterSSL;
 
-    private List<HttpHost> httpHosts = new ArrayList<>();
-
     /**
      * 高可用构建
      *
      * @return
      */
     @Override
-    @Bean
-    @ConditionalOnMissingBean
     public RestHighLevelClient elasticsearchClient() {
-        if (clusterNodes.isEmpty() && clusterNodes.contains(",") && clusterNodes.split(",").length > 0) {
-            throw new RuntimeException("集群节点不允许为空");
-        }
-
-        List<String> list = Arrays.asList(clusterNodes.split(","));
-
-        list.forEach(node -> {
-            try {
-                if (StringUtils.isNotBlank(node)) {
-                    String[] parts = StringUtils.split(node, ":");
-                    Assert.notNull(parts, "Must defined");
-                    Assert.state(parts.length == 2, "Must be defined as 'host:port'");
-                    httpHosts.add(new HttpHost(parts[0], Integer.parseInt(parts[1]), clusterSSL));
-                }
-            } catch (Exception e) {
-                throw new IllegalStateException("Invalid ES nodes " + "property '" + node + "'", e);
-            }
-        });
-        RestClientBuilder builder = RestClient.builder(httpHosts.toArray(new HttpHost[0]));
-        return getRestHighLevelClient(builder);
-    }
-
-    /**
-     * 重新构建ES
-     * @return
-     */
-    private RestHighLevelClient getRestHighLevelClient(RestClientBuilder builder) {
         LogUtil.sysInfo("RestHighLevelClient install");
-        builder.setHttpClientConfigCallback(httpClientBuilder -> {
-            httpClientBuilder.setDefaultIOReactorConfig(IOReactorConfig.custom()
-                    .setSoKeepAlive(true)
-                    .build());
-            // 3分钟
-            httpClientBuilder.setKeepAliveStrategy((response, context) -> 3 * 1000 * 60);
-            return httpClientBuilder;
-        });
-        return new RestHighLevelClient(builder);
+
+        String[] split = clusterNodes.split(":");
+
+        // 重新构建ES
+        RestClientBuilder restClientBuilder = RestClient.builder(new HttpHost(split[0], Integer.parseInt(split[1]) , clusterSSL)).setHttpClientConfigCallback(httpClientBuilder -> httpClientBuilder
+                .setDefaultIOReactorConfig(IOReactorConfig.custom()
+                        .setSoKeepAlive(true)
+                        .build()).setKeepAliveStrategy((response, context) -> 3 * 1000 * 60));
+
+        // 构建高可用方式
+        return new RestHighLevelClient(restClientBuilder);
     }
 }
