@@ -1,13 +1,21 @@
 package com.epoch.loan.workshop.common.config;
 
-import com.epoch.loan.workshop.common.util.LogUtil;
 import org.apache.http.HttpHost;
 import org.apache.http.impl.nio.reactor.IOReactorConfig;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.elasticsearch.config.AbstractElasticsearchConfiguration;
+import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author : Duke
@@ -19,27 +27,53 @@ import org.springframework.data.elasticsearch.config.AbstractElasticsearchConfig
 @Configuration
 public class RestClientConfig extends AbstractElasticsearchConfiguration {
 
+    @Value("${spring.elastic..rest.url}")
+    private String clusterNodes;
+
+    private List<HttpHost> httpHosts = new ArrayList<>();
+
     /**
      * 高可用构建
      *
      * @return
      */
     @Override
+    @Bean
+    @ConditionalOnMissingBean
     public RestHighLevelClient elasticsearchClient() {
-        /* 使用密码
-        final CredentialsProvider credentialsProvider=new BasicCredentialsProvider();
-        credentialsProvider.setCredentials(AuthScope.ANY,new UsernamePasswordCredentials("",""));
-        */
+        if (clusterNodes.isEmpty() && clusterNodes.contains(";") && clusterNodes.split(";").length > 0) {
+            throw new RuntimeException("集群节点不允许为空");
+        }
 
-        LogUtil.sysInfo("RestHighLevelClient install");
+        List<String> list = Arrays.asList(clusterNodes.split(";"));
 
-        // 重新构建ES
-        RestClientBuilder restClientBuilder = RestClient.builder(new HttpHost("loan-es", 9200, "http")).setHttpClientConfigCallback(httpClientBuilder -> httpClientBuilder
-                .setDefaultIOReactorConfig(IOReactorConfig.custom()
-                        .setSoKeepAlive(true)
-                        .build()));
+        list.forEach(node -> {
+            try {
+                String[] parts = StringUtils.split(node, ":");
+                Assert.notNull(parts, "Must defined");
+                Assert.state(parts.length == 2, "Must be defined as 'host:port'");
+                httpHosts.add(new HttpHost(parts[0], Integer.parseInt(parts[1]), "http"));
+            } catch (Exception e) {
+                throw new IllegalStateException("Invalid ES nodes " + "property '" + node + "'", e);
+            }
+        });
+        RestClientBuilder builder = RestClient.builder(httpHosts.toArray(new HttpHost[0]));
+        return getRestHighLevelClient(builder);
+    }
 
-        // 构建高可用方式
-        return new RestHighLevelClient(restClientBuilder);
+    /**
+     * 重新构建ES
+     * @return
+     */
+    private static RestHighLevelClient getRestHighLevelClient(RestClientBuilder builder) {
+        builder.setHttpClientConfigCallback(httpClientBuilder -> {
+            httpClientBuilder.setDefaultIOReactorConfig(IOReactorConfig.custom()
+                    .setSoKeepAlive(true)
+                    .build());
+            // 3分钟
+            httpClientBuilder.setKeepAliveStrategy((response, context) -> 3 * 1000 * 60);
+            return httpClientBuilder;
+        });
+        return new RestHighLevelClient(builder);
     }
 }
