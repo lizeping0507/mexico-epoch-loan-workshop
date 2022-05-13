@@ -28,6 +28,7 @@ import org.apache.rocketmq.common.message.MessageExt;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
+import sun.rmi.runtime.Log;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -352,7 +353,7 @@ public class Collection extends BaseCollectionMQ implements MessageListenerConcu
         orderParam.setLoanAmount(orderEntity.getApprovalAmount());
         orderParam.setActualLoanAmount(orderEntity.getActualAmount());
         orderParam.setShouldRepayAmount(orderEntity.getEstimatedRepaymentAmount());
-        orderParam.setThirdUserId(Long.valueOf(orderEntity.getUserId()));
+        orderParam.setThirdUserId(orderEntity.getUserId());
         orderParam.setSettledTime(lastOrderBill.getActualRepaymentTime());
 
         if (ObjectUtils.isNotEmpty(orderEntity.getActualRepaymentAmount())) {
@@ -477,7 +478,7 @@ public class Collection extends BaseCollectionMQ implements MessageListenerConcu
         LoanRemittanceAccountEntity remittanceAccount = loanRemittanceAccountDao.findRemittanceAccount(orderEntity.getBankCardId());
 
         CollectionUserInfoParam userInfoParam = new CollectionUserInfoParam();
-        userInfoParam.setThirdUserId(Long.valueOf(orderEntity.getUserId()));
+        userInfoParam.setThirdUserId(orderEntity.getUserId());
         userInfoParam.setName(userInfoEntity.getPapersFullName());
         userInfoParam.setAadharrNo(userInfoEntity.getPapersId());
         userInfoParam.setPhone(userInfoEntity.getMobile());
