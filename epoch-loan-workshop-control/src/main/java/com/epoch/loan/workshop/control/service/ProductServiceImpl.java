@@ -304,6 +304,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 appMaskModelResult.setButton(OrderUtils.button(OrderStatus.EXAMINE_FAIL));
                 appMaskModelResult.setOrderId(loanOrderEntity.getId());
                 appMaskModelResult.setOrderStatus(loanOrderEntity.getStatus());
+                appMaskModelResult.setApplyTime(loanOrderEntity.getApplyTime());
                 appMaskModelResult.setStatusDescription(OrderUtils.statusDescription(OrderStatus.EXAMINE_FAIL));
                 result.setData(appMaskModelResult);
                 return result;
@@ -365,13 +366,13 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             LoanOrderBillEntity loanOrderBillEntity = loanOrderBillDao.findOrderBillFastStagesByStatusAndOrderId(orderId, statusArray);
 
             // 还款时间
-            appMaskModelResult.setRepaymentTime(DateUtil.DateToString(loanOrderBillEntity.getRepaymentTime(), "yyyy-MM-dd"));
+            appMaskModelResult.setRepaymentTime(DateUtil.DateToString(loanOrderBillEntity.getRepaymentTime(), "d-M-yyyy"));
 
             // 应还金额
             appMaskModelResult.setAmount(String.valueOf(loanOrderBillEntity.getRepaymentAmount() - loanOrderBillEntity.getReductionAmount()));
         }else if (orderStatus > OrderStatus.CREATE){
             // 还款时间
-            appMaskModelResult.setRepaymentTime(DateUtil.DateToString(DateUtil.addDay(new Date() , 7), "yyyy-MM-dd"));
+            appMaskModelResult.setRepaymentTime(DateUtil.DateToString(DateUtil.addDay(new Date() , 7), "d-M-yyyy"));
         }
 
         // 返回结果
