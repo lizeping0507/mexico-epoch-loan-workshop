@@ -67,49 +67,49 @@ public class UserController extends BaseController {
             if (!registerParams.isMobileLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":mobile");
+                result.setMessage(ResultEnum.PARAM_ERROR.message());
                 return result;
             }
 
             if (!registerParams.isPasswordLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":password");
+                result.setMessage(ResultEnum.PARAM_ERROR.message());
                 return result;
             }
 
             if (!registerParams.isSmsCodeLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":smsCode");
+                result.setMessage(ResultEnum.PARAM_ERROR.message() );
                 return result;
             }
 
             if (!registerParams.isAndroidIdLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":androidId");
+                result.setMessage(ResultEnum.PARAM_ERROR.message());
                 return result;
             }
 
             if (!registerParams.isPlatformLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":platform");
+                result.setMessage(ResultEnum.PARAM_ERROR.message());
                 return result;
             }
 
             if (!registerParams.isGaIdLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":gaId");
+                result.setMessage(ResultEnum.PARAM_ERROR.message());
                 return result;
             }
 
             if (!registerParams.isImeiLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":imei");
+                result.setMessage(ResultEnum.PARAM_ERROR.message());
                 return result;
             }
 
@@ -143,13 +143,13 @@ public class UserController extends BaseController {
             if (!loginParams.isLoginNameLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":loginName");
+                result.setMessage(ResultEnum.PARAM_ERROR.message() );
                 return result;
             }
             if (!loginParams.isPasswordNameLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":password");
+                result.setMessage(ResultEnum.PARAM_ERROR.message() );
                 return result;
             }
 
@@ -184,25 +184,25 @@ public class UserController extends BaseController {
             if (!modifyPasswordParams.isPhoneNumberLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":PhoneNumber");
+                result.setMessage(ResultEnum.PARAM_ERROR.message() );
                 return result;
             }
             if (!modifyPasswordParams.isOldPasswordLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":OldPassword");
+                result.setMessage(ResultEnum.PARAM_ERROR.message() );
                 return result;
             }
             if (!modifyPasswordParams.isNewPasswordLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":NewPassword");
+                result.setMessage(ResultEnum.PARAM_ERROR.message() );
                 return result;
             }
             if (!modifyPasswordParams.isEnterPasswordLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":EnterPassword");
+                result.setMessage(ResultEnum.PARAM_ERROR.message() );
                 return result;
             }
             // 更新密码
@@ -234,21 +234,21 @@ public class UserController extends BaseController {
             if (!forgotPwdParams.isPasswdLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":Passwd");
+                result.setMessage(ResultEnum.PARAM_ERROR.message()  );
                 return result;
             }
             // 参数校验
             if (!forgotPwdParams.isPhoneNumberLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":PhoneNumber");
+                result.setMessage(ResultEnum.PARAM_ERROR.message() );
                 return result;
             }
             // 参数校验
             if (!forgotPwdParams.isSmsCodeLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":SmsCode");
+                result.setMessage(ResultEnum.PARAM_ERROR.message() );
                 return result;
             }
 
@@ -309,31 +309,31 @@ public class UserController extends BaseController {
             if (!params.isMonthlyIncomeLegal() ) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() +":MonthlyIncome");
+                result.setMessage(ResultEnum.PARAM_ERROR.message() );
                 return result;
             }
             if (!params.isPayPeriodLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":PayPeriodL");
+                result.setMessage(ResultEnum.PARAM_ERROR.message() );
                 return result;
             }
             if (!params.isOccupationLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":OccupationL");
+                result.setMessage(ResultEnum.PARAM_ERROR.message() );
                 return result;
             }
             if (!params.isPayMethodLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":PayMethodL");
+                result.setMessage(ResultEnum.PARAM_ERROR.message() );
                 return result;
             }
             if (!params.isContactsLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":ContactsL");
+                result.setMessage(ResultEnum.PARAM_ERROR.message() );
                 return result;
             }
             // 保存个人信息
@@ -365,49 +365,49 @@ public class UserController extends BaseController {
             if (!params.isCustomDateOfBirthLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":CustomDateOfBirthL");
+                result.setMessage(ResultEnum.PARAM_ERROR.message() );
                 return result;
             }
             if (!params.isEmailLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":Email");
+                result.setMessage(ResultEnum.PARAM_ERROR.message() );
                 return result;
             }
             if (!params.isCustomGenterLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":CustomGenterL");
+                result.setMessage(ResultEnum.PARAM_ERROR.message() );
                 return result;
             }
             if (!params.isChildrenNumberLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":ChildrenNumberL");
+                result.setMessage(ResultEnum.PARAM_ERROR.message() );
                 return result;
             }
             if (!params.isLiveTypeLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":LiveTypeL");
+                result.setMessage(ResultEnum.PARAM_ERROR.message() );
                 return result;
             }
             if (!params.isEducationLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":EducationL");
+                result.setMessage(ResultEnum.PARAM_ERROR.message()  );
                 return result;
             }
             if (!params.isMaritalLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":MaritalL");
+                result.setMessage(ResultEnum.PARAM_ERROR.message() );
                 return result;
             }
             if (!params.isLoanPurposeLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":LoanPurposeL");
+                result.setMessage(ResultEnum.PARAM_ERROR.message()  );
                 return result;
             }
             // 获取个人信息

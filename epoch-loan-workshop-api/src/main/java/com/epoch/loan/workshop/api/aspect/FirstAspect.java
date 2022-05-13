@@ -194,6 +194,18 @@ public class FirstAspect {
             jsonParams.put(Field.CHANNEL_CODE, channelCode);
         }
 
+        // gps
+        String gps = request.getHeader(Field.GPS);
+        if (StringUtils.isNotEmpty(channelCode)) {
+            jsonParams.put(Field.GPS, gps);
+        }
+
+        // gpsAddress
+        String gpsAddress = request.getHeader(Field.GPS_ADDRESS);
+        if (StringUtils.isNotEmpty(channelCode)) {
+            jsonParams.put(Field.GPS_ADDRESS, gpsAddress);
+        }
+
         // 用户信息
         Object objectUser = request.getAttribute(Field.USER);
         if (ObjectUtils.isNotEmpty(objectUser)) {

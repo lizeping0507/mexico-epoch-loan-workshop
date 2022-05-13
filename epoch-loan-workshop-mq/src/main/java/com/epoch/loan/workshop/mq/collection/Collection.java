@@ -28,6 +28,7 @@ import org.apache.rocketmq.common.message.MessageExt;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
+import sun.rmi.runtime.Log;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -352,7 +353,7 @@ public class Collection extends BaseCollectionMQ implements MessageListenerConcu
         orderParam.setLoanAmount(orderEntity.getApprovalAmount());
         orderParam.setActualLoanAmount(orderEntity.getActualAmount());
         orderParam.setShouldRepayAmount(orderEntity.getEstimatedRepaymentAmount());
-        orderParam.setThirdUserId(Long.valueOf(orderEntity.getUserId()));
+        orderParam.setThirdUserId(orderEntity.getUserId());
         orderParam.setSettledTime(lastOrderBill.getActualRepaymentTime());
 
         if (ObjectUtils.isNotEmpty(orderEntity.getActualRepaymentAmount())) {
@@ -477,12 +478,16 @@ public class Collection extends BaseCollectionMQ implements MessageListenerConcu
         LoanRemittanceAccountEntity remittanceAccount = loanRemittanceAccountDao.findRemittanceAccount(orderEntity.getBankCardId());
 
         CollectionUserInfoParam userInfoParam = new CollectionUserInfoParam();
-        userInfoParam.setThirdUserId(Long.valueOf(orderEntity.getUserId()));
+        userInfoParam.setThirdUserId(orderEntity.getUserId());
         userInfoParam.setName(userInfoEntity.getPapersFullName());
         userInfoParam.setAadharrNo(userInfoEntity.getPapersId());
         userInfoParam.setPhone(userInfoEntity.getMobile());
         userInfoParam.setPhoneType("NA");
-        userInfoParam.setAge(userInfoEntity.getPapersAge());
+        if (ObjectUtils.isNotEmpty(userInfoEntity.getPapersAge())){
+            userInfoParam.setAge(userInfoEntity.getPapersAge());
+        } else if (ObjectUtils.isNotEmpty(userInfoEntity.getCustomAge())){
+            userInfoParam.setAge(Integer.parseInt(userInfoEntity.getCustomAge()));
+        }
         userInfoParam.setEmail(userInfoEntity.getEmail());
         userInfoParam.setBankName(remittanceAccount.getBank());
         userInfoParam.setBankAccount(remittanceAccount.getAccountNumber());
@@ -519,6 +524,12 @@ public class Collection extends BaseCollectionMQ implements MessageListenerConcu
         String adFrontUrl = loanMiNioClient.upload(userFileBucketName, userInfoEntity.getFrontPath(), frontImgInfo);
         String adBackUrl = loanMiNioClient.upload(userFileBucketName, userInfoEntity.getBackPath(), backImgInfo);
         String livingUrl = loanMiNioClient.upload(userFileBucketName, userInfoEntity.getFacePath(), livingImgInfo);
+
+        // 此时照片连接为 http://loan-2:9000/mxg-react-user-img/usr/id/626b9aece4b0a52f73e99d96/face/30851954194444.jpeg
+        // 照片连接需改成外网可访问的 http://collectionloan.fortuneloan.net/minio/mxg-react-user-img/usr/id/626b9aece4b0a52f73e99d96/face/30851954194444.jpeg
+        adFrontUrl = adFrontUrl.replaceFirst(adFrontUrl.substring(0,adFrontUrl.indexOf(userFileBucketName)-1),CollectionField.MINIO_STATIC_URL_PRE);
+        adBackUrl = adBackUrl.replaceFirst(adBackUrl.substring(0,adBackUrl.indexOf(userFileBucketName)-1),CollectionField.MINIO_STATIC_URL_PRE);
+        livingUrl = livingUrl.replaceFirst(livingUrl.substring(0,livingUrl.indexOf(userFileBucketName)-1),CollectionField.MINIO_STATIC_URL_PRE);
 
         // 添加minio图片链接
         userInfoParam.setAadFrontImg(adFrontUrl);

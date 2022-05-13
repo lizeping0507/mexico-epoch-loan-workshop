@@ -302,6 +302,9 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 // 未过冷却期订单不允许再次进行申请
                 appMaskModelResult.setMaskModel(2);
                 appMaskModelResult.setButton(OrderUtils.button(OrderStatus.EXAMINE_FAIL));
+                appMaskModelResult.setOrderId(loanOrderEntity.getId());
+                appMaskModelResult.setOrderStatus(loanOrderEntity.getStatus());
+                appMaskModelResult.setApplyTime(loanOrderEntity.getApplyTime());
                 appMaskModelResult.setStatusDescription(OrderUtils.statusDescription(OrderStatus.EXAMINE_FAIL));
                 result.setData(appMaskModelResult);
                 return result;
@@ -363,13 +366,13 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             LoanOrderBillEntity loanOrderBillEntity = loanOrderBillDao.findOrderBillFastStagesByStatusAndOrderId(orderId, statusArray);
 
             // 还款时间
-            appMaskModelResult.setRepaymentTime(DateUtil.DateToString(loanOrderBillEntity.getRepaymentTime(), "yyyy-MM-dd"));
+            appMaskModelResult.setRepaymentTime(DateUtil.DateToString(loanOrderBillEntity.getRepaymentTime(), "d-M-yyyy"));
 
             // 应还金额
             appMaskModelResult.setAmount(String.valueOf(loanOrderBillEntity.getRepaymentAmount() - loanOrderBillEntity.getReductionAmount()));
         }else if (orderStatus > OrderStatus.CREATE){
             // 还款时间
-            appMaskModelResult.setRepaymentTime(DateUtil.DateToString(DateUtil.addDay(new Date() , 7), "yyyy-MM-dd"));
+            appMaskModelResult.setRepaymentTime(DateUtil.DateToString(DateUtil.addDay(new Date() , 7), "d-M-yyyy"));
         }
 
         // 返回结果
@@ -461,6 +464,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             // 封装
             ProductList productList = new ProductList();
             BeansUtil.copyProperties(loanProductEntity,productList);
+            productList.setInterest(loanProductEntity.getInterest() + "%/Dia");
             productList.setPassRate("");
             productList.setButton(OrderUtils.button(loanOrderEntity.getStatus()));
             productList.setOrderStatus(loanOrderEntity.getStatus());
@@ -513,6 +517,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             // 封装
             ProductList productList = new ProductList();
             BeansUtil.copyProperties(loanProductEntity,productList);
+            productList.setInterest(loanProduct.getInterest() + "%/Dia");
 
 
             // 新贷开量产品
@@ -531,6 +536,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             // 关量产品
             if (loanProductEntity.getIsOpen() == 0){
                 productList.setPassRate("");
+                productList.setInterest(loanProductEntity.getInterest() + "%/Dia");
                 productList.setButton("Full");
                 productList.setOrderStatus(OrderStatus.CREATE);
                 closeProductList.add(productList);
@@ -555,6 +561,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             // 封装
             ProductList productList = new ProductList();
             BeansUtil.copyProperties(productEntity, productList);
+            productList.setInterest(productEntity.getInterest() + "%/Dia");
 
             // 续贷 必定展示通过率
             if (status == OrderStatus.COMPLETE || status == OrderStatus.DUE_COMPLETE) {
@@ -682,6 +689,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             // 封装
             ProductList productList = new ProductList();
             BeansUtil.copyProperties(loanProductEntity, productList);
+            productList.setInterest(loanProductEntity.getInterest() + "%/Dia");
             productList.setButton(OrderUtils.button(OrderStatus.CREATE));
             newLoanAndOpenProductList.add(productList);
             // 移除
@@ -700,6 +708,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 // 封装
                 ProductList productList = new ProductList();
                 BeansUtil.copyProperties(productEntity, productList);
+                productList.setInterest(productEntity.getInterest() + "%/Dia");
                 productList.setButton(OrderUtils.button(OrderStatus.CREATE));
                 reloanOrderProductList.add(productList);
                 continue;

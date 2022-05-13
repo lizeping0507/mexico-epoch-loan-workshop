@@ -1,8 +1,10 @@
 package com.epoch.loan.workshop.common.params.params.result;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @author : Shangkunfeng
@@ -48,6 +50,12 @@ public class AppMaskModelResult implements Serializable {
      * 还款时间
      */
     private String repaymentTime;
+
+    /**
+     * 申请时间
+     */
+    @JsonFormat(pattern = "d-M-yyyy")
+    private Date applyTime;
 
     /**
      * 按钮文案

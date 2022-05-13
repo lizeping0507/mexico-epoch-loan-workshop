@@ -41,14 +41,14 @@ public class OrderController extends BaseController {
             if (!bindRemittanceAccountParams.isOrderIdLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":orderId");
+                result.setMessage(ResultEnum.PARAM_ERROR.message() );
                 return result;
             }
 
             if (!bindRemittanceAccountParams.isRemittanceAccountIdLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":remittanceAccountId");
+                result.setMessage(ResultEnum.PARAM_ERROR.message() );
                 return result;
             }
 
@@ -82,7 +82,7 @@ public class OrderController extends BaseController {
             if (!applyParams.isOrderIdLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":orderNo");
+                result.setMessage(ResultEnum.PARAM_ERROR.message() );
                 return result;
             }
 
@@ -198,7 +198,7 @@ public class OrderController extends BaseController {
             if (!params.isOrderIdLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":orderId");
+                result.setMessage(ResultEnum.PARAM_ERROR.message() );
                 return result;
             }
 
@@ -232,7 +232,7 @@ public class OrderController extends BaseController {
             if (!params.isOrderIdLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() + ":orderId");
+                result.setMessage(ResultEnum.PARAM_ERROR.message() );
                 return result;
             }
 
