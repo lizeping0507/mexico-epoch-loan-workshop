@@ -217,7 +217,7 @@ public class OrderServiceImpl extends BaseService implements OrderService {
                 if (ObjectUtils.isEmpty(estimatedRepaymentAmount)) {
                     estimatedRepaymentAmount = 0.0;
                 }
-                Double repaymentAmount = new BigDecimal(estimatedRepaymentAmount).subtract(new BigDecimal(actualRepaymentAmount)).setScale(2,RoundingMode.HALF_UP).doubleValue();
+                Double repaymentAmount = new BigDecimal(estimatedRepaymentAmount).subtract(new BigDecimal(actualRepaymentAmount)).setScale(2, RoundingMode.HALF_UP).doubleValue();
                 orderDTO.setRepaymentAmount(repaymentAmount);
             }
             LoanProductEntity product = loanProductDao.findProduct(loanOrderEntity.getProductId());
@@ -226,9 +226,14 @@ public class OrderServiceImpl extends BaseService implements OrderService {
 
             // 申请金额
             if (loanOrderEntity.getStatus() <= OrderStatus.EXAMINE_WAIT) {
-                String arrivalRange = product.getArrivalRange();
-                if (StringUtils.isNotBlank(arrivalRange) && arrivalRange.contains("-") && arrivalRange.split("-").length == 2) {
-                    orderDTO.setApprovalAmount(arrivalRange.split("-")[0]);
+                String amountRange = product.getAmountRange();
+
+                // 用户客群
+                Integer userType = userType(params.getUser().getId(), loanOrderEntity.getProductId());
+                if (UserType.NEW == userType) {
+                    orderDTO.setApprovalAmount(getMinAmountRange(amountRange, "newConfig"));
+                } else {
+                    orderDTO.setApprovalAmount(getMinAmountRange(amountRange, "oldConfig"));
                 }
             } else {
                 orderDTO.setApprovalAmount(loanOrderEntity.getApprovalAmount() + "");
@@ -288,9 +293,14 @@ public class OrderServiceImpl extends BaseService implements OrderService {
 
             // 申请金额
             if (loanOrderEntity.getStatus() <= OrderStatus.EXAMINE_WAIT) {
-                String arrivalRange = product.getArrivalRange();
-                if (StringUtils.isNotBlank(arrivalRange) && arrivalRange.contains("-") && arrivalRange.split("-").length == 2) {
-                    orderDTO.setApprovalAmount(arrivalRange.split("-")[0]);
+                String amountRange = product.getAmountRange();
+
+                // 用户客群
+                Integer userType = userType(params.getUser().getId(), loanOrderEntity.getProductId());
+                if (UserType.NEW == userType) {
+                    orderDTO.setApprovalAmount(getMinAmountRange(amountRange, "newConfig"));
+                } else {
+                    orderDTO.setApprovalAmount(getMinAmountRange(amountRange, "oldConfig"));
                 }
             } else {
                 orderDTO.setApprovalAmount(loanOrderEntity.getApprovalAmount() + "");
@@ -353,9 +363,14 @@ public class OrderServiceImpl extends BaseService implements OrderService {
 
             // 申请金额
             if (loanOrderEntity.getStatus() <= OrderStatus.EXAMINE_WAIT) {
-                String arrivalRange = product.getArrivalRange();
-                if (StringUtils.isNotBlank(arrivalRange) && arrivalRange.contains("-") && arrivalRange.split("-").length == 2) {
-                    orderDTO.setApprovalAmount(arrivalRange.split("-")[0]);
+                String amountRange = product.getAmountRange();
+
+                // 用户客群
+                Integer userType = userType(params.getUser().getId(), loanOrderEntity.getProductId());
+                if (UserType.NEW == userType) {
+                    orderDTO.setApprovalAmount(getMinAmountRange(amountRange, "newConfig"));
+                } else {
+                    orderDTO.setApprovalAmount(getMinAmountRange(amountRange, "oldConfig"));
                 }
             } else {
                 orderDTO.setApprovalAmount(loanOrderEntity.getApprovalAmount() + "");
@@ -435,28 +450,27 @@ public class OrderServiceImpl extends BaseService implements OrderService {
         }
 
         if (orderEntity.getStatus() <= OrderStatus.EXAMINE_WAIT) {
-            String arrivalRange = product.getArrivalRange();
+            String amountRange = product.getAmountRange();
             String repaymentRange = product.getRepaymentRange();
+            String arrivalRange = product.getArrivalRange();
 
-            if (StringUtils.isNotBlank(arrivalRange) && arrivalRange.contains("-") && arrivalRange.split("-").length == 2) {
-                detailResult.setApprovalAmount(arrivalRange.split("-")[0]);
-            }
-            if (StringUtils.isNotBlank(repaymentRange) && repaymentRange.contains("-") && repaymentRange.split("-").length == 2) {
-                detailResult.setEstimatedRepaymentAmount(repaymentRange.split("-")[0]);
-            }
+            // 用户客群
+            Integer userType = userType(params.getUser().getId(), product.getId());
 
-            if (StringUtils.isNotBlank(arrivalRange) && arrivalRange.contains("-") && arrivalRange.split("-").length == 2) {
-
-                // 扣除后剩余费用比例
-                BigDecimal realAmountRate = new BigDecimal(1).subtract(new BigDecimal(product.getProcessingFeeProportion()).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP));
-                // 最小到账金额
-                BigDecimal minApprovalAmount = new BigDecimal(arrivalRange.split("-")[0]).multiply(realAmountRate).setScale(0,RoundingMode.HALF_UP);
-                detailResult.setActualAmount(minApprovalAmount.doubleValue()+"");
+            // 申请额度
+            if (UserType.NEW == userType) {
+                detailResult.setApprovalAmount(getMinAmountRange(amountRange, "newConfig"));
+                detailResult.setEstimatedRepaymentAmount(getMinAmountRange(repaymentRange, "newConfig"));
+                detailResult.setActualAmount(getMinAmountRange(arrivalRange, "newConfig"));
+            } else {
+                detailResult.setApprovalAmount(getMinAmountRange(amountRange, "oldConfig"));
+                detailResult.setEstimatedRepaymentAmount(getMinAmountRange(repaymentRange, "oldConfig"));
+                detailResult.setActualAmount(getMinAmountRange(arrivalRange, "oldConfig"));
             }
         } else {
             detailResult.setApprovalAmount(orderEntity.getApprovalAmount() + "");
             detailResult.setEstimatedRepaymentAmount(estimatedRepaymentAmount + "");
-            detailResult.setActualAmount(orderEntity.getActualAmount()+"");
+            detailResult.setActualAmount(orderEntity.getActualAmount() + "");
         }
 
         // 申请时间
@@ -588,34 +602,37 @@ public class OrderServiceImpl extends BaseService implements OrderService {
         LoanProductEntity product = loanProductDao.findProduct(orderEntity.getProductId());
         detailResult.setProductName(product.getProductName());
         detailResult.setOrderStatus(orderEntity.getStatus());
-        detailResult.setIncidentalAmount(orderEntity.getIncidentalAmount()+"");
+        detailResult.setIncidentalAmount(orderEntity.getIncidentalAmount() + "");
 
         // 总利息
         Double interestAmount = loanOrderBillDao.sumOrderInterestAmount(orderEntity.getId());
-        detailResult.setInterest(interestAmount+"");
+        detailResult.setInterest(interestAmount + "");
 
         // 区分是否放款填充 预计还款时间、预计还款金额、申请时间、申请金额
         LoanOrderBillEntity lastOrderBill = loanOrderBillDao.findLastOrderBill(orderId);
         Double estimatedRepaymentAmount = orderEntity.getEstimatedRepaymentAmount();
         if (orderEntity.getStatus() <= OrderStatus.EXAMINE_WAIT) {
+            String amountRange = product.getAmountRange();
+            String repaymentRange = product.getRepaymentRange();
             String arrivalRange = product.getArrivalRange();
-            detailResult.setApprovalAmount(product.getArrivalRange());
-            detailResult.setEstimatedRepaymentAmount(product.getRepaymentRange());
-            if (StringUtils.isNotBlank(arrivalRange) && arrivalRange.contains("-") && arrivalRange.split("-").length == 2) {
 
-                // 扣除后剩余费用比例
-                BigDecimal realAmountRate = new BigDecimal(1).subtract(new BigDecimal(product.getProcessingFeeProportion()).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP));
-                // 最小到账金额
-                BigDecimal minApprovalAmount = new BigDecimal(arrivalRange.split("-")[0]).multiply(realAmountRate).setScale(0,RoundingMode.HALF_UP);
-                // 最大到账金额
-                BigDecimal maxApprovalAmount = new BigDecimal(arrivalRange.split("-")[1]).multiply(realAmountRate).setScale(0,RoundingMode.HALF_UP);
-                detailResult.setActualAmount(minApprovalAmount.doubleValue() + "-" + maxApprovalAmount.doubleValue());
+            // 用户客群
+            Integer userType = userType(params.getUser().getId(), product.getId());
+
+            // 申请额度
+            if (UserType.NEW == userType) {
+                detailResult.setApprovalAmount(getMinAmountRange(amountRange, "newConfig"));
+                detailResult.setEstimatedRepaymentAmount(getMinAmountRange(repaymentRange, "newConfig"));
+                detailResult.setActualAmount(getMinAmountRange(arrivalRange, "newConfig"));
+            } else {
+                detailResult.setApprovalAmount(getMinAmountRange(amountRange, "oldConfig"));
+                detailResult.setEstimatedRepaymentAmount(getMinAmountRange(repaymentRange, "oldConfig"));
+                detailResult.setActualAmount(getMinAmountRange(arrivalRange, "oldConfig"));
             }
-
         } else {
             detailResult.setApprovalAmount(orderEntity.getApprovalAmount() + "");
             detailResult.setEstimatedRepaymentAmount(estimatedRepaymentAmount + "");
-            detailResult.setActualAmount(orderEntity.getActualAmount()+"");
+            detailResult.setActualAmount(orderEntity.getActualAmount() + "");
         }
 
         // 申请时间
@@ -757,5 +774,47 @@ public class OrderServiceImpl extends BaseService implements OrderService {
         result.setMessage(ResultEnum.SUCCESS.message());
         result.setData(res);
         return result;
+    }
+
+
+    /**
+     * 计算用户客群
+     *
+     * @param userId 用户id
+     * @param productId 产品id
+     * @return 用户客群
+     */
+    protected Integer userType(String userId, String productId) {
+        // 用户在本包是否有还款
+        int[] status = {OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE};
+        Integer count = loanOrderDao.countUserOrderByStatusIn(userId, status);
+        // 无:2客群
+        if (count == 0) {
+            return 2;
+        }
+
+        // 本包本产品是否有还款
+        count = loanOrderDao.countUserOrderByProductAndStatusIn(userId, productId, status);
+        // 无:1客群
+        if (count == 0) {
+            return 1;
+        }
+        return 0;
+    }
+
+    /**
+     * 获取给定JSON字符串的指定key的值
+     *
+     * @param jsonRange JSON字符串
+     * @param key 指定key
+     * @return 最小的值
+     */
+    private String getMinAmountRange(String jsonRange, String key) {
+        JSONObject jsonObject = JSONObject.parseObject(jsonRange, JSONObject.class);
+        String range = jsonObject.getString(key);
+        if (StringUtils.isNotBlank(range) && range.contains("-") && range.split("-").length == 2) {
+            return range.split("-")[0];
+        }
+        return null;
     }
 }

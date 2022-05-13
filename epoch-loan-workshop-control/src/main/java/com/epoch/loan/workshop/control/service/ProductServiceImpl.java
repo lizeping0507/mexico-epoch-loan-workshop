@@ -42,6 +42,9 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         Result<ProductDetailResult> result = new Result<>();
         ProductDetailResult resData = new ProductDetailResult();
 
+        // 用户id
+        String userId = params.getUser().getId();
+
         // 产品id
         String productId = params.getProductId();
 
@@ -54,10 +57,30 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             return result;
         }
 
+        // 用户客群
+        Integer userType = userType(userId, productId);
+
         // 产品信息
-        resData.setArrivalRange(loanProductEntity.getArrivalRange());
-        resData.setInterestRange(loanProductEntity.getInterestRange()); // TODO
-        resData.setRepaymentRange(loanProductEntity.getRepaymentRange());
+        String arrivalRange = loanProductEntity.getArrivalRange();
+        if (StringUtils.isNotBlank(arrivalRange)) {
+            JSONObject jsonObject = JSONObject.parseObject(arrivalRange, JSONObject.class);
+            if (UserType.NEW == userType) {
+                resData.setArrivalRange(jsonObject.getString("newConfig"));
+            } else {
+                resData.setArrivalRange(jsonObject.getString("oldConfig"));
+            }
+        }
+        // TODO
+        String repaymentRange = loanProductEntity.getRepaymentRange();
+        if (StringUtils.isNotBlank(repaymentRange)) {
+            JSONObject jsonObject = JSONObject.parseObject(repaymentRange, JSONObject.class);
+            if (UserType.NEW == userType) {
+                resData.setRepaymentRange(jsonObject.getString("newConfig"));
+            } else {
+                resData.setRepaymentRange(jsonObject.getString("oldConfig"));
+            }
+        }
+        resData.setInterestRange(loanProductEntity.getInterestRange());
         resData.setServiceFeeRange(loanProductEntity.getServiceFeeRange());
         resData.setAmount(loanProductEntity.getAmountRange());
 
@@ -80,9 +103,6 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
         // app名称
         String appName = params.getAppName();
-
-        // 用户id
-        String userId = params.getUser().getId();
 
         // 查询指定状态的订单
         Integer[] status = new Integer[]{OrderStatus.CREATE, OrderStatus.EXAMINE_WAIT, OrderStatus.EXAMINE_PASS, OrderStatus.EXAMINE_FAIL, OrderStatus.WAIT_PAY, OrderStatus.WAY, OrderStatus.DUE, OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE};
@@ -175,7 +195,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         // 更新地址
         String gps = params.getGps();
         String gpsAddress = params.getGpsAddress();
-        if (StringUtils.isNotEmpty(gps) || StringUtils.isNotEmpty(gpsAddress)){
+        if (StringUtils.isNotEmpty(gps) || StringUtils.isNotEmpty(gpsAddress)) {
             loanUserInfoDao.updateUserGpsMsg(userId, gps, gpsAddress, new Date());
             tokenManager.updateUserCache(userId);
         }
@@ -215,7 +235,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         }
 
         // 查询三项认证是否都通过
-        if (!params.getUser().isIdentityAuth() ) {
+        if (!params.getUser().isIdentityAuth()) {
             // 没有通过 返回结果
             appMaskModelResult.setMaskModel(3);
             appMaskModelResult.setButton(OrderUtils.button(OrderStatus.CREATE));
@@ -370,9 +390,9 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
             // 应还金额
             appMaskModelResult.setAmount(String.valueOf(loanOrderBillEntity.getRepaymentAmount() - loanOrderBillEntity.getReductionAmount()));
-        }else if (orderStatus > OrderStatus.CREATE){
+        } else if (orderStatus > OrderStatus.CREATE) {
             // 还款时间
-            appMaskModelResult.setRepaymentTime(DateUtil.DateToString(DateUtil.addDay(new Date() , 7), "d-M-yyyy"));
+            appMaskModelResult.setRepaymentTime(DateUtil.DateToString(DateUtil.addDay(new Date(), 7), "d-M-yyyy"));
         }
 
         // 返回结果
@@ -427,7 +447,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         String userId = params.getUser().getId();
 
         // 是否有过放款成功
-        int[] statues = {OrderStatus.WAY,OrderStatus.DUE,OrderStatus.COMPLETE,OrderStatus.DUE_COMPLETE};
+        int[] statues = {OrderStatus.WAY, OrderStatus.DUE, OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE};
         Integer integer = loanOrderDao.countUserOrderByStatusIn(userId, statues);
         boolean hasPaymentOrder = integer > 0;
 
@@ -435,7 +455,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         List<LoanProductEntity> products = loanProductDao.findAll();
         Map<String, LoanProductEntity> productMap = new HashMap<>();
         products.forEach(product -> {
-            if (product.getStatus() == 1){
+            if (product.getStatus() == 1) {
                 productMap.put(product.getId(), product);
             }
         });
@@ -463,7 +483,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
             // 封装
             ProductList productList = new ProductList();
-            BeansUtil.copyProperties(loanProductEntity,productList);
+            BeansUtil.copyProperties(loanProductEntity, productList);
             productList.setInterest(loanProductEntity.getInterest() + "%/Dia");
             productList.setPassRate("");
             productList.setButton(OrderUtils.button(loanOrderEntity.getStatus()));
@@ -471,7 +491,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             productList.setOrderNo(loanOrderEntity.getId());
 
             // 通过订单状态加入对应列表
-            switch (orderStatus){
+            switch (orderStatus) {
                 case OrderStatus.WAY:
                 case OrderStatus.DUE:
                     // 待还款
@@ -489,7 +509,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 case OrderStatus.CREATE:
                     // 新建且开量产品
                     // 如果用户在本包没有放款成功记录 不展示通过率
-                    if(hasPaymentOrder){
+                    if (hasPaymentOrder) {
                         productList.setPassRate(loanProductEntity.getPassRate().toString());
                     }
                     newCreateProductList.add(productList);
@@ -510,20 +530,20 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         for (LoanProductEntity loanProduct : withoutUserOrderProductList) {
             String productId = loanProduct.getId();
             LoanProductEntity loanProductEntity = productMap.get(productId);
-            if (ObjectUtils.isEmpty(loanProductEntity)){
+            if (ObjectUtils.isEmpty(loanProductEntity)) {
                 continue;
             }
 
             // 封装
             ProductList productList = new ProductList();
-            BeansUtil.copyProperties(loanProductEntity,productList);
+            BeansUtil.copyProperties(loanProductEntity, productList);
             productList.setInterest(loanProduct.getInterest() + "%/Dia");
 
 
             // 新贷开量产品
-            if (loanProductEntity.getIsOpen() == 1){
+            if (loanProductEntity.getIsOpen() == 1) {
                 // 如果用户在本包没有放款成功记录 不展示通过率
-                if(!hasPaymentOrder){
+                if (!hasPaymentOrder) {
                     productList.setPassRate("");
                 }
                 productList.setButton(OrderUtils.button(OrderStatus.CREATE));
@@ -534,7 +554,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             }
 
             // 关量产品
-            if (loanProductEntity.getIsOpen() == 0){
+            if (loanProductEntity.getIsOpen() == 0) {
                 productList.setPassRate("");
                 productList.setInterest(loanProductEntity.getInterest() + "%/Dia");
                 productList.setButton("Full");
@@ -578,7 +598,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 // 已过冷却期
                 if (OrderUtils.isCdWithTime(cdDays, updateTime)) {
                     // 如果用户在本包没有放款成功记录 不展示通过率
-                    if(!hasPaymentOrder){
+                    if (!hasPaymentOrder) {
                         productList.setPassRate("");
                     }
                     productList.setButton(OrderUtils.button(OrderStatus.CREATE));
@@ -660,7 +680,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         // 排除下架产品/关量产品/当前产品
         Map<String, LoanProductEntity> productMap = new HashMap<>();
         products.forEach(product -> {
-            if (product.getStatus() == 1 && product.getIsOpen() == 1 && !product.getId().equals(currentProductId)){
+            if (product.getStatus() == 1 && product.getIsOpen() == 1 && !product.getId().equals(currentProductId)) {
                 productMap.put(product.getId(), product);
             }
         });
@@ -824,7 +844,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         loanOrderExamineDao.updateOrderExamineRequestById(orderExamineId, requestParams, new Date());
 
         // TODO 记得删
-        if (true){
+        if (true) {
             return true;
         }
 
@@ -1012,11 +1032,12 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
     /**
      * 获取用户客群
+     *
      * @param params
      * @return
      */
     @Override
-    public Result<UserTypeResult> getUserType(UserTypeParams params){
+    public Result<UserTypeResult> getUserType(UserTypeParams params) {
         Result<UserTypeResult> result = new Result<>();
 
         Integer type = userType(params.getUserId(), params.getUserId());

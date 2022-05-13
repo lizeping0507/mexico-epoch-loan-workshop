@@ -39,7 +39,7 @@ public class ProductDetailResult implements Serializable {
     private Integer baseInfoFlag;
 
     /**
-     * 还款范围
+     * 放款到账范围
      */
     private String arrivalRange;
 
@@ -49,7 +49,7 @@ public class ProductDetailResult implements Serializable {
     private String interestRange;
 
     /**
-     * 放款到账范围
+     * 还款范围
      */
     private String repaymentRange;
 
