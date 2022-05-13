@@ -21,7 +21,7 @@ public class CollectionUserInfoParam implements Serializable {
     /**
      * 三方用户id
      */
-    private Long thirdUserId;
+    private String thirdUserId;
 
     /**
      * 用户姓名

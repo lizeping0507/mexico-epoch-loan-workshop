@@ -89,7 +89,7 @@ public class CollectionOrderParam implements Serializable {
     /**
      * 三方用户id
      */
-    private Long thirdUserId;
+    private String thirdUserId;
 
     /**
      * 逾期天数
