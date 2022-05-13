@@ -214,7 +214,7 @@ public class RepaymentMQManager extends BaseMQ {
 
                     sendMessage(result.getJSONObject("params"), subExpression);
                 } catch (Exception e) {
-                    LogUtil.sysError("[RemittanceMQManager]", e);
+                    LogUtil.sysError("[RepaymentMQManager]", e);
                 }
             }
 
