@@ -303,6 +303,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 appMaskModelResult.setMaskModel(2);
                 appMaskModelResult.setButton(OrderUtils.button(OrderStatus.EXAMINE_FAIL));
                 appMaskModelResult.setOrderId(loanOrderEntity.getId());
+                appMaskModelResult.setOrderStatus(loanOrderEntity.getStatus());
                 appMaskModelResult.setStatusDescription(OrderUtils.statusDescription(OrderStatus.EXAMINE_FAIL));
                 result.setData(appMaskModelResult);
                 return result;
