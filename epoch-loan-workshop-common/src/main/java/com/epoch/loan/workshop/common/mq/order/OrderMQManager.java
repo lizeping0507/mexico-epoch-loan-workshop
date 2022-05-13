@@ -101,7 +101,7 @@ public class OrderMQManager extends BaseMQ {
      * @param tag
      * @throws Exception
      */
-    public void sendMessage(OrderParams orderParams, String tag) throws Exception {
+    public void sendMessage(Object orderParams, String tag) throws Exception {
         // 消息体
         Message msg = new Message();
 
@@ -127,7 +127,7 @@ public class OrderMQManager extends BaseMQ {
      * @param delayTimeLevel
      * @throws Exception
      */
-    public void sendMessage(OrderParams orderParams, String tag, int delayTimeLevel) throws Exception {
+    public void sendMessage(Object orderParams, String tag, int delayTimeLevel) throws Exception {
         // 加入redis队列中
         JSONObject result = new JSONObject();
         result.put("params", orderParams);
@@ -210,7 +210,7 @@ public class OrderMQManager extends BaseMQ {
                         continue;
                     }
 
-                    sendMessage(JSONObject.parseObject(result.getString("params"), OrderParams.class), subExpression);
+                    sendMessage(result.getJSONObject("params"), subExpression);
                 } catch (Exception e) {
                     LogUtil.sysError("[OrderMQManager]", e);
                 }

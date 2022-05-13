@@ -77,7 +77,7 @@ public class CollectionMQManager extends BaseMQ {
      * @param tag
      * @throws Exception
      */
-    public void sendMessage(CollectionParams params, String tag) throws Exception {
+    public void sendMessage(Object params, String tag) throws Exception {
         // 消息体
         Message msg = new Message();
 
@@ -102,7 +102,7 @@ public class CollectionMQManager extends BaseMQ {
      * @param tag
      * @throws Exception
      */
-    public void sendMessage(CollectionParams params, String tag, int delayTimeLevel) throws Exception {
+    public void sendMessage(Object params, String tag, int delayTimeLevel) throws Exception {
         // 加入redis队列中
         JSONObject result = new JSONObject();
         result.put("params", params);
@@ -185,7 +185,7 @@ public class CollectionMQManager extends BaseMQ {
                         continue;
                     }
 
-                    sendMessage(JSONObject.parseObject(result.getString("params"), CollectionParams.class), subExpression);
+                    sendMessage(result.getJSONObject("params"), subExpression);
                 } catch (Exception e) {
                     LogUtil.sysError("[CollectionMQManager]", e);
                 }

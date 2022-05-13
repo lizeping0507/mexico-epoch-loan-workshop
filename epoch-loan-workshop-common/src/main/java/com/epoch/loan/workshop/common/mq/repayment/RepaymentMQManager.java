@@ -3,8 +3,6 @@ package com.epoch.loan.workshop.common.mq.repayment;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.mq.BaseMQ;
-import com.epoch.loan.workshop.common.mq.repayment.params.DistributionRepaymentParams;
-import com.epoch.loan.workshop.common.mq.repayment.params.RepaymentParams;
 import com.epoch.loan.workshop.common.util.LogUtil;
 import lombok.Data;
 import org.apache.commons.lang3.ObjectUtils;
@@ -78,7 +76,6 @@ public class RepaymentMQManager extends BaseMQ {
         producer.start();
     }
 
-
     /**
      * 发送消息
      *
@@ -87,25 +84,7 @@ public class RepaymentMQManager extends BaseMQ {
      * @param delayTimeLevel 延时级别
      * @throws Exception e
      */
-    public void sendMessage(RepaymentParams params, String tag, int delayTimeLevel) throws Exception {
-        // 加入redis队列中
-        JSONObject result = new JSONObject();
-        result.put("params", params);
-        result.put("time", System.currentTimeMillis());
-        result.put("delayed", delayTimeLevel * 1000);
-        redisClient.rPush(topic + ":" + tag, result.toJSONString());
-    }
-
-
-    /**
-     * 发送消息
-     *
-     * @param params         队列参数
-     * @param tag            标签
-     * @param delayTimeLevel 延时级别
-     * @throws Exception e
-     */
-    public void sendMessage(DistributionRepaymentParams params, String tag, int delayTimeLevel) throws Exception {
+    public void sendMessage(Object params, String tag, int delayTimeLevel) throws Exception {
         // 加入redis队列中
         JSONObject result = new JSONObject();
         result.put("params", params);
