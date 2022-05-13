@@ -10,6 +10,11 @@ package com.epoch.loan.workshop.common.constant;
 public class CollectionField {
 
     /**
+     * minio外网访问前缀
+     */
+    public final static String MINIO_STATIC_URL_PRE = "/minio";
+
+    /**
      * 催收事件-案件创建
      */
     public final static int EVENT_CREATE = 0;
