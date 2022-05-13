@@ -28,7 +28,6 @@ import org.apache.rocketmq.common.message.MessageExt;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
-import sun.rmi.runtime.Log;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -114,8 +113,14 @@ public class Collection extends BaseCollectionMQ implements MessageListenerConcu
 
                 // 产品过滤
                 LoanProductEntity product = loanProductDao.findProduct(loanOrderEntity.getProductId());
-                if (ObjectUtils.isEmpty(product) || ObjectUtils.isEmpty(product.getReactType())
-                        || CollectionField.NO_PUSH == product.getReactType()) {
+                if (ObjectUtils.isEmpty(product)) {
+                    continue;
+                }
+
+                // 产品过滤
+                LoanProductExtEntity productExt= loanProductExtDao.findByProductId(loanOrderEntity.getProductId());
+                if (ObjectUtils.isEmpty(productExt) || ObjectUtils.isEmpty(productExt.getReactType())
+                        || CollectionField.NO_PUSH == productExt.getReactType()) {
                     continue;
                 }
 
@@ -123,24 +128,24 @@ public class Collection extends BaseCollectionMQ implements MessageListenerConcu
                 if (collectionParams.getCollectionEvent() == CollectionField.EVENT_CREATE) {
 
                     // 订单成功放款-在催收提环系统创建案件
-                    int pushRes = pushOrder(loanOrderEntity, product, lastOrderBill);
+                    int pushRes = pushOrder(loanOrderEntity, product, lastOrderBill,productExt);
                     if (CollectionField.PUSH_SUCCESS != pushRes) {
                         retryCollection(collectionParams, subExpression());
                     }
                 } else if (collectionParams.getCollectionEvent() == CollectionField.EVENT_COMPLETE) {
 
                     // 订单还款-在催收提环系统更新案件
-                    int pushRes = pushRepay(loanOrderEntity, product, lastOrderBill);
+                    int pushRes = pushRepay(loanOrderEntity, product, lastOrderBill,productExt);
                     if (CollectionField.PUSH_SUCCESS != pushRes) {
                         retryCollection(collectionParams, subExpression());
                     }
                 } else if (collectionParams.getCollectionEvent() == CollectionField.EVENT_DUE) {
 
                     // 订单逾期-在催收提环系统更新案件
-                    if (CollectionField.PUSH_REMIND == product.getReactType()) {
+                    if (CollectionField.PUSH_REMIND == productExt.getReactType()) {
                         continue;
                     }
-                    int pushRes = rePushOverdue(loanOrderEntity, product, lastOrderBill);
+                    int pushRes = rePushOverdue(loanOrderEntity, product, lastOrderBill,productExt);
                     if (CollectionField.PUSH_SUCCESS != pushRes) {
                         retryCollection(collectionParams, subExpression());
                     }
@@ -164,9 +169,10 @@ public class Collection extends BaseCollectionMQ implements MessageListenerConcu
      * @param orderEntity   订单实体类
      * @param product       产品类
      * @param lastOrderBill 最后一期订单账单
+     * @param productExt 产品扩展信息
      * @return 1--推送成功  0--推送失败
      */
-    public Integer pushRepay(LoanOrderEntity orderEntity, LoanProductEntity product, LoanOrderBillEntity lastOrderBill) {
+    public Integer pushRepay(LoanOrderEntity orderEntity, LoanProductEntity product, LoanOrderBillEntity lastOrderBill,LoanProductExtEntity productExt) {
         CollectionRepayParam repayParam = new CollectionRepayParam();
 
         // 订单信息填充
@@ -208,9 +214,9 @@ public class Collection extends BaseCollectionMQ implements MessageListenerConcu
             });
         }
         repayParam.setRepayRecord(repayRecord);
-        String requestParam = getRequestParam(product, CollectionField.PUSH_REPAY, repayParam);
+        String requestParam = getRequestParam(product,productExt, CollectionField.PUSH_REPAY, repayParam);
 
-        return push(requestParam, product.getReactType());
+        return push(requestParam, productExt.getReactType());
     }
 
     /**
@@ -219,9 +225,10 @@ public class Collection extends BaseCollectionMQ implements MessageListenerConcu
      * @param orderEntity   订单类
      * @param product       产品类
      * @param lastOrderBill 最后一期订单账单
+     * @param productExt 产品扩展信息
      * @return 1--推送成功  0--推送失败
      */
-    public Integer rePushOverdue(LoanOrderEntity orderEntity, LoanProductEntity product, LoanOrderBillEntity lastOrderBill) {
+    public Integer rePushOverdue(LoanOrderEntity orderEntity, LoanProductEntity product, LoanOrderBillEntity lastOrderBill,LoanProductExtEntity productExt) {
         CollectionOverdueParam param = new CollectionOverdueParam();
         param.setOrderNo(orderEntity.getId());
 
@@ -240,7 +247,7 @@ public class Collection extends BaseCollectionMQ implements MessageListenerConcu
         param.setUserType(orderEntity.getUserType());
         param.setFundType(1);
 
-        String requestParam = getRequestParam(product, CollectionField.PUSH_SYNC_OVERDUE, param);
+        String requestParam = getRequestParam(product, productExt,CollectionField.PUSH_SYNC_OVERDUE, param);
         return push(requestParam, CollectionField.PUSH_REACT);
     }
 
@@ -250,8 +257,9 @@ public class Collection extends BaseCollectionMQ implements MessageListenerConcu
      * @param orderEntity   订单信息
      * @param product       产品信息
      * @param lastOrderBill 最后一期账单信息
+     * @param productExt 产品扩展信息
      */
-    public Integer pushOrder(LoanOrderEntity orderEntity, LoanProductEntity product, LoanOrderBillEntity lastOrderBill) throws Exception {
+    public Integer pushOrder(LoanOrderEntity orderEntity, LoanProductEntity product, LoanOrderBillEntity lastOrderBill,LoanProductExtEntity productExt) throws Exception {
         if (lastOrderBill.getStatus() == OrderBillStatus.COMPLETE || lastOrderBill.getStatus() == OrderBillStatus.DUE_COMPLETE) {
             return CollectionField.PUSH_SUCCESS;
         }
@@ -266,19 +274,20 @@ public class Collection extends BaseCollectionMQ implements MessageListenerConcu
         pushOrderParam.setEmerContact(getEmergencyContact(userInfoEntity));
         pushOrderParam.setContact(getContact(orderEntity));
 
-        String requestParam = getRequestParam(product, CollectionField.PUSH_ORDER, pushOrderParam);
-        return push(requestParam, product.getReactType());
+        String requestParam = getRequestParam(product,productExt, CollectionField.PUSH_ORDER, pushOrderParam);
+        return push(requestParam, productExt.getReactType());
     }
 
     /**
      * 封装请求参数
      *
      * @param product  产品信息
+     * @param productExt  产品扩展信息
      * @param pushType push-order--推送订单   push-repay--推送还款  sync-overdue-fee--同步逾期
      * @param argMaps  请求携带参数 推送订单--CollectionPushOrderParam  还款--CollectionRepayParam 同步逾期--CollectionOverdueParam
      * @return 请求参数JSONString
      */
-    public String getRequestParam(LoanProductEntity product, String pushType, Object argMaps) {
+    public String getRequestParam(LoanProductEntity product,LoanProductExtEntity productExt, String pushType, Object argMaps) {
 
         // 参数封装
         CollectionBaseParam<String> param = new CollectionBaseParam<>();
@@ -290,7 +299,7 @@ public class Collection extends BaseCollectionMQ implements MessageListenerConcu
         String productName = getProductName(product.getProductName());
         param.setOrgId(productName);
 
-        String sign = getSign(productName, product.getProductKey(), pushType, argParam);
+        String sign = getSign(productName, productExt.getProductKey(), pushType, argParam);
         param.setSign(sign);
 
         return JSON.toJSONString(param, SerializerFeature.DisableCircularReferenceDetect);

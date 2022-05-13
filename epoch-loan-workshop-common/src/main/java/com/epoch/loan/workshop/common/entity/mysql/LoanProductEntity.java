@@ -135,14 +135,4 @@ public class LoanProductEntity {
      * 状态 1有效
      */
     private Integer status;
-
-    /**
-     * 0--不推送 1--只推送提还系统    2-- 只推送催收系统  3--推送提还和催收
-     */
-    private Integer reactType;
-
-    /**
-     * 与催收、提还交互的 用于生成验证码的 key
-     */
-    private String productKey;
 }

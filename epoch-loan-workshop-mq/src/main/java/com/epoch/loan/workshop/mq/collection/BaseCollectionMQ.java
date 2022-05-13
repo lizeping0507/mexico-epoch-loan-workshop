@@ -56,6 +56,12 @@ public abstract class BaseCollectionMQ {
     public LoanProductDao loanProductDao;
 
     /**
+     * 产品扩展
+     */
+    @Autowired
+    public LoanProductExtDao loanProductExtDao;
+
+    /**
      * 风控配置
      */
     @Autowired
