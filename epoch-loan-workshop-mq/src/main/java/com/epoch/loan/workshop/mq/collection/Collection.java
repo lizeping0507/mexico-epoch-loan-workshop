@@ -28,6 +28,7 @@ import org.apache.rocketmq.common.message.MessageExt;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
+import sun.rmi.runtime.Log;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -95,6 +96,8 @@ public class Collection extends BaseCollectionMQ implements MessageListenerConcu
                 if (ObjectUtils.isEmpty(collectionParams)) {
                     continue;
                 }
+
+                LogUtil.sysInfo("开始进入催收、提还主题：{}" , JSONObject.toJSONString(collectionParams));
 
                 // 订单id
                 String orderId = collectionParams.getOrderId();
