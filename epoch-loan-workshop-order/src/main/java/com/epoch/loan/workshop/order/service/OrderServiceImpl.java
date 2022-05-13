@@ -202,7 +202,7 @@ public class OrderServiceImpl extends BaseService implements OrderService {
             BeanUtils.copyProperties(loanOrderEntity, orderDTO);
             orderDTO.setOrderNo(loanOrderEntity.getId());
             orderDTO.setOrderStatus(loanOrderEntity.getStatus());
-            orderDTO.setOrderStatusStr(OrderUtils.button(loanOrderEntity.getStatus()));
+            orderDTO.setOrderStatusStr(OrderUtils.statusDescription(loanOrderEntity.getStatus()));
             orderDTO.setApplyTime(loanOrderEntity.getCreateTime());
             if (loanOrderEntity.getStatus() >= OrderStatus.WAY && loanOrderEntity.getStatus() != OrderStatus.ABANDONED) {
                 LoanOrderBillEntity lastOrderBill = loanOrderBillDao.findLastOrderBill(loanOrderEntity.getId());
@@ -280,7 +280,7 @@ public class OrderServiceImpl extends BaseService implements OrderService {
             BeanUtils.copyProperties(loanOrderEntity, orderDTO);
             orderDTO.setOrderNo(loanOrderEntity.getId());
             orderDTO.setOrderStatus(loanOrderEntity.getStatus());
-            orderDTO.setOrderStatusStr(OrderUtils.button(loanOrderEntity.getStatus()));
+            orderDTO.setOrderStatusStr(OrderUtils.statusDescription(loanOrderEntity.getStatus()));
             orderDTO.setApplyTime(loanOrderEntity.getCreateTime());
             LoanProductEntity product = loanProductDao.findProduct(loanOrderEntity.getProductId());
             orderDTO.setProductIconImageUrl(product.getIcon());
@@ -330,7 +330,7 @@ public class OrderServiceImpl extends BaseService implements OrderService {
             BeanUtils.copyProperties(loanOrderEntity, orderDTO);
             orderDTO.setOrderNo(loanOrderEntity.getId());
             orderDTO.setOrderStatus(loanOrderEntity.getStatus());
-            orderDTO.setOrderStatusStr(OrderUtils.button(loanOrderEntity.getStatus()));
+            orderDTO.setOrderStatusStr(OrderUtils.statusDescription(loanOrderEntity.getStatus()));
             orderDTO.setApplyTime(loanOrderEntity.getCreateTime());
             LoanOrderBillEntity lastOrderBill = loanOrderBillDao.findLastOrderBill(loanOrderEntity.getId());
             orderDTO.setRepaymentTime(lastOrderBill.getRepaymentTime());
@@ -402,7 +402,6 @@ public class OrderServiceImpl extends BaseService implements OrderService {
         LoanProductEntity product = loanProductDao.findProduct(orderEntity.getProductId());
         detailResult.setProductName(product.getProductName());
         detailResult.setOrderStatus(orderEntity.getStatus());
-        detailResult.setActualAmount(orderEntity.getActualAmount());
 
         // 服务费
         Double incidentalAmount = orderEntity.getIncidentalAmount();
@@ -445,9 +444,19 @@ public class OrderServiceImpl extends BaseService implements OrderService {
             if (StringUtils.isNotBlank(repaymentRange) && repaymentRange.contains("-") && repaymentRange.split("-").length == 2) {
                 detailResult.setEstimatedRepaymentAmount(repaymentRange.split("-")[0]);
             }
+
+            if (StringUtils.isNotBlank(arrivalRange) && arrivalRange.contains("-") && arrivalRange.split("-").length == 2) {
+
+                // 扣除后剩余费用比例
+                BigDecimal realAmountRate = new BigDecimal(1).subtract(new BigDecimal(product.getProcessingFeeProportion()).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP));
+                // 最小到账金额
+                BigDecimal minApprovalAmount = new BigDecimal(arrivalRange.split("-")[0]).multiply(realAmountRate).setScale(0,RoundingMode.HALF_UP);
+                detailResult.setActualAmount(minApprovalAmount.doubleValue()+"");
+            }
         } else {
             detailResult.setApprovalAmount(orderEntity.getApprovalAmount() + "");
             detailResult.setEstimatedRepaymentAmount(estimatedRepaymentAmount + "");
+            detailResult.setActualAmount(orderEntity.getActualAmount()+"");
         }
 
         // 申请时间
@@ -580,7 +589,6 @@ public class OrderServiceImpl extends BaseService implements OrderService {
         detailResult.setProductName(product.getProductName());
         detailResult.setOrderStatus(orderEntity.getStatus());
         detailResult.setIncidentalAmount(orderEntity.getIncidentalAmount()+"");
-        detailResult.setActualAmount(orderEntity.getActualAmount());
 
         // 总利息
         Double interestAmount = loanOrderBillDao.sumOrderInterestAmount(orderEntity.getId());
@@ -590,11 +598,24 @@ public class OrderServiceImpl extends BaseService implements OrderService {
         LoanOrderBillEntity lastOrderBill = loanOrderBillDao.findLastOrderBill(orderId);
         Double estimatedRepaymentAmount = orderEntity.getEstimatedRepaymentAmount();
         if (orderEntity.getStatus() <= OrderStatus.EXAMINE_WAIT) {
+            String arrivalRange = product.getArrivalRange();
             detailResult.setApprovalAmount(product.getArrivalRange());
             detailResult.setEstimatedRepaymentAmount(product.getRepaymentRange());
+            if (StringUtils.isNotBlank(arrivalRange) && arrivalRange.contains("-") && arrivalRange.split("-").length == 2) {
+
+                // 扣除后剩余费用比例
+                BigDecimal realAmountRate = new BigDecimal(1).subtract(new BigDecimal(product.getProcessingFeeProportion()).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP));
+                // 最小到账金额
+                BigDecimal minApprovalAmount = new BigDecimal(arrivalRange.split("-")[0]).multiply(realAmountRate).setScale(0,RoundingMode.HALF_UP);
+                // 最大到账金额
+                BigDecimal maxApprovalAmount = new BigDecimal(arrivalRange.split("-")[1]).multiply(realAmountRate).setScale(0,RoundingMode.HALF_UP);
+                detailResult.setActualAmount(minApprovalAmount.doubleValue() + "-" + maxApprovalAmount.doubleValue());
+            }
+
         } else {
             detailResult.setApprovalAmount(orderEntity.getApprovalAmount() + "");
             detailResult.setEstimatedRepaymentAmount(estimatedRepaymentAmount + "");
+            detailResult.setActualAmount(orderEntity.getActualAmount()+"");
         }
 
         // 申请时间
