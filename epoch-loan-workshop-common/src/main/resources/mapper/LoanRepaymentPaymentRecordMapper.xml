@@ -20,6 +20,7 @@
         search_request,
         search_response,
         status,
+        type,
         update_time,
         create_time
         )
@@ -40,6 +41,7 @@
         #{paymentRecord.searchRequest},
         #{paymentRecord.searchResponse},
         #{paymentRecord.status},
+        #{paymentRecord.type},
         #{paymentRecord.createTime},
         #{paymentRecord.updateTime}
         )

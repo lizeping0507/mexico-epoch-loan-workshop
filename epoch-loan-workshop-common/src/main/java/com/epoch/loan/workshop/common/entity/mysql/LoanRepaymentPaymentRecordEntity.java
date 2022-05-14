@@ -95,7 +95,7 @@ public class LoanRepaymentPaymentRecordEntity {
     private Integer status;
 
     /**
-     * 支付方式 0:银行卡 1.clabe
+     * 支付方式 0:线下 1.线上
      */
     private Integer type;
 

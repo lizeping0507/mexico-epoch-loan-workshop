@@ -136,11 +136,11 @@ public class PandaPay extends BaseRepaymentMQListener implements MessageListener
      * @return 查询结果
      */
     private int queryOrder(LoanRepaymentPaymentRecordEntity paymentRecord, LoanPaymentEntity loanPayment) {
-        String paymentType = "OXXO";
+        Integer type = paymentRecord.getType();
         int result = 0;
-        if(PaymentField.PAY_TYPE_SPEI.equals(paymentType)){
+        if(type == 1){
             result = speiQueryOrder(paymentRecord, loanPayment);
-        }else if(PaymentField.PAY_TYPE_OXXO.equals(paymentType)){
+        }else if(type == 0){
             result = oxxoQueryOrder(paymentRecord, loanPayment);
         }
 
