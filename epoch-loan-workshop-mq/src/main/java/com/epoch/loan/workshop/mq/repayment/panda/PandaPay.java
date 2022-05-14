@@ -230,7 +230,7 @@ public class PandaPay extends BaseRepaymentMQListener implements MessageListener
         } catch (Exception e) {
             LogUtil.sysError("[OxxoPandaPay repayment queryError]", e);
             // 更新请求响应数据
-            updateSearchRequestAndResponse(paymentRecord.getId(), businessId, "Error");
+            updateSearchRequestAndResponse(paymentRecord.getId(), JSONObject.toJSONString(params), "Error");
             // 请求失败
             return PaymentField.PAY_QUERY_ERROR;
         }

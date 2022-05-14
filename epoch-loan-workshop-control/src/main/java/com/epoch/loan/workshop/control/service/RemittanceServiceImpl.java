@@ -53,6 +53,7 @@ public class RemittanceServiceImpl extends BaseService implements RemittanceServ
 
         // 查询用户放款账户列表
         List<LoanRemittanceAccountEntity> loanRemittanceAccountEntityList = loanRemittanceAccountDao.findUserRemittanceAccountList(userId);
+        LogUtil.sysInfo("查询用户放款账户列表 :{}", JSONObject.toJSONString(loanRemittanceAccountEntityList));
 
         // 按照最后一条放款的账户在第一条进行排序
         List<RemittanceAccountList> remittanceAccountLists = new ArrayList<>();
@@ -70,7 +71,8 @@ public class RemittanceServiceImpl extends BaseService implements RemittanceServ
         }
 
         // 如果有最后一笔 插入到队首
-        if (ObjectUtils.isNotEmpty(lastUserLoanRemittanceAccountEntity)){
+        if (ObjectUtils.isNotEmpty(lastUserLoanRemittanceAccountEntity)) {
+            remittanceAccountList = new RemittanceAccountList();
             BeanUtils.copyProperties(lastUserLoanRemittanceAccountEntity, remittanceAccountList);
             remittanceAccountLists.add(0, remittanceAccountList);
         }
@@ -116,10 +118,10 @@ public class RemittanceServiceImpl extends BaseService implements RemittanceServ
         String mobile = addRemittanceAccountParams.getUser().getMobile();
 
         LoanRemittanceAccountEntity loanRemittanceAccount = loanRemittanceAccountDao.findByAccountNumber(accountNumber);
-        if (ObjectUtils.isNotEmpty(loanRemittanceAccount)){
+        if (ObjectUtils.isNotEmpty(loanRemittanceAccount)) {
             ResultEnum resultEnum = addRemittanceAccountParams.getType() == 0 ? ResultEnum.BANK_BEEN_USED_ERRO : ResultEnum.CLABE_BEEN_USED_ERRO;
             // 卡号已存在
-            result.setMessage( resultEnum.message());
+            result.setMessage(resultEnum.message());
             result.setReturnCode(resultEnum.code());
             return result;
         }
@@ -192,7 +194,7 @@ public class RemittanceServiceImpl extends BaseService implements RemittanceServ
 
         // 发送请求
         String result = HttpUtils.POST_FORM(riskConfig.getRiskUrl(), requestParams);
-        LogUtil.sysInfo("风控验卡 请求参数：{}， 响应参数：{}", requestParams,result);
+        LogUtil.sysInfo("风控验卡 请求参数：{}， 响应参数：{}", requestParams, result);
         if (StringUtils.isEmpty(result)) {
             return null;
         }

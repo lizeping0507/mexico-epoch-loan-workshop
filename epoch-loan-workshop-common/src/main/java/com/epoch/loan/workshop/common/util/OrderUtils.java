@@ -146,7 +146,7 @@ public class OrderUtils {
             case OrderStatus.WAY:
                 return "Reembolsando";
             case OrderStatus.DUE:
-                return "Vencido";
+                return "Atrasado";
             case OrderStatus.COMPLETE:
                 return "Pagado";
             case OrderStatus.DUE_COMPLETE:
