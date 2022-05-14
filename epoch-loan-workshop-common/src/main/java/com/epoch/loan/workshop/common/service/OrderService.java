@@ -26,7 +26,7 @@ public interface OrderService {
      * @param applyParams
      * @return
      */
-    Result apply(ApplyParams applyParams);
+    Result apply(ApplyParams applyParams) throws Exception;
 
     /**
      * 全部订单列表

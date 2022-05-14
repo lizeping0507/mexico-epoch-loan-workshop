@@ -87,7 +87,7 @@ public class OrderServiceImpl extends BaseService implements OrderService {
      * @return
      */
     @Override
-    public Result apply(ApplyParams applyParams) {
+    public Result apply(ApplyParams applyParams) throws Exception {
         // 结果集
         Result result = new Result();
 
