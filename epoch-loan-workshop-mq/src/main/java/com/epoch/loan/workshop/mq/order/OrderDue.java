@@ -99,6 +99,9 @@ public class OrderDue extends BaseOrderMQListener implements MessageListenerConc
                 // 利息金额
                 double interestAmount = loanOrderBillEntity.getInterestAmount();
 
+                // 手续费
+                double incidentalAmount = loanOrderBillEntity.getIncidentalAmount();
+
                 // 罚息利率
                 double penaltyInterest = loanOrderEntity.getPenaltyInterest();
 
@@ -109,7 +112,7 @@ public class OrderDue extends BaseOrderMQListener implements MessageListenerConc
                 }
 
                 // 应还款金额
-                double repaymentAmount = principalAmount + interestAmount + punishmentAmount;
+                double repaymentAmount = principalAmount + interestAmount + incidentalAmount + punishmentAmount;
 
                 // 更新减免金额
                 loanOrderBillDao.updateOrderBillReductionAmount(orderBillId, 0.00, new Date());
