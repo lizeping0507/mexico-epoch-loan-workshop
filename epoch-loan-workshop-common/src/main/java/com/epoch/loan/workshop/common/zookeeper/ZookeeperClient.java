@@ -41,7 +41,7 @@ public class ZookeeperClient {
     /**
      * zookeeper 链接
      */
-    private static CuratorFramework client;
+    private volatile static CuratorFramework client;
 
     /**
      * 初始化Zookeeper
