@@ -4,7 +4,7 @@
 
     <select id="findLoanRemittanceBankList"
             resultType="com.epoch.loan.workshop.common.entity.mysql.LoanRemittanceBankEntity">
-        SELECT * FROM loan_remittance_bank
+        SELECT * FROM loan_remittance_bank where user_id = #{userId}
     </select>
     <select id="findByName" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanRemittanceBankEntity">
         SELECT * FROM loan_remittance_bank WHERE name = #{name} LIMIT 1

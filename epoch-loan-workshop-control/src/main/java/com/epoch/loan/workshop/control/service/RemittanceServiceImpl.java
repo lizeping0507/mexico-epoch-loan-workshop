@@ -70,7 +70,7 @@ public class RemittanceServiceImpl extends BaseService implements RemittanceServ
         }
 
         // 如果有最后一笔 插入到队首
-        if (ObjectUtils.isNotEmpty(lastUserLoanRemittanceAccountEntity)){
+        if (ObjectUtils.isNotEmpty(lastUserLoanRemittanceAccountEntity)) {
             BeanUtils.copyProperties(lastUserLoanRemittanceAccountEntity, remittanceAccountList);
             remittanceAccountLists.add(0, remittanceAccountList);
         }
@@ -116,10 +116,10 @@ public class RemittanceServiceImpl extends BaseService implements RemittanceServ
         String mobile = addRemittanceAccountParams.getUser().getMobile();
 
         LoanRemittanceAccountEntity loanRemittanceAccount = loanRemittanceAccountDao.findByAccountNumber(accountNumber);
-        if (ObjectUtils.isNotEmpty(loanRemittanceAccount)){
+        if (ObjectUtils.isNotEmpty(loanRemittanceAccount)) {
             ResultEnum resultEnum = addRemittanceAccountParams.getType() == 0 ? ResultEnum.BANK_BEEN_USED_ERRO : ResultEnum.CLABE_BEEN_USED_ERRO;
             // 卡号已存在
-            result.setMessage( resultEnum.message());
+            result.setMessage(resultEnum.message());
             result.setReturnCode(resultEnum.code());
             return result;
         }
@@ -192,7 +192,7 @@ public class RemittanceServiceImpl extends BaseService implements RemittanceServ
 
         // 发送请求
         String result = HttpUtils.POST_FORM(riskConfig.getRiskUrl(), requestParams);
-        LogUtil.sysInfo("风控验卡 请求参数：{}， 响应参数：{}", requestParams,result);
+        LogUtil.sysInfo("风控验卡 请求参数：{}， 响应参数：{}", requestParams, result);
         if (StringUtils.isEmpty(result)) {
             return null;
         }
@@ -210,7 +210,8 @@ public class RemittanceServiceImpl extends BaseService implements RemittanceServ
     @Override
     public Result<RemittanceBankListResult> remittanceBankList(BaseParams baseParams) {
         // 查询放款银行列表
-        List<LoanRemittanceBankEntity> loanRemittanceBankList = loanRemittanceBankDao.findLoanRemittanceBankList();
+        List<LoanRemittanceBankEntity> loanRemittanceBankList = loanRemittanceBankDao.findLoanRemittanceBankList(baseParams.getUser().getId());
+        LogUtil.sysInfo("查询放款银行列表 :{}", JSONObject.toJSONString(loanRemittanceBankList));
 
         // 封装参数
         List<String> bankList = new ArrayList<>();

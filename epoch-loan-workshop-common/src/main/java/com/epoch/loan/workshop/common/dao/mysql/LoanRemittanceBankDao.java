@@ -16,11 +16,12 @@ import java.util.List;
 public interface LoanRemittanceBankDao {
 
     /**
-     * 查询放款银行列表
+     * 查询用户放款银行列表
+     * @param userId
      *
      * @return
      */
-    List<LoanRemittanceBankEntity> findLoanRemittanceBankList();
+    List<LoanRemittanceBankEntity> findLoanRemittanceBankList(String userId);
 
     /**
      * 通过名称查询

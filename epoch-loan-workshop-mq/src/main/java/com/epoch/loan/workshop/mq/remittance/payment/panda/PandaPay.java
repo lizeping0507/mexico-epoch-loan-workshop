@@ -192,10 +192,11 @@ public class PandaPay extends BaseRemittancePaymentMQListener implements Message
         Integer paymentAccountType = paymentConfig.getInteger(PaymentField.PANDAPAY_PAYMENT_ACCOUNT_TYPE);
         Integer paymentType = paymentConfig.getInteger(PaymentField.PANDAPAY_PAYMENT_TYPE);
         String payoutUrl = paymentConfig.getString(PaymentField.PANDAPAY_PAYOUT_URL);
+        String prefixCode = paymentConfig.getString(PaymentField.PANDAPAY_PAYOUT_PREFIX_CODE);
 
         // 封装请求参数
         PandaPayPayoutParam param = new PandaPayPayoutParam();
-        param.setClaveRastreo(paymentRecord.getId());
+        param.setClaveRastreo(prefixCode + paymentRecord.getId());
         param.setConceptoPago(orderRecord.getRemarks());
         param.setCuentaBeneficiario(orderRecord.getRemittanceAccount());
         param.setCuentaOrdenante(paymentBankAccount);
