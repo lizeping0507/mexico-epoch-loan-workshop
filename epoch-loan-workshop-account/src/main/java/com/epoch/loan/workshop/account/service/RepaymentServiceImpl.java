@@ -12,10 +12,7 @@ import com.epoch.loan.workshop.common.params.params.request.*;
 import com.epoch.loan.workshop.common.params.params.result.PandaPayH5Result;
 import com.epoch.loan.workshop.common.params.params.result.Result;
 import com.epoch.loan.workshop.common.service.RepaymentService;
-import com.epoch.loan.workshop.common.util.HttpUtils;
-import com.epoch.loan.workshop.common.util.LogUtil;
-import com.epoch.loan.workshop.common.util.ObjectIdUtil;
-import com.epoch.loan.workshop.common.util.PlatformUtil;
+import com.epoch.loan.workshop.common.util.*;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -50,7 +47,7 @@ public class RepaymentServiceImpl extends BaseService implements RepaymentServic
         // 查询挑选策略
         LoanProductRepaymentConfigEntity config = loanProductRepaymentConfigDao.findByGroupName(order.getRepaymentDistributionGroup());
         if (config == null) {
-            return errorPageUrl;
+            return AppDomainUtil.splicingRepaymentFailH5Url(order.getAppName());
         }
         LogUtil.sysInfo("config:{}", config);
 
@@ -84,7 +81,8 @@ public class RepaymentServiceImpl extends BaseService implements RepaymentServic
         if (CollectionUtils.isEmpty(loanRepaymentDistributions)) {
             LogUtil.sysInfo("无可用渠道配置:{}", loanRepaymentDistributions);
             //  无可用渠道配置
-            return errorPageUrl;
+            LoanOrderEntity order = loanOrderDao.findOrder(orderBill.getOrderId());
+            return AppDomainUtil.splicingRepaymentFailH5Url(order.getAppName());
         }
 
         // 根据策略挑选渠道
@@ -97,7 +95,8 @@ public class RepaymentServiceImpl extends BaseService implements RepaymentServic
             if (ObjectUtils.isEmpty(selectedRepaymentDistribution)) {
                 // 无可用渠道配置
                 LogUtil.sysInfo("根据权重策略选择渠道:{}", "空=====");
-                return errorPageUrl;
+                LoanOrderEntity order = loanOrderDao.findOrder(orderBill.getOrderId());
+                return AppDomainUtil.splicingRepaymentFailH5Url(order.getAppName());
             }
 
             // 权重挑选渠道
@@ -135,6 +134,7 @@ public class RepaymentServiceImpl extends BaseService implements RepaymentServic
             loanRepaymentPaymentRecordEntity.setEmail(userBasicInfo.getEmail());
             loanRepaymentPaymentRecordEntity.setName(remittanceAccount.getName());
             loanRepaymentPaymentRecordEntity.setEvent("OrderCompere");
+            loanRepaymentPaymentRecordEntity.setType("OXXO".equals(params.getPayType()) ? 0 : 1);
             LogUtil.sysInfo("loanRepaymentPaymentRecordEntity:{}", loanRepaymentPaymentRecordEntity);
 
             loanRepaymentPaymentRecordDao.insert(loanRepaymentPaymentRecordEntity);
@@ -154,7 +154,8 @@ public class RepaymentServiceImpl extends BaseService implements RepaymentServic
             LogUtil.sysInfo("payUrl:{}", payUrl);
         } else {
             // 策略无效
-            return errorPageUrl;
+            LoanOrderEntity order = loanOrderDao.findOrder(orderBill.getOrderId());
+            return AppDomainUtil.splicingRepaymentFailH5Url(order.getAppName());
         }
 
         // 发起结果校验
@@ -308,12 +309,14 @@ public class RepaymentServiceImpl extends BaseService implements RepaymentServic
 
         // 拆分
         List<String> spiltCodes = new ArrayList<>();
-        spiltCodes.add(clabe.substring(0,3));
-        spiltCodes.add(clabe.substring(3,6));
-        spiltCodes.add(clabe.substring(6,9));
-        spiltCodes.add(clabe.substring(9,12));
-        spiltCodes.add(clabe.substring(12,15));
-        spiltCodes.add(clabe.substring(15));
+        int length = clabe.length();
+        int start = 0;
+        while (start <= length - 3) {
+            spiltCodes.add(clabe.substring(start, start + 3));
+            start += 3;
+        }
+        spiltCodes.add(clabe.substring(start));
+
 
         PandaPayH5Result data = new PandaPayH5Result();
         data.setSpiltCode(spiltCodes);
@@ -323,10 +326,5 @@ public class RepaymentServiceImpl extends BaseService implements RepaymentServic
         result.setData(data);
 
         return result;
-    }
-
-    public static void main(String[] args) {
-        String s = "646180130900000024";
-        System.out.println(s.substring(0,3));
     }
 }

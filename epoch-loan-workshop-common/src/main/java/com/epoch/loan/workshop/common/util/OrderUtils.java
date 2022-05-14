@@ -103,7 +103,7 @@ public class OrderUtils {
             case OrderStatus.EXAMINE_WAIT:
                 return "Ver detalles";
             case OrderStatus.EXAMINE_PASS:
-                return "obtener el dinero";
+                return "Obtener el dinero";
             case OrderStatus.EXAMINE_FAIL:
                 return "Ver detalles";
             case OrderStatus.WAIT_PAY:

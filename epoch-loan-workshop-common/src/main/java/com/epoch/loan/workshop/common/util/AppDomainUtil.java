@@ -16,6 +16,14 @@ public class AppDomainUtil {
      * pandaPay SPEI方式还款H5
      */
     private static final String PANDAPAY_SPEI_PREFIX = "/pay/pandaPaySPEI.html?id=";
+    /**
+     * pandaPay SPEI方式还款H5
+     */
+    private static final String REPAYMENT_SUCCESS_PREFIX = "/pay/success.html";
+    /**
+     * pandaPay SPEI方式还款H5
+     */
+    private static final String REPAYMENT_FAIL_PREFIX = "/pay/fail.html";
 
     /**
      * 获取App顶级域名
@@ -51,6 +59,22 @@ public class AppDomainUtil {
      */
     public static String splicingPandapayOXXORepaymentH5Url(String appName,String id) {
         return splicingAppResourceDoamin(appName) + PANDAPAY_OXXO_PREFIX + id;
+    }
+    /**
+     *  pandaPay 支付成功页面
+     * @param appName
+     * @return
+     */
+    public static String splicingRepaymentSuccessH5Url(String appName) {
+        return splicingAppResourceDoamin(appName) + REPAYMENT_SUCCESS_PREFIX;
+    }
+    /**
+     *  pandaPay 支付失败页面
+     * @param appName
+     * @return
+     */
+    public static String splicingRepaymentFailH5Url(String appName) {
+        return splicingAppResourceDoamin(appName) + REPAYMENT_FAIL_PREFIX;
     }
 
     /**
