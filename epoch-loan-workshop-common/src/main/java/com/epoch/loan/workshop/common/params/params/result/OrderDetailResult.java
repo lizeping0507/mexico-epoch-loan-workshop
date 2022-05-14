@@ -56,7 +56,7 @@ public class OrderDetailResult implements Serializable {
     /**
      * 实际到账金额
      */
-    private Double actualAmount;
+    private String actualAmount;
 
     /**
      * 利息

@@ -275,6 +275,21 @@ public class RedisClient {
     }
 
     /**
+     * 向指定队列中添加数据
+     *
+     * @param key
+     * @param value
+     */
+    public long lPush(String key, String value) {
+        try {
+            Long remove = redisTemplate.opsForList().leftPush(key, value);
+            return remove;
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    /**
      * 删除hash表中的值
      *
      * @param key  键 不能为null

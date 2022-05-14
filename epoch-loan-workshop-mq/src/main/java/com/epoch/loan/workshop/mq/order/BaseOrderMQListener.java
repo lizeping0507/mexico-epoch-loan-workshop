@@ -229,7 +229,7 @@ public abstract class BaseOrderMQListener {
      * @throws Exception
      */
     public void retry(OrderParams orderParams, String tag) throws Exception {
-        orderMQManager.sendMessage(orderParams, tag, 4);
+        orderMQManager.sendMessage(orderParams, tag, 40);
     }
 
     /**

@@ -100,7 +100,7 @@ public abstract class BaseRepaymentMQListener {
      * @param subExpression   标签
      */
     protected void retryRepayment(RepaymentParams repaymentParams, String subExpression) throws Exception {
-        repaymentMQManager.sendMessage(repaymentParams, subExpression, 4);
+        repaymentMQManager.sendMessage(repaymentParams, subExpression, 60);
     }
 
     /**
@@ -110,7 +110,7 @@ public abstract class BaseRepaymentMQListener {
      * @param subExpression               标签
      */
     protected void retryDistributionRepayment(DistributionRepaymentParams distributionRepaymentParams, String subExpression) throws Exception {
-        repaymentMQManager.sendMessage(distributionRepaymentParams, subExpression, 4);
+        repaymentMQManager.sendMessage(distributionRepaymentParams, subExpression, 60);
     }
 
     /**

@@ -56,6 +56,12 @@ public abstract class BaseCollectionMQ {
     public LoanProductDao loanProductDao;
 
     /**
+     * 产品扩展
+     */
+    @Autowired
+    public LoanProductExtDao loanProductExtDao;
+
+    /**
      * 风控配置
      */
     @Autowired
@@ -121,7 +127,7 @@ public abstract class BaseCollectionMQ {
      */
     public void retryCollection(CollectionParams params, String tag) throws Exception {
         // 重入放款队列
-        collectionMQManager.sendMessage(params, tag, 4);
+        collectionMQManager.sendMessage(params, tag, 40);
     }
 
     /**

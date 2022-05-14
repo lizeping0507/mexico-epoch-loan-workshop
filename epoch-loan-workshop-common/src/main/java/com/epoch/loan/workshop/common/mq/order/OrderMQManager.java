@@ -1,9 +1,12 @@
 package com.epoch.loan.workshop.common.mq.order;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.mq.BaseMQ;
 import com.epoch.loan.workshop.common.mq.order.params.OrderParams;
+import com.epoch.loan.workshop.common.util.LogUtil;
 import lombok.Data;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
 import org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently;
 import org.apache.rocketmq.client.exception.MQClientException;
@@ -98,7 +101,7 @@ public class OrderMQManager extends BaseMQ {
      * @param tag
      * @throws Exception
      */
-    public void sendMessage(OrderParams orderParams, String tag) throws Exception {
+    public void sendMessage(Object orderParams, String tag) throws Exception {
         // 消息体
         Message msg = new Message();
 
@@ -124,24 +127,13 @@ public class OrderMQManager extends BaseMQ {
      * @param delayTimeLevel
      * @throws Exception
      */
-    public void sendMessage(OrderParams orderParams, String tag, int delayTimeLevel) throws Exception {
-        // 消息体
-        Message msg = new Message();
-
-        // 发送主题
-        msg.setTopic(topic);
-
-        // 标签
-        msg.setTags(tag);
-
-        // 延时级别
-        msg.setDelayTimeLevel(delayTimeLevel);
-
-        //送消息体内容
-        msg.setBody(JSON.toJSONString(orderParams).getBytes());
-
-        // 发送消息
-        producer.send(msg);
+    public void sendMessage(Object orderParams, String tag, int delayTimeLevel) throws Exception {
+        // 加入redis队列中
+        JSONObject result = new JSONObject();
+        result.put("params", orderParams);
+        result.put("time", System.currentTimeMillis());
+        result.put("delayed", delayTimeLevel * 1000);
+        redisClient.rPush(topic + ":" + tag, result.toJSONString());
     }
 
     /**
@@ -174,6 +166,66 @@ public class OrderMQManager extends BaseMQ {
 
         // 开始消费
         consumer.start();
+
+        // 延时消费
+        PullDelayedMessage pullDelayedMessage = new PullDelayedMessage(subExpression);
+        pullDelayedMessage.start();
+    }
+
+    /**
+     * 延时队列拉取消息实现
+     */
+    class PullDelayedMessage extends Thread {
+
+        /**
+         * 标签
+         */
+        private String subExpression;
+
+        /**
+         * 线程
+         */
+        @Override
+        public void run() {
+            while (true) {
+                try {
+                    // 消费者为空
+                    if (producer == null) {
+                        continue;
+                    }
+
+                    // 从队列中取出数据
+                    Object object = redisClient.lPop(topic + ":" + subExpression);
+                    if (ObjectUtils.isEmpty(object)) {
+                        Thread.sleep(5000);
+                        continue;
+                    }
+
+                    // 解析队列参数
+                    JSONObject result = JSONObject.parseObject(object.toString());
+
+                    // 判断是否达到延时时间
+                    if (result.getLong("time") + result.getLong("delayed") > System.currentTimeMillis()) {
+                        redisClient.lPush(topic + ":" + subExpression, result.toJSONString());
+                        continue;
+                    }
+
+                    sendMessage(result.getJSONObject("params"), subExpression);
+                } catch (Exception e) {
+                    LogUtil.sysError("[OrderMQManager]", e);
+                }
+            }
+
+        }
+
+        /**
+         * 有参构造函数
+         *
+         * @param subExpression
+         */
+        public PullDelayedMessage(String subExpression) {
+            this.subExpression = subExpression;
+        }
     }
 
 
