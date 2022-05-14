@@ -172,11 +172,11 @@ public class PandaPay extends BaseRepaymentMQListener implements MessageListener
 //            {"resultado":{"result":{"abono":{"claveRastreo":"Ras00032","institucionOrdenante":"90646","callbackTime":"2021-08-11 14:56:27","monto":"100.00","cuentaBeneficiario":"646180130900000011","nombreBeneficiario":"beneficiario","nombreOrdenante":"BRANDME CROWDMARKETING, SAPI DE CV","cuentaOrdenante":"646180110400000007","id":"41794243","referenciaNumerica":"9999999","institucionBeneficiaria":"90646"}}}}
             LogUtil.sysInfo("queryUrl: {} result : {}", queryUrl, result);
             // 更新请求响应数据
-            updateSearchRequestAndResponse(paymentRecord.getId(), businessId, result);
+            updateSearchRequestAndResponse(paymentRecord.getId(), JSONObject.toJSONString(params), result);
         } catch (Exception e) {
             LogUtil.sysError("[PandaPay repayment queryError]", e);
             // 更新请求响应数据
-            updateSearchRequestAndResponse(paymentRecord.getId(), businessId, "Error");
+            updateSearchRequestAndResponse(paymentRecord.getId(), JSONObject.toJSONString(params), "Error");
             // 请求失败
             return PaymentField.PAY_QUERY_ERROR;
         }
@@ -226,7 +226,7 @@ public class PandaPay extends BaseRepaymentMQListener implements MessageListener
             result = HttpUtils.simplePostInvoke(oxxPayQueryUrl, JSONObject.toJSONString(params), header);
             LogUtil.sysInfo("queryUrl: {} result : {}", oxxPayQueryUrl, result);
             // 更新请求响应数据
-            updateSearchRequestAndResponse(paymentRecord.getId(), businessId, result);
+            updateSearchRequestAndResponse(paymentRecord.getId(), JSONObject.toJSONString(params), result);
         } catch (Exception e) {
             LogUtil.sysError("[OxxoPandaPay repayment queryError]", e);
             // 更新请求响应数据

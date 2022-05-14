@@ -56,7 +56,7 @@ public class ZookeeperClient {
 
         //创建锁对象
         CuratorFramework client = this.getClient();
-        LogUtil.sysInfo("client:{}",client);
+        LogUtil.sysInfo("client:{}", client);
         InterProcessMutex lock = new InterProcessMutex(client, path);
         boolean success = false;
         try {
@@ -64,6 +64,8 @@ public class ZookeeperClient {
                 //获取锁
                 success = lock.acquire(mutex.getTimeout(), mutex.getTimeUnit());
             } catch (Exception e) {
+                LogUtil.sysError("[ZookeeperClient]", e);
+
                 throw new RuntimeException("obtain lock error " + e.getMessage() + ", path " + path);
             }
 
@@ -72,9 +74,9 @@ public class ZookeeperClient {
             } else {
                 return null;
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             throw new RuntimeException("obtain lock error " + e.getMessage() + ", path " + path);
-        }finally {
+        } finally {
             try {
                 if (success) {
                     lock.release(); //释放锁
@@ -86,11 +88,7 @@ public class ZookeeperClient {
     }
 
     public void init() {
-        this.client = CuratorFrameworkFactory
-                .builder()
-                .connectString(SERVER)
-                .retryPolicy(new ExponentialBackoffRetry(SLEEP_TIME, MAX_RETRIES))
-                .build();
+        this.client = CuratorFrameworkFactory.builder().connectString(SERVER).retryPolicy(new ExponentialBackoffRetry(SLEEP_TIME, MAX_RETRIES)).build();
         this.client.start();
     }
 }
