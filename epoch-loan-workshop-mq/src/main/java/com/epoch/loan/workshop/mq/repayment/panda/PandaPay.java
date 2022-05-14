@@ -159,7 +159,7 @@ public class PandaPay extends BaseRepaymentMQListener implements MessageListener
         String businessId = paymentRecord.getBusinessId();
         // 参数封装
         PandaPayQueryParams params = new PandaPayQueryParams();
-        params.setClabe("646180130900000011");
+        params.setClabe(paymentRecord.getClabe());
         Map<String,String> header = new HashMap<>();
         header.put("Encoding","UTF-8");
         header.put("Content-Type","application/json");
@@ -214,7 +214,7 @@ public class PandaPay extends BaseRepaymentMQListener implements MessageListener
         String businessId = paymentRecord.getBusinessId();
         // 参数封装
         OxxoPandaPayQueryParams params = new OxxoPandaPayQueryParams();
-        params.setReference("99000003834928");
+        params.setReference(paymentRecord.getClabe());
         Map<String,String> header = new HashMap<>();
         header.put("Encoding","UTF-8");
         header.put("Content-Type","application/json");
