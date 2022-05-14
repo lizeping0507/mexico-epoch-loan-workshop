@@ -80,22 +80,19 @@ public class OrderExaminePass extends BaseOrderMQListener implements MessageList
                 double approvalAmount = loanOrderEntity.getApprovalAmount();
 
                 /*放款金额计算*/
-                // 手续费费率
-                double processingFeeProportion = loanOrderEntity.getProcessingFeeProportion();
-
-                // 扣除费用
-                double incidentalAmount = approvalAmount * (processingFeeProportion / 100);
-
                 // 计算扣除费用后真实放款金额
                 double realAmount = loanOrderEntity.getApprovalAmount();
-
-                // 更新订单扣除费用
-                loanOrderDao.updateOrderIncidentalAmount(orderId, incidentalAmount, new Date());
 
                 // 更新实际放款金额
                 loanOrderDao.updateOrderActualAmount(orderId, realAmount, new Date());
 
                 /* 计算还款金额 */
+                // 手续费费率
+                double processingFeeProportion = loanOrderEntity.getProcessingFeeProportion();
+
+                // 手续费
+                double incidentalAmount = approvalAmount * (processingFeeProportion / 100);
+
                 // 利率
                 double interest = loanOrderEntity.getInterest();
 
@@ -103,7 +100,7 @@ public class OrderExaminePass extends BaseOrderMQListener implements MessageList
                 double interestAmount = approvalAmount * (interest / 100);
 
                 // 总还款金额(预计)
-                Double estimatedRepaymentAmount = approvalAmount + interestAmount;
+                Double estimatedRepaymentAmount = approvalAmount + interestAmount + incidentalAmount;
 
                 // 每期应还款金额
                 double stagesRepaymentAmount = estimatedRepaymentAmount / loanOrderEntity.getStages();
@@ -113,6 +110,9 @@ public class OrderExaminePass extends BaseOrderMQListener implements MessageList
 
                 // 每期应还利息
                 double stagesInterestAmount = interestAmount / loanOrderEntity.getStages();
+
+                // 每期应还手续费
+                double stagesIncidentalAmount = interestAmount / loanOrderEntity.getStages();
 
                 // 更新还款金额
                 loanOrderDao.updateOrderEstimatedRepaymentAmount(orderId, estimatedRepaymentAmount, new Date());
@@ -130,7 +130,7 @@ public class OrderExaminePass extends BaseOrderMQListener implements MessageList
                     loanOrderBillEntity.setInterestAmount(stagesInterestAmount);
                     loanOrderBillEntity.setReductionAmount(0.00);
                     loanOrderBillEntity.setPunishmentAmount(0.00);
-                    loanOrderBillEntity.setIncidentalAmount(0.00);
+                    loanOrderBillEntity.setIncidentalAmount(stagesIncidentalAmount);
                     loanOrderBillEntity.setReceivedAmount(0.00);
                     loanOrderBillEntity.setStages(i);
                     loanOrderBillEntity.setCreateTime(new Date());
