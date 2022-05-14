@@ -75,7 +75,7 @@ public class PandaPay extends BaseRepayment {
         params.setEmail(record.getEmail());
         params.setPhone(record.getPhone());
         params.setRfc(loanUserInfo.getRfc());
-        params.setCurp(loanUserInfo.getCurp());
+        params.setCurp(loanUserInfo.getPapersId());
         Map<String,String> header = new HashMap<>();
         header.put("Encoding","UTF-8");
         header.put("Content-Type","application/json");
