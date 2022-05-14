@@ -308,12 +308,14 @@ public class RepaymentServiceImpl extends BaseService implements RepaymentServic
 
         // 拆分
         List<String> spiltCodes = new ArrayList<>();
-        spiltCodes.add(clabe.substring(0,3));
-        spiltCodes.add(clabe.substring(3,6));
-        spiltCodes.add(clabe.substring(6,9));
-        spiltCodes.add(clabe.substring(9,12));
-        spiltCodes.add(clabe.substring(12,15));
-        spiltCodes.add(clabe.substring(15));
+        int length = clabe.length();
+        int start = 0;
+        while (start <= length - 3) {
+            spiltCodes.add(clabe.substring(start, start + 3));
+            start += 3;
+        }
+        spiltCodes.add(clabe.substring(start));
+
 
         PandaPayH5Result data = new PandaPayH5Result();
         data.setSpiltCode(spiltCodes);
@@ -323,10 +325,5 @@ public class RepaymentServiceImpl extends BaseService implements RepaymentServic
         result.setData(data);
 
         return result;
-    }
-
-    public static void main(String[] args) {
-        String s = "646180130900000024";
-        System.out.println(s.substring(0,3));
     }
 }
