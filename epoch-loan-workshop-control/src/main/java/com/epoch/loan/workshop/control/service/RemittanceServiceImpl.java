@@ -53,6 +53,7 @@ public class RemittanceServiceImpl extends BaseService implements RemittanceServ
 
         // 查询用户放款账户列表
         List<LoanRemittanceAccountEntity> loanRemittanceAccountEntityList = loanRemittanceAccountDao.findUserRemittanceAccountList(userId);
+        LogUtil.sysInfo("查询用户放款账户列表 :{}", JSONObject.toJSONString(loanRemittanceAccountEntityList));
 
         // 按照最后一条放款的账户在第一条进行排序
         List<RemittanceAccountList> remittanceAccountLists = new ArrayList<>();
@@ -71,6 +72,7 @@ public class RemittanceServiceImpl extends BaseService implements RemittanceServ
 
         // 如果有最后一笔 插入到队首
         if (ObjectUtils.isNotEmpty(lastUserLoanRemittanceAccountEntity)) {
+            remittanceAccountList = new RemittanceAccountList();
             BeanUtils.copyProperties(lastUserLoanRemittanceAccountEntity, remittanceAccountList);
             remittanceAccountLists.add(0, remittanceAccountList);
         }
@@ -210,8 +212,7 @@ public class RemittanceServiceImpl extends BaseService implements RemittanceServ
     @Override
     public Result<RemittanceBankListResult> remittanceBankList(BaseParams baseParams) {
         // 查询放款银行列表
-        List<LoanRemittanceBankEntity> loanRemittanceBankList = loanRemittanceBankDao.findLoanRemittanceBankList(baseParams.getUser().getId());
-        LogUtil.sysInfo("查询放款银行列表 :{}", JSONObject.toJSONString(loanRemittanceBankList));
+        List<LoanRemittanceBankEntity> loanRemittanceBankList = loanRemittanceBankDao.findLoanRemittanceBankList();
 
         // 封装参数
         List<String> bankList = new ArrayList<>();
