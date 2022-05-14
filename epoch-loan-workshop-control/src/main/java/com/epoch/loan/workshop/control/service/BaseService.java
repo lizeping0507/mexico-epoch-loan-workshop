@@ -1,5 +1,6 @@
 package com.epoch.loan.workshop.control.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.authentication.TokenManager;
 import com.epoch.loan.workshop.common.config.PlatformConfig;
 import com.epoch.loan.workshop.common.config.RiskConfig;
@@ -8,7 +9,9 @@ import com.epoch.loan.workshop.common.dao.elastic.SdkCatchDataSyncLogElasticDao;
 import com.epoch.loan.workshop.common.dao.mysql.*;
 import com.epoch.loan.workshop.common.redis.RedisClient;
 import com.epoch.loan.workshop.common.sms.SMSManager;
+import com.epoch.loan.workshop.common.util.LogUtil;
 import com.epoch.loan.workshop.common.zookeeper.ZookeeperClient;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;
@@ -146,4 +149,24 @@ public class BaseService {
      */
     @Autowired
     public TokenManager tokenManager;
+
+    /**
+     * 解析产品配置
+     * @param sources 原配置
+     * @param type 客群 0:新客 1:老客
+     * @return
+     */
+    protected String parseProductConfig(String sources, int type) {
+        try{
+            JSONObject jsonObject = JSONObject.parseObject(sources);
+            if (type == 0){
+                return jsonObject.getString("newConfig");
+            }else {
+                return jsonObject.getString("oldConfig");
+            }
+        } catch (Exception e){
+            LogUtil.sysError("[BaseService parseProductConfig]",e);
+            return null;
+        }
+    }
 }

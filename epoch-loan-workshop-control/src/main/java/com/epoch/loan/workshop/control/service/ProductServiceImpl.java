@@ -55,11 +55,11 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         }
 
         // 产品信息
-        resData.setArrivalRange(loanProductEntity.getArrivalRange());
-        resData.setInterestRange(loanProductEntity.getInterestRange()); // TODO
-        resData.setRepaymentRange(loanProductEntity.getRepaymentRange());
+        resData.setInterestRange(loanProductEntity.getInterestRange());
         resData.setServiceFeeRange(loanProductEntity.getServiceFeeRange());
-        resData.setAmount(loanProductEntity.getAmountRange());
+        resData.setArrivalRange(parseProductConfig(loanProductEntity.getArrivalRange(),1));
+        resData.setRepaymentRange(parseProductConfig(loanProductEntity.getRepaymentRange(),1));
+        resData.setAmount(parseProductConfig(loanProductEntity.getAmountRange(),1));
 
         // 用户认证状态
         resData.setIdFlag(params.getUser().isIdentityAuth() ? 1 : 0);
@@ -464,6 +464,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             // 封装
             ProductList productList = new ProductList();
             BeansUtil.copyProperties(loanProductEntity,productList);
+            productList.setAmountRange(parseProductConfig(loanProductEntity.getAmountRange(),1));
             productList.setInterest(loanProductEntity.getInterest() + "%/Dia");
             productList.setPassRate("");
             productList.setButton(OrderUtils.button(loanOrderEntity.getStatus()));
@@ -517,6 +518,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             // 封装
             ProductList productList = new ProductList();
             BeansUtil.copyProperties(loanProductEntity,productList);
+            productList.setAmountRange(parseProductConfig(loanProductEntity.getAmountRange(),1));
             productList.setInterest(loanProduct.getInterest() + "%/Dia");
 
 
@@ -561,6 +563,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             // 封装
             ProductList productList = new ProductList();
             BeansUtil.copyProperties(productEntity, productList);
+            productList.setAmountRange(parseProductConfig(productEntity.getAmountRange(),1));
             productList.setInterest(productEntity.getInterest() + "%/Dia");
 
             // 续贷 必定展示通过率
@@ -689,6 +692,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             // 封装
             ProductList productList = new ProductList();
             BeansUtil.copyProperties(loanProductEntity, productList);
+            productList.setAmountRange(parseProductConfig(loanProductEntity.getAmountRange(),1));
             productList.setInterest(loanProductEntity.getInterest() + "%/Dia");
             productList.setButton(OrderUtils.button(OrderStatus.CREATE));
             newLoanAndOpenProductList.add(productList);
@@ -708,6 +712,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 // 封装
                 ProductList productList = new ProductList();
                 BeansUtil.copyProperties(productEntity, productList);
+                productList.setAmountRange(parseProductConfig(productEntity.getAmountRange(),1));
                 productList.setInterest(productEntity.getInterest() + "%/Dia");
                 productList.setButton(OrderUtils.button(OrderStatus.CREATE));
                 reloanOrderProductList.add(productList);
