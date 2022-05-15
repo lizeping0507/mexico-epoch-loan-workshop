@@ -189,13 +189,12 @@ public class PandaPay extends BaseRepaymentMQListener implements MessageListener
                 return PaymentField.PAY_QUERY_ERROR;
             }
             JSONObject resultado = resJsonObj.getJSONObject("resultado");
-            JSONObject pandaResult = resultado.getJSONObject("result");
-            if (ObjectUtils.isNotEmpty(pandaResult)) {
+            if (ObjectUtils.isEmpty(resultado.getString(PaymentField.PANDAPAY_DESCRIPCION_ERROR))) {
                 // 支付成功
                 return PaymentField.PAY_SUCCESS;
             } else {
-                // 支付失败
-                return PaymentField.PAY_FAILED;
+                // 支付中
+                return PaymentField.PAY_PROCESS;
             }
         } catch (Exception e) {
             LogUtil.sysError("[PandaPay repayment queryParseError]", e);
@@ -247,8 +246,8 @@ public class PandaPay extends BaseRepaymentMQListener implements MessageListener
                 // 支付成功
                 return PaymentField.PAY_SUCCESS;
             } else {
-                // 支付失败
-                return PaymentField.PAY_FAILED;
+                // 支付中
+                return PaymentField.PAY_PROCESS;
             }
         } catch (Exception e) {
             LogUtil.sysError("[PandaPay repayment queryParseError]", e);
