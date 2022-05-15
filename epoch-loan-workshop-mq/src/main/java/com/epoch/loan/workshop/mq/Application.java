@@ -5,7 +5,6 @@ import com.epoch.loan.workshop.common.mq.collection.CollectionMQManager;
 import com.epoch.loan.workshop.common.mq.order.OrderMQManager;
 import com.epoch.loan.workshop.common.mq.remittance.RemittanceMQManager;
 import com.epoch.loan.workshop.common.mq.repayment.RepaymentMQManager;
-import com.epoch.loan.workshop.common.zookeeper.ZookeeperClient;
 import com.epoch.loan.workshop.mq.collection.Collection;
 import com.epoch.loan.workshop.mq.log.AccessLogStorage;
 import com.epoch.loan.workshop.mq.order.*;
@@ -157,7 +156,6 @@ public class Application {
      */
     @PostConstruct
     public void startJob() throws Exception {
-        orderMQManager.init();
         repaymentMQManager.init();
         remittanceMQManagerProduct.init();
         collectionMQManager.init();

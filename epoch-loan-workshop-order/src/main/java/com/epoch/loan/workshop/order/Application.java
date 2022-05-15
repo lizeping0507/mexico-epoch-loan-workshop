@@ -56,6 +56,5 @@ public class Application {
      */
     @PostConstruct
     public void startJob() throws Exception {
-        orderMQManager.init();
     }
 }

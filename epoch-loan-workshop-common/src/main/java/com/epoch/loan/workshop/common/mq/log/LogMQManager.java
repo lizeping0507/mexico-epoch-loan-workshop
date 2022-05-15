@@ -61,7 +61,6 @@ public class LogMQManager extends BaseMQ {
     @Value("${rocket.log.accessLogStorage.subExpression}")
     private String requestLogStorageSubExpression;
 
-
     /**
      * 初始化
      */
@@ -73,7 +72,6 @@ public class LogMQManager extends BaseMQ {
         producer.setSendMessageWithVIPChannel(false);
         producer.start();
     }
-
 
     /**
      * 发送消息
@@ -98,7 +96,6 @@ public class LogMQManager extends BaseMQ {
         // 发送消息
         producer.send(msg);
     }
-
 
     /**
      * 消费者
