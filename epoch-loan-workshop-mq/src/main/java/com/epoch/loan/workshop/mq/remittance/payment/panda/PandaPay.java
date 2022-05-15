@@ -277,9 +277,10 @@ public class PandaPay extends BaseRemittancePaymentMQListener implements Message
         String queryUrl = paymentConfig.getString(PaymentField.PANDAPAY_QUERY_URL);
         String appId = paymentConfig.getString(PaymentField.PANDAPAY_APPID);
         String key = paymentConfig.getString(PaymentField.PANDAPAY_KEY);
+        String prefixCode = paymentConfig.getString(PaymentField.PANDAPAY_PAYOUT_PREFIX_CODE);
 
         PandaPayPayOutQueryParam param = new PandaPayPayOutQueryParam();
-        param.setClaveRastreo(paymentRecord.getId());
+        param.setClaveRastreo(prefixCode + paymentRecord.getId());
         // 三方请求处理
         Map<String,String> header = new HashMap<>();
         header.put("Encoding","UTF-8");
@@ -331,11 +332,5 @@ public class PandaPay extends BaseRemittancePaymentMQListener implements Message
             // 其他状态 进行中
             return PaymentField.PAYOUT_PROCESS;
         }
-    }
-
-
-    public static void main(String[] args){
-        System.out.println(System.currentTimeMillis());
-        System.out.println(Integer.valueOf(String.valueOf(System.currentTimeMillis()).substring(6)));
     }
 }
