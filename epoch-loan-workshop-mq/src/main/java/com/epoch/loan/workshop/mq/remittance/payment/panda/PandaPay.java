@@ -207,13 +207,7 @@ public class PandaPay extends BaseRemittancePaymentMQListener implements Message
         param.setMonto(df.format(orderRecord.getAmount()));
         param.setNombreBeneficiario(orderRecord.getName());
         param.setReferenciaNumerica(Integer.valueOf(String.valueOf(System.currentTimeMillis()).substring(6)));
-        if(ObjectUtils.isNotEmpty(orderRecord.getCurp())){
-            param.setRfcCurpBeneficiario(orderRecord.getCurp());
-        } else if(ObjectUtils.isNotEmpty(orderRecord.getRfc())){
-            param.setRfcCurpBeneficiario(orderRecord.getRfc());
-        } else{
-            param.setRfcCurpBeneficiario("ND");
-        }
+        param.setRfcCurpBeneficiario("ND");
         param.setRfcCurpOrdenante(rfcCurpOrdenante);
         param.setTipoCuentaBeneficiario(orderRecord.getType() == 1 ? 40 : 3);
         param.setTipoCuentaOrdenante(paymentAccountType);
