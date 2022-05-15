@@ -193,7 +193,7 @@ public class Collection extends BaseCollectionMQ implements MessageListenerConcu
         List<CollectionRepayRecordParam> repayRecord = new ArrayList<>();
         List<LoanRepaymentPaymentRecordEntity> successRecordList = loanRepaymentPaymentRecordDao.findListRecordDTOByOrderIdAndStatus(orderEntity.getId(), LoanRepaymentPaymentRecordStatus.SUCCESS);
         if (CollectionUtils.isNotEmpty(successRecordList)) {
-            successRecordList.stream().forEach(successRecord -> {
+            successRecordList.forEach(successRecord -> {
                 CollectionRepayRecordParam collectionRepayRecordParam = new CollectionRepayRecordParam();
                 collectionRepayRecordParam.setOrderNo(orderEntity.getId());
                 collectionRepayRecordParam.setThirdRepayRecordId(successRecord.getId());
