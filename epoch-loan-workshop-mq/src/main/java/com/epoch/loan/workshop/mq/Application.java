@@ -51,12 +51,6 @@ public class Application {
     public com.epoch.loan.workshop.mq.repayment.Distribution distributionRepayment;
 
     /**
-     * Zookeeper工具类
-     */
-    @Autowired
-    public ZookeeperClient zookeeperClient;
-
-    /**
      * 订单队列
      */
     @Autowired
@@ -163,7 +157,6 @@ public class Application {
      */
     @PostConstruct
     public void startJob() throws Exception {
-        zookeeperClient.init();
         orderMQManager.init();
         repaymentMQManager.init();
         remittanceMQManagerProduct.init();

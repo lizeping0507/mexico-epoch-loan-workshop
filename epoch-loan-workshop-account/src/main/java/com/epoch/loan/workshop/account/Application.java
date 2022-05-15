@@ -35,7 +35,7 @@ public class Application {
      * 汇款分配队列
      */
     @Autowired
-    private RemittanceMQManager remittanceMQManagerProduct;
+    private RemittanceMQManager remittanceMQManager;
     /**
      * 还款
      */
@@ -61,7 +61,7 @@ public class Application {
      */
     @PostConstruct
     public void startJob() throws Exception {
-        remittanceMQManagerProduct.init();
+        remittanceMQManager.init();
         repaymentMQManager.init();
     }
 }

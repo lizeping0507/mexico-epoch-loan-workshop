@@ -1,6 +1,5 @@
-package com.epoch.loan.workshop.common.lock;
+package com.epoch.loan.workshop.common.zookeeper.lock;
 
-import com.epoch.loan.workshop.common.zookeeper.AbstractZookeeperLock;
 import lombok.Data;
 
 /**

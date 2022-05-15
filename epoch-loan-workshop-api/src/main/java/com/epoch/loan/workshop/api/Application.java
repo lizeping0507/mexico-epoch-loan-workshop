@@ -51,12 +51,6 @@ public class Application {
     private LogMQManager logMQManager;
 
     /**
-     * Zookeeper工具类
-     */
-    @Autowired
-    public ZookeeperClient zookeeperClient;
-
-    /**
      * 启动类
      *
      * @param args
@@ -70,7 +64,6 @@ public class Application {
 
     @PostConstruct
     public void startJob() throws Exception {
-        zookeeperClient.init();
         // 初始化动态地址配置
         loadDynamicRequestConfig();
 
