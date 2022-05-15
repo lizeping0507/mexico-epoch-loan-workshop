@@ -1,4 +1,4 @@
-package com.epoch.loan.workshop.common.zookeeper;
+package com.epoch.loan.workshop.common.zookeeper.lock;
 
 import java.util.concurrent.TimeUnit;
 
@@ -28,6 +28,7 @@ public abstract class AbstractZookeeperLock<T> {
      * @return
      */
     public abstract T execute() throws Exception;
+
 
     public int getTimeout() {
         return TIME_OUT;

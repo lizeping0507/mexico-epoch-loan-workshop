@@ -3,15 +3,21 @@ package com.epoch.loan.workshop.order.service;
 import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.constant.*;
 import com.epoch.loan.workshop.common.entity.mysql.*;
-import com.epoch.loan.workshop.common.lock.UserApplyDetailLock;
 import com.epoch.loan.workshop.common.mq.order.params.OrderParams;
 import com.epoch.loan.workshop.common.params.params.BaseParams;
-import com.epoch.loan.workshop.common.params.params.request.*;
-import com.epoch.loan.workshop.common.params.params.result.*;
+import com.epoch.loan.workshop.common.params.params.request.ApplyParams;
+import com.epoch.loan.workshop.common.params.params.request.BindRemittanceAccountParams;
+import com.epoch.loan.workshop.common.params.params.request.ConfirmMergePushApplyParams;
+import com.epoch.loan.workshop.common.params.params.request.OrderDetailParams;
+import com.epoch.loan.workshop.common.params.params.result.ConfirmMergePushApplyResult;
+import com.epoch.loan.workshop.common.params.params.result.OrderDetailResult;
+import com.epoch.loan.workshop.common.params.params.result.OrderListResult;
+import com.epoch.loan.workshop.common.params.params.result.Result;
 import com.epoch.loan.workshop.common.params.params.result.model.LoanRepaymentRecordDTO;
 import com.epoch.loan.workshop.common.params.params.result.model.OrderDTO;
 import com.epoch.loan.workshop.common.service.OrderService;
 import com.epoch.loan.workshop.common.util.*;
+import com.epoch.loan.workshop.common.zookeeper.lock.UserApplyDetailLock;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -87,7 +93,7 @@ public class OrderServiceImpl extends BaseService implements OrderService {
      * @return
      */
     @Override
-    public Result apply(ApplyParams applyParams) {
+    public Result apply(ApplyParams applyParams) throws Exception {
         // 结果集
         Result result = new Result();
 

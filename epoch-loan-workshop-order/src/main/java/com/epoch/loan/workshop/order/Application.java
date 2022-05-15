@@ -32,12 +32,6 @@ import javax.annotation.PostConstruct;
 public class Application {
 
     /**
-     * Zookeeper工具类
-     */
-    @Autowired
-    public ZookeeperClient zookeeperClient;
-
-    /**
      * 订单队列组件
      */
     @Autowired
@@ -62,7 +56,6 @@ public class Application {
      */
     @PostConstruct
     public void startJob() throws Exception {
-        zookeeperClient.init();
         orderMQManager.init();
     }
 }

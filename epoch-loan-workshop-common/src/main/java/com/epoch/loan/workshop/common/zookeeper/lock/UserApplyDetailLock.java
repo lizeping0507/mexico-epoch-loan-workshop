@@ -1,6 +1,4 @@
-package com.epoch.loan.workshop.common.lock;
-
-import com.epoch.loan.workshop.common.zookeeper.AbstractZookeeperLock;
+package com.epoch.loan.workshop.common.zookeeper.lock;
 
 /**
  * @author : Duke

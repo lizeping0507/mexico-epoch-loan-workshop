@@ -1,7 +1,6 @@
 package com.epoch.loan.workshop.common.zookeeper;
 
-import com.epoch.loan.workshop.common.util.LogUtil;
-import lombok.Data;
+import com.epoch.loan.workshop.common.zookeeper.lock.AbstractZookeeperLock;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.recipes.locks.InterProcessMutex;
@@ -19,7 +18,6 @@ import org.springframework.stereotype.Component;
  */
 @RefreshScope
 @Component
-@Data
 public class ZookeeperClient {
     /**
      * 等待时间
@@ -39,10 +37,19 @@ public class ZookeeperClient {
      */
     @Value("${zookeeper.path}")
     private String PATH;
+
     /**
-     * 连接
+     * zookeeper 链接
      */
-    private CuratorFramework client;
+    private volatile static CuratorFramework client;
+
+    /**
+     * 初始化Zookeeper
+     */
+    protected void init() {
+        client = CuratorFrameworkFactory.builder().connectString(SERVER).retryPolicy(new ExponentialBackoffRetry(SLEEP_TIME, MAX_RETRIES)).build();
+        client.start();
+    }
 
     /**
      * 分布式锁
@@ -51,44 +58,44 @@ public class ZookeeperClient {
      * @param <T>
      * @return
      */
-    public <T> T lock(AbstractZookeeperLock<T> mutex) {
+    public <T> T lock(AbstractZookeeperLock<T> mutex) throws Exception {
+        // 懒加载
+        if (client == null) {
+            init();
+        }
+
+        // 锁路径
         String path = PATH + mutex.getLockPath();
 
-        //创建锁对象
-        CuratorFramework client = this.getClient();
-        LogUtil.sysInfo("client:{}", client);
+        // 获取锁
         InterProcessMutex lock = new InterProcessMutex(client, path);
+
+        // 是否获取锁标识
         boolean success = false;
         try {
-            try {
-                //获取锁
-                success = lock.acquire(mutex.getTimeout(), mutex.getTimeUnit());
-            } catch (Exception e) {
-                LogUtil.sysError("[ZookeeperClient]", e);
+            //获取锁
+            success = lock.acquire(mutex.getTimeout(), mutex.getTimeUnit());
 
-                throw new RuntimeException("obtain lock error " + e.getMessage() + ", path " + path);
-            }
-
+            // 判断是否获取到锁
             if (success) {
                 return (T) mutex.execute();
             } else {
+                // 没用获取到锁返回空
                 return null;
             }
         } catch (Exception e) {
-            throw new RuntimeException("obtain lock error " + e.getMessage() + ", path " + path);
+            throw e;
         } finally {
             try {
                 if (success) {
-                    lock.release(); //释放锁
+                    //释放锁
+                    lock.release();
                 }
             } catch (Exception e) {
-                throw new RuntimeException("obtain lock error " + e.getMessage() + ", path " + path);
+                throw e;
             }
         }
     }
 
-    public void init() {
-        this.client = CuratorFrameworkFactory.builder().connectString(SERVER).retryPolicy(new ExponentialBackoffRetry(SLEEP_TIME, MAX_RETRIES)).build();
-        this.client.start();
-    }
+
 }
