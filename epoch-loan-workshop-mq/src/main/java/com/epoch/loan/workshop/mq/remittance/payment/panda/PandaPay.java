@@ -202,7 +202,7 @@ public class PandaPay extends BaseRemittancePaymentMQListener implements Message
         param.setCuentaOrdenante(paymentBankAccount);
         String bank = orderRecord.getBank();
         LoanRemittanceBankEntity loanRemittanceBank = loanRemittanceBankDao.findByName(bank);
-        param.setInstitucionContraparte(loanRemittanceBank.getName());
+        param.setInstitucionContraparte(loanRemittanceBank.getCode());
         param.setInstitucionOperante(paymentBankCode);
         param.setMonto(df.format(orderRecord.getAmount()));
         param.setNombreBeneficiario(orderRecord.getName());
