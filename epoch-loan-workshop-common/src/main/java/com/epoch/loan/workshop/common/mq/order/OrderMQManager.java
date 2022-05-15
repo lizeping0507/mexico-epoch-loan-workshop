@@ -118,7 +118,6 @@ public class OrderMQManager extends BaseMQ {
         producer.send(msg);
     }
 
-
     /**
      * 发送消息
      *
