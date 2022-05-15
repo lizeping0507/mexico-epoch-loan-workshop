@@ -206,7 +206,7 @@ public class PandaPay extends BaseRemittancePaymentMQListener implements Message
         param.setInstitucionOperante(paymentBankCode);
         param.setMonto(df.format(orderRecord.getAmount()));
         param.setNombreBeneficiario(orderRecord.getName());
-        param.setReferenciaNumerica(UUIDUtils.uuid().indexOf(7));
+        param.setReferenciaNumerica(Integer.valueOf(String.valueOf(System.currentTimeMillis()).substring(6)));
         if(ObjectUtils.isNotEmpty(orderRecord.getCurp())){
             param.setRfcCurpBeneficiario(orderRecord.getCurp());
         } else if(ObjectUtils.isNotEmpty(orderRecord.getRfc())){
@@ -331,5 +331,11 @@ public class PandaPay extends BaseRemittancePaymentMQListener implements Message
             // 其他状态 进行中
             return PaymentField.PAYOUT_PROCESS;
         }
+    }
+
+
+    public static void main(String[] args){
+        System.out.println(System.currentTimeMillis());
+        System.out.println(Integer.valueOf(String.valueOf(System.currentTimeMillis()).substring(6)));
     }
 }
