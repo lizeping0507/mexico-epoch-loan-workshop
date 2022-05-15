@@ -202,18 +202,12 @@ public class PandaPay extends BaseRemittancePaymentMQListener implements Message
         param.setCuentaOrdenante(paymentBankAccount);
         String bank = orderRecord.getBank();
         LoanRemittanceBankEntity loanRemittanceBank = loanRemittanceBankDao.findByName(bank);
-        param.setInstitucionContraparte(loanRemittanceBank.getName());
+        param.setInstitucionContraparte(loanRemittanceBank.getCode());
         param.setInstitucionOperante(paymentBankCode);
         param.setMonto(df.format(orderRecord.getAmount()));
         param.setNombreBeneficiario(orderRecord.getName());
-        param.setReferenciaNumerica(UUIDUtils.uuid().indexOf(7));
-        if(ObjectUtils.isNotEmpty(orderRecord.getCurp())){
-            param.setRfcCurpBeneficiario(orderRecord.getCurp());
-        } else if(ObjectUtils.isNotEmpty(orderRecord.getRfc())){
-            param.setRfcCurpBeneficiario(orderRecord.getRfc());
-        } else{
-            param.setRfcCurpBeneficiario("ND");
-        }
+        param.setReferenciaNumerica(Integer.valueOf(String.valueOf(System.currentTimeMillis()).substring(6)));
+        param.setRfcCurpBeneficiario("ND");
         param.setRfcCurpOrdenante(rfcCurpOrdenante);
         param.setTipoCuentaBeneficiario(orderRecord.getType() == 1 ? 40 : 3);
         param.setTipoCuentaOrdenante(paymentAccountType);
@@ -277,9 +271,10 @@ public class PandaPay extends BaseRemittancePaymentMQListener implements Message
         String queryUrl = paymentConfig.getString(PaymentField.PANDAPAY_QUERY_URL);
         String appId = paymentConfig.getString(PaymentField.PANDAPAY_APPID);
         String key = paymentConfig.getString(PaymentField.PANDAPAY_KEY);
+        String prefixCode = paymentConfig.getString(PaymentField.PANDAPAY_PAYOUT_PREFIX_CODE);
 
         PandaPayPayOutQueryParam param = new PandaPayPayOutQueryParam();
-        param.setClaveRastreo(paymentRecord.getId());
+        param.setClaveRastreo(prefixCode + paymentRecord.getId());
         // 三方请求处理
         Map<String,String> header = new HashMap<>();
         header.put("Encoding","UTF-8");

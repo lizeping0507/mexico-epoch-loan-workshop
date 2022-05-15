@@ -14,7 +14,7 @@ import java.util.Date;
  * @description : 订单列表信息类
  */
 @Data
-public class OrderDTO implements Serializable {
+public class OrderInfoResult implements Serializable {
 
     /**
      * 订单编号

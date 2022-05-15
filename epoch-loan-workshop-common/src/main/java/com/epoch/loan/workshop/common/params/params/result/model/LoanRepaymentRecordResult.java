@@ -9,12 +9,12 @@ import java.util.Date;
 /**
  * @author 魏玉强
  * @packagename : com.epoch.loan.workshop.common.params.params.result.model
- * @className : LoanRepaymentRecordDTO
+ * @className : LoanRepaymentRecordResult
  * @createTime : 2022/04/24 15:26
  * @Description: 历史还款成功的记录
  */
 @Data
-public class LoanRepaymentRecordDTO implements Serializable {
+public class LoanRepaymentRecordResult implements Serializable {
 
     /**
      * 还款总额

@@ -1,6 +1,6 @@
 package com.epoch.loan.workshop.common.params.params.result;
 
-import com.epoch.loan.workshop.common.params.params.result.model.LoanRepaymentRecordDTO;
+import com.epoch.loan.workshop.common.params.params.result.model.LoanRepaymentRecordResult;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
@@ -86,7 +86,7 @@ public class OrderDetailResult implements Serializable {
     /**
      * 还款记录
      */
-    private List<LoanRepaymentRecordDTO> repayRecord;
+    private List<LoanRepaymentRecordResult> repayRecord;
 
     /**
      * 银行卡名称

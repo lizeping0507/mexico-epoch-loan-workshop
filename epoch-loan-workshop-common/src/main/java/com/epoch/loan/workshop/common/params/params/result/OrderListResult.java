@@ -1,6 +1,6 @@
 package com.epoch.loan.workshop.common.params.params.result;
 
-import com.epoch.loan.workshop.common.params.params.result.model.OrderDTO;
+import com.epoch.loan.workshop.common.params.params.result.model.OrderInfoResult;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,6 +23,6 @@ public class OrderListResult implements Serializable {
     /**
      * 订单列表
      */
-    private List<OrderDTO> list;
+    private List<OrderInfoResult> list;
 
 }

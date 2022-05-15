@@ -16,7 +16,7 @@ import java.math.BigDecimal;
  * @packagename: com.epoch.loan.workshop.common.params.result.model
  */
 @Data
-public class MergePushProductListDTO implements Serializable {
+public class MergePushProductInfo implements Serializable {
 
     /**
      * 产品id

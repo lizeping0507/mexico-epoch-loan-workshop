@@ -17,4 +17,9 @@ public class LoanRemittanceBankEntity {
      */
     private String name;
 
+    /**
+     * 名称
+     */
+    private String code;
+
 }
