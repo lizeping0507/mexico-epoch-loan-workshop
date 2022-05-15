@@ -1,6 +1,6 @@
 package com.epoch.loan.workshop.common.params.params.result;
 
-import com.epoch.loan.workshop.common.params.params.result.model.MergePushProductListDTO;
+import com.epoch.loan.workshop.common.params.params.result.model.MergePushProductInfo;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -64,5 +64,5 @@ public class MergePushHomeResult implements Serializable {
     /**
      * 产品列表
      */
-    private List<MergePushProductListDTO> productList;
+    private List<MergePushProductInfo> productList;
 }
