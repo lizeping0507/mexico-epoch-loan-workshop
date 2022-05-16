@@ -281,6 +281,11 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         // 产品id
         String productId = loanOrderEntity.getProductId();
 
+        // 已申请放款的金额设置申请时间
+        if (orderStatus >= OrderStatus.EXAMINE_WAIT){
+            appMaskModelResult.setApplyTime(loanOrderEntity.getApplyTime());
+        }
+
         /* 判断订单状态是否已经结清*/
         if (orderStatus == OrderStatus.DUE_COMPLETE || orderStatus == OrderStatus.COMPLETE) {
             // 返回结果
