@@ -4,10 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.constant.Field;
 import com.epoch.loan.workshop.common.constant.OrderExamineStatus;
 import com.epoch.loan.workshop.common.constant.OrderStatus;
-import com.epoch.loan.workshop.common.entity.mysql.LoanOrderBillEntity;
-import com.epoch.loan.workshop.common.entity.mysql.LoanOrderEntity;
-import com.epoch.loan.workshop.common.entity.mysql.LoanOrderExamineEntity;
-import com.epoch.loan.workshop.common.entity.mysql.LoanUserInfoEntity;
+import com.epoch.loan.workshop.common.entity.mysql.*;
 import com.epoch.loan.workshop.common.mq.order.params.OrderParams;
 import com.epoch.loan.workshop.common.util.DateUtil;
 import com.epoch.loan.workshop.common.util.HttpUtils;
@@ -256,7 +253,8 @@ public class RiskModelV1 extends BaseOrderMQListener implements MessageListenerC
             bizData.put("approvalAmount", LatelyLoanOrderEntity.getApprovalAmount());
             bizData.put("phone", mobile);
             bizData.put("appName", appName);
-            bizData.put("channelCode", userChannelId);
+            LoanChannelEntity channel = loanChannelDao.findChannel(userChannelId);
+            bizData.put("channelCode", channel.getChannelName());
             params.put(Field.BIZ_DATA, bizData.toJSONString());
 
             // 生成签名

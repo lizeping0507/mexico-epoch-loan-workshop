@@ -45,6 +45,12 @@ public abstract class BaseOrderMQListener {
     public RedisClient redisClient;
 
     /**
+     * 用户渠道
+     */
+    @Autowired
+    public LoanChannelDao loanChannelDao;
+
+    /**
      * 风控配置
      */
     @Autowired
