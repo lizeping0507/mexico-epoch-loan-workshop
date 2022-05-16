@@ -224,8 +224,6 @@ public class OrderMQManager extends BaseMQ {
         consumer.start();
     }
 
-
-
     /**
      * 消费者
      *

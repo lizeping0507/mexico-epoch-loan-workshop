@@ -3,6 +3,7 @@ package com.epoch.loan.workshop.common.mq.remittance;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.mq.BaseMQ;
+import com.epoch.loan.workshop.common.mq.DelayMQParams;
 import com.epoch.loan.workshop.common.mq.remittance.params.DistributionRemittanceParams;
 import com.epoch.loan.workshop.common.mq.remittance.params.RemittanceParams;
 import com.epoch.loan.workshop.common.util.LogUtil;
@@ -10,14 +11,19 @@ import lombok.Data;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
+import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyContext;
+import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyStatus;
 import org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently;
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.rocketmq.common.consumer.ConsumeFromWhere;
 import org.apache.rocketmq.common.message.Message;
+import org.apache.rocketmq.common.message.MessageExt;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 /**
  * @author : Duke
@@ -113,24 +119,117 @@ public class RemittanceMQManager extends BaseMQ {
     /**
      * 发送消息
      *
-     * @param params         队列参数
-     * @param tag            标签
-     * @param delayTimeLevel 延时级别
-     * @throws Exception e
+     * @param params
+     * @param subExpression
+     * @param delayTimeLevel
+     * @throws Exception
      */
-    public void sendMessage(Object params, String tag, int delayTimeLevel) throws Exception {
-        // 加入redis队列中
-        JSONObject result = new JSONObject();
-        result.put("params", params);
-        result.put("time", System.currentTimeMillis());
-        result.put("delayed", delayTimeLevel * 1000);
-        redisClient.rPush(topic + ":" + tag, result.toJSONString());
+    public void sendMessage(Object params, String subExpression, int delayTimeLevel) throws Exception {
+        // 消息体
+        Message msg = new Message();
+
+        // 发送主题
+        msg.setTopic(topic);
+
+        // 标签
+        msg.setTags(subExpression + "_Delay");
+
+        // 封装参数
+        DelayMQParams delayMQParams = new DelayMQParams();
+        delayMQParams.setParams(params);
+        delayMQParams.setTime(System.currentTimeMillis());
+        delayMQParams.setDelayTime(delayTimeLevel);
+        msg.setBody(JSON.toJSONString(delayMQParams).getBytes());
+
+        // 发送消息
+        producer.send(msg);
+    }
+
+    /**
+     * 延时消费队列
+     *
+     * @param topic
+     * @param subExpression
+     * @param producerGroup
+     * @param threadNumber
+     * @throws MQClientException
+     */
+    protected void delayConsumer(String topic, String subExpression, String producerGroup, int threadNumber) throws MQClientException {
+        // 定义消费者
+        DefaultMQPushConsumer consumer = new DefaultMQPushConsumer(producerGroup + "_" + subExpression + "_Delay");
+
+        // 程序第一次启动从消息队列头获取数据
+        consumer.setConsumeFromWhere(ConsumeFromWhere.CONSUME_FROM_FIRST_OFFSET);
+
+        // 订阅主题及标签
+        consumer.subscribe(topic, subExpression + "_Delay");
+
+        // nameServer地址
+        consumer.setNamesrvAddr(nameServer);
+
+        // 最大线程数量
+        consumer.setConsumeThreadMax(threadNumber);
+
+        // 最小线程数量
+        consumer.setConsumeThreadMin(threadNumber);
+
+        //可以修改每次消费消息的数量，默认设置是每次消费一条
+        consumer.setConsumeMessageBatchMaxSize(1);
+
+        // 执行方法
+        consumer.registerMessageListener(new MessageListenerConcurrently() {
+            @Override
+            public ConsumeConcurrentlyStatus consumeMessage(List<MessageExt> messageExtList, ConsumeConcurrentlyContext consumeConcurrentlyContext) {
+                // 循环消费
+                for (MessageExt messageExt : messageExtList) {
+                    // 消息对象
+                    DelayMQParams delayMQParams;
+
+                    try {
+                        // 获取消息对象
+                        delayMQParams = getMessage(messageExt, DelayMQParams.class);
+
+                        // 未达到指定时间
+                        long timeStamp =  + delayMQParams.getTime() + delayMQParams.getDelayTime() * 1000L;
+                        if (timeStamp > System.currentTimeMillis()) {
+                            Thread.sleep(1 * 1000);
+                            // 加入延时队列继续等待
+                            // 消息体
+                            Message msg = new Message();
+                            msg.setTopic(topic);
+                            msg.setTags(subExpression + "_Delay");
+                            msg.setBody(JSON.toJSONString(delayMQParams).getBytes());
+                            producer.send(msg);
+                            continue;
+                        }
+
+                        // 发送消费队列
+                        sendMessage(delayMQParams.getParams(), subExpression);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
+                // 处理成功
+                return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
+            }
+        });
+
+        // 开始消费
+        consumer.start();
     }
 
     /**
      * 消费者
+     *
+     * @param messageListenerConcurrently
+     * @param subExpression
+     * @throws MQClientException
      */
     public void consumer(MessageListenerConcurrently messageListenerConcurrently, String subExpression) throws MQClientException {
+        // 定义延时消息队列
+        delayConsumer(topic, subExpression, producerGroup, consumeThreadMax);
+
         // 定义消费者
         DefaultMQPushConsumer consumer = new DefaultMQPushConsumer(producerGroup + "_" + subExpression);
 
@@ -157,66 +256,6 @@ public class RemittanceMQManager extends BaseMQ {
 
         // 开始消费
         consumer.start();
-
-        // 延时消费
-        PullDelayedMessage pullDelayedMessage = new PullDelayedMessage(subExpression);
-        pullDelayedMessage.start();
-    }
-
-    /**
-     * 延时队列拉取消息实现
-     */
-    class PullDelayedMessage extends Thread {
-
-        /**
-         * 标签
-         */
-        private String subExpression;
-
-        /**
-         * 线程
-         */
-        @Override
-        public void run() {
-            while (true) {
-                try {
-                    // 消费者为空
-                    if (producer == null) {
-                        continue;
-                    }
-
-                    // 从队列中取出数据
-                    Object object = redisClient.lPop(topic + ":" + subExpression);
-                    if (ObjectUtils.isEmpty(object)) {
-                        Thread.sleep(5000);
-                        continue;
-                    }
-
-                    // 解析队列参数
-                    JSONObject result = JSONObject.parseObject(object.toString());
-
-                    // 判断是否达到延时时间
-                    if (result.getLong("time") + result.getLong("delayed") > System.currentTimeMillis()) {
-                        redisClient.lPush(topic + ":" + subExpression, result.toJSONString());
-                        continue;
-                    }
-
-                    sendMessage(result.getJSONObject("params"), subExpression);
-                } catch (Exception e) {
-                    LogUtil.sysError("[RemittanceMQManager]", e);
-                }
-            }
-
-        }
-
-        /**
-         * 有参构造函数
-         *
-         * @param subExpression
-         */
-        public PullDelayedMessage(String subExpression) {
-            this.subExpression = subExpression;
-        }
     }
 
 
