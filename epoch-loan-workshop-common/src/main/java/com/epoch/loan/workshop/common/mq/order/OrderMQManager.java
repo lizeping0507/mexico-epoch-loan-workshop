@@ -201,9 +201,10 @@ public class OrderMQManager extends BaseMQ {
                         delayMQParams = getMessage(messageExt, DelayMQParams.class);
 
                         // 未达到指定时间
-                        if (delayMQParams.getDelayTime() + delayMQParams.getTime() * 1000 > System.currentTimeMillis()) {
-                            LogUtil.sysError("时间不满足:" + (delayMQParams.getDelayTime() + delayMQParams.getTime() * 1000) + "|" + System.currentTimeMillis());
-                            Thread.sleep(10*1000);
+                        long timeStamp =  + delayMQParams.getTime() + delayMQParams.getDelayTime() * 1000L;
+                        if (timeStamp > System.currentTimeMillis()) {
+                            LogUtil.sysError("时间不满足:" + timeStamp + "|" + System.currentTimeMillis());
+                            Thread.sleep(1 * 1000);
                             // 加入延时队列继续等待
                             // 消息体
                             Message msg = new Message();
