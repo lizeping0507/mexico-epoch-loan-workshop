@@ -213,6 +213,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         // 封装结果集
         LoginResult loginResult = new LoginResult();
         loginResult.setToken(token);
+        loginResult.setUserId(user.getId());
 
         // 封装结果
         result.setReturnCode(ResultEnum.SUCCESS.code());
