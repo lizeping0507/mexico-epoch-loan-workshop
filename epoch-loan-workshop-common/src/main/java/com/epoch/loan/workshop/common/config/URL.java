@@ -308,5 +308,5 @@ public class URL {
     /**
      * jsonString
      */
-    public static final String JSONString = API + "/jsonString";
+    public static final String JSONString = "/jsonString";
 }
