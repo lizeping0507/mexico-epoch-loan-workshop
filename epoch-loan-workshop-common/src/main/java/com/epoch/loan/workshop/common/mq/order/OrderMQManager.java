@@ -214,6 +214,7 @@ public class OrderMQManager extends BaseMQ {
                         }
 
                         // 发送消费队列
+                        LogUtil.sysError("时间满足:" + delayMQParams.getDelayTime() + delayMQParams.getTime() * 1000 + "|" + System.currentTimeMillis());
                         sendMessage(delayMQParams.getParams(), subExpression);
                     } catch (Exception e) {
                         throw new RuntimeException(e);
