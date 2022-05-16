@@ -204,8 +204,8 @@ public class OrderMQManager extends BaseMQ {
 
 
                         // 未达到指定时间
-                        if (delayMQParams.getDelayTime() + delayMQParams.getTime() > System.currentTimeMillis()) {
-                            LogUtil.sysError("[delayMQParams not]"+ JSONObject.toJSONString(delayMQParams));
+                        if (delayMQParams.getDelayTime() + delayMQParams.getTime() * 1000 > System.currentTimeMillis()) {
+                            LogUtil.sysError("[delayMQParams not]" + JSONObject.toJSONString(delayMQParams));
 
                             // 加入延时队列继续等待
                             sendMessage(delayMQParams.getParams(), subExpression, delayMQParams.getDelayTime());
