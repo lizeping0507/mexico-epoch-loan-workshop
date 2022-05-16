@@ -165,6 +165,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         // 封装结果
         RegisterResult registerResult = new RegisterResult();
         registerResult.setToken(token);
+        registerResult.setUserId(user.getId());
         result.setReturnCode(ResultEnum.SUCCESS.code());
         result.setMessage(ResultEnum.SUCCESS.message());
         result.setData(registerResult);
