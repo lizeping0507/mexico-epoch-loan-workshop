@@ -167,7 +167,7 @@ public class OrderMQManager extends BaseMQ {
      */
     protected void delayConsumer(String topic, String subExpression, String producerGroup, int threadNumber) throws MQClientException {
         // 定义消费者
-        DefaultMQPushConsumer consumer = new DefaultMQPushConsumer(producerGroup + "_" + subExpression + "_delay");
+        DefaultMQPushConsumer consumer = new DefaultMQPushConsumer(producerGroup + "_" + subExpression + "_Delay");
 
         // 程序第一次启动从消息队列头获取数据
         consumer.setConsumeFromWhere(ConsumeFromWhere.CONSUME_FROM_FIRST_OFFSET);
@@ -231,6 +231,8 @@ public class OrderMQManager extends BaseMQ {
         // 开始消费
         consumer.start();
     }
+
+
 
     /**
      * 消费者
