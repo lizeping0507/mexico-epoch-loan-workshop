@@ -21,12 +21,6 @@ import org.springframework.stereotype.Component;
 public class BaseMQ {
 
     /**
-     * Redis
-     */
-    @Autowired
-    public RedisClient redisClient;
-
-    /**
      * MQ的地址
      */
     @Value("${rocket.nameServer}")
