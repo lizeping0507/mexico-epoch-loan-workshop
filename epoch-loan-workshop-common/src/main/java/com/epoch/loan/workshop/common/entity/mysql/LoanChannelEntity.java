@@ -12,7 +12,7 @@ import java.util.Date;
  * @description : 渠道信息
  */
 @Data
-public class PlatformChannelEntity {
+public class LoanChannelEntity {
 
     /**
      * 主键

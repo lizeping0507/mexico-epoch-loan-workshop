@@ -759,7 +759,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         Integer userChannelId = user.getChannelId();
 
         // 查询渠道信息
-        PlatformChannelEntity platformChannelEntity = platformChannelDao.findChannel(userChannelId);
+        LoanChannelEntity platformChannelEntity = platformChannelDao.findChannel(userChannelId);
 
         // 渠道名称
         String channelName = platformChannelEntity.getChannelName();

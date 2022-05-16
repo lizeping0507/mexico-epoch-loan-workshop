@@ -1,6 +1,6 @@
 package com.epoch.loan.workshop.common.dao.mysql;
 
-import com.epoch.loan.workshop.common.entity.mysql.PlatformChannelEntity;
+import com.epoch.loan.workshop.common.entity.mysql.LoanChannelEntity;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
@@ -11,7 +11,7 @@ import org.apache.ibatis.annotations.Mapper;
  * @description : 渠道
  */
 @Mapper
-public interface PlatformChannelDao {
+public interface LoanChannelDao {
 
     /**
      * 根据ID查询渠道
@@ -19,5 +19,5 @@ public interface PlatformChannelDao {
      * @param id
      * @return
      */
-    PlatformChannelEntity findChannel(Integer id);
+    LoanChannelEntity findChannel(Integer id);
 }
