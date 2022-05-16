@@ -334,6 +334,11 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             // 订单状态
             orderStatus = loanOrderEntity.getStatus();
 
+            // 已申请放款的金额设置申请时间
+            if (orderStatus >= OrderStatus.EXAMINE_WAIT){
+                appMaskModelResult.setApplyTime(loanOrderEntity.getApplyTime());
+            }
+
             // 返回结果集
             appMaskModelResult.setMaskModel(0);
             appMaskModelResult.setButton(OrderUtils.button(orderStatus));
