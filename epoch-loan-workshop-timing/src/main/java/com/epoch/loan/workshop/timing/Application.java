@@ -72,6 +72,7 @@ public class Application {
      */
     @PostConstruct
     public void startJob() throws Exception {
+        orderMQManager.init();
         remittanceMqManagerProduct.init();
         repaymentMQManager.init();
         quartzUtil.startJob();

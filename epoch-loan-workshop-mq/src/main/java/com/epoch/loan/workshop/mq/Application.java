@@ -157,6 +157,7 @@ public class Application {
     @PostConstruct
     public void startJob() throws Exception {
         repaymentMQManager.init();
+        orderMQManager.init();
         remittanceMQManagerProduct.init();
         collectionMQManager.init();
         riskModelMask.start();

@@ -88,19 +88,13 @@ public class OrderMQManager extends BaseMQ {
     /**
      * 获取消费者对象
      */
-    protected DefaultMQProducer getProduct() throws MQClientException {
-        // 如果消费者对象不为空直接返回消费者对象
-        if (producer != null) {
-            return producer;
-        }
-
+    public void init() throws MQClientException {
         producer = new DefaultMQProducer();
         producer.setProducerGroup(producerGroup);
         producer.setNamesrvAddr(nameServer);
         producer.setRetryTimesWhenSendFailed(3);
         producer.setSendMessageWithVIPChannel(false);
         producer.start();
-        return producer;
     }
 
     /**
@@ -124,7 +118,7 @@ public class OrderMQManager extends BaseMQ {
         msg.setBody(JSON.toJSONString(params).getBytes());
 
         // 发送消息
-        this.getProduct().send(msg);
+        producer.send(msg);
     }
 
     /**
@@ -153,7 +147,7 @@ public class OrderMQManager extends BaseMQ {
         msg.setBody(JSON.toJSONString(delayMQParams).getBytes());
 
         // 发送消息
-        this.getProduct().send(msg);
+        producer.send(msg);
     }
 
     /**
@@ -211,7 +205,7 @@ public class OrderMQManager extends BaseMQ {
                             msg.setTopic(topic);
                             msg.setTags(subExpression + "_Delay");
                             msg.setBody(JSON.toJSONString(delayMQParams).getBytes());
-                            getProduct().send(msg);
+                            producer.send(msg);
                             continue;
                         }
 
