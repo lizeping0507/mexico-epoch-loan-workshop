@@ -684,7 +684,15 @@ public class UserServiceImpl extends BaseService implements UserService {
             userInfoById.setPapersId(idNumber);
             userInfoById.setPapersVoterId(frontInfo.getVoterId());
             userInfoById.setRfc(rfc);
-            userInfoById.setPapersAge(frontInfo.getAge());
+
+            // 年龄
+            if (ObjectUtils.isEmpty(frontInfo.getAge())) {
+                Date age = DateUtil.StringToDate(frontInfo.getBirthday(), "ddMMyyyy");
+                int intervalYears = DateUtil.getIntervalYears(age, new Date());
+                userInfoById.setPapersAge(intervalYears);
+            } else {
+                userInfoById.setPapersAge(frontInfo.getAge());
+            }
             userInfoById.setPapersGender(frontInfo.getGender());
             userInfoById.setPapersDateOfBirth(frontInfo.getBirthday());
             userInfoById.setCustomName(params.getName());
