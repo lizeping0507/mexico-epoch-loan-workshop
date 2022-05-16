@@ -623,6 +623,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         }
 
         // 解析风控校验结果
+        LogUtil.sysInfo("请求风控CURP校验，返回：{}" , riskObject.toJSONString());
         Integer code = riskObject.getInteger(Field.ERROR);
         if (code != 200) {
             result.setReturnCode(ResultEnum.RFC_CHECK_CURP_ERROR.code());

@@ -27,7 +27,6 @@ import java.util.Random;
 @RequestMapping(URL.RANDOM)
 public class RandomController extends BaseController  {
 
-    @Authentication
     @PostMapping(URL.JSONString)
     public Result<RandomResult> randomJson(){
         // 结果集
