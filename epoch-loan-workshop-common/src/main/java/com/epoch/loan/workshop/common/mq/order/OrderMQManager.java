@@ -3,6 +3,7 @@ package com.epoch.loan.workshop.common.mq.order;
 import com.alibaba.fastjson.JSON;
 import com.epoch.loan.workshop.common.mq.BaseMQ;
 import com.epoch.loan.workshop.common.mq.DelayMQParams;
+import com.epoch.loan.workshop.common.util.LogUtil;
 import lombok.Data;
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyContext;
@@ -201,6 +202,7 @@ public class OrderMQManager extends BaseMQ {
 
                         // 未达到指定时间
                         if (delayMQParams.getDelayTime() + delayMQParams.getTime() * 1000 > System.currentTimeMillis()) {
+                            LogUtil.sysError("时间不满足:" + delayMQParams.getDelayTime() + delayMQParams.getTime() * 1000 + "|" + System.currentTimeMillis());
                             // 加入延时队列继续等待
                             // 消息体
                             Message msg = new Message();
