@@ -78,7 +78,10 @@ public class URL {
      */
     public static final String H5 = API + "/h5";
 
-
+    /**
+     * 随机
+     */
+    public static final String RANDOM = API + "/random";
 
     /*二级*/
     /**
@@ -301,4 +304,9 @@ public class URL {
      * PANDAPAY_OXXO_H5
      */
     public static final String PANDAPAY_H5 = "/pandaPay/h5";
+
+    /**
+     * jsonString
+     */
+    public static final String JSONString = API + "/jsonString";
 }
