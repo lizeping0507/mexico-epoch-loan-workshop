@@ -67,6 +67,7 @@ public class RiskModelV1 extends BaseOrderMQListener implements MessageListenerC
                 // 队列拦截
                 if (intercept(orderParams.getGroupName(), subExpression())) {
                     // 等待重试
+                    LogUtil.sysInfo("[RiskModelV1 队列拦截]");
                     retry(orderParams, subExpression());
                     continue;
                 }

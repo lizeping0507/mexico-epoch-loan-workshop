@@ -34,24 +34,6 @@ public class BaseService {
     public LoanOrderBillDao loanOrderBillDao;
 
     /**
-     * 旧订单
-     */
-    @Autowired
-    public PlatformOrderDao platformOrderDao;
-
-    /**
-     * 用户
-     */
-    @Autowired
-    public PlatformUserDao platformUserDao;
-
-    /**
-     * 用户Ocr信息
-     */
-    @Autowired
-    public PlatformUserOcrBasicInfoDao platformUserOcrBasicInfoDao;
-
-    /**
      * 放款账户
      */
     @Autowired

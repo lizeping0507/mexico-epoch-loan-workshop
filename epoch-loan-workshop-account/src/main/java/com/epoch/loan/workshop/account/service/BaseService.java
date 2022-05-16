@@ -61,17 +61,6 @@ public class BaseService {
     @Autowired
     public RepaymentMQManager repaymentMQManager;
     /**
-     * 用户
-     */
-    @Autowired
-    public PlatformUserDao platformUserDao;
-
-    /**
-     * 基础信息
-     */
-    @Autowired
-    public PlatformUserBasicInfoDao platformUserBasicInfoDao;
-    /**
      * 新订单表
      */
     @Autowired
