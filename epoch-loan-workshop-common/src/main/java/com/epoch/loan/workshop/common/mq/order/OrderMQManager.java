@@ -1,10 +1,8 @@
 package com.epoch.loan.workshop.common.mq.order;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.mq.BaseMQ;
 import com.epoch.loan.workshop.common.mq.DelayMQParams;
-import com.epoch.loan.workshop.common.util.LogUtil;
 import lombok.Data;
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyContext;
@@ -144,7 +142,7 @@ public class OrderMQManager extends BaseMQ {
         msg.setTopic(topic);
 
         // 标签
-        msg.setTags(subExpression + "_delay");
+        msg.setTags(subExpression + "_Delay");
 
         // 封装参数
         DelayMQParams delayMQParams = new DelayMQParams();
@@ -174,7 +172,7 @@ public class OrderMQManager extends BaseMQ {
         consumer.setConsumeFromWhere(ConsumeFromWhere.CONSUME_FROM_FIRST_OFFSET);
 
         // 订阅主题及标签
-        consumer.subscribe(topic, subExpression + "_delay");
+        consumer.subscribe(topic, subExpression + "_Delay");
 
         // nameServer地址
         consumer.setNamesrvAddr(nameServer);
@@ -200,19 +198,18 @@ public class OrderMQManager extends BaseMQ {
                     try {
                         // 获取消息对象
                         delayMQParams = getMessage(messageExt, DelayMQParams.class);
-                        LogUtil.sysError("[delayMQParams]"+ JSONObject.toJSONString(delayMQParams));
-
 
                         // 未达到指定时间
                         if (delayMQParams.getDelayTime() + delayMQParams.getTime() * 1000 > System.currentTimeMillis()) {
-                            LogUtil.sysError("[delayMQParams not]" + JSONObject.toJSONString(delayMQParams));
-
                             // 加入延时队列继续等待
-                            sendMessage(delayMQParams.getParams(), subExpression, delayMQParams.getDelayTime());
+                            // 消息体
+                            Message msg = new Message();
+                            msg.setTopic(topic);
+                            msg.setTags(subExpression + "_Delay");
+                            msg.setBody(JSON.toJSONString(delayMQParams).getBytes());
+                            getProduct().send(msg);
                             continue;
                         }
-
-                        LogUtil.sysError("[delayMQParams yes]"+ JSONObject.toJSONString(delayMQParams));
 
                         // 发送消费队列
                         sendMessage(delayMQParams.getParams(), subExpression);
