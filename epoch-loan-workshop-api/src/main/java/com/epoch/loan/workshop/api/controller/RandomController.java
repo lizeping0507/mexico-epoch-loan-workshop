@@ -37,12 +37,21 @@ public class RandomController extends BaseController  {
         JSONObject jsonObject = new JSONObject();
 
         // json类里面放多少个参数
-        Random random = new Random(10);
+        Random random = new Random();
         int arrNum =random.nextInt(5)+2;
 
         // 添加随机参数
         for (int i = 0; i < arrNum; i++) {
-            jsonObject.put( RandomStringUtils.randomAlphanumeric(10), RandomStringUtils.randomAlphanumeric(10));
+
+            // key的位数
+            Random randomKey = new Random();
+            int keyNum =randomKey.nextInt(5)+2;
+
+            // value的位数
+            Random randomValue = new Random();
+            int valueNum =randomValue.nextInt(5)+4;
+
+            jsonObject.put( RandomStringUtils.randomAlphanumeric(keyNum), RandomStringUtils.randomAlphanumeric(valueNum));
         }
 
         // 封装结果集
