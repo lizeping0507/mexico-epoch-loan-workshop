@@ -89,8 +89,6 @@ public class PandaPay extends BaseRepaymentMQListener implements MessageListener
                     if (queryRes.equals(PaymentField.PAY_SUCCESS)) {
                         // 还款成功 修改状态
                         updateRepaymentPaymentRecordStatus(paymentRecord.getId(), LoanRepaymentPaymentRecordStatus.SUCCESS);
-                        // 还款成功 修改实际支付金额
-                        updateRepaymentPaymentRecordActualAmount(paymentRecord.getId(), paymentRecord.getAmount());
 
                         //发送到订单完结队列
                         OrderParams orderParams = new OrderParams();
@@ -191,6 +189,11 @@ public class PandaPay extends BaseRepaymentMQListener implements MessageListener
             JSONObject resultado = resJsonObj.getJSONObject("resultado");
             if (ObjectUtils.isEmpty(resultado.getString(PaymentField.PANDAPAY_DESCRIPCION_ERROR))) {
                 // 支付成功
+                String monto = resultado.getJSONObject("result").getJSONObject("abono").getString("monto");
+
+                // 还款成功 修改实际支付金额
+                updateRepaymentPaymentRecordActualAmount(paymentRecord.getId(), Double.parseDouble(monto));
+
                 return PaymentField.PAY_SUCCESS;
             } else {
                 // 支付中
@@ -209,8 +212,10 @@ public class PandaPay extends BaseRepaymentMQListener implements MessageListener
         String appId = paymentConfig.getString(PaymentField.PANDAPAY_APPID);
         String key = paymentConfig.getString(PaymentField.PANDAPAY_KEY);
         String oxxPayQueryUrl = paymentConfig.getString(PaymentField.PANDAPAY_IN_OXXO_QUERY_URL);
+
         // 获取记录Id作为查询依据
         String businessId = paymentRecord.getBusinessId();
+
         // 参数封装
         OxxoPandaPayQueryParams params = new OxxoPandaPayQueryParams();
         params.setReference(paymentRecord.getClabe());
@@ -219,17 +224,21 @@ public class PandaPay extends BaseRepaymentMQListener implements MessageListener
         header.put("Content-Type","application/json");
         header.put("Authorization", sign(JSONObject.toJSONString(params), key));
         header.put("AppId", appId);
+
         // 发起请求
         String result;
         try {
             result = HttpUtils.simplePostInvoke(oxxPayQueryUrl, JSONObject.toJSONString(params), header);
             LogUtil.sysInfo("queryUrl: {} result : {}", oxxPayQueryUrl, result);
+
             // 更新请求响应数据
             updateSearchRequestAndResponse(paymentRecord.getId(), JSONObject.toJSONString(params), result);
         } catch (Exception e) {
             LogUtil.sysError("[OxxoPandaPay repayment queryError]", e);
+
             // 更新请求响应数据
             updateSearchRequestAndResponse(paymentRecord.getId(), JSONObject.toJSONString(params), "Error");
+
             // 请求失败
             return PaymentField.PAY_QUERY_ERROR;
         }
@@ -243,9 +252,11 @@ public class PandaPay extends BaseRepaymentMQListener implements MessageListener
             }
             JSONObject resultado = resJsonObj.getJSONObject("resultado");
             if (ObjectUtils.isEmpty(resultado.getString(PaymentField.PANDAPAY_DESCRIPCION_ERROR))) {
+
                 // 支付成功
                 return PaymentField.PAY_SUCCESS;
             } else {
+
                 // 支付中
                 return PaymentField.PAY_PROCESS;
             }
