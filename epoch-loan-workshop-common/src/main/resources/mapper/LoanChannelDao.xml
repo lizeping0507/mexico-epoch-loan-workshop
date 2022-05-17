@@ -3,6 +3,6 @@
 <mapper namespace="com.epoch.loan.workshop.common.dao.mysql.LoanChannelDao">
 
     <select id="findChannel" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanChannelEntity">
-        SELECT * FROM loan_channel WHERE id=#{id}
+        SELECT * FROM loan_channel WHERE id=#{id} LIMIT 1
     </select>
 </mapper>
