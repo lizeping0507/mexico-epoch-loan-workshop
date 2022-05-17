@@ -232,6 +232,10 @@ public class RiskModelV1 extends BaseOrderMQListener implements MessageListenerC
             Integer[] status = new Integer[]{OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE};
             LoanOrderEntity LatelyLoanOrderEntity = loanOrderDao.findLatelyOrderByUserIdAndProductIdAndStatus(userId, productId, status);
 
+            // 查询同产品放款成功次数
+            int[] statues = new int[]{OrderStatus.WAY, OrderStatus.DUE, OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE};
+            Integer productNumber = loanOrderDao.countUserOrderByProductAndStatusIn(userId, productId, statues);
+
             // 封装请求参数
             Map<String, String> params = new HashMap<>();
             params.put(Field.METHOD, "riskmanagement.mexico.decision.model.dc");
@@ -248,7 +252,7 @@ public class RiskModelV1 extends BaseOrderMQListener implements MessageListenerC
             bizData.put("repaymentTime", intervalDays);
             bizData.put("currentOrder", singleQuantity);
             bizData.put("allOrder", allQuantity);
-            bizData.put("productNumber", productId);
+            bizData.put("productNumber", productNumber);
             bizData.put("productSort", 1);
             bizData.put("approvalAmount", LatelyLoanOrderEntity.getApprovalAmount());
             bizData.put("phone", mobile);

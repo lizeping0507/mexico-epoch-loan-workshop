@@ -240,6 +240,10 @@ public class RiskModelMask extends BaseOrderMQListener implements MessageListene
             Integer[] status = new Integer[]{OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE};
             LoanOrderEntity latelyLoanOrderEntity = loanOrderDao.findLatelyOrderByUserIdAndProductIdAndStatus(userId, productId, status);
 
+            // 查询同产品放款成功次数
+            int[] statues = new int[]{OrderStatus.WAY, OrderStatus.DUE, OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE};
+            Integer productNumber = loanOrderDao.countUserOrderByProductAndStatusIn(userId, productId, statues);
+
             // 封装请求参数
             Map<String, String> params = new HashMap<>();
             params.put(Field.METHOD, "riskmanagement.mexico.decision.model.dc");
@@ -256,7 +260,7 @@ public class RiskModelMask extends BaseOrderMQListener implements MessageListene
             bizData.put("repaymentTime", intervalDays);
             bizData.put("currentOrder", singleQuantity);
             bizData.put("allOrder", allQuantity);
-            bizData.put("productNumber", productId);
+            bizData.put("productNumber", productNumber);
             bizData.put("productSort", 1);
             if (ObjectUtils.isNotEmpty(latelyLoanOrderEntity)){
                 bizData.put("approvalAmount", latelyLoanOrderEntity.getApprovalAmount());
@@ -265,7 +269,8 @@ public class RiskModelMask extends BaseOrderMQListener implements MessageListene
             }
             bizData.put("phone", mobile);
             bizData.put("appName", appName);
-            bizData.put("channelCode", userChannelId);
+            LoanChannelEntity channel = loanChannelDao.findChannel(userChannelId);
+            bizData.put("channelCode", channel.getChannelName());
             params.put(Field.BIZ_DATA, bizData.toJSONString());
 
             // 生成签名
