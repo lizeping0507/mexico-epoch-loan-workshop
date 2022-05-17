@@ -595,6 +595,7 @@ public class OrderServiceImpl extends BaseService implements OrderService {
             double charge = new BigDecimal(paymentRecord.getAmount()).subtract(new BigDecimal(paymentRecord.getActualAmount())).doubleValue();
             recordDTO.setCharge(charge);
             recordDTO.setSuccessTime(paymentRecord.getUpdateTime());
+            recordDTO.setSuccessDay(paymentRecord.getUpdateTime());
             recordDTO.setRepayWay(paymentRecord.getType());
             recordDTOList.add(recordDTO);
         });
@@ -753,6 +754,7 @@ public class OrderServiceImpl extends BaseService implements OrderService {
             double charge = new BigDecimal(paymentRecord.getAmount()).subtract(new BigDecimal(paymentRecord.getActualAmount())).doubleValue();
             recordDTO.setCharge(charge);
             recordDTO.setSuccessTime(paymentRecord.getUpdateTime());
+            recordDTO.setSuccessDay(paymentRecord.getUpdateTime());
             recordDTO.setRepayWay(paymentRecord.getType());
             recordDTOList.add(recordDTO);
         });
