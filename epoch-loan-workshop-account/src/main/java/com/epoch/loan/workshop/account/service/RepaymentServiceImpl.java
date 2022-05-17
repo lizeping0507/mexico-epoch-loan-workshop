@@ -309,8 +309,8 @@ public class RepaymentServiceImpl extends BaseService implements RepaymentServic
         LoanOrderBillEntity bill = loanOrderBillDao.findOrderBill(record.getOrderBillId());
         Double receivedAmount = bill.getReceivedAmount();
         Double punishmentAmount = bill.getPunishmentAmount();
-
-        Double fee = amount - (punishmentAmount - receivedAmount);
+        Double actualAmount = punishmentAmount - receivedAmount;
+        double fee = amount - actualAmount;
 
         // 拆分
         List<String> spiltCodes = new ArrayList<>();
@@ -328,7 +328,7 @@ public class RepaymentServiceImpl extends BaseService implements RepaymentServic
         data.setClabe(clabe);
         data.setBarCode(barCode);
         data.setAmount(amount.toString());
-        data.setFee(fee.toString());
+        data.setFee(Double.toString(fee));
         data.setActualAmount(actualAmount.toString());
         result.setData(data);
 
