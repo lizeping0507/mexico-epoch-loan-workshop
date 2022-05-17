@@ -246,6 +246,11 @@ public class User implements Serializable {
     private String customName;
 
     /**
+     * 用户填写 性别
+     */
+    private String customGenter;
+
+    /**
      * 身份证号
      */
     private String curp;
