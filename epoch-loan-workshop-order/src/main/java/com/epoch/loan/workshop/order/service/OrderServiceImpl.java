@@ -210,7 +210,7 @@ public class OrderServiceImpl extends BaseService implements OrderService {
             BeanUtils.copyProperties(loanOrderEntity, orderInfoResult);
             orderInfoResult.setOrderNo(loanOrderEntity.getId());
             orderInfoResult.setOrderStatus(loanOrderEntity.getStatus());
-            orderInfoResult.setOrderStatusStr(OrderUtils.statusDescription(loanOrderEntity.getStatus()));
+            orderInfoResult.setOrderStatusStr(OrderUtils.button(loanOrderEntity.getStatus()));
 
             // 申请时间--- 取订单创建时间
             orderInfoResult.setApplyTime(loanOrderEntity.getCreateTime());
@@ -309,7 +309,7 @@ public class OrderServiceImpl extends BaseService implements OrderService {
             BeanUtils.copyProperties(loanOrderEntity, orderInfoResult);
             orderInfoResult.setOrderNo(loanOrderEntity.getId());
             orderInfoResult.setOrderStatus(loanOrderEntity.getStatus());
-            orderInfoResult.setOrderStatusStr(OrderUtils.statusDescription(loanOrderEntity.getStatus()));
+            orderInfoResult.setOrderStatusStr(OrderUtils.button(loanOrderEntity.getStatus()));
 
             // 申请时间--- 取订单创建时间
             orderInfoResult.setApplyTime(loanOrderEntity.getCreateTime());
@@ -371,7 +371,7 @@ public class OrderServiceImpl extends BaseService implements OrderService {
             BeanUtils.copyProperties(loanOrderEntity, orderInfoResult);
             orderInfoResult.setOrderNo(loanOrderEntity.getId());
             orderInfoResult.setOrderStatus(loanOrderEntity.getStatus());
-            orderInfoResult.setOrderStatusStr(OrderUtils.statusDescription(loanOrderEntity.getStatus()));
+            orderInfoResult.setOrderStatusStr(OrderUtils.button(loanOrderEntity.getStatus()));
 
             // 申请时间--- 取订单创建时间
             orderInfoResult.setApplyTime(loanOrderEntity.getCreateTime());
