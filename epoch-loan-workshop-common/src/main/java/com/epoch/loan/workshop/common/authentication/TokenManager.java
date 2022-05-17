@@ -141,6 +141,7 @@ public class TokenManager {
         user.setCustomName(userInfoEntity.getCustomName());
         user.setCustomMotherName(userInfoEntity.getCustomMotherName());
         user.setCustomFullName(userInfoEntity.getCustomFullName());
+        user.setCustomGenter(userInfoEntity.getCustomGenter());
         user.setFrontPath(userInfoEntity.getFrontPath());
         user.setBackPath(userInfoEntity.getBackPath());
         user.setFacePath(userInfoEntity.getFacePath());
