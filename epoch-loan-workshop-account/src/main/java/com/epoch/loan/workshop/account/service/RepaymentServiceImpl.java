@@ -308,8 +308,8 @@ public class RepaymentServiceImpl extends BaseService implements RepaymentServic
 
         LoanOrderBillEntity bill = loanOrderBillDao.findOrderBill(record.getOrderBillId());
         Double receivedAmount = bill.getReceivedAmount();
-        Double punishmentAmount = bill.getPunishmentAmount();
-        Double actualAmount = punishmentAmount - receivedAmount;
+        Double principalAmount = bill.getPrincipalAmount();
+        Double actualAmount = principalAmount - receivedAmount;
         double fee = amount - actualAmount;
 
         // 拆分
