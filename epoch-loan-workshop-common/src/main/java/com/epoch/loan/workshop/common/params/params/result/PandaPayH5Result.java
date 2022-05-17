@@ -28,5 +28,13 @@ public class PandaPayH5Result implements Serializable {
      * 条形码
      */
     private String barCode;
+    /**
+     * 手续费
+     */
+    private String fee;
+    /**
+     * 本金
+     */
+    private String actualAmount;
 
 }

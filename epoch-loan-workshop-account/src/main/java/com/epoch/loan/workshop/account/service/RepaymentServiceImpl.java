@@ -302,10 +302,15 @@ public class RepaymentServiceImpl extends BaseService implements RepaymentServic
         String id = params.getId();
         LoanRepaymentPaymentRecordEntity record = loanRepaymentPaymentRecordDao.findRepaymentPaymentRecordById(id);
         // TODO 结果校验
-
         String clabe = record.getClabe();
         String barCode = record.getBarCode();
         Double amount = record.getAmount();
+
+        LoanOrderBillEntity bill = loanOrderBillDao.findOrderBill(record.getOrderBillId());
+        Double receivedAmount = bill.getReceivedAmount();
+        Double punishmentAmount = bill.getPunishmentAmount();
+
+        Double fee = amount - (punishmentAmount - receivedAmount);
 
         // 拆分
         List<String> spiltCodes = new ArrayList<>();
@@ -323,6 +328,8 @@ public class RepaymentServiceImpl extends BaseService implements RepaymentServic
         data.setClabe(clabe);
         data.setBarCode(barCode);
         data.setAmount(amount.toString());
+        data.setFee(fee.toString());
+        data.setActualAmount(actualAmount.toString());
         result.setData(data);
 
         return result;
