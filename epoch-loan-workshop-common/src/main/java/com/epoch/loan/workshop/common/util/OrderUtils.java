@@ -98,8 +98,10 @@ public class OrderUtils {
     public static String button(Integer orderStatus) {
         // 根据订单状态获取按钮文案
         switch (orderStatus) {
-            case OrderStatus.CREATE:
+            case 0:
                 return "Aplicar ahora";
+            case OrderStatus.CREATE:
+                return "Continuar";
             case OrderStatus.EXAMINE_WAIT:
                 return "Ver detalles";
             case OrderStatus.EXAMINE_PASS:

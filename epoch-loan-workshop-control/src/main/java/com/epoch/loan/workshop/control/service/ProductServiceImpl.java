@@ -218,7 +218,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         if (!params.getUser().isIdentityAuth() ) {
             // 没有通过 返回结果
             appMaskModelResult.setMaskModel(3);
-            appMaskModelResult.setButton(OrderUtils.button(OrderStatus.CREATE));
+            appMaskModelResult.setButton(OrderUtils.button(0));
             appMaskModelResult.setStatusDescription(OrderUtils.statusDescription(OrderStatus.CREATE));
             result.setData(appMaskModelResult);
             return result;
@@ -533,7 +533,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 if(!hasPaymentOrder){
                     productList.setPassRate("");
                 }
-                productList.setButton(OrderUtils.button(OrderStatus.CREATE));
+                productList.setButton(OrderUtils.button(0));
                 newLoanAndOpenProductList.add(productList);
                 // 移除
                 productMap.remove(productId);
@@ -573,7 +573,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
             // 续贷 必定展示通过率
             if (status == OrderStatus.COMPLETE || status == OrderStatus.DUE_COMPLETE) {
-                productList.setButton(OrderUtils.button(OrderStatus.CREATE));
+                productList.setButton("Aplicar de nuevo");
                 reloanOrderProductList.add(productList);
                 continue;
             }
@@ -589,7 +589,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                     if(!hasPaymentOrder){
                         productList.setPassRate("");
                     }
-                    productList.setButton(OrderUtils.button(OrderStatus.CREATE));
+                    productList.setButton(OrderUtils.button(0));
                     productList.setOrderStatus(OrderStatus.CREATE);
                     newCreateProductList.add(productList);
                     continue;
@@ -699,7 +699,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             BeansUtil.copyProperties(loanProductEntity, productList);
             productList.setAmountRange(parseProductConfig(loanProductEntity.getAmountRange(),1));
             productList.setInterest(loanProductEntity.getInterest() + "%/Dia");
-            productList.setButton(OrderUtils.button(OrderStatus.CREATE));
+            productList.setButton(OrderUtils.button(0));
             newLoanAndOpenProductList.add(productList);
             // 移除
             productMap.remove(productId);
@@ -719,7 +719,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 BeansUtil.copyProperties(productEntity, productList);
                 productList.setAmountRange(parseProductConfig(productEntity.getAmountRange(),1));
                 productList.setInterest(productEntity.getInterest() + "%/Dia");
-                productList.setButton(OrderUtils.button(OrderStatus.CREATE));
+                productList.setButton("Aplicar de nuevo");
                 reloanOrderProductList.add(productList);
                 continue;
             }
