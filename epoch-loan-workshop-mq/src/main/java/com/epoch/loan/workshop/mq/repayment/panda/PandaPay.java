@@ -192,6 +192,7 @@ public class PandaPay extends BaseRepaymentMQListener implements MessageListener
                 String monto = resultado.getJSONObject("result").getJSONObject("abono").getString("monto");
 
                 // 还款成功 修改实际支付金额
+                paymentRecord.setActualAmount(Double.parseDouble(monto));
                 updateRepaymentPaymentRecordActualAmount(paymentRecord.getId(), Double.parseDouble(monto));
 
                 return PaymentField.PAY_SUCCESS;
@@ -252,6 +253,13 @@ public class PandaPay extends BaseRepaymentMQListener implements MessageListener
             }
             JSONObject resultado = resJsonObj.getJSONObject("resultado");
             if (ObjectUtils.isEmpty(resultado.getString(PaymentField.PANDAPAY_DESCRIPCION_ERROR))) {
+
+                // 支付成功
+                String monto = resultado.getJSONObject("result").getJSONObject("data").getJSONObject("object").getString("amount");
+
+                // 还款成功 修改实际支付金额
+                paymentRecord.setActualAmount(Double.parseDouble(monto));
+                updateRepaymentPaymentRecordActualAmount(paymentRecord.getId(), Double.parseDouble(monto));
 
                 // 支付成功
                 return PaymentField.PAY_SUCCESS;

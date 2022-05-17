@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Value;
 
+import java.text.DecimalFormat;
 import java.util.*;
 
 /**
@@ -298,14 +299,20 @@ public class RepaymentServiceImpl extends BaseService implements RepaymentServic
     @Override
     public Result<Object> pandaPayH5(PandaPayH5Params params){
         Result<Object> result = new Result<>();
+        DecimalFormat df = new DecimalFormat("0.00");
 
         String id = params.getId();
         LoanRepaymentPaymentRecordEntity record = loanRepaymentPaymentRecordDao.findRepaymentPaymentRecordById(id);
         // TODO 结果校验
-
         String clabe = record.getClabe();
         String barCode = record.getBarCode();
         Double amount = record.getAmount();
+
+        LoanOrderBillEntity bill = loanOrderBillDao.findOrderBill(record.getOrderBillId());
+        Double receivedAmount = bill.getReceivedAmount();
+        Double principalAmount = bill.getPrincipalAmount();
+        Double actualAmount = principalAmount - receivedAmount;
+        double fee = amount - actualAmount;
 
         // 拆分
         List<String> spiltCodes = new ArrayList<>();
@@ -322,7 +329,9 @@ public class RepaymentServiceImpl extends BaseService implements RepaymentServic
         data.setSpiltCode(spiltCodes);
         data.setClabe(clabe);
         data.setBarCode(barCode);
-        data.setAmount(amount.toString());
+        data.setAmount(df.format(amount));
+        data.setFee(df.format(fee));
+        data.setActualAmount(df.format(actualAmount));
         result.setData(data);
 
         return result;
