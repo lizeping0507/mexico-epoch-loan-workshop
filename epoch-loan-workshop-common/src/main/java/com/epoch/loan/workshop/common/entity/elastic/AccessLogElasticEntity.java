@@ -18,7 +18,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
-@Document(indexName = "mexico_access_log", type = "_doc", shards = 3, replicas = 1)
+@Document(indexName = "mexico_access_log")
 public class AccessLogElasticEntity {
     /**
      * 响应流水号

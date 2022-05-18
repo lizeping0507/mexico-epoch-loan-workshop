@@ -16,7 +16,7 @@ import java.util.Date;
  * @Description: advance活体检测日志
  */
 @Data
-@Document(indexName = "ocr_living_detection_log", shards = 3, replicas = 1)
+@Document(indexName = "ocr_living_detection_log")
 public class OcrLivingDetectionLogElasticEntity {
 
     /**
