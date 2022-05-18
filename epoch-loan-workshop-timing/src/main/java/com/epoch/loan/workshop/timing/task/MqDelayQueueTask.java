@@ -39,6 +39,10 @@ public class MqDelayQueueTask extends BaseTask implements Job {
                     remittanceMQManager.sendMessage(delayMQParamss.getParams(), delayMQParamss.getSubExpression());
                 } else if (delayMQParamss.getTopic().startsWith("LOG")) {
                     logMQManager.sendMessage(delayMQParamss.getParams(), delayMQParamss.getSubExpression());
+                }else if (delayMQParamss.getTopic().startsWith("REPAYMENT")) {
+                    repaymentMQManager.sendMessage(delayMQParamss.getParams(), delayMQParamss.getSubExpression());
+                }else if (delayMQParamss.getTopic().startsWith("COLLECTION")) {
+                    collectionMQManager.sendMessage(delayMQParamss.getParams(), delayMQParamss.getSubExpression());
                 }
 
                 redisClient.del(RedisKeyField.MQ_DELAY + delayMQParamss.getId());
