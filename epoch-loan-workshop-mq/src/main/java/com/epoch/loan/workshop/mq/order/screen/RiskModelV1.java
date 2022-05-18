@@ -230,7 +230,6 @@ public class RiskModelV1 extends BaseOrderMQListener implements MessageListenerC
 
             // 查找该产品最后一笔还款订单
             Integer[] status = new Integer[]{OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE};
-            LoanOrderEntity LatelyLoanOrderEntity = loanOrderDao.findLatelyOrderByUserIdAndProductIdAndStatus(userId, productId, status);
 
             // 查询同产品放款成功次数
             int[] statues = new int[]{OrderStatus.WAY, OrderStatus.DUE, OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE};
@@ -254,7 +253,6 @@ public class RiskModelV1 extends BaseOrderMQListener implements MessageListenerC
             bizData.put("allOrder", allQuantity);
             bizData.put("productNumber", productNumber);
             bizData.put("productSort", 1);
-            bizData.put("approvalAmount", LatelyLoanOrderEntity.getApprovalAmount());
             bizData.put("phone", mobile);
             bizData.put("appName", appName);
             LoanChannelEntity channel = loanChannelDao.findChannel(userChannelId);
