@@ -833,11 +833,6 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         // 更新节点请求数据
         loanOrderExamineDao.updateOrderExamineRequestById(orderExamineId, requestParams, new Date());
 
-        // TODO 记得删
-        if (true){
-            return true;
-        }
-
         // 发送请求
         String result = HttpUtils.POST_FORM(riskConfig.getRiskUrl(), requestParams);
         if (StringUtils.isEmpty(result)) {

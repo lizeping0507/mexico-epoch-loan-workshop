@@ -449,7 +449,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         // 更新
         loanUserInfoDao.update(userInfo);
 
-        // TODO 更新用户缓存
+        // 更新用户缓存
         tokenManager.updateUserCache(user.getId());
 
         result.setReturnCode(ResultEnum.SUCCESS.code());
