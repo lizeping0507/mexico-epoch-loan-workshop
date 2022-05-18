@@ -10,13 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>epoch-loan-workshop-common</artifactId>
-    <dependencies>
-        <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-elasticsearch</artifactId>
-            <version>3.2.5.RELEASE</version>
-        </dependency>
-    </dependencies>
+
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
