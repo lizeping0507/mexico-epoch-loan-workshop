@@ -835,6 +835,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
         // 发送请求
         String result = HttpUtils.POST_FORM(riskConfig.getRiskUrl(), requestParams);
+        LogUtil.sysInfo("请求风控多投限制 : request:{}  response:{}", requestParams, result);
         if (StringUtils.isEmpty(result)) {
             return false;
         }
