@@ -129,7 +129,7 @@ public abstract class BaseRemittanceMQListener {
      * @param params 队列参数
      */
     public void retryDistribution(DistributionRemittanceParams params, String tag) throws Exception {
-        remittanceMQManager.sendMessage(params, tag, 40);
+        remittanceMQManager.sendMessage(params, tag, 60);
     }
 
     /**

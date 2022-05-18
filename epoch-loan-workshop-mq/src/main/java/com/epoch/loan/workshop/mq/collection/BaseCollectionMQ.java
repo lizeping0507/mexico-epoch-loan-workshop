@@ -127,7 +127,7 @@ public abstract class BaseCollectionMQ {
      */
     public void retryCollection(CollectionParams params, String tag) throws Exception {
         // 重入放款队列
-        collectionMQManager.sendMessage(params, tag, 40);
+        collectionMQManager.sendMessage(params, tag, 60);
     }
 
     /**

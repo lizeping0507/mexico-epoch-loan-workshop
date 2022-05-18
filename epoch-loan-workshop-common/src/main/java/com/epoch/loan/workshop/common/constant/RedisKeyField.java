@@ -43,4 +43,15 @@ public class RedisKeyField {
      * advance License记录
      */
     public final static String ADVANCE_LICENSE = "advanceLicenseCacheKey";
+
+
+    /**
+     * MQ延时队列
+     */
+    public final static String MQ_DELAY = "mqDelay" + SPLIT;
+
+    /**
+     * MQ延时队列
+     */
+    public final static String MQ_DELAY_INDEX = "mqDelayIndex" + SPLIT;
 }

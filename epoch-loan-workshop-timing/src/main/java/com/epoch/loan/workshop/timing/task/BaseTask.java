@@ -2,6 +2,7 @@ package com.epoch.loan.workshop.timing.task;
 
 import com.epoch.loan.workshop.common.dao.mysql.*;
 import com.epoch.loan.workshop.common.mq.collection.CollectionMQManager;
+import com.epoch.loan.workshop.common.mq.log.LogMQManager;
 import com.epoch.loan.workshop.common.mq.order.OrderMQManager;
 import com.epoch.loan.workshop.common.mq.remittance.RemittanceMQManager;
 import com.epoch.loan.workshop.common.mq.repayment.RepaymentMQManager;
@@ -16,6 +17,40 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @description : TODO
  */
 public class BaseTask {
+
+    /**
+     * Redis链接类
+     */
+    @Autowired
+    public RedisClient redisClient;
+
+    /**
+     * collection
+     */
+    @Autowired
+    public CollectionMQManager collectionMQManager;
+    /**
+     * 订单队列
+     */
+    @Autowired
+    public OrderMQManager orderMQManager;
+
+    /**
+     * 日志队列
+     */
+    @Autowired
+    public LogMQManager logMQManager;
+
+    /**
+     * 还款队列
+     */
+    @Autowired
+    public RepaymentMQManager repaymentMQManager;
+    /**
+     * 放款队列
+     */
+    @Autowired
+    protected RemittanceMQManager remittanceMQManager;
     /**
      * 定时任务
      */
@@ -31,11 +66,6 @@ public class BaseTask {
      */
     @Autowired
     public LoanOrderExamineDao loanOrderExamineDao;
-    /**
-     * 订单队列
-     */
-    @Autowired
-    public OrderMQManager orderMQManager;
     /**
      * 订单队列
      */
@@ -68,27 +98,6 @@ public class BaseTask {
      */
     @Autowired
     public LoanRemittancePaymentRecordDao loanRemittancePaymentRecordDao;
-    /**
-     * Redis工具类
-     */
-    @Autowired
-    public RedisClient redisClient;
-    /**
-     * 还款队列生产
-     */
-    @Autowired
-    public RepaymentMQManager repaymentMQManager;
-    /**
-     * 支付分配队列
-     */
-    @Autowired
-    protected RemittanceMQManager remittanceMqManagerProduct;
-
-    /**
-     * 催收、提还队列管理
-     */
-    @Autowired
-    public CollectionMQManager collectionMQManager;
 
     /**
      * 获取定时任务参数（直接从数据库加载，获取最新的参数）

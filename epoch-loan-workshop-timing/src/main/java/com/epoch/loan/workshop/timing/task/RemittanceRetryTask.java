@@ -41,7 +41,7 @@ public class RemittanceRetryTask extends BaseTask implements Job {
                 DistributionRemittanceParams params = new DistributionRemittanceParams();
                 params.setGroupName(groupName);
                 params.setId(failedOrderRecord.getId());
-                remittanceMqManagerProduct.sendMessage(params, remittanceMqManagerProduct.getDistributionSubExpression());
+                remittanceMQManager.sendMessage(params, remittanceMQManager.getDistributionSubExpression());
             } catch (Exception exception) {
                 LogUtil.sysError("[RemittanceRetryTask]", exception);
             }
