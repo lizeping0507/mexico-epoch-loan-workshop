@@ -19,4 +19,8 @@ public class LoginResult implements Serializable {
      * token
      */
     private String token;
+    /**
+     * token
+     */
+    private String userId;
 }

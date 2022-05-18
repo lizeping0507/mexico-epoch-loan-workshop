@@ -11,10 +11,7 @@ import com.epoch.loan.workshop.common.redis.RedisClient;
 import com.epoch.loan.workshop.common.sms.SMSManager;
 import com.epoch.loan.workshop.common.util.LogUtil;
 import com.epoch.loan.workshop.common.zookeeper.ZookeeperClient;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.Date;
 
 /**
  * @author : Shangkunfeng
@@ -130,7 +127,7 @@ public class BaseService {
      * 渠道
      */
     @Autowired
-    public PlatformChannelDao platformChannelDao;
+    public LoanChannelDao platformChannelDao;
 
     /**
      * 变身包承接盘配置

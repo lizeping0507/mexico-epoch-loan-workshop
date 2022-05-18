@@ -112,6 +112,25 @@ public class DateUtil {
     }
 
     /**
+     * 获取两个时间的相差年数
+     *
+     * @param date      日期
+     * @param otherDate 另一个日期
+     * @return 相差年数。如果失败则返回-1
+     */
+    public static int getIntervalYears(Date date, Date otherDate) {
+        int num = -1;
+        if (date != null && otherDate != null) {
+            Calendar calStartTime = Calendar.getInstance();
+            Calendar calEndTime = Calendar.getInstance();
+            calStartTime .setTime(date);
+            calEndTime .setTime(otherDate);
+            num = calEndTime.get(Calendar.YEAR) - calStartTime.get(Calendar.YEAR);
+        }
+        return num;
+    }
+
+    /**
      * 获取日期中的某数值。如获取月份
      *
      * @param date     日期

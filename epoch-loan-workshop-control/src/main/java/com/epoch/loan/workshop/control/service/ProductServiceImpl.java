@@ -218,7 +218,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         if (!params.getUser().isIdentityAuth() ) {
             // 没有通过 返回结果
             appMaskModelResult.setMaskModel(3);
-            appMaskModelResult.setButton(OrderUtils.button(OrderStatus.CREATE));
+            appMaskModelResult.setButton(OrderUtils.button(0));
             appMaskModelResult.setStatusDescription(OrderUtils.statusDescription(OrderStatus.CREATE));
             result.setData(appMaskModelResult);
             return result;
@@ -280,6 +280,11 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
         // 产品id
         String productId = loanOrderEntity.getProductId();
+
+        // 已申请放款的金额设置申请时间
+        if (orderStatus >= OrderStatus.EXAMINE_WAIT){
+            appMaskModelResult.setApplyTime(loanOrderEntity.getApplyTime());
+        }
 
         /* 判断订单状态是否已经结清*/
         if (orderStatus == OrderStatus.DUE_COMPLETE || orderStatus == OrderStatus.COMPLETE) {
@@ -528,7 +533,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 if(!hasPaymentOrder){
                     productList.setPassRate("");
                 }
-                productList.setButton(OrderUtils.button(OrderStatus.CREATE));
+                productList.setButton(OrderUtils.button(0));
                 newLoanAndOpenProductList.add(productList);
                 // 移除
                 productMap.remove(productId);
@@ -568,7 +573,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
             // 续贷 必定展示通过率
             if (status == OrderStatus.COMPLETE || status == OrderStatus.DUE_COMPLETE) {
-                productList.setButton(OrderUtils.button(OrderStatus.CREATE));
+                productList.setButton("Aplicar de nuevo");
                 reloanOrderProductList.add(productList);
                 continue;
             }
@@ -584,7 +589,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                     if(!hasPaymentOrder){
                         productList.setPassRate("");
                     }
-                    productList.setButton(OrderUtils.button(OrderStatus.CREATE));
+                    productList.setButton(OrderUtils.button(0));
                     productList.setOrderStatus(OrderStatus.CREATE);
                     newCreateProductList.add(productList);
                     continue;
@@ -694,7 +699,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             BeansUtil.copyProperties(loanProductEntity, productList);
             productList.setAmountRange(parseProductConfig(loanProductEntity.getAmountRange(),1));
             productList.setInterest(loanProductEntity.getInterest() + "%/Dia");
-            productList.setButton(OrderUtils.button(OrderStatus.CREATE));
+            productList.setButton(OrderUtils.button(0));
             newLoanAndOpenProductList.add(productList);
             // 移除
             productMap.remove(productId);
@@ -714,7 +719,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 BeansUtil.copyProperties(productEntity, productList);
                 productList.setAmountRange(parseProductConfig(productEntity.getAmountRange(),1));
                 productList.setInterest(productEntity.getInterest() + "%/Dia");
-                productList.setButton(OrderUtils.button(OrderStatus.CREATE));
+                productList.setButton("Aplicar de nuevo");
                 reloanOrderProductList.add(productList);
                 continue;
             }
@@ -759,7 +764,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         Integer userChannelId = user.getChannelId();
 
         // 查询渠道信息
-        PlatformChannelEntity platformChannelEntity = platformChannelDao.findChannel(userChannelId);
+        LoanChannelEntity platformChannelEntity = platformChannelDao.findChannel(userChannelId);
 
         // 渠道名称
         String channelName = platformChannelEntity.getChannelName();

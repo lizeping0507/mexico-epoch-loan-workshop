@@ -1,8 +1,10 @@
 package com.epoch.loan.workshop.common.params.params.result;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -28,5 +30,23 @@ public class PandaPayH5Result implements Serializable {
      * 条形码
      */
     private String barCode;
+    /**
+     * 手续费
+     */
+    private String fee;
+    /**
+     * 本金
+     */
+    private String actualAmount;
+    /**
+     * 时间
+     */
+    @JsonFormat(pattern = "HH:mm:ss")
+    private Date time;
+    /**
+     * 时间后半部分
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date shortTime;
 
 }

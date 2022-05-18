@@ -19,4 +19,8 @@ public class RegisterResult implements Serializable {
      * token
      */
     private String token;
+    /**
+     * 用户Id
+     */
+    private String userId;
 }

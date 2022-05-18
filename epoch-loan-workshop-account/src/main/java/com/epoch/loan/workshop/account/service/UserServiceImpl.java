@@ -118,8 +118,7 @@ public class UserServiceImpl extends BaseService implements UserService {
             registerCode = "0000";
         } else {
             registerCode = (String) redisClient.get(String.format(RedisKeyField.SMS_CODE_TEMPLATE, params.getAppName(), params.getMobile()));
-            // TODO 测试用
-            registerCode = "0000";
+            LogUtil.sysInfo("{}发送验证码:{}", params.getMobile(), registerCode);
         }
         if (StringUtils.isEmpty(registerCode) || !registerCode.equals(params.getSmsCode())) {
             result.setReturnCode(ResultEnum.SMS_CODE_ERROR.code());
@@ -165,6 +164,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         // 封装结果
         RegisterResult registerResult = new RegisterResult();
         registerResult.setToken(token);
+        registerResult.setUserId(user.getId());
         result.setReturnCode(ResultEnum.SUCCESS.code());
         result.setMessage(ResultEnum.SUCCESS.message());
         result.setData(registerResult);
@@ -205,14 +205,13 @@ public class UserServiceImpl extends BaseService implements UserService {
         // 更新缓存
         tokenManager.updateUserCache(user.getId());
 
-        // TODO 新增或更新afid
-
         // 更新版本号,方便指定版本控制
         loanUserDao.updateAppVersion(user.getId(), params.getAppVersion());
 
         // 封装结果集
         LoginResult loginResult = new LoginResult();
         loginResult.setToken(token);
+        loginResult.setUserId(user.getId());
 
         // 封装结果
         result.setReturnCode(ResultEnum.SUCCESS.code());
@@ -238,8 +237,7 @@ public class UserServiceImpl extends BaseService implements UserService {
             registerCode = "0000";
         } else {
             registerCode = (String) redisClient.get(String.format(RedisKeyField.SMS_CODE_TEMPLATE, params.getAppName(), params.getPhoneNumber()));
-            // TODO 测试用
-            registerCode = "0000";
+            LogUtil.sysInfo("{}发送验证码:{}", params.getPhoneNumber(), registerCode);
         }
         if (StringUtils.isEmpty(registerCode) || !registerCode.equals(params.getSmsCode())) {
             result.setReturnCode(ResultEnum.SMS_CODE_ERROR.code());
@@ -623,6 +621,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         }
 
         // 解析风控校验结果
+        LogUtil.sysInfo("请求风控CURP校验，返回：{}", riskObject.toJSONString());
         Integer code = riskObject.getInteger(Field.ERROR);
         if (code != 200) {
             result.setReturnCode(ResultEnum.RFC_CHECK_CURP_ERROR.code());
@@ -682,7 +681,15 @@ public class UserServiceImpl extends BaseService implements UserService {
             userInfoById.setPapersId(idNumber);
             userInfoById.setPapersVoterId(frontInfo.getVoterId());
             userInfoById.setRfc(rfc);
-            userInfoById.setPapersAge(frontInfo.getAge());
+
+            // 年龄
+            if (ObjectUtils.isEmpty(frontInfo.getAge())) {
+                Date age = DateUtil.StringToDate(frontInfo.getBirthday(), "ddMMyyyy");
+                int intervalYears = DateUtil.getIntervalYears(age, new Date());
+                userInfoById.setPapersAge(intervalYears);
+            } else {
+                userInfoById.setPapersAge(frontInfo.getAge());
+            }
             userInfoById.setPapersGender(frontInfo.getGender());
             userInfoById.setPapersDateOfBirth(frontInfo.getBirthday());
             userInfoById.setCustomName(params.getName());
@@ -846,7 +853,7 @@ public class UserServiceImpl extends BaseService implements UserService {
             if (OcrField.ADVANCE_OCR_NO_RESULT.equalsIgnoreCase(code)) {
                 result.setMessage(OcrField.ADVANCE_OCR_NO_RESULT_MESSAGE);
             }
-            if (OcrField.ADVANCE_CARD_TYPE_NOT_MATCH.equalsIgnoreCase(code)){
+            if (OcrField.ADVANCE_CARD_TYPE_NOT_MATCH.equalsIgnoreCase(code)) {
                 result.setMessage(OcrField.ADVANCE_CARD_TYPE_NOT_MATCH_MESSAGE);
             }
             return result;
@@ -878,11 +885,12 @@ public class UserServiceImpl extends BaseService implements UserService {
 
     /**
      * 版本检查
+     *
      * @param params
      * @return
      */
     @Override
-    public Result<VersionResult> checkVersion(BaseParams params){
+    public Result<VersionResult> checkVersion(BaseParams params) {
         //结果集
         Result<VersionResult> result = new Result<>();
         VersionResult versionResult = new VersionResult();
@@ -896,9 +904,9 @@ public class UserServiceImpl extends BaseService implements UserService {
         LoanAppControlEntity loanAppControlEntity = loanAppControlDao.findByAppNameAndAppVersion(appName, appVersion);
 
         // 封装
-        if (ObjectUtils.isEmpty(loanAppControlEntity) || loanAppControlEntity.getStatus() != 1){
+        if (ObjectUtils.isEmpty(loanAppControlEntity) || loanAppControlEntity.getStatus() != 1) {
             versionResult.setStatus(0);
-        }else {
+        } else {
             versionResult.setStatus(1);
         }
 
