@@ -1,4 +1,4 @@
-package com.epoch.loan.workshop.common.config;
+package com.epoch.loan.workshop.common.minio;
 
 import com.epoch.loan.workshop.common.util.LogUtil;
 import io.minio.BucketExistsArgs;
