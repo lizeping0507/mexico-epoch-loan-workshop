@@ -117,6 +117,9 @@ public class OrderExaminePass extends BaseOrderMQListener implements MessageList
                 // 更新还款金额
                 loanOrderDao.updateOrderEstimatedRepaymentAmount(orderId, estimatedRepaymentAmount, new Date());
 
+                // 更新手续费
+                loanOrderDao.updateOrderIncidentalAmount(orderId, incidentalAmount, new Date());
+
                 // 更新通过时间
                 loanOrderDao.updateOrderExaminePassTime(orderId, new Date(), new Date());
 
