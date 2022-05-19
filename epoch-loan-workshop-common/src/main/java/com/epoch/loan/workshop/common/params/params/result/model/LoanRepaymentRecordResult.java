@@ -34,13 +34,13 @@ public class LoanRepaymentRecordResult implements Serializable {
     /**
      * 还款时间
      */
-    @JsonFormat(pattern = "d-M-yyyy")
+    @JsonFormat(pattern = "d-M-yyyy",timezone = "America/Mexico_City")
     private Date successDay;
 
     /**
      * 还款时间
      */
-    @JsonFormat(pattern = "HH:mm:ss")
+    @JsonFormat(pattern = "HH:mm:ss",timezone = "America/Mexico_City")
     private Date successTime;
 
     /**

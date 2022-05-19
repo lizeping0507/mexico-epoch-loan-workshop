@@ -104,7 +104,7 @@ public abstract class BaseRepaymentMQListener {
     }
 
     /**
-     * 重回队列
+     * 重回分配队列
      *
      * @param distributionRepaymentParams 还款参数
      * @param subExpression               标签

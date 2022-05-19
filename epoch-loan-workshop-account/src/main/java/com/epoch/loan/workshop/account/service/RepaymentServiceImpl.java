@@ -333,7 +333,6 @@ public class RepaymentServiceImpl extends BaseService implements RepaymentServic
         data.setFee(df.format(fee));
         data.setActualAmount(df.format(actualAmount));
         data.setShortTime(new Date());
-        data.setTime(new Date());
         result.setData(data);
 
         return result;

@@ -1,6 +1,8 @@
 package com.epoch.loan.workshop.timing;
 
 import com.epoch.loan.workshop.common.config.StartConfig;
+import com.epoch.loan.workshop.common.mq.collection.CollectionMQManager;
+import com.epoch.loan.workshop.common.mq.log.LogMQManager;
 import com.epoch.loan.workshop.common.mq.order.OrderMQManager;
 import com.epoch.loan.workshop.common.mq.remittance.RemittanceMQManager;
 import com.epoch.loan.workshop.common.mq.repayment.RepaymentMQManager;
@@ -31,22 +33,31 @@ import javax.annotation.PostConstruct;
 @EnableAspectJAutoProxy(exposeProxy = true)
 public class Application {
     /**
+     * collection
+     */
+    @Autowired
+    public CollectionMQManager collectionMQManager;
+    /**
      * 订单队列
      */
     @Autowired
-    private OrderMQManager orderMQManager;
+    public OrderMQManager orderMQManager;
     /**
-     * 支付分配队列
+     * 日志队列
      */
     @Autowired
-    private RemittanceMQManager remittanceMqManagerProduct;
+    public LogMQManager logMQManager;
 
     /**
      * 还款队列
      */
     @Autowired
-    private RepaymentMQManager repaymentMQManager;
-
+    public RepaymentMQManager repaymentMQManager;
+    /**
+     * 放款队列
+     */
+    @Autowired
+    protected RemittanceMQManager remittanceMQManager;
     /**
      * 定时任务
      */
@@ -72,9 +83,11 @@ public class Application {
      */
     @PostConstruct
     public void startJob() throws Exception {
-        orderMQManager.init();
-        remittanceMqManagerProduct.init();
+        remittanceMQManager.init();
         repaymentMQManager.init();
+        logMQManager.init();
+        orderMQManager.init();
+        collectionMQManager.init();
         quartzUtil.startJob();
     }
 }

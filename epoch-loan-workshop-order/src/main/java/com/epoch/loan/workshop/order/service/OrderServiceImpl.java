@@ -669,13 +669,13 @@ public class OrderServiceImpl extends BaseService implements OrderService {
 
             // 申请额度
             if (UserType.NEW == userType) {
-                detailResult.setApprovalAmount(getMinAmountRange(amountRange, "newConfig"));
-                detailResult.setEstimatedRepaymentAmount(getMinAmountRange(repaymentRange, "newConfig"));
-                detailResult.setActualAmount(getMinAmountRange(arrivalRange, "newConfig"));
+                detailResult.setApprovalAmount(getAmountRange(amountRange, "newConfig"));
+                detailResult.setEstimatedRepaymentAmount(getAmountRange(repaymentRange, "newConfig"));
+                detailResult.setActualAmount(getAmountRange(arrivalRange, "newConfig"));
             } else {
-                detailResult.setApprovalAmount(getMinAmountRange(amountRange, "oldConfig"));
-                detailResult.setEstimatedRepaymentAmount(getMinAmountRange(repaymentRange, "oldConfig"));
-                detailResult.setActualAmount(getMinAmountRange(arrivalRange, "oldConfig"));
+                detailResult.setApprovalAmount(getAmountRange(amountRange, "oldConfig"));
+                detailResult.setEstimatedRepaymentAmount(getAmountRange(repaymentRange, "oldConfig"));
+                detailResult.setActualAmount(getAmountRange(arrivalRange, "oldConfig"));
             }
         } else {
             detailResult.setApprovalAmount(orderEntity.getApprovalAmount() + "");
@@ -851,18 +851,29 @@ public class OrderServiceImpl extends BaseService implements OrderService {
     }
 
     /**
-     * 获取给定JSON字符串的指定key的值
+     * 获取给定JSON字符串的指定key的最小值
      *
      * @param jsonRange JSON字符串
      * @param key 指定key
      * @return 最小的值
      */
     private String getMinAmountRange(String jsonRange, String key) {
-        JSONObject jsonObject = JSONObject.parseObject(jsonRange, JSONObject.class);
-        String range = jsonObject.getString(key);
+        String range = getAmountRange(jsonRange, key);
         if (StringUtils.isNotBlank(range) && range.contains("-") && range.split("-").length == 2) {
             return range.split("-")[0];
         }
         return null;
+    }
+
+    /**
+     * 获取给定JSON字符串的指定key的值
+     *
+     * @param jsonRange JSON字符串
+     * @param key 指定key
+     * @return 最小的值
+     */
+    private String getAmountRange(String jsonRange, String key) {
+        JSONObject jsonObject = JSONObject.parseObject(jsonRange, JSONObject.class);
+        return jsonObject.getString(key);
     }
 }

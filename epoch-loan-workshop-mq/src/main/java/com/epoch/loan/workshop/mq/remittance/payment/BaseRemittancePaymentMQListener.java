@@ -71,7 +71,7 @@ public abstract class BaseRemittancePaymentMQListener extends BaseRemittanceMQLi
         updateLoanRemittancePaymentRecordQueueParam(params);
 
         // 重入放款队列
-        remittanceMQManager.sendMessage(params, tag, 60);
+        remittanceMQManager.sendMessage(params, tag, 5 * 60);
     }
 
     /**

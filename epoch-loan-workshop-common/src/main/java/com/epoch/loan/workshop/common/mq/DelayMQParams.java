@@ -11,6 +11,10 @@ import lombok.Data;
  */
 @Data
 public class DelayMQParams {
+    /**
+     * 标识
+     */
+    private String id;
 
     /**
      * 参数
@@ -18,12 +22,12 @@ public class DelayMQParams {
     private Object params;
 
     /**
-     * 时间
+     * 主题
      */
-    private Long time;
+    private String topic;
 
     /**
-     * 延时时间
+     * 标签
      */
-    private int delayTime;
+    private String subExpression;
 }
