@@ -67,6 +67,7 @@ public class PandaPay extends BaseRepayment {
         String appId = paymentConfig.getString(PaymentField.PANDAPAY_APPID);
         String key = paymentConfig.getString(PaymentField.PANDAPAY_KEY);
         String url = paymentConfig.getString(PaymentField.PANDAPAY_PAY_URL);
+        Double payFee = paymentConfig.getDouble(PaymentField.PANDAPAY_PAY_SPEI_FEE);
 
         // 参数封装
         PandaPayParams params = new PandaPayParams();
@@ -116,6 +117,8 @@ public class PandaPay extends BaseRepayment {
             } else{
                 // 发起成功 修改状态
                 updatePaymentRecordStatus(record.getId(), LoanRepaymentPaymentRecordStatus.PROCESS);
+                // 发起成功 填充手续费
+                updatePaymentRecordPayFee(record.getId(), payFee);
                 // 存储支付方订单号
                 updatePamentRecordBussinesId(record.getId(), payOrderId);
                 // 存储clabe和条形码
@@ -145,6 +148,7 @@ public class PandaPay extends BaseRepayment {
         String paymentSourcesType = paymentConfig.getString(PaymentField.PANDAPAY_PAYMENT_SOURCES_TYPE);
         String cpmpanyId = paymentConfig.getString(PaymentField.PANDAPAY_PAYMENT_COMPANY_ID);
         String url = paymentConfig.getString(PaymentField.PANDAPAY_OXXO_PAY_URL);
+        Double payFee = paymentConfig.getDouble(PaymentField.PANDAPAY_PAY_OXXO_FEE);
 
         // 参数封装
         OxxoPandaPayParams params = new OxxoPandaPayParams();
@@ -205,6 +209,8 @@ public class PandaPay extends BaseRepayment {
                 String clabe = dataJson.get(0).getString("barcode");
                 // 发起成功 修改状态
                 updatePaymentRecordStatus(record.getId(), LoanRepaymentPaymentRecordStatus.PROCESS);
+                // 发起成功 填充手续费
+                updatePaymentRecordPayFee(record.getId(), payFee);
                 // 存储支付方订单号
                 updatePamentRecordBussinesId(record.getId(), payOrderId);
                 // 存储clabe和条形码

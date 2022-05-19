@@ -50,6 +50,11 @@ public class LoanRepaymentPaymentRecordEntity {
     private Double actualAmount;
 
     /**
+     * 支付渠道手续费
+     */
+    private Double payFee;
+
+    /**
      * 手机号
      */
     private String phone;

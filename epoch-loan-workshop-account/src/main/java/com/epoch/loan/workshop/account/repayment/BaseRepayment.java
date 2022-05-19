@@ -98,4 +98,14 @@ public abstract class BaseRepayment {
         loanRepaymentPaymentRecordDao.updateStatus(id, status, new Date());
     }
 
+    /**
+     * 更新手续费用
+     *
+     * @param id     记录id
+     * @param payFee 手续费
+     */
+    protected void updatePaymentRecordPayFee(String id, Double payFee) {
+        loanRepaymentPaymentRecordDao.updatePaymentRecordPayFee(id, payFee, new Date());
+    }
+
 }

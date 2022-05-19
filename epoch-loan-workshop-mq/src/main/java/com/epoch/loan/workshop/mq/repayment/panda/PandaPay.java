@@ -152,6 +152,7 @@ public class PandaPay extends BaseRepaymentMQListener implements MessageListener
         String appId = paymentConfig.getString(PaymentField.PANDAPAY_APPID);
         String key = paymentConfig.getString(PaymentField.PANDAPAY_KEY);
         String queryUrl = paymentConfig.getString(PaymentField.PANDAPAY_IN_QUERY_URL);
+        Double payFee = paymentConfig.getDouble(PaymentField.PANDAPAY_PAY_SPEI_FEE);
 
         // 获取记录Id作为查询依据
         String businessId = paymentRecord.getBusinessId();
@@ -192,8 +193,15 @@ public class PandaPay extends BaseRepaymentMQListener implements MessageListener
                 String monto = resultado.getJSONObject("result").getJSONObject("abono").getString("monto");
 
                 // 还款成功 修改实际支付金额
-                paymentRecord.setActualAmount(Double.parseDouble(monto));
-                updateRepaymentPaymentRecordActualAmount(paymentRecord.getId(), Double.parseDouble(monto));
+                double actualAmount = Double.parseDouble(monto);
+                // 实际支付金额 - 手续费 小于零则置为零
+                double effectiveAamount = actualAmount - payFee;
+                if (effectiveAamount<0){
+                    effectiveAamount = 0.00D;
+                }
+
+                paymentRecord.setActualAmount(effectiveAamount);
+                updateRepaymentPaymentRecordActualAmount(paymentRecord.getId(), effectiveAamount);
 
                 return PaymentField.PAY_SUCCESS;
             } else {
@@ -213,6 +221,7 @@ public class PandaPay extends BaseRepaymentMQListener implements MessageListener
         String appId = paymentConfig.getString(PaymentField.PANDAPAY_APPID);
         String key = paymentConfig.getString(PaymentField.PANDAPAY_KEY);
         String oxxPayQueryUrl = paymentConfig.getString(PaymentField.PANDAPAY_IN_OXXO_QUERY_URL);
+        Double payFee = paymentConfig.getDouble(PaymentField.PANDAPAY_PAY_OXXO_FEE);
 
         // 获取记录Id作为查询依据
         String businessId = paymentRecord.getBusinessId();
@@ -258,8 +267,15 @@ public class PandaPay extends BaseRepaymentMQListener implements MessageListener
                 String monto = resultado.getJSONObject("result").getJSONObject("data").getJSONObject("object").getString("amount");
 
                 // 还款成功 修改实际支付金额
-                paymentRecord.setActualAmount(Double.parseDouble(monto));
-                updateRepaymentPaymentRecordActualAmount(paymentRecord.getId(), Double.parseDouble(monto));
+                double actualAmount = Double.parseDouble(monto);
+                // 实际支付金额 - 手续费 小于零则置为零
+                double effectiveAamount = actualAmount - payFee;
+                if (effectiveAamount<0){
+                    effectiveAamount = 0.00D;
+                }
+
+                paymentRecord.setActualAmount(effectiveAamount);
+                updateRepaymentPaymentRecordActualAmount(paymentRecord.getId(), effectiveAamount);
 
                 // 支付成功
                 return PaymentField.PAY_SUCCESS;
