@@ -139,7 +139,7 @@
         `status` >= 80
         AND user_id = #{userId}
         ORDER BY
-        create_time DESC
+        create_time DESC Limit 1
     </select>
     <select id="findOrderByUserAndProductIdAndStatus"
             resultType="com.epoch.loan.workshop.common.entity.mysql.LoanOrderEntity">
