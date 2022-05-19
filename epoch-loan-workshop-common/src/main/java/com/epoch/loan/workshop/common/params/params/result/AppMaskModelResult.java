@@ -54,7 +54,7 @@ public class AppMaskModelResult implements Serializable {
     /**
      * 申请时间
      */
-    @JsonFormat(pattern = "d-M-yyyy")
+    @JsonFormat(pattern = "d-M-yyyy",timezone = "America/Mexico_City")
     private Date applyTime;
 
     /**

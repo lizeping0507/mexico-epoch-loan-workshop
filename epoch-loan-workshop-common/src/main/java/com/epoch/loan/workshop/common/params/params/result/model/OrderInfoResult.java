@@ -44,7 +44,7 @@ public class OrderInfoResult implements Serializable {
     /**
      * 订单创建时间
      */
-    @JsonFormat(pattern = "d-M-yyyy")
+    @JsonFormat(pattern = "d-M-yyyy",timezone = "America/Mexico_City")
     private Date applyTime;
 
     /**
@@ -55,13 +55,13 @@ public class OrderInfoResult implements Serializable {
     /**
      * 放款时间
      */
-    @JsonFormat(pattern = "d-M-yyyy")
+    @JsonFormat(pattern = "d-M-yyyy",timezone = "America/Mexico_City")
     private Date loanTime;
 
     /**
      * 到期时间
      */
-    @JsonFormat(pattern = "d-M-yyyy")
+    @JsonFormat(pattern = "d-M-yyyy",timezone = "America/Mexico_City")
     private Date repaymentTime;
 
     /**
