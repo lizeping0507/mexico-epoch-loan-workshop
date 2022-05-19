@@ -464,17 +464,6 @@ public class OrderServiceImpl extends BaseService implements OrderService {
         detailResult.setProductName(product.getProductName());
         detailResult.setOrderStatus(orderEntity.getStatus());
 
-        // 服务费
-        Double incidentalAmount = orderEntity.getIncidentalAmount();
-        if (ObjectUtils.isNotEmpty(incidentalAmount) && new BigDecimal(incidentalAmount).compareTo(BigDecimal.ZERO) != 1) {
-            detailResult.setIncidentalAmount(incidentalAmount + "");
-        } else {
-            String serviceFeeRange = product.getServiceFeeRange();
-            if (StringUtils.isNotBlank(serviceFeeRange) && serviceFeeRange.contains("-") && serviceFeeRange.split("-").length == 2) {
-                detailResult.setIncidentalAmount(serviceFeeRange.split("-")[0]);
-            }
-        }
-
         // 总利息
         Double interestAmount = loanOrderBillDao.sumOrderInterestAmount(orderEntity.getId());
         if (ObjectUtils.isNotEmpty(interestAmount)) {
@@ -517,6 +506,18 @@ public class OrderServiceImpl extends BaseService implements OrderService {
             detailResult.setApprovalAmount(orderEntity.getApprovalAmount() + "");
             detailResult.setEstimatedRepaymentAmount(estimatedRepaymentAmount + "");
             detailResult.setActualAmount(orderEntity.getActualAmount() + "");
+        }
+
+
+        // 服务费
+        Double incidentalAmount = orderEntity.getIncidentalAmount();
+        if (ObjectUtils.isNotEmpty(incidentalAmount) && new BigDecimal(incidentalAmount).compareTo(BigDecimal.ZERO) == 1) {
+            detailResult.setIncidentalAmount(incidentalAmount + "");
+        } else {
+            // 手续费
+            String incidentalAmountStr = new BigDecimal(detailResult.getApprovalAmount())
+                    .multiply(new BigDecimal(orderEntity.getProcessingFeeProportion()/100)).setScale(2,RoundingMode.HALF_UP).doubleValue() + "";
+            detailResult.setIncidentalAmount(incidentalAmountStr);
         }
 
         // 申请时间
