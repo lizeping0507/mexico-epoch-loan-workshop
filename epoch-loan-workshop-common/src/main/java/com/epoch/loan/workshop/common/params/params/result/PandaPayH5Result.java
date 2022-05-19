@@ -41,12 +41,12 @@ public class PandaPayH5Result implements Serializable {
     /**
      * 时间
      */
-    @JsonFormat(pattern = "HH:mm:ss",timezone="")
+    @JsonFormat(pattern = "HH:mm:ss",timezone = "America/Mexico_City")
     private Date time;
     /**
      * 时间后半部分
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "America/Mexico_City")
     private Date shortTime;
 
 }

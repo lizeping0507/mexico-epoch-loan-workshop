@@ -106,24 +106,24 @@ public class OrderDetailResult implements Serializable {
     /**
      * 有进入审核时间就用进入审核时间，如果没有，就用创建时间
      */
-    @JsonFormat(pattern = "d-M-yyyy")
+    @JsonFormat(pattern = "d-M-yyyy",timezone = "America/Mexico_City")
     private Date applyTime;
 
     /**
      * 放款时间
      */
-    @JsonFormat(pattern = "d-M-yyyy")
+    @JsonFormat(pattern = "d-M-yyyy",timezone = "America/Mexico_City")
     private Date loanTime;
 
     /**
      * 预计还款时间
      */
-    @JsonFormat(pattern = "d-M-yyyy")
+    @JsonFormat(pattern = "d-M-yyyy",timezone = "America/Mexico_City")
     private Date expectedRepaymentTime;
 
     /**
      * 还款时间
      */
-    @JsonFormat(pattern = "d-M-yyyy")
+    @JsonFormat(pattern = "d-M-yyyy",timezone = "America/Mexico_City")
     private Date actualRepaymentTime;
 }
