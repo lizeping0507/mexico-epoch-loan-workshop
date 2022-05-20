@@ -72,6 +72,14 @@ public class OrderWay extends BaseOrderMQListener implements MessageListenerConc
                 // 订单id
                 String orderId = orderParams.getOrderId();
 
+                // 判断模型状态
+                int status = getModelStatus(orderId, subExpression());
+                if (status == OrderExamineStatus.PASS) {
+                    // 发送下一模型
+                    sendNextModel(orderParams, subExpression());
+                    continue;
+                }
+
                 // 查询订单ID
                 LoanOrderEntity loanOrderEntity = loanOrderDao.findOrder(orderId);
                 if (ObjectUtils.isEmpty(loanOrderEntity)) {

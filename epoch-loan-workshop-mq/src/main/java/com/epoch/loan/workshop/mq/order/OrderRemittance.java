@@ -73,6 +73,14 @@ public class OrderRemittance extends BaseOrderMQListener implements MessageListe
                 // 订单id
                 String orderId = orderParams.getOrderId();
 
+                // 判断模型状态
+                int status = getModelStatus(orderId, subExpression());
+                if (status == OrderExamineStatus.PASS) {
+                    // 发送下一模型
+                    sendNextModel(orderParams, subExpression());
+                    continue;
+                }
+
                 // 查询订单ID
                 LoanOrderEntity loanOrderEntity = loanOrderDao.findOrder(orderId);
                 if (ObjectUtils.isEmpty(loanOrderEntity)) {
@@ -86,9 +94,6 @@ public class OrderRemittance extends BaseOrderMQListener implements MessageListe
 
                 // 用户id
                 String userId = loanOrderEntity.getUserId();
-
-                // 查询当前模型处理状态
-                int status = getModelStatus(orderId, subExpression());
 
                 // 判断是否是创建状态
                 if (status == OrderExamineStatus.CREATE) {
