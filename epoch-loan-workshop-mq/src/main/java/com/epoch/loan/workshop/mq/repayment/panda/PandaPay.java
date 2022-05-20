@@ -258,8 +258,8 @@ public class PandaPay extends BaseRepaymentMQListener implements MessageListener
                 String monto = resultado.getJSONObject("result").getJSONObject("data").getJSONObject("object").getString("amount");
 
                 // 还款成功 修改实际支付金额
-                paymentRecord.setActualAmount(Double.parseDouble(monto));
-                updateRepaymentPaymentRecordActualAmount(paymentRecord.getId(), Double.parseDouble(monto));
+                paymentRecord.setActualAmount(Double.parseDouble(monto) / 100);
+                updateRepaymentPaymentRecordActualAmount(paymentRecord.getId(), Double.parseDouble(monto) / 100);
 
                 // 支付成功
                 return PaymentField.PAY_SUCCESS;
