@@ -36,8 +36,10 @@ public class AppDomainUtil {
         switch (appName) {
             case "CreditPeso":
                 return "creditopesos.com";
-            case "PesoMax":
+            case "PesoAhora":
                 return "pesoahora.com";
+            case "PesoMax":
+                return "peso-max.com";
             default:
                 return null;
         }
