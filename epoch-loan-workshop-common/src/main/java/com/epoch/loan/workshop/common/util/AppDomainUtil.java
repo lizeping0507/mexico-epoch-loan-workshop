@@ -11,19 +11,19 @@ public class AppDomainUtil {
     /**
      * pandaPay OXXO方式还款H5
      */
-    private static final String PANDAPAY_OXXO_PREFIX = "/pay/pandaPayOXXO.html?id=";
+    private static final String PANDAPAY_OXXO_PREFIX = "/pay/%s/pandaPayOXXO.html?id=%s";
     /**
      * pandaPay SPEI方式还款H5
      */
-    private static final String PANDAPAY_SPEI_PREFIX = "/pay/pandaPaySPEI.html?id=";
+    private static final String PANDAPAY_SPEI_PREFIX = "/pay/%s/pandaPaySPEI.html?id=%s";
     /**
-     * pandaPay SPEI方式还款H5
+     * pandaPay支付成功页面
      */
-    private static final String REPAYMENT_SUCCESS_PREFIX = "/pay/success.html";
+    private static final String REPAYMENT_SUCCESS_PREFIX = "/pay/%s/success.html";
     /**
-     * pandaPay SPEI方式还款H5
+     * pandaPay支付失败页面
      */
-    private static final String REPAYMENT_FAIL_PREFIX = "/pay/fail.html";
+    private static final String REPAYMENT_FAIL_PREFIX = "/pay/%s/fail.html";
 
     /**
      * 获取App顶级域名
@@ -62,7 +62,7 @@ public class AppDomainUtil {
      * @return
      */
     public static String splicingPandapayOXXORepaymentH5Url(String appName,String id) {
-        return splicingAppResourceDoamin(appName) + PANDAPAY_OXXO_PREFIX + id;
+        return splicingAppResourceDoamin(appName) + String.format(PANDAPAY_OXXO_PREFIX,appName,id);
     }
     /**
      *  pandaPay 支付成功页面
@@ -70,7 +70,7 @@ public class AppDomainUtil {
      * @return
      */
     public static String splicingRepaymentSuccessH5Url(String appName) {
-        return splicingAppResourceDoamin(appName) + REPAYMENT_SUCCESS_PREFIX;
+        return splicingAppResourceDoamin(appName) + String.format(REPAYMENT_SUCCESS_PREFIX,appName);
     }
     /**
      *  pandaPay 支付失败页面
@@ -78,7 +78,7 @@ public class AppDomainUtil {
      * @return
      */
     public static String splicingRepaymentFailH5Url(String appName) {
-        return splicingAppResourceDoamin(appName) + REPAYMENT_FAIL_PREFIX;
+        return splicingAppResourceDoamin(appName) + String.format(REPAYMENT_FAIL_PREFIX,appName);
     }
 
     /**
@@ -88,6 +88,7 @@ public class AppDomainUtil {
      * @return
      */
     public static String splicingPandapaySPEIRepaymentH5Url(String appName, String id) {
-        return splicingAppResourceDoamin(appName) + PANDAPAY_SPEI_PREFIX + id;
+        return splicingAppResourceDoamin(appName) + String.format(PANDAPAY_SPEI_PREFIX,appName,id);
     }
+
 }
