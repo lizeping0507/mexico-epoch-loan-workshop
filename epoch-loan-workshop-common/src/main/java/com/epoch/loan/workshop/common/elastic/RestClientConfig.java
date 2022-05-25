@@ -1,4 +1,4 @@
-package com.epoch.loan.workshop.common.config;
+package com.epoch.loan.workshop.common.elastic;
 
 import com.epoch.loan.workshop.common.util.LogUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -20,7 +20,7 @@ import java.util.List;
 
 /**
  * @author : Duke
- * @packageName : com.epoch.loan.workshop.common.config
+ * @packageName : com.epoch.loan.workshop.common.elastic
  * @className : RestClientConfig
  * @createTime : 2022/5/12 18:37
  * @description : ES高可用构建方式
