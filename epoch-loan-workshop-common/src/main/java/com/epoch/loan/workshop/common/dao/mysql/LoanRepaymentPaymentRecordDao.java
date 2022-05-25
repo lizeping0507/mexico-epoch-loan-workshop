@@ -104,4 +104,13 @@ public interface LoanRepaymentPaymentRecordDao {
      * @param updateTime
      */
     void updatePaymentRecordClabeAndBarCode(String id, String clabe, String barCode, Date updateTime);
+
+    /**
+     * 修改手续费
+     *
+     * @param id
+     * @param payFee
+     * @param updateTime
+     */
+    void updatePaymentRecordPayFee(String id, Double payFee, Date updateTime);
 }

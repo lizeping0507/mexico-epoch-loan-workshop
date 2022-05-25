@@ -52,6 +52,8 @@ public class PaymentField {
     public static final String PANDAPAY_PAYMENT_COMPANY_ID = "paymentCompanyId";
     public static final String PANDAPAY_PAYOUT_URL = "payoutUrl";
     public static final String PANDAPAY_PAY_URL = "payUrl";
+    public static final String PANDAPAY_PAY_SPEI_FEE = "paySpeiFee";
+    public static final String PANDAPAY_PAY_OXXO_FEE = "payOxxoFee";
     public static final String PANDAPAY_OXXO_PAY_URL = "oxxoPayUrl";
     public static final String PANDAPAY_QUERY_URL = "queryUrl";
     public static final String PANDAPAY_IN_QUERY_URL = "payinqueryUrl";
