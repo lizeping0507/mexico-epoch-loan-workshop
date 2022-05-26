@@ -91,9 +91,6 @@ public class OrderExaminePass extends BaseOrderMQListener implements MessageList
                 // 计算扣除费用后真实放款金额
                 double realAmount = loanOrderEntity.getApprovalAmount();
 
-                // 更新实际放款金额
-                loanOrderDao.updateOrderActualAmount(orderId, realAmount, new Date());
-
                 /* 计算还款金额 */
                 // 手续费费率
                 double processingFeeProportion = loanOrderEntity.getProcessingFeeProportion();
@@ -121,6 +118,9 @@ public class OrderExaminePass extends BaseOrderMQListener implements MessageList
 
                 // 每期应还手续费
                 double stagesIncidentalAmount = incidentalAmount / loanOrderEntity.getStages();
+
+                // 更新实际放款金额
+                loanOrderDao.updateOrderActualAmount(orderId, realAmount, new Date());
 
                 // 更新订单扣除费用
                 loanOrderDao.updateOrderIncidentalAmount(orderId, incidentalAmount, new Date());
