@@ -151,7 +151,6 @@ public class OrderExaminePass extends BaseOrderMQListener implements MessageList
                 // 更新通过时间
                 loanOrderDao.updateOrderExaminePassTime(orderId, new Date(), new Date());
 
-
                 // 修改订单状态为审核通过
                 updateOrderStatus(orderId, OrderStatus.EXAMINE_PASS);
 
