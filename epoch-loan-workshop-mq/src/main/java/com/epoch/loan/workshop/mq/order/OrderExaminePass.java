@@ -119,18 +119,6 @@ public class OrderExaminePass extends BaseOrderMQListener implements MessageList
                 // 每期应还手续费
                 double stagesIncidentalAmount = incidentalAmount / loanOrderEntity.getStages();
 
-                // 更新实际放款金额
-                loanOrderDao.updateOrderActualAmount(orderId, realAmount, new Date());
-
-                // 更新订单扣除费用
-                loanOrderDao.updateOrderIncidentalAmount(orderId, incidentalAmount, new Date());
-
-                // 更新还款金额
-                loanOrderDao.updateOrderEstimatedRepaymentAmount(orderId, estimatedRepaymentAmount, new Date());
-
-                // 更新通过时间
-                loanOrderDao.updateOrderExaminePassTime(orderId, new Date(), new Date());
-
                 // 初始化订单账单
                 for (int i = 1; i <= loanOrderEntity.getStages(); i++) {
                     LoanOrderBillEntity loanOrderBillEntity = new LoanOrderBillEntity();
@@ -150,6 +138,19 @@ public class OrderExaminePass extends BaseOrderMQListener implements MessageList
                     loanOrderBillEntity.setType(OrderBillType.LOAN);
                     loanOrderBillDao.insertOrderBill(loanOrderBillEntity);
                 }
+
+                // 更新实际放款金额
+                loanOrderDao.updateOrderActualAmount(orderId, realAmount, new Date());
+
+                // 更新订单扣除费用
+                loanOrderDao.updateOrderIncidentalAmount(orderId, incidentalAmount, new Date());
+
+                // 更新还款金额
+                loanOrderDao.updateOrderEstimatedRepaymentAmount(orderId, estimatedRepaymentAmount, new Date());
+
+                // 更新通过时间
+                loanOrderDao.updateOrderExaminePassTime(orderId, new Date(), new Date());
+
 
                 // 修改订单状态为审核通过
                 updateOrderStatus(orderId, OrderStatus.EXAMINE_PASS);
