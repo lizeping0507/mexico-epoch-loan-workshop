@@ -122,6 +122,9 @@ public class OrderExaminePass extends BaseOrderMQListener implements MessageList
                 // 每期应还手续费
                 double stagesIncidentalAmount = incidentalAmount / loanOrderEntity.getStages();
 
+                // 更新订单扣除费用
+                loanOrderDao.updateOrderIncidentalAmount(orderId, incidentalAmount, new Date());
+
                 // 更新还款金额
                 loanOrderDao.updateOrderEstimatedRepaymentAmount(orderId, estimatedRepaymentAmount, new Date());
 
