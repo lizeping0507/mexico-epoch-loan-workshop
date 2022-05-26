@@ -117,10 +117,10 @@ public class OrderExaminePass extends BaseOrderMQListener implements MessageList
                 double stagesPrincipalAmount = approvalAmount / loanOrderEntity.getStages();
 
                 // 每期应还利息
-                double stagesInterestAmount = incidentalAmount / loanOrderEntity.getStages();
+                double stagesInterestAmount = interestAmount / loanOrderEntity.getStages();
 
                 // 每期应还手续费
-                double stagesIncidentalAmount = interestAmount / loanOrderEntity.getStages();
+                double stagesIncidentalAmount = incidentalAmount / loanOrderEntity.getStages();
 
                 // 更新还款金额
                 loanOrderDao.updateOrderEstimatedRepaymentAmount(orderId, estimatedRepaymentAmount, new Date());
