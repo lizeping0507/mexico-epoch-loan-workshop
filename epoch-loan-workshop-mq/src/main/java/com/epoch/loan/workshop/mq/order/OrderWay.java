@@ -103,12 +103,8 @@ public class OrderWay extends BaseOrderMQListener implements MessageListenerConc
                     repaymentTimeMap.put(i, repaymentTime);
                 }
 
-                // 应还金额
-                double repaymentAmount = loanOrderEntity.getEstimatedRepaymentAmount() / loanOrderEntity.getStages();
-
                 // 查询订单账单列表
                 List<LoanOrderBillEntity> loanOrderBillEntityList = loanOrderBillDao.findOrderBillByOrderId(orderId);
-
 
                 // 修改订单账单还款实际及还款金额
                 LoanOrderBillEntity orderBillEntity = null;
@@ -117,9 +113,6 @@ public class OrderWay extends BaseOrderMQListener implements MessageListenerConc
                     if (loanOrderBillEntity.getStages().equals(1)) {
                         orderBillEntity = loanOrderBillEntity;
                     }
-
-                    // 修改应还金额
-                    loanOrderBillDao.updateOrderBillRepaymentAmount(loanOrderBillEntity.getId(), repaymentAmount, new Date());
 
                     // 修改还款时间
                     Date repaymentTime = DateUtil.StringToDate(DateUtil.DateToString(repaymentTimeMap.get(loanOrderBillEntity.getStages()), "yyyy-MM-dd") + " 23:59:59", "yyyy-MM-dd HH:mm:ss");
