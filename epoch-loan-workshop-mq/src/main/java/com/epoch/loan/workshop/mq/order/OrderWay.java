@@ -107,13 +107,7 @@ public class OrderWay extends BaseOrderMQListener implements MessageListenerConc
                 List<LoanOrderBillEntity> loanOrderBillEntityList = loanOrderBillDao.findOrderBillByOrderId(orderId);
 
                 // 修改订单账单还款实际及还款金额
-                LoanOrderBillEntity orderBillEntity = null;
                 for (LoanOrderBillEntity loanOrderBillEntity : loanOrderBillEntityList) {
-                    // 取期数为1的账单id
-                    if (loanOrderBillEntity.getStages().equals(1)) {
-                        orderBillEntity = loanOrderBillEntity;
-                    }
-
                     // 修改还款时间
                     Date repaymentTime = DateUtil.StringToDate(DateUtil.DateToString(repaymentTimeMap.get(loanOrderBillEntity.getStages()), "yyyy-MM-dd") + " 23:59:59", "yyyy-MM-dd HH:mm:ss");
                     loanOrderBillEntity.setRepaymentTime(repaymentTime);
@@ -130,7 +124,7 @@ public class OrderWay extends BaseOrderMQListener implements MessageListenerConc
                 // 发送还款策略组分配队列计算还款策略
                 DistributionRepaymentParams distributionRepaymentParams = new DistributionRepaymentParams();
                 distributionRepaymentParams.setOrderId(orderId);
-                distributionRepaymentParams.setOrderBillId(orderBillEntity.getId());
+                distributionRepaymentParams.setOrderBillId(loanOrderBillEntityList.get(0).getId());
                 sendRepaymentDistribution(distributionRepaymentParams);
 
                 // 推送催收
