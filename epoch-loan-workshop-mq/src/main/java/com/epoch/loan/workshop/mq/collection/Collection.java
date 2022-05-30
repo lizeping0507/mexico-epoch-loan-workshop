@@ -11,6 +11,7 @@ import com.epoch.loan.workshop.common.mq.collection.params.CollectionParams;
 import com.epoch.loan.workshop.common.util.*;
 import com.epoch.loan.workshop.mq.collection.order.*;
 import com.epoch.loan.workshop.mq.collection.overdue.CollectionOverdueParam;
+import com.epoch.loan.workshop.mq.collection.reduction.CollectionReductionAmountParam;
 import com.epoch.loan.workshop.mq.collection.repay.CollectionOrderInfoParam;
 import com.epoch.loan.workshop.mq.collection.repay.CollectionRepayParam;
 import com.epoch.loan.workshop.mq.collection.repay.CollectionRepayRecordParam;
@@ -30,6 +31,7 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 /**
@@ -149,6 +151,16 @@ public class Collection extends BaseCollectionMQ implements MessageListenerConcu
                     if (CollectionField.PUSH_SUCCESS != pushRes) {
                         retryCollection(collectionParams, subExpression());
                     }
+                } else if (collectionParams.getCollectionEvent() == CollectionField.EVENT_REDUCTION_AMOUNT) {
+
+                    // 订单同步减免金额-在催收提环系统更新案件
+                    if (CollectionField.PUSH_REMIND == productExt.getReactType()) {
+                        continue;
+                    }
+                    int pushRes = rePushReductionAmount(loanOrderEntity, product, lastOrderBill,productExt);
+                    if (CollectionField.PUSH_SUCCESS != pushRes) {
+                        retryCollection(collectionParams, subExpression());
+                    }
                 }
             } catch (Exception e) {
                 try {
@@ -246,6 +258,35 @@ public class Collection extends BaseCollectionMQ implements MessageListenerConcu
 
         param.setUserType(orderEntity.getUserType());
         param.setFundType(1);
+
+        String requestParam = getRequestParam(product, productExt,CollectionField.PUSH_SYNC_OVERDUE, param);
+        return push(requestParam, CollectionField.PUSH_REACT);
+    }
+
+    /**
+     * 同步逾期费用
+     *
+     * @param orderEntity   订单类
+     * @param product       产品类
+     * @param lastOrderBill 最后一期订单账单
+     * @param productExt 产品扩展信息
+     * @return 1--推送成功  0--推送失败
+     */
+    public Integer rePushReductionAmount(LoanOrderEntity orderEntity, LoanProductEntity product, LoanOrderBillEntity lastOrderBill,LoanProductExtEntity productExt) {
+        CollectionReductionAmountParam param = new CollectionReductionAmountParam();
+        param.setOrderNo(orderEntity.getId());
+
+        // 已还款金额
+        Double actualRepaymentAmount = orderEntity.getActualRepaymentAmount();
+        param.setReturnedAmount(ObjectUtils.isNotEmpty(actualRepaymentAmount) ? actualRepaymentAmount : 0.0);
+
+        // 减免费用
+        Double reductionAmount = loanOrderBillDao.sumReductionAmount(orderEntity.getId());
+        param.setReductionAmount(ObjectUtils.isNotEmpty(reductionAmount) ? reductionAmount : 0.0);
+
+        // 剩余还款金额 = 预估还款金额-实际还款金额 - 总减免金额
+        Double repaymentAmount = new BigDecimal(orderEntity.getEstimatedRepaymentAmount()).subtract(new BigDecimal(actualRepaymentAmount)).subtract(new BigDecimal(reductionAmount)).setScale(2, RoundingMode.HALF_UP).doubleValue();
+        param.setRemainingRepaymentAmount(repaymentAmount);
 
         String requestParam = getRequestParam(product, productExt,CollectionField.PUSH_SYNC_OVERDUE, param);
         return push(requestParam, CollectionField.PUSH_REACT);

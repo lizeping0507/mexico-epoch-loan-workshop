@@ -232,14 +232,20 @@ public class OrderServiceImpl extends BaseService implements OrderService {
                     estimatedRepaymentAmount = 0.0;
                 }
 
-                // 剩余还款金额 = 预估还款金额-实际还款金额
-                Double repaymentAmount = new BigDecimal(estimatedRepaymentAmount).subtract(new BigDecimal(actualRepaymentAmount)).setScale(2, RoundingMode.HALF_UP).doubleValue();
+                // 总减免金额
+                Double reductionAmount = loanOrderBillDao.sumReductionAmount(loanOrderEntity.getId());
+                if (ObjectUtils.isEmpty(reductionAmount)) {
+                    reductionAmount = 0.0;
+                }
+
+                // 剩余还款金额 = 预估还款金额-实际还款金额 - 总减免金额
+                Double repaymentAmount = new BigDecimal(estimatedRepaymentAmount).subtract(new BigDecimal(actualRepaymentAmount)).subtract(new BigDecimal(reductionAmount)).setScale(2, RoundingMode.HALF_UP).doubleValue();
+
                 if (loanOrderEntity.getStatus() == OrderStatus.COMPLETE || loanOrderEntity.getStatus() == OrderStatus.DUE_COMPLETE) {
                     orderInfoResult.setRepaymentAmount(estimatedRepaymentAmount);
                 } else {
                     orderInfoResult.setRepaymentAmount(repaymentAmount);
                 }
-
             }
 
             // 添加产品名称 和 产品图片
@@ -397,8 +403,14 @@ public class OrderServiceImpl extends BaseService implements OrderService {
                 estimatedRepaymentAmount = 0.0;
             }
 
-            // 剩余还款金额 = 预估还款金额-实际还款金额
-            Double repaymentAmount = new BigDecimal(estimatedRepaymentAmount).subtract(new BigDecimal(actualRepaymentAmount)).setScale(2, RoundingMode.HALF_UP).doubleValue();
+            // 总减免金额
+            Double reductionAmount = loanOrderBillDao.sumReductionAmount(loanOrderEntity.getId());
+            if (ObjectUtils.isEmpty(reductionAmount)) {
+                reductionAmount = 0.0;
+            }
+            // 剩余还款金额 = 预估还款金额-实际还款金额 - 总减免金额
+            Double repaymentAmount = new BigDecimal(estimatedRepaymentAmount).subtract(new BigDecimal(actualRepaymentAmount)).subtract(new BigDecimal(reductionAmount)).setScale(2, RoundingMode.HALF_UP).doubleValue();
+
             orderInfoResult.setRepaymentAmount(repaymentAmount);
 
             // 添加产品名称 和 产品图片
