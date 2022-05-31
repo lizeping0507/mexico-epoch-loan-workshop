@@ -859,8 +859,8 @@ public class OrderServiceImpl extends BaseService implements OrderService {
         Double reductionAmount = loanOrderBillDao.sumReductionAmount(reductionParams.getOrderNo());
         BigDecimal subOverdueAmount = reductionParams.getSubOverdueAmount();
         if (new BigDecimal(reductionAmount).compareTo(subOverdueAmount) == 1 ) {
-            result.setReturnCode(ResultEnum.REDUCTION_AMOUNT_ERROR.code());
-            result.setMessage(ResultEnum.REDUCTION_AMOUNT_ERROR.message());
+            result.setReturnCode(ResultEnum.REDUCTION_AMOUNT_MORE_ERROR.code());
+            result.setMessage(ResultEnum.REDUCTION_AMOUNT_MORE_ERROR.message());
             return result;
         }
 

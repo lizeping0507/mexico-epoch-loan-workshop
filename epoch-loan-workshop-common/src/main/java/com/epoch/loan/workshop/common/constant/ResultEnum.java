@@ -228,7 +228,12 @@ public enum ResultEnum {
     /**
      * 催收减免失败
      */
-    REDUCTION_AMOUNT_ERROR(11000, "催收减免失败");
+    REDUCTION_AMOUNT_ERROR(11000, "Cantidad de deducción fallida"),
+
+    /**
+     * 催收减免-- 已减免更多金额
+     */
+    REDUCTION_AMOUNT_MORE_ERROR(11001, "Más cantidad se ha descontada");
 
     private Integer code;
     private String message;
