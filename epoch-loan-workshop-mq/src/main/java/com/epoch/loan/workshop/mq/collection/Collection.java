@@ -264,7 +264,7 @@ public class Collection extends BaseCollectionMQ implements MessageListenerConcu
     }
 
     /**
-     * 同步逾期费用
+     * 同步减免金额
      *
      * @param orderEntity   订单类
      * @param product       产品类
