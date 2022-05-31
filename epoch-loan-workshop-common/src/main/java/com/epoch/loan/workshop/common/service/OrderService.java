@@ -76,4 +76,10 @@ public interface OrderService {
      */
     Result<ConfirmMergePushApplyResult> confirmMergePushApply(ConfirmMergePushApplyParams params) throws Exception;
 
+    /**
+     * 催收减免
+     * @param reductionParams 请求参数
+     * @return
+     */
+    Result<Object> reduction(CollectionReductionParams reductionParams);
 }
