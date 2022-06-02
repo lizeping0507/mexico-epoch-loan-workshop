@@ -5,10 +5,7 @@ import com.epoch.loan.workshop.common.constant.*;
 import com.epoch.loan.workshop.common.entity.mysql.*;
 import com.epoch.loan.workshop.common.mq.order.params.OrderParams;
 import com.epoch.loan.workshop.common.params.params.BaseParams;
-import com.epoch.loan.workshop.common.params.params.request.ApplyParams;
-import com.epoch.loan.workshop.common.params.params.request.BindRemittanceAccountParams;
-import com.epoch.loan.workshop.common.params.params.request.ConfirmMergePushApplyParams;
-import com.epoch.loan.workshop.common.params.params.request.OrderDetailParams;
+import com.epoch.loan.workshop.common.params.params.request.*;
 import com.epoch.loan.workshop.common.params.params.result.ConfirmMergePushApplyResult;
 import com.epoch.loan.workshop.common.params.params.result.OrderDetailResult;
 import com.epoch.loan.workshop.common.params.params.result.OrderListResult;
@@ -234,12 +231,12 @@ public class OrderServiceImpl extends BaseService implements OrderService {
 
                 // 剩余还款金额 = 预估还款金额-实际还款金额
                 Double repaymentAmount = new BigDecimal(estimatedRepaymentAmount).subtract(new BigDecimal(actualRepaymentAmount)).setScale(2, RoundingMode.HALF_UP).doubleValue();
+
                 if (loanOrderEntity.getStatus() == OrderStatus.COMPLETE || loanOrderEntity.getStatus() == OrderStatus.DUE_COMPLETE) {
                     orderInfoResult.setRepaymentAmount(estimatedRepaymentAmount);
                 } else {
                     orderInfoResult.setRepaymentAmount(repaymentAmount);
                 }
-
             }
 
             // 添加产品名称 和 产品图片
@@ -825,6 +822,69 @@ public class OrderServiceImpl extends BaseService implements OrderService {
         return result;
     }
 
+    /**
+     * 催收减免
+     * @param reductionParams 减免金额相关
+     * @return
+     */
+    @Override
+    public Result<Object> reduction(CollectionReductionParams reductionParams){
+        // 结果集
+        Result result = new Result();
+
+        // 验证订单是否存在
+        LoanOrderEntity loanOrder = loanOrderDao.findOrder(reductionParams.getOrderNo());
+        if (ObjectUtils.isEmpty(loanOrder)) {
+            result.setReturnCode(ResultEnum.ORDER_ERROR.code());
+            result.setMessage(ResultEnum.ORDER_ERROR.message());
+            return result;
+        }
+
+        // 验证是否是同一个产品
+        LoanProductEntity product = loanProductDao.findProduct(loanOrder.getProductId());
+        if (ObjectUtils.isEmpty(product) || !product.getProductName().equalsIgnoreCase(reductionParams.getOrgId())) {
+            result.setReturnCode(ResultEnum.ORDER_ERROR.code());
+            result.setMessage(ResultEnum.ORDER_ERROR.message());
+            return result;
+        }
+
+        // 已完结订单 不修改减免金额
+        if (OrderStatus.COMPLETE == loanOrder.getStatus() || OrderStatus.DUE_COMPLETE == loanOrder.getStatus()) {
+            result.setReturnCode(ResultEnum.ORDER_ERROR.code());
+            result.setMessage(ResultEnum.ORDER_ERROR.message());
+            return result;
+        }
+
+        // 判断减免金额大小, 催收减免金额不能大于 贷超后台减免金额
+        Double reductionAmount = loanOrderBillDao.sumReductionAmount(reductionParams.getOrderNo());
+        BigDecimal subOverdueAmount = reductionParams.getSubOverdueAmount();
+        if (new BigDecimal(reductionAmount).compareTo(subOverdueAmount) == 1 ) {
+            result.setReturnCode(ResultEnum.REDUCTION_AMOUNT_MORE_ERROR.code());
+            result.setMessage(ResultEnum.REDUCTION_AMOUNT_MORE_ERROR.message());
+            return result;
+        }
+
+        // 修改订单最后一期的 金额
+        LoanOrderBillEntity lastOrderBill = loanOrderBillDao.findLastOrderBill(reductionParams.getOrderNo());
+
+        // 应还款金额
+        double repaymentAmount = lastOrderBill.getRepaymentAmount() - subOverdueAmount.doubleValue();
+
+        // 更新减免金额
+        loanOrderBillDao.updateOrderBillReductionAmount(lastOrderBill.getId(), subOverdueAmount.doubleValue(), new Date());
+
+        // 更新还款金额
+        loanOrderBillDao.updateOrderBillRepaymentAmount(lastOrderBill.getId(), repaymentAmount, new Date());
+
+        // 计算预计还款金额更新预计还款金额
+        double amount = loanOrderBillDao.sumOrderRepaymentAmount(reductionParams.getOrderNo());
+        loanOrderDao.updateOrderEstimatedRepaymentAmount(reductionParams.getOrderNo(), amount, new Date());
+
+        // 封装结果
+        result.setReturnCode(ResultEnum.SUCCESS.code());
+        result.setMessage(ResultEnum.SUCCESS.message());
+        return result;
+    }
 
     /**
      * 计算用户客群

@@ -30,6 +30,11 @@ public class CollectionField {
     public final static int EVENT_COMPLETE = 2;
 
     /**
+     * 催收事件-同步减免金额
+     */
+    public final static int EVENT_REDUCTION_AMOUNT = 3;
+
+    /**
      * 催收事件-案件展期
      */
     public final static int EVENT_EXTENSION = 3;

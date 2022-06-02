@@ -83,6 +83,11 @@ public class URL {
      */
     public static final String RANDOM = API + "/random";
 
+    /**
+     * 催收还提
+     */
+    public static final String COLLECTION = API + "/collection";
+
     /*二级*/
     /**
      * 隐私协议
@@ -309,4 +314,9 @@ public class URL {
      * jsonString
      */
     public static final String JSONString = "/jsonString";
+
+    /**
+     * 减免
+     */
+    public static final String REDUCTION = "/reduction";
 }

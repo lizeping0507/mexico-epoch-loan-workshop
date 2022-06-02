@@ -224,10 +224,16 @@ public enum ResultEnum {
      * 无可用聚道
      */
     CHANNEL_UN_DO_ERROR(10000, "No hay proveedores de servicios OCR disponibles para este canal "),
-    ;
 
+    /**
+     * 催收减免失败
+     */
+    REDUCTION_AMOUNT_ERROR(11000, "Cantidad de deducción fallida"),
 
-
+    /**
+     * 催收减免-- 已减免更多金额
+     */
+    REDUCTION_AMOUNT_MORE_ERROR(11001, "Más cantidad se ha descontada");
 
     private Integer code;
     private String message;
