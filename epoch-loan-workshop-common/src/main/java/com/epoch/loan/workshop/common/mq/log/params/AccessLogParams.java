@@ -60,12 +60,12 @@ public class AccessLogParams extends BaseParams {
     /**
      * 响应数据
      */
-    private Object response;
+    private String response;
 
     /**
      * 请求数据
      */
-    private Object request;
+    private String request;
 
     /**
      * 访问耗时时间(MS)

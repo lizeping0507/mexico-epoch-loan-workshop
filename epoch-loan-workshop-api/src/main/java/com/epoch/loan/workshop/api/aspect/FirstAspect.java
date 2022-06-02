@@ -96,7 +96,7 @@ public class FirstAspect {
             }
 
             // 将解析器
-            accessLogParams.setRequest(jsonParams);
+            accessLogParams.setRequest(JSONObject.toJSONString(jsonParams));
 
             // 将请求参数进行格式化(动态参数)
             jsonParams = formatDynamicRequestParams(jsonParams, mappingUrl);
@@ -122,14 +122,14 @@ public class FirstAspect {
                 result = formatDynamicResponseParams(result, mappingUrl);
 
                 // 将返回前端的参数封装进日志
-                accessLogParams.setResponse(result);
+                accessLogParams.setResponse(JSONObject.toJSONString(result));
                 accessLogParams.setEx(result.getEx());
                 request.setAttribute(Field.ACCESS_LOG, accessLogParams);
                 result.setEx("");
                 return result;
             } else {
                 // 将返回前端的参数封装进日志
-                accessLogParams.setResponse(objectResult);
+                accessLogParams.setResponse(String.valueOf(objectResult));
                 request.setAttribute(Field.ACCESS_LOG, accessLogParams);
                 return objectResult;
             }
