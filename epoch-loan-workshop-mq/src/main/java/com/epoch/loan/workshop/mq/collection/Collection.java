@@ -157,7 +157,7 @@ public class Collection extends BaseCollectionMQ implements MessageListenerConcu
                     if (CollectionField.PUSH_REMIND == productExt.getReactType()) {
                         continue;
                     }
-                    int pushRes = rePushReductionAmount(loanOrderEntity, product, lastOrderBill,productExt);
+                    int pushRes = rePushReductionAmount(loanOrderEntity, product, productExt);
                     if (CollectionField.PUSH_SUCCESS != pushRes) {
                         retryCollection(collectionParams, subExpression());
                     }
@@ -268,11 +268,10 @@ public class Collection extends BaseCollectionMQ implements MessageListenerConcu
      *
      * @param orderEntity   订单类
      * @param product       产品类
-     * @param lastOrderBill 最后一期订单账单
      * @param productExt 产品扩展信息
      * @return 1--推送成功  0--推送失败
      */
-    public Integer rePushReductionAmount(LoanOrderEntity orderEntity, LoanProductEntity product, LoanOrderBillEntity lastOrderBill,LoanProductExtEntity productExt) {
+    public Integer rePushReductionAmount(LoanOrderEntity orderEntity, LoanProductEntity product, LoanProductExtEntity productExt) {
         CollectionReductionAmountParam param = new CollectionReductionAmountParam();
         param.setOrderNo(orderEntity.getId());
 
@@ -405,6 +404,8 @@ public class Collection extends BaseCollectionMQ implements MessageListenerConcu
         orderParam.setShouldRepayAmount(orderEntity.getEstimatedRepaymentAmount());
         orderParam.setThirdUserId(orderEntity.getUserId());
         orderParam.setSettledTime(lastOrderBill.getActualRepaymentTime());
+        orderParam.setReductionAmount(0.0);
+        orderParam.setRemainingRepaymentAmount(orderEntity.getEstimatedRepaymentAmount());
 
         if (ObjectUtils.isNotEmpty(orderEntity.getActualRepaymentAmount())) {
             orderParam.setReturnedAmount(orderEntity.getActualRepaymentAmount());

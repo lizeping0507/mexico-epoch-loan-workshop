@@ -87,6 +87,16 @@ public class CollectionOrderParam implements Serializable {
     private Double returnedAmount;
 
     /**
+     * 减免费用
+     */
+    private Double reductionAmount;
+
+    /**
+     * 剩余还款金额(总)
+     */
+    private Double remainingRepaymentAmount;
+
+    /**
      * 三方用户id
      */
     private String thirdUserId;
