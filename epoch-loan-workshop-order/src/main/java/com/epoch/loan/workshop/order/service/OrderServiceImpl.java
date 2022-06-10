@@ -217,6 +217,9 @@ public class OrderServiceImpl extends BaseService implements OrderService {
                 LoanOrderBillEntity lastOrderBill = loanOrderBillDao.findLastOrderBill(loanOrderEntity.getId());
                 orderInfoResult.setRepaymentTime(lastOrderBill.getRepaymentTime());
 
+                // 添加账单id
+                orderInfoResult.setOrderBillId(lastOrderBill.getId());
+
                 // 实际还款金额
                 Double actualRepaymentAmount = loanOrderEntity.getActualRepaymentAmount();
                 if (ObjectUtils.isEmpty(actualRepaymentAmount)) {
@@ -381,6 +384,9 @@ public class OrderServiceImpl extends BaseService implements OrderService {
             // 应还款时间
             LoanOrderBillEntity lastOrderBill = loanOrderBillDao.findLastOrderBill(loanOrderEntity.getId());
             orderInfoResult.setRepaymentTime(lastOrderBill.getRepaymentTime());
+
+            // 添加账单id
+            orderInfoResult.setOrderBillId(lastOrderBill.getId());
 
             // 实际还款金额
             Double actualRepaymentAmount = loanOrderEntity.getActualRepaymentAmount();
