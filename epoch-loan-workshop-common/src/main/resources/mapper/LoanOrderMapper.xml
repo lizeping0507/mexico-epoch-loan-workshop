@@ -237,4 +237,9 @@
         LIMIT 0,1
     </select>
 
+    <select id="findOrderByStatusIn" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanOrderEntity">
+        SELECT * from loan_order WHERE 1 = 1
+        <foreach collection="array" item="statu" index="index" open="AND status IN(" close=")" separator=",">#{statu}</foreach>
+    </select>
+
 </mapper>

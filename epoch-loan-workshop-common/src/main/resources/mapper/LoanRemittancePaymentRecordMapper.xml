@@ -93,4 +93,9 @@
     <select id="getByBusinessId" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanRemittancePaymentRecordEntity">
         SELECT * FROM loan_remittance_payment_record where business_id = #{businessId}
     </select>
+    <select id="findByStatus"
+            resultType="com.epoch.loan.workshop.common.entity.mysql.LoanRemittancePaymentRecordEntity">
+        select * from loan_remittance_payment_record where 1=1
+        <foreach collection="array" item="statu" index="index" open="AND status IN(" close=")" separator=",">#{statu}</foreach>
+    </select>
 </mapper>
