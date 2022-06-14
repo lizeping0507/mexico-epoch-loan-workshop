@@ -75,6 +75,11 @@ public class LoanRemittanceOrderRecordEntity {
     private Integer status;
 
     /**
+     * 放款成功之后回调事件
+     */
+    private String event;
+
+    /**
      * 进行中支付记录id
      */
     private String processRemittancePaymentRecordId;
