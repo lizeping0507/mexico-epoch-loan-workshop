@@ -181,7 +181,7 @@ public class RiskModelV1 extends BaseOrderMQListener implements MessageListenerC
                     LogUtil.sysError("[RiskModelV1]", exception);
                 }
 
-                LogUtil.sysError("[RiskModelV1]", e);
+                LogUtil.sysError("[RiskModelV1 " + orderParams.getOrderId() + "]", e);
             }
         }
         return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;

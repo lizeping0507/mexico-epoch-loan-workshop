@@ -190,7 +190,7 @@ public class RiskModelMask extends BaseOrderMQListener implements MessageListene
                     LogUtil.sysError("[RiskModelMask]", exception);
                 }
 
-                LogUtil.sysError("[RiskModelMask]", e);
+                LogUtil.sysError("[RiskModelMask " + orderParams.getOrderId() + "]", e);
             }
         }
         return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
