@@ -13,10 +13,6 @@ import java.util.List;
  */
 @Data
 public class OrderParams {
-    /**
-     * 风控模型列表
-     */
-    public List<String> modelList;
 
     /**
      * 订单ID
@@ -24,17 +20,7 @@ public class OrderParams {
     private String orderId;
 
     /**
-     * 模型
-     */
-    private String groupName;
-
-    /**
      * 订单账单Id
      */
     private String orderBillId;
-
-    /**
-     * 金额
-     */
-    private double amount;
 }

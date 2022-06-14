@@ -70,7 +70,6 @@ public class OrderDueTask extends BaseTask implements Job {
                     String orderBillId = loanOrderBillEntity.getId();
 
                     OrderParams params = new OrderParams();
-                    params.setGroupName("SYSTEM");
                     params.setOrderId(orderId);
                     params.setOrderBillId(orderBillId);
                     orderMQManager.sendMessage(params, orderMQManager.getOrderDueSubExpression());

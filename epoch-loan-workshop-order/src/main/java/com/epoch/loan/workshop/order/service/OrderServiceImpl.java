@@ -148,8 +148,6 @@ public class OrderServiceImpl extends BaseService implements OrderService {
                     // 发送订单审核队列
                     OrderParams orderParams = new OrderParams();
                     orderParams.setOrderId(orderId);
-                    orderParams.setGroupName(orderModelGroup);
-                    orderParams.setModelList(orderModelList);
                     orderMQManager.sendMessage(orderParams, orderModelList.get(0));
                     LogUtil.sysInfo("SUCCESS: {}", "SUCCESS");
 

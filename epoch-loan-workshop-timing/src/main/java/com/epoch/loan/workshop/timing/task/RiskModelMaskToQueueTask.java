@@ -41,8 +41,6 @@ public class RiskModelMaskToQueueTask extends BaseTask implements Job {
             try {
                 OrderParams orderParams = new OrderParams();
                 orderParams.setOrderId(loanOrderExamineEntity.getOrderId());
-                orderParams.setModelList(modelNames);
-                orderParams.setGroupName("MASK");
                 orderMQManager.sendMessage(orderParams, modelNames.get(0));
             } catch (Exception exception) {
                 LogUtil.sysError("[RiskModelMaskToQueueTask]", exception);
