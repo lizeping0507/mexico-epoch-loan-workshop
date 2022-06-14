@@ -14,7 +14,7 @@ import com.epoch.loan.workshop.common.params.params.result.model.LoanRepaymentRe
 import com.epoch.loan.workshop.common.params.params.result.model.OrderInfoResult;
 import com.epoch.loan.workshop.common.service.OrderService;
 import com.epoch.loan.workshop.common.util.*;
-import com.epoch.loan.workshop.common.zookeeper.lock.UserApplyDetailLock;
+import com.epoch.loan.workshop.common.lock.UserApplyDetailLock;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;

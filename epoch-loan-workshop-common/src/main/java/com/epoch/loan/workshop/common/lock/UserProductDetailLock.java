@@ -1,24 +1,24 @@
-package com.epoch.loan.workshop.common.zookeeper.lock;
+package com.epoch.loan.workshop.common.lock;
 
 /**
  * @author : Duke
  * @packageName : com.epoch.loan.workshop.common.lock
- * @className : UserApplyDetailLock
+ * @className : UserProductDetailLock
  * @createTime : 2022/4/22 19:17
- * @description : 用户申请
+ * @description : 用户产品
  */
-public abstract class UserApplyDetailLock<String> extends AbstractZookeeperLock<String> {
+public abstract class UserProductDetailLock<String> extends AbstractZookeeperLock<String> {
     /**
      * 锁路径
      */
-    private static final java.lang.String LOCK_PATH = "_user_apply_lock_";
+    private static final java.lang.String LOCK_PATH = "_user_product_detail_lock_";
 
     /**
      * 锁id
      */
     private String lockId;
 
-    public UserApplyDetailLock(String lockId) {
+    public UserProductDetailLock(String lockId) {
         this.lockId = lockId;
     }
 

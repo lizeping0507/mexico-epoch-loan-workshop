@@ -1,6 +1,6 @@
 package com.epoch.loan.workshop.common.zookeeper;
 
-import com.epoch.loan.workshop.common.zookeeper.lock.AbstractZookeeperLock;
+import com.epoch.loan.workshop.common.lock.AbstractZookeeperLock;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.recipes.locks.InterProcessMutex;

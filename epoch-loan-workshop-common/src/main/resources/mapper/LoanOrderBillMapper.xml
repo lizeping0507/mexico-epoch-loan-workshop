@@ -54,6 +54,11 @@
     <update id="updateOrderBillStatus">
         UPDATE loan_order_bill SET status=#{status},update_time=#{updateTime} WHERE id=#{id}
     </update>
+    <delete id="removeOrderBillByOrderId" parameterType="java.lang.String">
+        DELETE
+        FROM loan_order_bill
+        WHERE order_id = #{orderId}
+    </delete>
     <select id="findOrderBillByOrderId" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanOrderBillEntity">
         SELECT * FROM loan_order_bill WHERE order_id=#{orderId}
     </select>
@@ -132,5 +137,10 @@
         </foreach>
         ORDER BY stages ASC
         LIMIT 0,1
+    </select>
+    <select id="findOrderBillCountByOrderId" resultType="java.lang.Integer" parameterType="java.lang.String">
+        SELECT COUNT(1)
+        FROM loan_order_bill
+        WHERE order_id = #{orderId}
     </select>
 </mapper>

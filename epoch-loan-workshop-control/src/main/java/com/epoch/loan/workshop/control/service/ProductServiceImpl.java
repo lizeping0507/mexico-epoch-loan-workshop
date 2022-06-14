@@ -12,7 +12,7 @@ import com.epoch.loan.workshop.common.params.params.result.*;
 import com.epoch.loan.workshop.common.params.params.result.model.ProductList;
 import com.epoch.loan.workshop.common.service.ProductService;
 import com.epoch.loan.workshop.common.util.*;
-import com.epoch.loan.workshop.common.zookeeper.lock.UserProductDetailLock;
+import com.epoch.loan.workshop.common.lock.UserProductDetailLock;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;

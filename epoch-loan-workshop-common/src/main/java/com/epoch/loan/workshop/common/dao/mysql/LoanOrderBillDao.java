@@ -17,6 +17,23 @@ import java.util.List;
 @Mapper
 public interface LoanOrderBillDao {
 
+
+    /**
+     * 根据订单id删除账单
+     *
+     * @param orderId
+     * @return
+     */
+    int removeOrderBillByOrderId(String orderId);
+
+    /**
+     * 查询订单账单数量
+     *
+     * @param orderId
+     * @return
+     */
+    Integer findOrderBillCountByOrderId(String orderId);
+
     /**
      * 查询结清-有逾期的订单账单数量
      *
