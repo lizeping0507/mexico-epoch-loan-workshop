@@ -63,27 +63,30 @@ public class OrderRemittance extends BaseOrderMQListener implements MessageListe
                     continue;
                 }
 
+                // 订单id
+                String orderId = orderParams.getOrderId();
+
+                // 查询订单ID
+                LoanOrderEntity loanOrderEntity = loanOrderDao.findOrder(orderId);
+                if (ObjectUtils.isEmpty(loanOrderEntity)) {
+                    continue;
+                }
+
+                // 审核模型组
+                String orderModelGroup = loanOrderEntity.getOrderModelGroup();
+
                 // 队列拦截
-                if (intercept(orderParams.getGroupName(), subExpression())) {
+                if (intercept(orderModelGroup, subExpression())) {
                     // 等待重试
                     retry(orderParams, subExpression());
                     continue;
                 }
 
-                // 订单id
-                String orderId = orderParams.getOrderId();
-
                 // 判断模型状态
                 int status = getModelStatus(orderId, subExpression());
                 if (status == OrderExamineStatus.PASS) {
                     // 发送下一模型
-                    sendNextModel(orderParams, subExpression());
-                    continue;
-                }
-
-                // 查询订单ID
-                LoanOrderEntity loanOrderEntity = loanOrderDao.findOrder(orderId);
-                if (ObjectUtils.isEmpty(loanOrderEntity)) {
+                    sendNextModel(orderParams, orderModelGroup, subExpression());
                     continue;
                 }
 
@@ -177,7 +180,7 @@ public class OrderRemittance extends BaseOrderMQListener implements MessageListe
                     updateLoanTime(orderId);
 
                     // 发送下一模型
-                    sendNextModel(orderParams, subExpression());
+                    sendNextModel(orderParams, orderModelGroup, subExpression());
                     continue;
                 } else if (loanRemittanceOrderRecordStatus == LoanRemittanceOrderRecordStatus.THOROUGHLY_FAILED) {
                     // 异常状况 此订单放款彻底失败  流程结束

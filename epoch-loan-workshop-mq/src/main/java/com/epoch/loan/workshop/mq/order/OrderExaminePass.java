@@ -60,27 +60,35 @@ public class OrderExaminePass extends BaseOrderMQListener implements MessageList
                     continue;
                 }
 
+                // 订单id
+                String orderId = orderParams.getOrderId();
+
+                // 查询订单ID
+                LoanOrderEntity loanOrderEntity = loanOrderDao.findOrder(orderId);
+                if (ObjectUtils.isEmpty(loanOrderEntity)) {
+                    continue;
+                }
+
+                // 审核模型组
+                String orderModelGroup = loanOrderEntity.getOrderModelGroup();
+
                 // 队列拦截
-                if (intercept(orderParams.getGroupName(), subExpression())) {
+                if (intercept(orderModelGroup, subExpression())) {
                     // 等待重试
                     retry(orderParams, subExpression());
                     continue;
                 }
 
-                // 订单id
-                String orderId = orderParams.getOrderId();
-
                 // 判断模型状态
                 int status = getModelStatus(orderId, subExpression());
                 if (status == OrderExamineStatus.PASS) {
                     // 发送下一模型
-                    sendNextModel(orderParams, subExpression());
+                    sendNextModel(orderParams, orderModelGroup, subExpression());
                     continue;
                 }
 
-                // 查询订单ID
-                LoanOrderEntity loanOrderEntity = loanOrderDao.findOrder(orderId);
-                if (ObjectUtils.isEmpty(loanOrderEntity)) {
+                // 判断订单状态是否为废弃
+                if (loanOrderEntity.getStatus() == OrderStatus.ABANDONED) {
                     continue;
                 }
 
@@ -157,8 +165,8 @@ public class OrderExaminePass extends BaseOrderMQListener implements MessageList
                 // 修改审核状态
                 updateModeExamine(orderId, subExpression(), OrderExamineStatus.PASS);
 
-                // 发送到下一模型
-                sendNextModel(orderParams, subExpression());
+                // 发送下一模型
+                sendNextModel(orderParams, orderModelGroup, subExpression());
             } catch (Exception e) {
                 try {
                     // 更新对应模型审核状态
