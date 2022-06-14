@@ -5,6 +5,8 @@ import com.epoch.loan.workshop.common.constant.LoanRemittancePaymentRecordStatus
 import com.epoch.loan.workshop.common.dao.mysql.*;
 import com.epoch.loan.workshop.common.entity.mysql.LoanRemittanceOrderRecordEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanRemittancePaymentRecordEntity;
+import com.epoch.loan.workshop.common.mq.order.OrderMQManager;
+import com.epoch.loan.workshop.common.mq.order.params.OrderParams;
 import com.epoch.loan.workshop.common.mq.remittance.params.DistributionRemittanceParams;
 import com.epoch.loan.workshop.common.mq.remittance.params.RemittanceParams;
 import com.epoch.loan.workshop.common.util.ObjectIdUtil;
@@ -27,6 +29,12 @@ import java.util.List;
 @RefreshScope
 @Component
 public abstract class BaseRemittancePaymentMQListener extends BaseRemittanceMQListener {
+
+    /**
+     * 订单队列
+     */
+    @Autowired
+    public OrderMQManager orderMQManager;
 
     /**
      * 支付分配
@@ -73,6 +81,21 @@ public abstract class BaseRemittancePaymentMQListener extends BaseRemittanceMQLi
         // 重入放款队列
         remittanceMQManager.sendMessage(params, tag, 5 * 60);
     }
+
+
+    /**
+     * 订单放放款队列回调
+     *
+     * @param orderId
+     * @param tag
+     * @throws Exception
+     */
+    public void callBackOrderRemittance(String orderId, String tag) throws Exception {
+        OrderParams orderParams = new OrderParams();
+        orderParams.setOrderId(orderId);
+        orderMQManager.sendMessage(orderParams, tag);
+    }
+
 
     /**
      * 放款队列消息重回分配队列

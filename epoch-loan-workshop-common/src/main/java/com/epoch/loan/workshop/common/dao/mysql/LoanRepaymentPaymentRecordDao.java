@@ -113,4 +113,14 @@ public interface LoanRepaymentPaymentRecordDao {
      * @param updateTime
      */
     void updatePaymentRecordPayFee(String id, Double payFee, Date updateTime);
+
+    /**
+     * 通过状态和时间段查询还款记录
+     *
+     * @param status 支付状态
+     * @param startTime 开始时间
+     * @param endTime 结束时间
+     * @return
+     */
+    List<LoanRepaymentPaymentRecordEntity> findByStatusAndTime(int status, Date startTime, Date endTime);
 }

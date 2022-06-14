@@ -129,4 +129,12 @@ public interface LoanRemittancePaymentRecordDao {
      * @return
      */
     LoanRemittancePaymentRecordEntity getByBusinessId(String businessId);
+
+    /**
+     * 查询指定状态放款详情
+     *
+     * @param status
+     * @return
+     */
+    List<LoanRemittancePaymentRecordEntity> findByStatus(int[] status);
 }

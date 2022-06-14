@@ -139,6 +139,7 @@ public class OrderRemittance extends BaseOrderMQListener implements MessageListe
                             loanRemittanceOrderRecordEntity.setSuccessRemittancePaymentRecordId("");
                             loanRemittanceOrderRecordEntity.setCreateTime(new Date());
                             loanRemittanceOrderRecordEntity.setUpdateTime(new Date());
+                            loanRemittanceOrderRecordEntity.setEvent(subExpression());
                             loanRemittanceOrderRecordDao.insert(loanRemittanceOrderRecordEntity);
 
                             // 更新订单状态为等待放款
@@ -156,8 +157,6 @@ public class OrderRemittance extends BaseOrderMQListener implements MessageListe
                         }
                     });
 
-                    // 放入队列等待放款成功
-                    retry(orderParams, subExpression());
                     continue;
                 }
 
@@ -189,8 +188,8 @@ public class OrderRemittance extends BaseOrderMQListener implements MessageListe
                     // 更改新表订单状态 : 废弃
                     updateOrderStatus(orderId, OrderStatus.ABANDONED);
                 } else {
-                    // 放入队列等待放款成功
-                    retry(orderParams, subExpression());
+                    // 更新对应模型审核状态
+                    updateModeExamine(orderId, subExpression(), OrderExamineStatus.WAIT);
                     continue;
                 }
             } catch (Exception e) {

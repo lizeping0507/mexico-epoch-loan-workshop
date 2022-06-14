@@ -11,6 +11,7 @@ import com.epoch.loan.workshop.mq.order.*;
 import com.epoch.loan.workshop.mq.order.screen.RiskModelMask;
 import com.epoch.loan.workshop.mq.order.screen.RiskModelV1;
 import com.epoch.loan.workshop.mq.remittance.Distribution;
+import com.epoch.loan.workshop.mq.remittance.RetryRemittance;
 import com.epoch.loan.workshop.mq.remittance.payment.panda.PandaPay;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -135,6 +136,17 @@ public class Application {
     @Autowired
     private CollectionMQManager collectionMQManager;
 
+    /**
+     * 放款补偿
+     */
+    @Autowired
+    public RetryRemittance retryRemittance;
+
+    /**
+     * 订单补偿
+     */
+    @Autowired
+    public RetryOrder retryOrder;
 
     /**
      * 启动类
@@ -160,6 +172,8 @@ public class Application {
         orderMQManager.init();
         remittanceMQManagerProduct.init();
         collectionMQManager.init();
+        retryOrder.retry();
+        retryRemittance.retry();
         riskModelMask.start();
         orderComplete.start();
         orderDue.start();

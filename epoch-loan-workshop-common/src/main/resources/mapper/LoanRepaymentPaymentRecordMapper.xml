@@ -82,4 +82,11 @@
     <select id="findListRecordDTOByOrderIdAndStatus" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanRepaymentPaymentRecordEntity">
         SELECT * FROM loan_repayment_payment_record WHERE order_id=#{orderId} AND status = #{status}
     </select>
+    <select id="findByStatusAndTime"
+            resultType="com.epoch.loan.workshop.common.entity.mysql.LoanRepaymentPaymentRecordEntity">
+        SELECT *
+        FROM loan_repayment_payment_record
+        WHERE status = #{status}
+          AND create_time &gt; #{startTime} AND create_time &lt; #{endTime}
+    </select>
 </mapper>
