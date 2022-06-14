@@ -116,7 +116,6 @@ public class OrderExaminePass extends BaseOrderMQListener implements MessageList
                 // 总还款金额(预计)
                 Double estimatedRepaymentAmount = approvalAmount + interestAmount + incidentalAmount;
 
-
                 // 生成账单(使用分布式锁)
                 zookeeperClient.lock(new OrderExaminePassLock<String>(orderId) {
                     @Override
@@ -170,7 +169,6 @@ public class OrderExaminePass extends BaseOrderMQListener implements MessageList
                         return null;
                     }
                 });
-
 
                 // 更新实际放款金额
                 loanOrderDao.updateOrderActualAmount(orderId, realAmount, new Date());
