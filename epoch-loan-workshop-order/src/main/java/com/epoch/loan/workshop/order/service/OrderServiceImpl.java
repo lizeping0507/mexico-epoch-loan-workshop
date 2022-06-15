@@ -593,7 +593,7 @@ public class OrderServiceImpl extends BaseService implements OrderService {
             recordDTO.setTotalAmount(paymentRecord.getActualAmount());
 
             // 手续费
-            double charge = new BigDecimal(paymentRecord.getAmount()).subtract(new BigDecimal(paymentRecord.getActualAmount())).doubleValue();
+            Double charge = paymentRecord.getPayFee();
             recordDTO.setCharge(charge);
             recordDTO.setSuccessTime(paymentRecord.getUpdateTime());
             recordDTO.setSuccessDay(paymentRecord.getUpdateTime());
