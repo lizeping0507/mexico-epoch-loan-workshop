@@ -589,8 +589,8 @@ public class OrderServiceImpl extends BaseService implements OrderService {
         List<LoanRepaymentPaymentRecordEntity> paymentRecordList = loanRepaymentPaymentRecordDao.findListRecordDTOByOrderIdAndStatus(orderId, LoanRepaymentPaymentRecordStatus.SUCCESS);
         paymentRecordList.forEach(paymentRecord -> {
             LoanRepaymentRecordResult recordDTO = new LoanRepaymentRecordResult();
-            recordDTO.setRepaymentAmount(paymentRecord.getAmount());
-            recordDTO.setTotalAmount(paymentRecord.getActualAmount());
+            recordDTO.setTotalAmount(paymentRecord.getAmount());
+            recordDTO.setRepaymentAmount(paymentRecord.getActualAmount());
 
             // 手续费
             Double charge = paymentRecord.getPayFee();
