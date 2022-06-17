@@ -1,6 +1,8 @@
 package com.epoch.loan.workshop.common.entity.elastic;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
@@ -16,6 +18,8 @@ import java.util.Date;
  * @Description: advance活体检测日志
  */
 @Data
+@NoArgsConstructor
+@Accessors(chain = true)
 @Document(indexName = "mexico_ocr_living_detection_log")
 public class OcrLivingDetectionLogElasticEntity {
 

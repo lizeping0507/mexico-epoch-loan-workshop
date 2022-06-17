@@ -734,8 +734,8 @@ public class UserServiceImpl extends BaseService implements UserService {
 
         // 文件列表
         HashMap<String, File> fileMap = Maps.newHashMap();
-        fileMap.put("firstImage", convertToFile(params.getIdImageData()));
-        fileMap.put("secondImage", convertToFile(params.getFaceImageData()));
+        fileMap.put("firstImage", convertToFile(params.getIdImageData(),params.getIdImgType()));
+        fileMap.put("secondImage", convertToFile(params.getFaceImageData() , params.getFaceImgType()));
 
         // 发送请求
         String resultStr = HttpUtils.POST_WITH_HEADER_FORM_FILE(faceComparisonUrl, null, heardMap, fileMap);
@@ -819,7 +819,7 @@ public class UserServiceImpl extends BaseService implements UserService {
 
         // 文件列表
         HashMap<String, File> fileMap = Maps.newHashMap();
-        fileMap.put("image", convertToFile(params.getImageData()));
+        fileMap.put("image", convertToFile(params.getImageData(),params.getImageFileType()));
 
         // 发送请求
         String resultStr = HttpUtils.POST_WITH_HEADER_FORM_FILE(cardInfoUrl, paramMap, heardMap, fileMap);
@@ -845,6 +845,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         livingDetectionLog.setResponse(resultStr);
         livingDetectionLog.setUserId(userId);
         livingDetectionLog.setCreateTime(new Date());
+        LogUtil.sysInfo("advance获取证件信息日志: {}",livingDetectionLog.toString());
         ocrLivingDetectionLogElasticDao.save(livingDetectionLog);
 
         // 根据code值进行判定
@@ -916,7 +917,13 @@ public class UserServiceImpl extends BaseService implements UserService {
         return result;
     }
 
-    private File convertToFile(byte[] byteFile) {
+    /**
+     * 文件转换
+     * @param byteFile 图片二进制数据
+     * @param imageType 图片类型
+     * @return
+     */
+    private File convertToFile(byte[] byteFile,String imageType) {
         String objectId = ObjectIdUtil.getObjectId();
         String newFilePath = "/tmp/" + objectId;
 
@@ -926,10 +933,7 @@ public class UserServiceImpl extends BaseService implements UserService {
             if (!newFile) {
                 return null;
             }
-            OutputStream os = new FileOutputStream(file);
-            // 输出流
-            os.write(byteFile);
-            os.close();
+            ImageUtil.compressUnderSize(byteFile,2*1024*1024,file,imageType);
             return file;
         } catch (IOException e) {
             e.printStackTrace();
