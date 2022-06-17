@@ -42,7 +42,7 @@ import java.util.Map;
  * @createTime : 2022/3/21 11:53
  * @description : 用户相关业务 实现
  */
-@DubboService(timeout = 5000)
+@DubboService(timeout = 8000)
 public class UserServiceImpl extends BaseService implements UserService {
 
     @Value("${spring.cloud.nacos.discovery.namespace}")
