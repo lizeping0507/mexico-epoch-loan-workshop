@@ -16,7 +16,7 @@ import java.util.Date;
  * @Description:  epoch抓取数据同步回调日志
  */
 @Data
-@Document(indexName = "sdk_catch_data_sync_log")
+@Document(indexName = "mexico_sdk_catch_data_sync_log")
 public class SdkCatchDataSyncLogElasticEntity {
 
     /**
