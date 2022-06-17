@@ -883,6 +883,7 @@ public class UserServiceImpl extends BaseService implements UserService {
                 ocrResult.setInfo(JSONObject.toJSONString(values));
             } catch (Exception e) {
                 e.printStackTrace();
+                LogUtil.sysError("advance获取证件背面转换String",e);
             }
 
             LogUtil.sysInfo("advance获取证件背面转换String");
