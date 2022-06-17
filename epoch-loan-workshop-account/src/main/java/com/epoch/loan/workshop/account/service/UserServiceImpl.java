@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.epoch.loan.workshop.common.constant.*;
-import com.epoch.loan.workshop.common.entity.elastic.OcrLivingDetectionLogElasticEntity;
+import com.epoch.loan.workshop.common.entity.elastic.OcrAdvanceLogElasticEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanAppControlEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanUserEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanUserInfoEntity;
@@ -753,14 +753,14 @@ public class UserServiceImpl extends BaseService implements UserService {
         AdvanceFaceComparisonResult comparisonResult = JSONObject.parseObject(resultStr, AdvanceFaceComparisonResult.class);
 
         // 日志写入Elastic
-        OcrLivingDetectionLogElasticEntity livingDetectionLog = new OcrLivingDetectionLogElasticEntity();
+        OcrAdvanceLogElasticEntity livingDetectionLog = new OcrAdvanceLogElasticEntity();
         BeanUtils.copyProperties(comparisonResult, livingDetectionLog);
         livingDetectionLog.setRequestUrl(faceComparisonUrl);
         livingDetectionLog.setRequestHeard(heardMap);
-        livingDetectionLog.setResponse(resultStr);
+        livingDetectionLog.setResponse(comparisonResult);
         livingDetectionLog.setUserId(userId);
         livingDetectionLog.setCreateTime(new Date());
-        ocrLivingDetectionLogElasticDao.save(livingDetectionLog);
+        ocrAdvanceLogElasticDao.save(livingDetectionLog);
 
         // 根据code值进行判定
         String code = comparisonResult.getCode();
@@ -837,16 +837,16 @@ public class UserServiceImpl extends BaseService implements UserService {
         AdvanceOcrInfoResult ocrInfoResult = JSONObject.parseObject(resultStr, AdvanceOcrInfoResult.class);
 
         // 日志写入Elastic
-        OcrLivingDetectionLogElasticEntity livingDetectionLog = new OcrLivingDetectionLogElasticEntity();
+        OcrAdvanceLogElasticEntity livingDetectionLog = new OcrAdvanceLogElasticEntity();
         BeanUtils.copyProperties(ocrInfoResult, livingDetectionLog);
         livingDetectionLog.setRequestUrl(cardInfoUrl);
         livingDetectionLog.setRequestParam(paramMap);
         livingDetectionLog.setRequestHeard(heardMap);
-        livingDetectionLog.setResponse(resultStr);
+        livingDetectionLog.setResponse(ocrInfoResult);
         livingDetectionLog.setUserId(userId);
         livingDetectionLog.setCreateTime(new Date());
         LogUtil.sysInfo("advance获取证件信息日志: {}",livingDetectionLog.toString());
-        ocrLivingDetectionLogElasticDao.save(livingDetectionLog);
+        ocrAdvanceLogElasticDao.save(livingDetectionLog);
 
         // 根据code值进行判定
         String code = ocrInfoResult.getCode();

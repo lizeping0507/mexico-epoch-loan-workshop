@@ -6,7 +6,7 @@ import com.epoch.loan.workshop.common.constant.OcrChannelConfigStatus;
 import com.epoch.loan.workshop.common.constant.OcrField;
 import com.epoch.loan.workshop.common.constant.RedisKeyField;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
-import com.epoch.loan.workshop.common.entity.elastic.OcrLivingDetectionLogElasticEntity;
+import com.epoch.loan.workshop.common.entity.elastic.OcrAdvanceLogElasticEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanOcrProviderConfig;
 import com.epoch.loan.workshop.common.params.params.BaseParams;
 import com.epoch.loan.workshop.common.params.params.request.UserLivenessScoreParams;
@@ -114,15 +114,15 @@ public class OcrServiceImpl extends BaseService implements OcrService {
         AdvanceLicenseResult licenseResult = JSONObject.parseObject(response, AdvanceLicenseResult.class);
 
         // 日志写入Elastic
-        OcrLivingDetectionLogElasticEntity livingDetectionLog = new OcrLivingDetectionLogElasticEntity();
+        OcrAdvanceLogElasticEntity livingDetectionLog = new OcrAdvanceLogElasticEntity();
         BeanUtils.copyProperties(licenseResult, livingDetectionLog);
         livingDetectionLog.setRequestUrl(licenseUrl);
         livingDetectionLog.setRequestParam(param);
         livingDetectionLog.setRequestHeard(headers);
-        livingDetectionLog.setResponse(response);
+        livingDetectionLog.setResponse(licenseResult);
         livingDetectionLog.setUserId(userId);
         livingDetectionLog.setCreateTime(new Date());
-        ocrLivingDetectionLogElasticDao.save(livingDetectionLog);
+        ocrAdvanceLogElasticDao.save(livingDetectionLog);
 
         // 判断是否请求成功
         String code = licenseResult.getCode();
@@ -192,15 +192,15 @@ public class OcrServiceImpl extends BaseService implements OcrService {
         AdvanceScoreResult scoreResult = JSONObject.parseObject(responseStr, AdvanceScoreResult.class);
 
         // 日志写入Elastic
-        OcrLivingDetectionLogElasticEntity livingDetectionLog = new OcrLivingDetectionLogElasticEntity();
+        OcrAdvanceLogElasticEntity livingDetectionLog = new OcrAdvanceLogElasticEntity();
         BeanUtils.copyProperties(scoreResult, livingDetectionLog);
         livingDetectionLog.setRequestUrl(scoreUrl);
         livingDetectionLog.setRequestParam(param);
         livingDetectionLog.setRequestHeard(headers);
-        livingDetectionLog.setResponse(responseStr);
+        livingDetectionLog.setResponse(scoreResult);
         livingDetectionLog.setUserId(userId);
         livingDetectionLog.setCreateTime(new Date());
-        ocrLivingDetectionLogElasticDao.save(livingDetectionLog);
+        ocrAdvanceLogElasticDao.save(livingDetectionLog);
 
         // 判断是否响应成功
         String code = scoreResult.getCode();

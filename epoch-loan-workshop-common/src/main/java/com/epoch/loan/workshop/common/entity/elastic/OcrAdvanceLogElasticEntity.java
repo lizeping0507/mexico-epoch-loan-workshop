@@ -18,10 +18,8 @@ import java.util.Date;
  * @Description: advance活体检测日志
  */
 @Data
-@NoArgsConstructor
-@Accessors(chain = true)
 @Document(indexName = "mexico_ocr_advance_log")
-public class OcrLivingDetectionLogElasticEntity {
+public class OcrAdvanceLogElasticEntity {
 
     /**
      * id
