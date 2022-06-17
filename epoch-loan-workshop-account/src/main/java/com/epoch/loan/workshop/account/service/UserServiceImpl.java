@@ -878,7 +878,13 @@ public class UserServiceImpl extends BaseService implements UserService {
             });
             LogUtil.sysInfo("advance获取证件背面结束转换");
             ocrResult.setType(data.getCardType());
-            ocrResult.setInfo(JSONObject.toJSONString(data.getValues()));
+            try {
+                AdvanceOcrBackInfoResult values = data.getValues();
+                ocrResult.setInfo(JSONObject.toJSONString(values));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
             LogUtil.sysInfo("advance获取证件背面转换String");
             result.setReturnCode(ResultEnum.SUCCESS.code());
             result.setMessage(ResultEnum.SUCCESS.message());
