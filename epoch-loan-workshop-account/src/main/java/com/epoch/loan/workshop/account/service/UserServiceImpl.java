@@ -872,21 +872,11 @@ public class UserServiceImpl extends BaseService implements UserService {
             result.setMessage(ResultEnum.SUCCESS.message());
             result.setData(ocrResult);
         } else if (OcrField.ADVANCE_USER_OCR_ID_BACK.equalsIgnoreCase(imageType)) {
-
-            LogUtil.sysInfo("advance获取证件背面开始转换");
             AdvanceOcrInfoResponse<AdvanceOcrBackInfoResult> data = JSON.parseObject(jsonObject.toJSONString(), new TypeReference<AdvanceOcrInfoResponse<AdvanceOcrBackInfoResult>>() {
             });
-            LogUtil.sysInfo("advance获取证件背面结束转换");
             ocrResult.setType(data.getCardType());
-            try {
-                AdvanceOcrBackInfoResult values = data.getValues();
-                ocrResult.setInfo(JSONObject.toJSONString(values));
-            } catch (Exception e) {
-                e.printStackTrace();
-                LogUtil.sysError("advance获取证件背面转换String",e);
-            }
-
-            LogUtil.sysInfo("advance获取证件背面转换String");
+            AdvanceOcrBackInfoResult values = data.getValues();
+            ocrResult.setInfo(JSONObject.toJSONString(values));
             result.setReturnCode(ResultEnum.SUCCESS.code());
             result.setMessage(ResultEnum.SUCCESS.message());
             result.setData(ocrResult);
