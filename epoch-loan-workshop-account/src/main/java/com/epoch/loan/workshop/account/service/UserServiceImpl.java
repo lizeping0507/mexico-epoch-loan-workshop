@@ -94,21 +94,21 @@ public class UserServiceImpl extends BaseService implements UserService {
         // 结果结果集
         Result<RegisterResult> result = new Result<>();
 
-        // 设备是否已经注册
-        Integer isExitByAndroidId = loanUserDao.exitByAppNameAndAndroidId(params.getAppName(), params.getAndroidId());
-        LogUtil.sysInfo("用户注册 : isExitByAndroidId {}", JSONObject.toJSONString(isExitByAndroidId));
-        if (isExitByAndroidId != 0) {
-            result.setReturnCode(ResultEnum.DEVICE_REGISTERED.code());
-            result.setMessage(ResultEnum.DEVICE_REGISTERED.message());
-            return result;
-        }
-
         // 手机号是否已经注册
         Integer isExit = loanUserDao.exitByAppNameAndLoginName(params.getAppName(), params.getMobile());
         LogUtil.sysInfo("用户注册 : isExit {}", JSONObject.toJSONString(isExit));
         if (isExit != 0) {
             result.setReturnCode(ResultEnum.PHONE_EXIT.code());
             result.setMessage(ResultEnum.PHONE_EXIT.message());
+            return result;
+        }
+
+        // 设备是否已经注册
+        Integer isExitByAndroidId = loanUserDao.exitByAppNameAndAndroidId(params.getAppName(), params.getAndroidId());
+        LogUtil.sysInfo("用户注册 : isExitByAndroidId {}", JSONObject.toJSONString(isExitByAndroidId));
+        if (isExitByAndroidId != 0) {
+            result.setReturnCode(ResultEnum.DEVICE_REGISTERED.code());
+            result.setMessage(ResultEnum.DEVICE_REGISTERED.message());
             return result;
         }
 
