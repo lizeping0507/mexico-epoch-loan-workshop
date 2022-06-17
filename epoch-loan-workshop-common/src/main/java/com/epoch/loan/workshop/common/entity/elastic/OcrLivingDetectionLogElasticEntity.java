@@ -20,7 +20,7 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
-@Document(indexName = "mexico_ocr_living_detection_log")
+@Document(indexName = "mexico_ocr_advance_log")
 public class OcrLivingDetectionLogElasticEntity {
 
     /**
