@@ -120,12 +120,12 @@ public class FirstAspect {
 
                 // 将响应参数进行格式化(动态参数)
                 result = formatDynamicResponseParams(result, mappingUrl);
+                accessLogParams.setEx(result.getEx());
 
                 // 将返回前端的参数封装进日志
-                accessLogParams.setResponse(JSONObject.toJSONString(result));
-                accessLogParams.setEx(result.getEx());
-                request.setAttribute(Field.ACCESS_LOG, accessLogParams);
                 result.setEx("");
+                accessLogParams.setResponse(JSONObject.toJSONString(result));
+                request.setAttribute(Field.ACCESS_LOG, accessLogParams);
                 return result;
             } else {
                 // 将返回前端的参数封装进日志
