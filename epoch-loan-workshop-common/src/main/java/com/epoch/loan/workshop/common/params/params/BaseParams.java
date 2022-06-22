@@ -80,6 +80,9 @@ public class BaseParams implements Serializable {
     }
 
     public String getGpsAddress() {
+        if(StringUtils.isEmpty(gpsAddress)) {
+            return gpsAddress;
+        }
         try {
             return URLDecoder.decode(gpsAddress,"UTF-8");
         } catch (UnsupportedEncodingException e) {
