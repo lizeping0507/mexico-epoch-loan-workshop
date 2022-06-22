@@ -14,7 +14,7 @@ import com.epoch.loan.workshop.common.params.params.result.model.LoanRepaymentRe
 import com.epoch.loan.workshop.common.params.params.result.model.OrderInfoResult;
 import com.epoch.loan.workshop.common.service.OrderService;
 import com.epoch.loan.workshop.common.util.*;
-import com.epoch.loan.workshop.common.zookeeper.lock.UserApplyDetailLock;
+import com.epoch.loan.workshop.common.lock.UserApplyDetailLock;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -148,8 +148,6 @@ public class OrderServiceImpl extends BaseService implements OrderService {
                     // 发送订单审核队列
                     OrderParams orderParams = new OrderParams();
                     orderParams.setOrderId(orderId);
-                    orderParams.setGroupName(orderModelGroup);
-                    orderParams.setModelList(orderModelList);
                     orderMQManager.sendMessage(orderParams, orderModelList.get(0));
                     LogUtil.sysInfo("SUCCESS: {}", "SUCCESS");
 
@@ -591,11 +589,11 @@ public class OrderServiceImpl extends BaseService implements OrderService {
         List<LoanRepaymentPaymentRecordEntity> paymentRecordList = loanRepaymentPaymentRecordDao.findListRecordDTOByOrderIdAndStatus(orderId, LoanRepaymentPaymentRecordStatus.SUCCESS);
         paymentRecordList.forEach(paymentRecord -> {
             LoanRepaymentRecordResult recordDTO = new LoanRepaymentRecordResult();
-            recordDTO.setRepaymentAmount(paymentRecord.getAmount());
-            recordDTO.setTotalAmount(paymentRecord.getActualAmount());
+            recordDTO.setTotalAmount(paymentRecord.getAmount());
+            recordDTO.setRepaymentAmount(paymentRecord.getActualAmount());
 
             // 手续费
-            double charge = new BigDecimal(paymentRecord.getAmount()).subtract(new BigDecimal(paymentRecord.getActualAmount())).doubleValue();
+            Double charge = paymentRecord.getPayFee();
             recordDTO.setCharge(charge);
             recordDTO.setSuccessTime(paymentRecord.getUpdateTime());
             recordDTO.setSuccessDay(paymentRecord.getUpdateTime());

@@ -6,6 +6,7 @@ import com.epoch.loan.workshop.common.constant.OrderExamineStatus;
 import com.epoch.loan.workshop.common.constant.OrderStatus;
 import com.epoch.loan.workshop.common.entity.mysql.LoanOrderBillEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanOrderEntity;
+import com.epoch.loan.workshop.common.lock.OrderExaminePassLock;
 import com.epoch.loan.workshop.common.mq.order.params.OrderParams;
 import com.epoch.loan.workshop.common.util.LogUtil;
 import com.epoch.loan.workshop.common.util.ObjectIdUtil;
@@ -60,27 +61,35 @@ public class OrderExaminePass extends BaseOrderMQListener implements MessageList
                     continue;
                 }
 
+                // 订单id
+                String orderId = orderParams.getOrderId();
+
+                // 查询订单ID
+                LoanOrderEntity loanOrderEntity = loanOrderDao.findOrder(orderId);
+                if (ObjectUtils.isEmpty(loanOrderEntity)) {
+                    continue;
+                }
+
+                // 审核模型组
+                String orderModelGroup = loanOrderEntity.getOrderModelGroup();
+
                 // 队列拦截
-                if (intercept(orderParams.getGroupName(), subExpression())) {
+                if (intercept(orderModelGroup, subExpression())) {
                     // 等待重试
                     retry(orderParams, subExpression());
                     continue;
                 }
 
-                // 订单id
-                String orderId = orderParams.getOrderId();
-
                 // 判断模型状态
                 int status = getModelStatus(orderId, subExpression());
                 if (status == OrderExamineStatus.PASS) {
                     // 发送下一模型
-                    sendNextModel(orderParams, subExpression());
+                    sendNextModel(orderParams, orderModelGroup, subExpression());
                     continue;
                 }
 
-                // 查询订单ID
-                LoanOrderEntity loanOrderEntity = loanOrderDao.findOrder(orderId);
-                if (ObjectUtils.isEmpty(loanOrderEntity)) {
+                // 判断订单状态是否为废弃
+                if (loanOrderEntity.getStatus() == OrderStatus.ABANDONED) {
                     continue;
                 }
 
@@ -107,37 +116,59 @@ public class OrderExaminePass extends BaseOrderMQListener implements MessageList
                 // 总还款金额(预计)
                 Double estimatedRepaymentAmount = approvalAmount + interestAmount + incidentalAmount;
 
-                // 每期应还款金额
-                double stagesRepaymentAmount = estimatedRepaymentAmount / loanOrderEntity.getStages();
+                // 生成账单(使用分布式锁)
+                zookeeperClient.lock(new OrderExaminePassLock<String>(orderId) {
+                    @Override
+                    public String execute() throws Exception {
+                        // 查询订单账单数量，如果不符合期数删除重新生成
+                        boolean addOrderBill = true;
+                        Integer count = loanOrderBillDao.findOrderBillCountByOrderId(orderId);
+                        if (count != 0) {
+                            if (!count.equals(loanOrderEntity.getStages())) {
+                                loanOrderBillDao.removeOrderBillByOrderId(orderId);
+                            } else {
+                                addOrderBill = false;
+                            }
+                        }
 
-                // 每期应还本金
-                double stagesPrincipalAmount = approvalAmount / loanOrderEntity.getStages();
+                        // 判断是否生成账单
+                        if (addOrderBill) {
+                            // 每期应还款金额
+                            double stagesRepaymentAmount = estimatedRepaymentAmount / loanOrderEntity.getStages();
 
-                // 每期应还利息
-                double stagesInterestAmount = interestAmount / loanOrderEntity.getStages();
+                            // 每期应还本金
+                            double stagesPrincipalAmount = approvalAmount / loanOrderEntity.getStages();
 
-                // 每期应还手续费
-                double stagesIncidentalAmount = incidentalAmount / loanOrderEntity.getStages();
+                            // 每期应还利息
+                            double stagesInterestAmount = interestAmount / loanOrderEntity.getStages();
 
-                // 初始化订单账单
-                for (int i = 1; i <= loanOrderEntity.getStages(); i++) {
-                    LoanOrderBillEntity loanOrderBillEntity = new LoanOrderBillEntity();
-                    loanOrderBillEntity.setId(ObjectIdUtil.getObjectId());
-                    loanOrderBillEntity.setOrderId(loanOrderEntity.getId());
-                    loanOrderBillEntity.setRepaymentAmount(stagesRepaymentAmount);
-                    loanOrderBillEntity.setPrincipalAmount(stagesPrincipalAmount);
-                    loanOrderBillEntity.setInterestAmount(stagesInterestAmount);
-                    loanOrderBillEntity.setReductionAmount(0.00);
-                    loanOrderBillEntity.setPunishmentAmount(0.00);
-                    loanOrderBillEntity.setIncidentalAmount(stagesIncidentalAmount);
-                    loanOrderBillEntity.setReceivedAmount(0.00);
-                    loanOrderBillEntity.setStages(i);
-                    loanOrderBillEntity.setCreateTime(new Date());
-                    loanOrderBillEntity.setUpdateTime(new Date());
-                    loanOrderBillEntity.setStatus(OrderBillStatus.CREATE);
-                    loanOrderBillEntity.setType(OrderBillType.LOAN);
-                    loanOrderBillDao.insertOrderBill(loanOrderBillEntity);
-                }
+                            // 每期应还手续费
+                            double stagesIncidentalAmount = incidentalAmount / loanOrderEntity.getStages();
+
+                            // 初始化订单账单
+                            for (int i = 1; i <= loanOrderEntity.getStages(); i++) {
+                                LoanOrderBillEntity loanOrderBillEntity = new LoanOrderBillEntity();
+                                loanOrderBillEntity.setId(ObjectIdUtil.getObjectId());
+                                loanOrderBillEntity.setOrderId(loanOrderEntity.getId());
+                                loanOrderBillEntity.setRepaymentAmount(stagesRepaymentAmount);
+                                loanOrderBillEntity.setPrincipalAmount(stagesPrincipalAmount);
+                                loanOrderBillEntity.setInterestAmount(stagesInterestAmount);
+                                loanOrderBillEntity.setIncidentalAmount(stagesIncidentalAmount);
+                                loanOrderBillEntity.setReductionAmount(0.00);
+                                loanOrderBillEntity.setPunishmentAmount(0.00);
+                                loanOrderBillEntity.setReceivedAmount(0.00);
+                                loanOrderBillEntity.setStages(i);
+                                loanOrderBillEntity.setCreateTime(new Date());
+                                loanOrderBillEntity.setUpdateTime(new Date());
+                                loanOrderBillEntity.setStatus(OrderBillStatus.CREATE);
+                                loanOrderBillEntity.setType(OrderBillType.LOAN);
+                                loanOrderBillDao.insertOrderBill(loanOrderBillEntity);
+                            }
+                        }
+
+                        return null;
+                    }
+                });
 
                 // 更新实际放款金额
                 loanOrderDao.updateOrderActualAmount(orderId, realAmount, new Date());
@@ -157,8 +188,8 @@ public class OrderExaminePass extends BaseOrderMQListener implements MessageList
                 // 修改审核状态
                 updateModeExamine(orderId, subExpression(), OrderExamineStatus.PASS);
 
-                // 发送到下一模型
-                sendNextModel(orderParams, subExpression());
+                // 发送下一模型
+                sendNextModel(orderParams, orderModelGroup, subExpression());
             } catch (Exception e) {
                 try {
                     // 更新对应模型审核状态

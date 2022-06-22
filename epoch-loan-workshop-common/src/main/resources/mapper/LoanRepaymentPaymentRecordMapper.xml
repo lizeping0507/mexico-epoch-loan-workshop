@@ -3,83 +3,118 @@
 <mapper namespace="com.epoch.loan.workshop.common.dao.mysql.LoanRepaymentPaymentRecordDao">
 
     <insert id="insert">
-        INSERT INTO loan_repayment_payment_record (
-        id,
-        order_id,
-        order_bill_id,
-        payment_id,
-        business_id,
-        amount,
-        actual_amount,
-        phone,
-        email,
-        `name`,
-        event,
-        request,
-        response,
-        search_request,
-        search_response,
-        status,
-        type,
-        update_time,
-        create_time
-        )
-        VALUES (
-        #{paymentRecord.id},
-        #{paymentRecord.orderId},
-        #{paymentRecord.orderBillId},
-        #{paymentRecord.paymentId},
-        #{paymentRecord.businessId},
-        #{paymentRecord.amount},
-        #{paymentRecord.actualAmount},
-        #{paymentRecord.phone},
-        #{paymentRecord.email},
-        #{paymentRecord.name},
-        #{paymentRecord.event},
-        #{paymentRecord.request},
-        #{paymentRecord.response},
-        #{paymentRecord.searchRequest},
-        #{paymentRecord.searchResponse},
-        #{paymentRecord.status},
-        #{paymentRecord.type},
-        #{paymentRecord.createTime},
-        #{paymentRecord.updateTime}
-        )
+        INSERT INTO loan_repayment_payment_record (id,
+                                                   order_id,
+                                                   order_bill_id,
+                                                   payment_id,
+                                                   business_id,
+                                                   amount,
+                                                   actual_amount,
+                                                   phone,
+                                                   email,
+                                                   `name`,
+                                                   event,
+                                                   request,
+                                                   response,
+                                                   search_request,
+                                                   search_response,
+                                                   status,
+                                                   type,
+                                                   update_time,
+                                                   create_time)
+        VALUES (#{paymentRecord.id},
+                #{paymentRecord.orderId},
+                #{paymentRecord.orderBillId},
+                #{paymentRecord.paymentId},
+                #{paymentRecord.businessId},
+                #{paymentRecord.amount},
+                #{paymentRecord.actualAmount},
+                #{paymentRecord.phone},
+                #{paymentRecord.email},
+                #{paymentRecord.name},
+                #{paymentRecord.event},
+                #{paymentRecord.request},
+                #{paymentRecord.response},
+                #{paymentRecord.searchRequest},
+                #{paymentRecord.searchResponse},
+                #{paymentRecord.status},
+                #{paymentRecord.type},
+                #{paymentRecord.createTime},
+                #{paymentRecord.updateTime})
     </insert>
     <update id="updateRequestAndResponse">
-        update loan_repayment_payment_record set request = #{request},response=#{response},update_time = #{updateTime}
+        update loan_repayment_payment_record
+        set request     = #{request},
+            response=#{response},
+            update_time = #{updateTime}
         WHERE id = #{id}
     </update>
     <update id="updateStatus">
-        update loan_repayment_payment_record set status = #{status},update_time = #{updateTime} WHERE id = #{id}
+        update loan_repayment_payment_record
+        set status      = #{status},
+            update_time = #{updateTime}
+        WHERE id = #{id}
     </update>
     <update id="updateSearchRequestAndResponse">
-        update loan_repayment_payment_record set search_request = #{request},search_response=#{response},update_time =
-        #{updateTime} WHERE id = #{id}
+        update loan_repayment_payment_record
+        set search_request = #{request},
+            search_response=#{response},
+            update_time    =
+                #{updateTime}
+        WHERE id = #{id}
     </update>
     <update id="updateBussinesId">
-        update loan_repayment_payment_record set business_id = #{businessId},update_time = #{updateTime} WHERE id =
-        #{id}
+        update loan_repayment_payment_record
+        set business_id = #{businessId},
+            update_time = #{updateTime}
+        WHERE id =
+              #{id}
     </update>
     <update id="updateRepaymentPaymentRecordActualAmount">
-        update loan_repayment_payment_record set actual_amount = #{actualAmount},update_time = #{updateTime} WHERE id =
-        #{id}
+        update loan_repayment_payment_record
+        set actual_amount = #{actualAmount},
+            update_time   = #{updateTime}
+        WHERE id =
+              #{id}
     </update>
     <update id="updatePaymentRecordClabeAndBarCode">
-        update loan_repayment_payment_record set clabe = #{clabe}, bar_code = #{barCode}, update_time = #{updateTime} WHERE id = #{id}
+        update loan_repayment_payment_record
+        set clabe       = #{clabe},
+            bar_code    = #{barCode},
+            update_time = #{updateTime}
+        WHERE id = #{id}
     </update>
     <update id="updatePaymentRecordPayFee">
-        update loan_repayment_payment_record set pay_fee = #{payFee}, update_time = #{updateTime} WHERE id = #{id}
+        update loan_repayment_payment_record
+        set pay_fee     = #{payFee},
+            update_time = #{updateTime}
+        WHERE id = #{id}
     </update>
     <select id="findRepaymentPaymentRecordById"
             resultType="com.epoch.loan.workshop.common.entity.mysql.LoanRepaymentPaymentRecordEntity">
-        SELECT * FROM loan_repayment_payment_record WHERE id=#{id}
+        SELECT *
+        FROM loan_repayment_payment_record
+        WHERE id = #{id}
     </select>
     <select id="sumRepaymentRecordActualAmount" resultType="java.lang.Double">
-        SELECT SUM(actual_amount) FROM loan_repayment_payment_record WHERE order_bill_id=#{orderBillId}
+        SELECT SUM(actual_amount)
+        FROM loan_repayment_payment_record
+        WHERE order_bill_id = #{orderBillId}
+          AND status = 40
     </select>
-
-    <select id="findListRecordDTOByOrderIdAndStatus" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanRepaymentPaymentRecordEntity">
-        SELECT * FROM loan_repayment_payment_record WHERE order_id=#{orderId} AND status = #{status}
+    <select id="findListRecordDTOByOrderIdAndStatus"
+            resultType="com.epoch.loan.workshop.common.entity.mysql.LoanRepaymentPaymentRecordEntity">
+        SELECT *
+        FROM loan_repayment_payment_record
+        WHERE order_id = #{orderId}
+          AND status = #{status}
+    </select>
+    <select id="findByStatusAndTime"
+            resultType="com.epoch.loan.workshop.common.entity.mysql.LoanRepaymentPaymentRecordEntity">
+        SELECT *
+        FROM loan_repayment_payment_record
+        WHERE status = #{status}
+          AND create_time &gt; #{startTime}
+          AND create_time &lt; #{endTime}
     </select>
 </mapper>

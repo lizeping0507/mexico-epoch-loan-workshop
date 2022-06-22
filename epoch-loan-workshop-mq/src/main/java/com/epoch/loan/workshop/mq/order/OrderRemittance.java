@@ -11,7 +11,7 @@ import com.epoch.loan.workshop.common.mq.order.params.OrderParams;
 import com.epoch.loan.workshop.common.mq.remittance.params.DistributionRemittanceParams;
 import com.epoch.loan.workshop.common.util.LogUtil;
 import com.epoch.loan.workshop.common.util.ObjectIdUtil;
-import com.epoch.loan.workshop.common.zookeeper.lock.OrderRemittanceLock;
+import com.epoch.loan.workshop.common.lock.OrderRemittanceLock;
 import lombok.Data;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -63,27 +63,30 @@ public class OrderRemittance extends BaseOrderMQListener implements MessageListe
                     continue;
                 }
 
+                // 订单id
+                String orderId = orderParams.getOrderId();
+
+                // 查询订单ID
+                LoanOrderEntity loanOrderEntity = loanOrderDao.findOrder(orderId);
+                if (ObjectUtils.isEmpty(loanOrderEntity)) {
+                    continue;
+                }
+
+                // 审核模型组
+                String orderModelGroup = loanOrderEntity.getOrderModelGroup();
+
                 // 队列拦截
-                if (intercept(orderParams.getGroupName(), subExpression())) {
+                if (intercept(orderModelGroup, subExpression())) {
                     // 等待重试
                     retry(orderParams, subExpression());
                     continue;
                 }
 
-                // 订单id
-                String orderId = orderParams.getOrderId();
-
                 // 判断模型状态
                 int status = getModelStatus(orderId, subExpression());
                 if (status == OrderExamineStatus.PASS) {
                     // 发送下一模型
-                    sendNextModel(orderParams, subExpression());
-                    continue;
-                }
-
-                // 查询订单ID
-                LoanOrderEntity loanOrderEntity = loanOrderDao.findOrder(orderId);
-                if (ObjectUtils.isEmpty(loanOrderEntity)) {
+                    sendNextModel(orderParams, orderModelGroup, subExpression());
                     continue;
                 }
 
@@ -136,6 +139,7 @@ public class OrderRemittance extends BaseOrderMQListener implements MessageListe
                             loanRemittanceOrderRecordEntity.setSuccessRemittancePaymentRecordId("");
                             loanRemittanceOrderRecordEntity.setCreateTime(new Date());
                             loanRemittanceOrderRecordEntity.setUpdateTime(new Date());
+                            loanRemittanceOrderRecordEntity.setEvent(subExpression());
                             loanRemittanceOrderRecordDao.insert(loanRemittanceOrderRecordEntity);
 
                             // 更新订单状态为等待放款
@@ -153,8 +157,6 @@ public class OrderRemittance extends BaseOrderMQListener implements MessageListe
                         }
                     });
 
-                    // 放入队列等待放款成功
-                    retry(orderParams, subExpression());
                     continue;
                 }
 
@@ -177,7 +179,7 @@ public class OrderRemittance extends BaseOrderMQListener implements MessageListe
                     updateLoanTime(orderId);
 
                     // 发送下一模型
-                    sendNextModel(orderParams, subExpression());
+                    sendNextModel(orderParams, orderModelGroup, subExpression());
                     continue;
                 } else if (loanRemittanceOrderRecordStatus == LoanRemittanceOrderRecordStatus.THOROUGHLY_FAILED) {
                     // 异常状况 此订单放款彻底失败  流程结束
@@ -186,8 +188,8 @@ public class OrderRemittance extends BaseOrderMQListener implements MessageListe
                     // 更改新表订单状态 : 废弃
                     updateOrderStatus(orderId, OrderStatus.ABANDONED);
                 } else {
-                    // 放入队列等待放款成功
-                    retry(orderParams, subExpression());
+                    // 更新对应模型审核状态
+                    updateModeExamine(orderId, subExpression(), OrderExamineStatus.WAIT);
                     continue;
                 }
             } catch (Exception e) {

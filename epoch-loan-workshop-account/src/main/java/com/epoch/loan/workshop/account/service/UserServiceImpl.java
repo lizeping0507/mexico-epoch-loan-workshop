@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.epoch.loan.workshop.common.constant.*;
-import com.epoch.loan.workshop.common.entity.elastic.OcrLivingDetectionLogElasticEntity;
+import com.epoch.loan.workshop.common.entity.elastic.OcrAdvanceLogElasticEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanAppControlEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanUserEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanUserInfoEntity;
@@ -42,7 +42,7 @@ import java.util.Map;
  * @createTime : 2022/3/21 11:53
  * @description : 用户相关业务 实现
  */
-@DubboService(timeout = 5000)
+@DubboService(timeout = 8000)
 public class UserServiceImpl extends BaseService implements UserService {
 
     @Value("${spring.cloud.nacos.discovery.namespace}")
@@ -94,21 +94,21 @@ public class UserServiceImpl extends BaseService implements UserService {
         // 结果结果集
         Result<RegisterResult> result = new Result<>();
 
-        // 设备是否已经注册
-        Integer isExitByAndroidId = loanUserDao.exitByAppNameAndAndroidId(params.getAppName(), params.getAndroidId());
-        LogUtil.sysInfo("用户注册 : isExitByAndroidId {}", JSONObject.toJSONString(isExitByAndroidId));
-        if (isExitByAndroidId != 0) {
-            result.setReturnCode(ResultEnum.DEVICE_REGISTERED.code());
-            result.setMessage(ResultEnum.DEVICE_REGISTERED.message());
-            return result;
-        }
-
         // 手机号是否已经注册
         Integer isExit = loanUserDao.exitByAppNameAndLoginName(params.getAppName(), params.getMobile());
         LogUtil.sysInfo("用户注册 : isExit {}", JSONObject.toJSONString(isExit));
         if (isExit != 0) {
             result.setReturnCode(ResultEnum.PHONE_EXIT.code());
             result.setMessage(ResultEnum.PHONE_EXIT.message());
+            return result;
+        }
+
+        // 设备是否已经注册
+        Integer isExitByAndroidId = loanUserDao.exitByAppNameAndAndroidId(params.getAppName(), params.getAndroidId());
+        LogUtil.sysInfo("用户注册 : isExitByAndroidId {}", JSONObject.toJSONString(isExitByAndroidId));
+        if (isExitByAndroidId != 0) {
+            result.setReturnCode(ResultEnum.DEVICE_REGISTERED.code());
+            result.setMessage(ResultEnum.DEVICE_REGISTERED.message());
             return result;
         }
 
@@ -734,8 +734,8 @@ public class UserServiceImpl extends BaseService implements UserService {
 
         // 文件列表
         HashMap<String, File> fileMap = Maps.newHashMap();
-        fileMap.put("firstImage", convertToFile(params.getIdImageData()));
-        fileMap.put("secondImage", convertToFile(params.getFaceImageData()));
+        fileMap.put("firstImage", convertToFile(params.getIdImageData(),params.getIdImgType()));
+        fileMap.put("secondImage", convertToFile(params.getFaceImageData() , params.getFaceImgType()));
 
         // 发送请求
         String resultStr = HttpUtils.POST_WITH_HEADER_FORM_FILE(faceComparisonUrl, null, heardMap, fileMap);
@@ -753,14 +753,14 @@ public class UserServiceImpl extends BaseService implements UserService {
         AdvanceFaceComparisonResult comparisonResult = JSONObject.parseObject(resultStr, AdvanceFaceComparisonResult.class);
 
         // 日志写入Elastic
-        OcrLivingDetectionLogElasticEntity livingDetectionLog = new OcrLivingDetectionLogElasticEntity();
+        OcrAdvanceLogElasticEntity livingDetectionLog = new OcrAdvanceLogElasticEntity();
         BeanUtils.copyProperties(comparisonResult, livingDetectionLog);
         livingDetectionLog.setRequestUrl(faceComparisonUrl);
         livingDetectionLog.setRequestHeard(heardMap);
-        livingDetectionLog.setResponse(resultStr);
+        livingDetectionLog.setResponse(comparisonResult);
         livingDetectionLog.setUserId(userId);
         livingDetectionLog.setCreateTime(new Date());
-        ocrLivingDetectionLogElasticDao.save(livingDetectionLog);
+        ocrAdvanceLogElasticDao.save(livingDetectionLog);
 
         // 根据code值进行判定
         String code = comparisonResult.getCode();
@@ -819,11 +819,11 @@ public class UserServiceImpl extends BaseService implements UserService {
 
         // 文件列表
         HashMap<String, File> fileMap = Maps.newHashMap();
-        fileMap.put("image", convertToFile(params.getImageData()));
+        fileMap.put("image", convertToFile(params.getImageData(),params.getImageFileType()));
 
         // 发送请求
         String resultStr = HttpUtils.POST_WITH_HEADER_FORM_FILE(cardInfoUrl, paramMap, heardMap, fileMap);
-
+        LogUtil.sysInfo("advance获取证件信息: {}",resultStr);
         // 释放文件
         for (Map.Entry<String, File> entry : fileMap.entrySet()) {
             File value = entry.getValue();
@@ -837,15 +837,16 @@ public class UserServiceImpl extends BaseService implements UserService {
         AdvanceOcrInfoResult ocrInfoResult = JSONObject.parseObject(resultStr, AdvanceOcrInfoResult.class);
 
         // 日志写入Elastic
-        OcrLivingDetectionLogElasticEntity livingDetectionLog = new OcrLivingDetectionLogElasticEntity();
+        OcrAdvanceLogElasticEntity livingDetectionLog = new OcrAdvanceLogElasticEntity();
         BeanUtils.copyProperties(ocrInfoResult, livingDetectionLog);
         livingDetectionLog.setRequestUrl(cardInfoUrl);
         livingDetectionLog.setRequestParam(paramMap);
         livingDetectionLog.setRequestHeard(heardMap);
-        livingDetectionLog.setResponse(resultStr);
+        livingDetectionLog.setResponse(ocrInfoResult);
         livingDetectionLog.setUserId(userId);
         livingDetectionLog.setCreateTime(new Date());
-        ocrLivingDetectionLogElasticDao.save(livingDetectionLog);
+        LogUtil.sysInfo("advance获取证件信息日志: {}",livingDetectionLog.toString());
+        ocrAdvanceLogElasticDao.save(livingDetectionLog);
 
         // 根据code值进行判定
         String code = ocrInfoResult.getCode();
@@ -874,7 +875,8 @@ public class UserServiceImpl extends BaseService implements UserService {
             AdvanceOcrInfoResponse<AdvanceOcrBackInfoResult> data = JSON.parseObject(jsonObject.toJSONString(), new TypeReference<AdvanceOcrInfoResponse<AdvanceOcrBackInfoResult>>() {
             });
             ocrResult.setType(data.getCardType());
-            ocrResult.setInfo(JSONObject.toJSONString(data.getValues()));
+            AdvanceOcrBackInfoResult values = data.getValues();
+            ocrResult.setInfo(JSONObject.toJSONString(values));
             result.setReturnCode(ResultEnum.SUCCESS.code());
             result.setMessage(ResultEnum.SUCCESS.message());
             result.setData(ocrResult);
@@ -916,7 +918,13 @@ public class UserServiceImpl extends BaseService implements UserService {
         return result;
     }
 
-    private File convertToFile(byte[] byteFile) {
+    /**
+     * 文件转换
+     * @param byteFile 图片二进制数据
+     * @param imageType 图片类型
+     * @return
+     */
+    private File convertToFile(byte[] byteFile,String imageType) {
         String objectId = ObjectIdUtil.getObjectId();
         String newFilePath = "/tmp/" + objectId;
 
@@ -926,10 +934,7 @@ public class UserServiceImpl extends BaseService implements UserService {
             if (!newFile) {
                 return null;
             }
-            OutputStream os = new FileOutputStream(file);
-            // 输出流
-            os.write(byteFile);
-            os.close();
+            ImageUtil.compressUnderSize(byteFile,2*1024*1024,file,imageType);
             return file;
         } catch (IOException e) {
             e.printStackTrace();

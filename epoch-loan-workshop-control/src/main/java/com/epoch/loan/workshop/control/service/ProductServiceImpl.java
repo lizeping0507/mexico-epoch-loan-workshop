@@ -12,7 +12,7 @@ import com.epoch.loan.workshop.common.params.params.result.*;
 import com.epoch.loan.workshop.common.params.params.result.model.ProductList;
 import com.epoch.loan.workshop.common.service.ProductService;
 import com.epoch.loan.workshop.common.util.*;
-import com.epoch.loan.workshop.common.zookeeper.lock.UserProductDetailLock;
+import com.epoch.loan.workshop.common.lock.UserProductDetailLock;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -371,13 +371,13 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             LoanOrderBillEntity loanOrderBillEntity = loanOrderBillDao.findOrderBillFastStagesByStatusAndOrderId(orderId, statusArray);
 
             // 还款时间
-            appMaskModelResult.setRepaymentTime(DateUtil.DateToString(loanOrderBillEntity.getRepaymentTime(), "d-M-yyyy"));
+            appMaskModelResult.setRepaymentTime(loanOrderBillEntity.getRepaymentTime());
 
             // 应还金额
             appMaskModelResult.setAmount(String.valueOf(loanOrderBillEntity.getRepaymentAmount() - loanOrderBillEntity.getReductionAmount()));
         }else if (orderStatus > OrderStatus.CREATE){
             // 还款时间
-            appMaskModelResult.setRepaymentTime(DateUtil.DateToString(DateUtil.addDay(new Date() , 7), "d-M-yyyy"));
+            appMaskModelResult.setRepaymentTime(DateUtil.addDay(new Date() , 7));
         }
 
         // 返回结果

@@ -56,6 +56,13 @@ public class OrderDueTask extends BaseTask implements Job {
             // 循环插入队列计算逾期
             for (LoanOrderBillEntity loanOrderBillEntity : loanOrderBillEntityList) {
                 try {
+                    // 罚息大于或等于本金
+                    if (loanOrderBillEntity.getPunishmentAmount() >= loanOrderBillEntity.getPrincipalAmount()){
+                        // 删除数据
+                        loanOrderBillEntityList.remove(loanOrderBillEntity);
+                        continue;
+                    }
+
                     // 订单ID
                     String orderId = loanOrderBillEntity.getOrderId();
 
@@ -63,7 +70,6 @@ public class OrderDueTask extends BaseTask implements Job {
                     String orderBillId = loanOrderBillEntity.getId();
 
                     OrderParams params = new OrderParams();
-                    params.setGroupName("SYSTEM");
                     params.setOrderId(orderId);
                     params.setOrderBillId(orderBillId);
                     orderMQManager.sendMessage(params, orderMQManager.getOrderDueSubExpression());

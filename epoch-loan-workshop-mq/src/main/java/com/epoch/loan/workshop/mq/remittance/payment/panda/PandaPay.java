@@ -145,6 +145,9 @@ public class PandaPay extends BaseRemittancePaymentMQListener implements Message
                         updateLoanRemittancePaymentRecordStatus(paymentRecord.getId(), LoanRemittancePaymentRecordStatus.SUCCESS);
                         updateProcessRemittancePaymentRecordId(orderRecordId, "");
                         updateSuccessRemittancePaymentRecordId(orderRecordId, paymentRecord.getId());
+
+                        // 回调Order
+                        callBackOrderRemittance(orderRecord.getOrderId(), orderRecord.getEvent());
                         continue;
                     } else if (res == PaymentField.PAYOUT_PROCESS || res == PaymentField.PAYOUT_QUERY_ERROR) {
                         //  进行中 重回放款队列

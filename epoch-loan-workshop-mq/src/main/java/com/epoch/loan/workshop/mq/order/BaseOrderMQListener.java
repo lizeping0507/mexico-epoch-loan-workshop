@@ -241,16 +241,14 @@ public abstract class BaseOrderMQListener {
     /**
      * 发送订单到下一个模型
      *
-     * @param orderParams 队列消息
-     * @param tag         标签
+     * @param orderParams
+     * @param orderModelGroup
+     * @param tag
      * @throws Exception
      */
-    public void sendNextModel(OrderParams orderParams, String tag) throws Exception {
+    public void sendNextModel(OrderParams orderParams, String orderModelGroup, String tag) throws Exception {
         // 查询模型列表
-        List<String> modelList = orderParams.getModelList();
-        if (CollectionUtils.isEmpty(modelList)) {
-            return;
-        }
+        List<String> modelList = loanOrderModelDao.findNamesByGroup(orderModelGroup);
 
         // 是否是下一个模型
         boolean isNext = false;

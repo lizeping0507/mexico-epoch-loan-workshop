@@ -93,9 +93,7 @@ public class PandaPay extends BaseRepaymentMQListener implements MessageListener
                         //发送到订单完结队列
                         OrderParams orderParams = new OrderParams();
                         orderParams.setOrderId(paymentRecord.getOrderId());
-                        orderParams.setGroupName("SYSTEM");
                         orderParams.setOrderBillId(paymentRecord.getOrderBillId());
-                        orderParams.setAmount(paymentRecord.getAmount());
                         sendToOrderCompleteQueue(orderParams, orderMQManager.getOrderCompleteSubExpression());
                     } else if (queryRes.equals(PaymentField.PAY_FAILED)) {
                         // 放款失败 修改状态 (已经成功过不修改)

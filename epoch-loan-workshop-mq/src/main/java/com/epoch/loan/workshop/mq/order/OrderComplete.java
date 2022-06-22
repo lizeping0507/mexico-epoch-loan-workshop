@@ -64,15 +64,7 @@ public class OrderComplete extends BaseOrderMQListener implements MessageListene
 
                 // 订单id
                 String orderId = orderParams.getOrderId();
-
-                // 判断模型状态
-                int status = getModelStatus(orderId, subExpression());
-                if (status == OrderExamineStatus.PASS) {
-                    // 发送下一模型
-                    sendNextModel(orderParams, subExpression());
-                    continue;
-                }
-
+                
                 // 订单账单id
                 String orderBillId = orderParams.getOrderBillId();
 

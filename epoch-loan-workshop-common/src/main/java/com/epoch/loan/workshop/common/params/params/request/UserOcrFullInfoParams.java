@@ -25,6 +25,11 @@ public class UserOcrFullInfoParams extends BaseParams {
     private byte[] imageData;
 
     /**
+     * 证件图片类型(不需要前端传，后台从传递的File获取)
+     */
+    private String imageFileType;
+
+    /**
      * 验证 识别类型 是否合法
      *
      * @return true或false

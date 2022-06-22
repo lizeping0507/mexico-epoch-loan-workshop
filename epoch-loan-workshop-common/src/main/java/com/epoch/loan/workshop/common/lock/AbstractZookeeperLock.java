@@ -1,4 +1,4 @@
-package com.epoch.loan.workshop.common.zookeeper.lock;
+package com.epoch.loan.workshop.common.lock;
 
 import java.util.concurrent.TimeUnit;
 
