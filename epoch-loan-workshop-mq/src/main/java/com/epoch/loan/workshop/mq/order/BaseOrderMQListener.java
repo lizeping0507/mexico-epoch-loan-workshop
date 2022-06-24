@@ -291,7 +291,7 @@ public abstract class BaseOrderMQListener {
         CollectionParams collection = new CollectionParams();
         collection.setCollectionEvent(collectionEvent);
         collection.setOrderId(orderId);
-        collectionMQManager.sendMessage(collection, "");
+        collectionMQManager.sendMessage(collection, "Collection");
     }
 
     /**
