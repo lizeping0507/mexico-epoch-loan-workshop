@@ -112,6 +112,9 @@ public class OrderComplete extends BaseOrderMQListener implements MessageListene
 
                 // 如果未偿还金额大于0
                 if (nonArrivalAmount > 0) {
+                    // 计算已还款金额更新实际还款总额
+                    double amount = loanOrderBillDao.sumOrderReceivedAmount(orderId);
+                    loanOrderDao.updateOrderActualRepaymentAmount(orderId, amount, new Date());
                     continue;
                 }
 
@@ -128,7 +131,7 @@ public class OrderComplete extends BaseOrderMQListener implements MessageListene
                 updateOrderBillStatus(orderBillId, orderBillStatus);
 
                 // 计算已还款金额更新实际还款总额
-                double amount = loanOrderBillDao.sumOrderCompleteRepaymentAmount(orderId);
+                double amount = loanOrderBillDao.sumOrderReceivedAmount(orderId);
                 loanOrderDao.updateOrderActualRepaymentAmount(orderId, amount, new Date());
 
                 // 查询未还款订单账单数量

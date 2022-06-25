@@ -143,4 +143,7 @@
         FROM loan_order_bill
         WHERE order_id = #{orderId}
     </select>
+    <select id="sumOrderReceivedAmount" resultType="java.lang.Double">
+        SELECT SUM(received_amount) FROM loan_order_bill WHERE order_id=#{orderId}
+    </select>
 </mapper>

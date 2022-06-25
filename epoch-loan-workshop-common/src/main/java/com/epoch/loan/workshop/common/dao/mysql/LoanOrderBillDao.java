@@ -282,4 +282,11 @@ public interface LoanOrderBillDao {
      * @return 查询指定状态订单并只返回最早的一期账单
      */
     LoanOrderBillEntity findOrderBillFastStagesByStatusAndOrderId(String orderId, @Param("array") Integer[] statusArray);
+
+    /**
+     * 查询订单所有账单实际已还金额总额
+     * @param orderId
+     * @return
+     */
+    double sumOrderReceivedAmount(String orderId);
 }
