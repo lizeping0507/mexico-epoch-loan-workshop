@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 
 /**
  * @author : Duke
@@ -77,5 +79,18 @@ public class BaseParams implements Serializable {
         return true;
     }
 
+    public String getGpsAddress() {
+        if(StringUtils.isEmpty(gpsAddress)) {
+            return gpsAddress;
+        }
+        try {
+            return URLDecoder.decode(gpsAddress,"UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            return gpsAddress;
+        }
+    }
 
+    public void setGpsAddress(String gpsAddress) {
+        this.gpsAddress = gpsAddress;
+    }
 }

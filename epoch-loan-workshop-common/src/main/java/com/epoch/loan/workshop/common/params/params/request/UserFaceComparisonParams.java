@@ -19,7 +19,17 @@ public class UserFaceComparisonParams extends BaseParams {
     private byte[] idImageData;
 
     /**
+     * 证件图片类型(不需要前端传，后台从传递的File获取)
+     */
+    private String idImgType;
+
+    /**
      * 人脸图片
      */
     private byte[] faceImageData;
+
+    /**
+     * 人脸图片类型(不需要前端传，后台从传递的File获取)
+     */
+    private String faceImgType;
 }

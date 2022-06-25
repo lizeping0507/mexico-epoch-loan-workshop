@@ -581,7 +581,7 @@ public class OrderServiceImpl extends BaseService implements OrderService {
         detailResult.setActualRepaymentAmount(actualRepaymentAmount);
 
         // 剩余还款金额
-        Double remainingRepaymentAmount = new BigDecimal(estimatedRepaymentAmount).subtract(new BigDecimal(actualRepaymentAmount)).doubleValue();
+        Double remainingRepaymentAmount = new BigDecimal(estimatedRepaymentAmount).subtract(new BigDecimal(actualRepaymentAmount)).setScale(2,RoundingMode.HALF_UP).doubleValue();
         detailResult.setRemainingRepaymentAmount(remainingRepaymentAmount);
 
         // 已还款成功记录
@@ -589,12 +589,15 @@ public class OrderServiceImpl extends BaseService implements OrderService {
         List<LoanRepaymentPaymentRecordEntity> paymentRecordList = loanRepaymentPaymentRecordDao.findListRecordDTOByOrderIdAndStatus(orderId, LoanRepaymentPaymentRecordStatus.SUCCESS);
         paymentRecordList.forEach(paymentRecord -> {
             LoanRepaymentRecordResult recordDTO = new LoanRepaymentRecordResult();
-            recordDTO.setRepaymentAmount(paymentRecord.getAmount());
-            recordDTO.setTotalAmount(paymentRecord.getActualAmount());
 
             // 手续费
-            double charge = new BigDecimal(paymentRecord.getAmount()).subtract(new BigDecimal(paymentRecord.getActualAmount())).doubleValue();
+            Double charge = paymentRecord.getPayFee();
             recordDTO.setCharge(charge);
+
+            // 本次总还款额度
+            BigDecimal totalAmount = new BigDecimal(paymentRecord.getActualAmount()).add(new BigDecimal(charge)).setScale(2, RoundingMode.HALF_DOWN);
+            recordDTO.setTotalAmount(totalAmount.doubleValue());
+            recordDTO.setRepaymentAmount(paymentRecord.getActualAmount());
             recordDTO.setSuccessTime(paymentRecord.getUpdateTime());
             recordDTO.setSuccessDay(paymentRecord.getUpdateTime());
             recordDTO.setRepayWay(paymentRecord.getType());

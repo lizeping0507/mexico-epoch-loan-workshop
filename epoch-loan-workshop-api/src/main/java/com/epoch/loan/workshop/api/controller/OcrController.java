@@ -214,8 +214,8 @@ public class OcrController extends BaseController {
 
             // 获取文件类型
             String idFrontImgType = FilenameUtils.getExtension(fileMap.get("idFrontImage").getOriginalFilename());
-            String idBackImgType = FilenameUtils.getExtension(fileMap.get("idFrontImage").getOriginalFilename());
-            String faceImgType = FilenameUtils.getExtension(fileMap.get("idFrontImage").getOriginalFilename());
+            String idBackImgType = FilenameUtils.getExtension(fileMap.get("idBackImage").getOriginalFilename());
+            String faceImgType = FilenameUtils.getExtension(fileMap.get("faceImage").getOriginalFilename());
             params.setIdFrontImgType(idFrontImgType);
             params.setIdBackImgType(idBackImgType);
             params.setFaceImgType(faceImgType);
@@ -252,6 +252,12 @@ public class OcrController extends BaseController {
             Map<String, MultipartFile> fileMap = mRequest.getFileMap();
             params.setIdImageData(fileMap.get("idImage").getBytes());
             params.setFaceImageData(fileMap.get("faceImage").getBytes());
+
+            // 获取图片类型
+            String idImgType = FilenameUtils.getExtension(fileMap.get("idImage").getOriginalFilename());
+            String faceImgType = FilenameUtils.getExtension(fileMap.get("faceImage").getOriginalFilename());
+            params.setIdImgType(idImgType);
+            params.setFaceImgType(faceImgType);
 
             // 获取相似度
             return userService.faceComparison(params);
@@ -293,6 +299,10 @@ public class OcrController extends BaseController {
             MultipartHttpServletRequest mRequest = resolver.resolveMultipart(request);
             Map<String, MultipartFile> fileMap = mRequest.getFileMap();
             params.setImageData(fileMap.get("image").getBytes());
+
+            // 获取图片类型
+            String imgFileType = FilenameUtils.getExtension(fileMap.get("image").getOriginalFilename());
+            params.setImageFileType(imgFileType);
 
             // 获取证件信息
             return userService.userOcrInfo(params);

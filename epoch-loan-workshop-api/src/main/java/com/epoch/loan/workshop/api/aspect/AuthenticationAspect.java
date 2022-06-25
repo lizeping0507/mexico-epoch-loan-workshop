@@ -4,10 +4,13 @@ import com.epoch.loan.workshop.api.annotated.Authentication;
 import com.epoch.loan.workshop.common.authentication.TokenManager;
 import com.epoch.loan.workshop.common.constant.Field;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
+import com.epoch.loan.workshop.common.dao.mysql.LoanAppControlDao;
+import com.epoch.loan.workshop.common.entity.mysql.LoanAppControlEntity;
 import com.epoch.loan.workshop.common.params.User;
 import com.epoch.loan.workshop.common.params.params.result.Result;
 import com.epoch.loan.workshop.common.util.LogUtil;
 import com.epoch.loan.workshop.common.util.ThrowableUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -40,6 +43,12 @@ public class AuthenticationAspect {
      */
     @Autowired
     private TokenManager tokenManager;
+
+    /**
+     * app版本
+     */
+    @Autowired
+    public LoanAppControlDao loanAppControlDao;
 
 
     /**
@@ -90,6 +99,17 @@ public class AuthenticationAspect {
                 result.setMessage(ResultEnum.NO_LOGIN.message());
                 return result;
             }
+
+            // 判断是否需要强更
+            String appName = request.getHeader(Field.APP_NAME);
+            String appVersion = request.getHeader(Field.APP_VERSION);
+            LoanAppControlEntity loanAppControlEntity = loanAppControlDao.findByAppNameAndAppVersion(appName, appVersion);
+            if (ObjectUtils.isEmpty(loanAppControlEntity) || loanAppControlEntity.getStatus() != 1) {
+                result.setReturnCode(ResultEnum.VERSION_ERROR.code());
+                result.setMessage(ResultEnum.VERSION_ERROR.message());
+                return result;
+            }
+
 
             // 获取用户缓存
             User user = this.tokenManager.getUserCache(token);
