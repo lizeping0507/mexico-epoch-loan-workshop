@@ -14,16 +14,6 @@ import org.apache.commons.lang3.StringUtils;
 @Data
 public class UserAddInfoParams extends BaseParams {
     /**
-     * 用户填写生日
-     */
-    private String customDateOfBirth;
-
-    /**
-     * 用户填写性别
-     */
-    private String customGenter;
-
-    /**
      * 孩子数量
      */
     private String childrenNumber ;
@@ -59,26 +49,6 @@ public class UserAddInfoParams extends BaseParams {
      */
     public boolean isEmailLegal(){
         if (StringUtils.isEmpty(this.email)){
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * 字段校验-用户填写生日
-     */
-    public boolean isCustomDateOfBirthLegal(){
-        if (StringUtils.isEmpty(this.customDateOfBirth)){
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * 字段校验-用户填写性别
-     */
-    public boolean isCustomGenterLegal(){
-        if (StringUtils.isEmpty(this.customGenter)){
             return false;
         }
         return true;

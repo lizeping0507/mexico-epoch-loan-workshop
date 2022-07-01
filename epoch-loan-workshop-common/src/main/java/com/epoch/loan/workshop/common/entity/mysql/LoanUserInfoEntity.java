@@ -205,19 +205,9 @@ public class LoanUserInfoEntity {
     private String customFullName;
 
     /**
-     * 用户填写 生日
-     */
-    private String customDateOfBirth;
-
-    /**
      * 用户填写 年龄
      */
     private String customAge;
-
-    /**
-     * 用户填写 性别
-     */
-    private String customGenter;
 
     /**
      * 上传证件的正面图片路径

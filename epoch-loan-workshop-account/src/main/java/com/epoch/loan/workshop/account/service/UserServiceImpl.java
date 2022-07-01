@@ -399,8 +399,6 @@ public class UserServiceImpl extends BaseService implements UserService {
 
         // 查询用户详细信息
         LoanUserInfoEntity userInfo = loanUserInfoDao.findUserInfoById(user.getId());
-        userInfo.setCustomDateOfBirth(params.getCustomDateOfBirth());
-        userInfo.setCustomGenter(params.getCustomGenter());
         userInfo.setChildrenNumber(params.getChildrenNumber());
         userInfo.setLiveType(params.getLiveType());
         userInfo.setEducation(params.getEducation());
