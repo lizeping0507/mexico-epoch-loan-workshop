@@ -362,19 +362,7 @@ public class UserController extends BaseController {
         Result<SaveUserInfoResult> result = new Result<>();
 
         try {
-            if (!params.isCustomDateOfBirthLegal()) {
-                // 异常返回结果
-                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() );
-                return result;
-            }
             if (!params.isEmailLegal()) {
-                // 异常返回结果
-                result.setReturnCode(ResultEnum.PARAM_ERROR.code());
-                result.setMessage(ResultEnum.PARAM_ERROR.message() );
-                return result;
-            }
-            if (!params.isCustomGenterLegal()) {
                 // 异常返回结果
                 result.setReturnCode(ResultEnum.PARAM_ERROR.code());
                 result.setMessage(ResultEnum.PARAM_ERROR.message() );

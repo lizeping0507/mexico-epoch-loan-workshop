@@ -552,7 +552,7 @@ public class Collection extends BaseCollectionMQ implements MessageListenerConcu
         userInfoParam.setRegisterTime(userInfoEntity.getCreateTime());
 
         // 性别
-        String gender = userInfoEntity.getCustomGenter();
+        String gender = userInfoEntity.getPapersGender();
         if (StringUtils.isNotBlank(gender) && gender.equalsIgnoreCase(CollectionField.SEX_FEMALE)) {
             userInfoParam.setGender(2);
         } else {
