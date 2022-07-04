@@ -10,7 +10,7 @@ import com.epoch.loan.workshop.common.entity.mysql.LoanRemittancePaymentRecordEn
 import com.epoch.loan.workshop.common.mq.remittance.RemittanceMQManager;
 import com.epoch.loan.workshop.common.mq.remittance.params.RemittanceParams;
 import com.epoch.loan.workshop.common.mq.repayment.RepaymentMQManager;
-import com.epoch.loan.workshop.common.oss.AlibabaOssClient;
+import com.epoch.loan.workshop.common.oss.LoanOssClient;
 import com.epoch.loan.workshop.common.redis.RedisClient;
 import com.epoch.loan.workshop.common.sms.SMSManager;
 import org.apache.commons.lang3.ObjectUtils;
@@ -128,7 +128,7 @@ public class BaseService {
      * OSS
      */
     @Autowired
-    public AlibabaOssClient alibabaOssClient;
+    public LoanOssClient loanOssClient;
 
     /**
      * OSS

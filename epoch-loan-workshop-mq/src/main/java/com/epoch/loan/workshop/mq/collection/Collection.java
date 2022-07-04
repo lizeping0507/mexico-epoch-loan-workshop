@@ -567,9 +567,9 @@ public class Collection extends BaseCollectionMQ implements MessageListenerConcu
         }
 
         // 先获取贷超照片信息
-        OSSObject frontImgInfo = alibabaOssClient.getFileInfo(userOssBucketName, userInfoEntity.getFrontPath());
-        OSSObject backImgInfo = alibabaOssClient.getFileInfo(userOssBucketName, userInfoEntity.getBackPath());
-        OSSObject livingImgInfo = alibabaOssClient.getFileInfo(userOssBucketName, userInfoEntity.getFacePath());
+        OSSObject frontImgInfo = loanOssClient.getFileInfo(userOssBucketName, userInfoEntity.getFrontPath());
+        OSSObject backImgInfo = loanOssClient.getFileInfo(userOssBucketName, userInfoEntity.getBackPath());
+        OSSObject livingImgInfo = loanOssClient.getFileInfo(userOssBucketName, userInfoEntity.getFacePath());
 
         // 将照片上传至minio上
         String adFrontUrl = loanMiNioClient.upload(userFileBucketName, userInfoEntity.getFrontPath(), frontImgInfo);

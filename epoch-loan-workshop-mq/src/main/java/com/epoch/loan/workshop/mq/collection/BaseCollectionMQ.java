@@ -5,7 +5,7 @@ import com.epoch.loan.workshop.common.config.RiskConfig;
 import com.epoch.loan.workshop.common.dao.mysql.*;
 import com.epoch.loan.workshop.common.mq.collection.CollectionMQManager;
 import com.epoch.loan.workshop.common.mq.collection.params.CollectionParams;
-import com.epoch.loan.workshop.common.oss.AlibabaOssClient;
+import com.epoch.loan.workshop.common.oss.LoanOssClient;
 import com.epoch.loan.workshop.common.minio.LoanMinIoClient;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently;
@@ -83,7 +83,7 @@ public abstract class BaseCollectionMQ {
      * OSS
      */
     @Autowired
-    public AlibabaOssClient alibabaOssClient;
+    public LoanOssClient loanOssClient;
 
     /**
      * minio

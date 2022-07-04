@@ -310,6 +310,7 @@ public abstract class BaseOrderMQListener {
      * @param orderBillId 订单账单ID
      * @param status      状态
      */
+
     public void updateOrderBillStatus(String orderBillId, int status) {
         loanOrderBillDao.updateOrderBillStatus(orderBillId, status, new Date());
     }

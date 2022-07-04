@@ -23,7 +23,7 @@ import java.util.Date;
 @RefreshScope
 @Component
 @Data
-public class AlibabaOssClient {
+public class LoanOssClient {
 
     /**
      * OSS连接池
