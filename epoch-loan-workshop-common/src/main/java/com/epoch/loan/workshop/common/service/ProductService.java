@@ -48,6 +48,16 @@ public interface ProductService {
      */
     Result<ProductRecommendResult> recommendList(ProductRecommendListParams params) throws Exception;
 
+
+    /**
+     * 变身贷超
+     *
+     * @param params 入参
+     * @return Result
+     * @throws Exception 请求异常
+     */
+    Result<Object> turnIntoLoan(BaseParams params) throws Exception;
+
     /**
      * 获取用户客群
      * @param params

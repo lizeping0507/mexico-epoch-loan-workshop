@@ -77,4 +77,29 @@ public class AppMaskModelResult implements Serializable {
      * 订单状态
      */
     private Integer orderStatus;
+
+    /**
+     * 可申请额度
+     */
+    private Long availableCredit;
+
+    /**
+     * 总额度
+     */
+    private Long totalCredit;
+
+    /**
+     * 已用额度
+     */
+    private Long usedCredit;
+
+    /**
+     * 额度锁定 0-不锁，1-锁定
+     */
+    private Integer locked;
+
+    /**
+     * 引导标识 0-不显示该标识 1-再贷一笔 2-提升额度
+     */
+    private Integer guideType;
 }

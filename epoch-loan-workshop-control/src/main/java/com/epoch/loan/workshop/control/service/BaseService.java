@@ -76,6 +76,12 @@ public class BaseService {
     public LoanOrderDao loanOrderDao;
 
     /**
+     * 用户模式
+     */
+    @Autowired
+    public LoanUserModelDao loanUserModelDao;
+
+    /**
      * 放款账户
      */
     @Autowired

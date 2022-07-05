@@ -204,6 +204,11 @@ public class URL {
     public static final String PRODUCT_RECOMMEND_LIST = "/recommendList";
 
     /**
+     * 变身贷超
+     */
+    public static final String TURN_INTO_LOAN = "/turnIntoLoan";
+
+    /**
      * 订单 - 全部订单列表
      */
     public static final String ORDER_LIST_ALL = "/listAll";

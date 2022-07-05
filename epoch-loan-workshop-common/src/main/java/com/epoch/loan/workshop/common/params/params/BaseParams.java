@@ -66,6 +66,11 @@ public class BaseParams implements Serializable {
      */
     private String gaid;
 
+    /**
+     * 贷超包类型 1-多推包
+     */
+    private Integer appType;
+
 
     /**
      * 验证 app名称 是否合法

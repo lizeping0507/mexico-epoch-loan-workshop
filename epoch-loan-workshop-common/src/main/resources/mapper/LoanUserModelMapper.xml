@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.epoch.loan.workshop.common.dao.mysql.LoanUserModelDao">
+
+    <select id="findByUserId" resultType="java.lang.Integer">
+        SELECT modleTag FROM `loan_user_model` WHERE user_id = #{userId}
+    </select>
+
+    <insert id="addLoanUserModel">
+        INSERT INTO loan_user_model (
+            `user_id`,
+            `app_name`,
+            `model_tag`,
+            `create_time`)
+        VALUES (
+            #{loanUserModelEntity.userId},
+            #{loanUserModelEntity.appName},
+            #{loanUserModelEntity.modelTag},
+            #{loanUserModelEntity.createTime}
+        );
+    </insert>
+</mapper>

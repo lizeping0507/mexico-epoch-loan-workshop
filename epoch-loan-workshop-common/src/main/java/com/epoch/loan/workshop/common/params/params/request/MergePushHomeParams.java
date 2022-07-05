@@ -14,11 +14,6 @@ import lombok.Data;
 public class MergePushHomeParams extends BaseParams {
 
     /**
-     * 用户标识
-     */
-    private String userId;
-
-    /**
      * 注册地址
      */
     private String registerAddr;

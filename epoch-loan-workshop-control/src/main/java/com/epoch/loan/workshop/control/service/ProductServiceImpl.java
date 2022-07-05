@@ -163,6 +163,12 @@ public class ProductServiceImpl extends BaseService implements ProductService {
      */
     @Override
     public Result<AppMaskModelResult> appMaskModel(BaseParams params) throws Exception {
+
+        // 多推包判断
+        if(ObjectUtils.isNotEmpty(params.getAppType()) && params.getAppType().equals(NumberField.NUM_ONE)){
+            return mergePushMask(params);
+        }
+
         // 结果集
         Result<AppMaskModelResult> result = new Result<>();
         AppMaskModelResult appMaskModelResult = new AppMaskModelResult();
@@ -378,6 +384,248 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         }else if (orderStatus > OrderStatus.CREATE){
             // 还款时间
             appMaskModelResult.setRepaymentTime(DateUtil.addDay(new Date() , 7));
+        }
+
+        // 返回结果
+        appMaskModelResult.setMaskModel(0);
+        appMaskModelResult.setButton(OrderUtils.button(orderStatus));
+        appMaskModelResult.setStatusDescription(OrderUtils.statusDescription(orderStatus));
+        appMaskModelResult.setOrderId(orderId);
+        appMaskModelResult.setOrderStatus(orderStatus);
+        result.setData(appMaskModelResult);
+        return result;
+    }
+
+    /**
+     * 获取用户app模式-多推包
+     *
+     * @param params 入参
+     * @return Result
+     * @throws Exception 请求异常
+     */
+    public Result<AppMaskModelResult> mergePushMask(BaseParams params) throws Exception{
+        // 结果集
+        Result<AppMaskModelResult> result = new Result<>();
+        AppMaskModelResult appMaskModelResult = new AppMaskModelResult();
+        result.setReturnCode(ResultEnum.SUCCESS.code());
+        result.setMessage(ResultEnum.SUCCESS.message());
+
+        // 用户id
+        String userId = params.getUser().getId();
+
+        // 更新地址
+        String gps = params.getGps();
+        String gpsAddress = params.getGpsAddress();
+        if (StringUtils.isNotEmpty(gps) || StringUtils.isNotEmpty(gpsAddress)){
+            loanUserInfoDao.updateUserGpsMsg(userId, gps, gpsAddress, new Date());
+            tokenManager.updateUserCache(userId);
+        }
+
+        // app名称
+        String appName = params.getUser().getAppName();
+
+        // App版本
+        String appVersion = params.getAppVersion();
+
+        // 初始化金额
+        appMaskModelResult.setAmount("10000");
+
+        // 多推用户模式标识 0-现金贷 1-贷超
+        Integer userModelType = 0;
+
+        // 初始额度赋值
+        appMaskModelResult.setAvailableCredit(NumberField.NUM_L_TEN_THOUSAND);
+        appMaskModelResult.setTotalCredit(NumberField.NUM_L_TEN_THOUSAND);
+        appMaskModelResult.setUsedCredit(NumberField.NUM_L_ZERO);
+        // 默认无锁定标识
+        appMaskModelResult.setLocked(NumberField.NUM_ZERO);
+        // 默认不展示引导标识
+        appMaskModelResult.setGuideType(NumberField.NUM_ZERO);
+
+        /*查询用户认证情况*/
+        // 身份认证
+        appMaskModelResult.setIdentityAuth(0);
+        if (params.getUser().isIdentityAuth()) {
+            appMaskModelResult.setIdentityAuth(1);
+        }
+
+        // 基本信息认证
+        appMaskModelResult.setBasicInfoAuth(0);
+        if (params.getUser().isBasicInfoAuth()) {
+            appMaskModelResult.setBasicInfoAuth(1);
+        }
+
+        // 补充信息认证
+        appMaskModelResult.setAddInfoAuth(0);
+        if (params.getUser().isAddInfoAuth()) {
+            appMaskModelResult.setAddInfoAuth(1);
+        }
+
+        // 查询用户有没有添加过卡
+        appMaskModelResult.setRemittanceAccountAuth(0);
+        if (params.getUser().isRemittanceAccountAuth()) {
+            appMaskModelResult.setRemittanceAccountAuth(1);
+        }
+
+        // 查询三项认证是否都通过
+        if (!params.getUser().isIdentityAuth() ) {
+            // 没有通过 返回结果
+            appMaskModelResult.setMaskModel(3);
+            appMaskModelResult.setButton(OrderUtils.button(0));
+            appMaskModelResult.setStatusDescription(OrderUtils.statusDescription(OrderStatus.CREATE));
+            result.setData(appMaskModelResult);
+            return result;
+        }
+
+        // 多推模式，判断用户当前是永久现金贷，还是已转贷超
+        Integer userModel = loanUserModelDao.findByUserId(params.getUser().getId());
+        userModelType = (userModel == null || ObjectUtils.isEmpty(userModel))? 0 : userModel;
+
+        if (userModelType.equals(NumberField.NUM_ONE)) {
+            // 贷超模式已经有订单
+            appMaskModelResult.setMaskModel(1);
+            result.setData(appMaskModelResult);
+            return result;
+        }
+
+        // 指定状态的订单最后生成一个订单
+        Integer[] status = new Integer[]{OrderStatus.CREATE, OrderStatus.EXAMINE_WAIT, OrderStatus.EXAMINE_PASS, OrderStatus.EXAMINE_FAIL, OrderStatus.WAIT_PAY, OrderStatus.WAY, OrderStatus.DUE, OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE};
+        LoanOrderEntity loanOrderEntity = loanOrderDao.findLatelyOrderByUserIdAndStatus(userId, status);
+        if (ObjectUtils.isEmpty(loanOrderEntity)) {
+            // 查询A阈值的承接盘
+            LoanMaskEntity loanMaskEntity = loanMaskDao.findLoanMaskByAppNameAndLevel(appName, "A");
+
+            // 产品id
+            String maskProductId = loanMaskEntity.getProductId();
+
+            // 查询承接盘详细信息
+            LoanProductEntity maskLoanProductEntity = loanProductDao.findProduct(maskProductId);
+
+            // 生成订单
+            loanOrderEntity = initOrder(params.getUser(), OrderType.MASK, appVersion, appName, "MASK", maskLoanProductEntity);
+
+            // 订单是否创建成功
+            if (ObjectUtils.isEmpty(loanOrderEntity)) {
+                // 封装结果
+                result.setReturnCode(ResultEnum.SYNCHRONIZATION_ERROR.code());
+                result.setMessage(ResultEnum.SYNCHRONIZATION_ERROR.message());
+                return result;
+            }
+
+            // 订单状态
+            Integer orderStatus = loanOrderEntity.getStatus();
+
+            // 返回结果集
+            appMaskModelResult.setMaskModel(0);
+            appMaskModelResult.setButton(OrderUtils.button(orderStatus));
+            appMaskModelResult.setStatusDescription(OrderUtils.statusDescription(orderStatus));
+            appMaskModelResult.setOrderId(loanOrderEntity.getId());
+            appMaskModelResult.setOrderStatus(orderStatus);
+            result.setData(appMaskModelResult);
+            return result;
+        }
+
+        // 订单编号
+        String orderId = loanOrderEntity.getId();
+
+        // 订单状态
+        Integer orderStatus = loanOrderEntity.getStatus();
+
+        // 产品id
+        String productId = loanOrderEntity.getProductId();
+
+        // 已申请放款的金额设置申请时间
+        if (orderStatus >= OrderStatus.EXAMINE_WAIT){
+            appMaskModelResult.setApplyTime(loanOrderEntity.getApplyTime());
+        }
+
+        /* 判断订单状态是否已经结清*/
+        if (orderStatus == OrderStatus.DUE_COMPLETE || orderStatus == OrderStatus.COMPLETE) {
+            // 返回结果
+            appMaskModelResult.setMaskModel(1);
+            result.setData(appMaskModelResult);
+            return result;
+        }
+
+        /*判断最后一条订单是否是被拒订单*/
+        if (orderStatus == OrderStatus.EXAMINE_FAIL) {
+            // 更新时间
+            Date updateTime = loanOrderEntity.getUpdateTime();
+
+            // 产品冷却期
+            int cdDays = 1;
+
+            // 判断是否过了冷却期
+            if (!OrderUtils.isCdWithTime(cdDays, updateTime)) {
+                // 未过冷却期订单不允许再次进行申请
+                appMaskModelResult.setMaskModel(2);
+                appMaskModelResult.setButton(OrderUtils.button(OrderStatus.EXAMINE_FAIL));
+                appMaskModelResult.setOrderId(loanOrderEntity.getId());
+                appMaskModelResult.setOrderStatus(loanOrderEntity.getStatus());
+                appMaskModelResult.setApplyTime(loanOrderEntity.getApplyTime());
+                appMaskModelResult.setStatusDescription(OrderUtils.statusDescription(OrderStatus.EXAMINE_FAIL));
+                result.setData(appMaskModelResult);
+                return result;
+            }
+
+            /*冷却期结束生成新的订单*/
+            // 查询A阈值的承接盘
+            LoanMaskEntity loanMaskEntity = loanMaskDao.findLoanMaskByAppNameAndLevel(appName, "A");
+
+            // 产品id
+            String maskProductId = loanMaskEntity.getProductId();
+
+            // 查询承接盘详细信息
+            LoanProductEntity maskLoanProductEntity = loanProductDao.findProduct(maskProductId);
+
+            // 生成订单
+            loanOrderEntity = initOrder(params.getUser(), OrderType.MASK, appVersion, appName, "MASK", maskLoanProductEntity);
+
+            // 订单是否创建成功
+            if (ObjectUtils.isEmpty(loanOrderEntity)) {
+                // 封装结果
+                result.setReturnCode(ResultEnum.SYNCHRONIZATION_ERROR.code());
+                result.setMessage(ResultEnum.SYNCHRONIZATION_ERROR.message());
+                return result;
+            }
+
+            // 订单状态
+            orderStatus = loanOrderEntity.getStatus();
+
+            // 返回结果集
+            appMaskModelResult.setMaskModel(0);
+            appMaskModelResult.setButton(OrderUtils.button(orderStatus));
+            appMaskModelResult.setStatusDescription(OrderUtils.statusDescription(orderStatus));
+            appMaskModelResult.setOrderId(loanOrderEntity.getId());
+            appMaskModelResult.setOrderStatus(orderStatus);
+            result.setData(appMaskModelResult);
+            return result;
+        }
+
+        /*已经有在途订单*/
+
+        // 如果订单处于在途或者在途之后的状态那么金额就为预计还款金额
+        if (orderStatus >= OrderStatus.WAY) {
+            // 查询最早一期没还款的账单
+            Integer[] statusArray = {OrderBillStatus.WAY, OrderBillStatus.DUE};
+            LoanOrderBillEntity loanOrderBillEntity = loanOrderBillDao.findOrderBillFastStagesByStatusAndOrderId(orderId, statusArray);
+
+            // 还款时间
+            appMaskModelResult.setRepaymentTime(loanOrderBillEntity.getRepaymentTime());
+
+            // 应还金额
+            appMaskModelResult.setAmount(String.valueOf(loanOrderBillEntity.getRepaymentAmount() - loanOrderBillEntity.getReductionAmount()));
+        }else if (orderStatus > OrderStatus.CREATE){
+            // 还款时间
+            appMaskModelResult.setRepaymentTime(DateUtil.addDay(new Date() , 7));
+
+            // 状态赋值
+            if(orderStatus.equals(OrderStatus.EXAMINE_WAIT)){
+                appMaskModelResult.setLocked(NumberField.NUM_ONE);
+                appMaskModelResult.setTotalCredit(loanOrderEntity.getApprovalAmount().longValue());
+                appMaskModelResult.setAvailableCredit(loanOrderEntity.getApprovalAmount().longValue());
+            }
+
         }
 
         // 返回结果
@@ -737,6 +985,38 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         result.setReturnCode(ResultEnum.SUCCESS.code());
         result.setMessage(ResultEnum.SUCCESS.message());
         return result;
+    }
+
+    /**
+     * 变身贷超
+     *
+     * @param params 入参
+     * @return 产品集合
+     * @throws Exception 请求异常
+     */
+    @Override
+    public Result<Object> turnIntoLoan(BaseParams params) throws Exception{
+        // 返回集
+        Result<Object> response = new Result<>();
+
+        // 保存用户标识
+        LoanUserModelEntity userModel = new LoanUserModelEntity();
+        userModel.setUserId(Long.getLong(params.getUser().getId()));
+        userModel.setModleTag(NumberField.NUM_ONE);
+        userModel.setCreateTime(new Date());
+        userModel.setAppName(params.getAppName());
+
+        Integer I = loanUserModelDao.addLoanUserModel(userModel);
+
+        if(I.equals(NumberField.NUM_ONE)){
+            response.setReturnCode(200);
+            response.setMessage("success");
+        }else {
+            response.setReturnCode(400);
+            response.setMessage("error");
+        }
+
+        return response;
     }
 
     /**
