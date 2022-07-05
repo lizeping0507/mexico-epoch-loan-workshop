@@ -604,6 +604,30 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
         /*已经有在途订单*/
 
+        // 查看缓存，判断订单号是否已生成
+        Object  json = redisClient.get("ydplatform:app-api:mergePush:templateOrder:" + params.getUser().getId());
+
+        // 如果上一笔已还清，则生成一笔虚拟单
+        if(ObjectUtils.isEmpty(json) && orderStatus.equals(OrderStatus.COMPLETE) && userModelType.equals(NumberField.NUM_ZERO)){
+
+            // 生成订单号
+            String virtulOrderNo = ObjectIdUtil.getObjectId();;
+
+            // 存储
+            redisClient.set("ydplatform:app-api:mergePush:templateOrder:" + params.getUser().getId(),virtulOrderNo);
+
+            // 赋值虚拟单号、状态
+            orderId = virtulOrderNo;
+            orderStatus = OrderStatus.CREATE;
+
+        }
+
+        if(ObjectUtils.isNotEmpty(json)){
+            orderId = (String) json;
+            orderStatus = OrderStatus.CREATE;
+        }
+
+
         // 如果订单处于在途或者在途之后的状态那么金额就为预计还款金额
         if (orderStatus >= OrderStatus.WAY) {
             // 查询最早一期没还款的账单
