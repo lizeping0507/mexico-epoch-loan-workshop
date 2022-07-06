@@ -259,6 +259,9 @@ public class OcrController extends BaseController {
             params.setIdImgType(idImgType);
             params.setFaceImgType(faceImgType);
 
+            LogUtil.sysInfo("[UserController faceComparison]");
+
+
             // 获取相似度
             return userService.faceComparison(params);
         } catch (Exception e) {
