@@ -733,10 +733,8 @@ public class UserServiceImpl extends BaseService implements UserService {
         fileMap.put("firstImage", convertToFile(params.getIdImageData(),params.getIdImgType()));
         fileMap.put("secondImage", convertToFile(params.getFaceImageData() , params.getFaceImgType()));
 
-        LogUtil.sysInfo("开始请求advance, appName:{} , url:{} ,  heardMap:{}   fileMap:{}" , appName, faceComparisonUrl,heardMap,fileMap);
         // 发送请求
         String resultStr = HttpUtils.POST_WITH_HEADER_FORM_FILE(faceComparisonUrl, null, heardMap, fileMap);
-        LogUtil.sysInfo("advance响应" , resultStr);
 
         // 释放文件
         for (Map.Entry<String, File> entry : fileMap.entrySet()) {
