@@ -40,6 +40,8 @@ public class AppDomainUtil {
                 return "pesoahora.com";
             case "PesoMax":
                 return "peso-max.com";
+            case "CreditoHucha":
+                return "creditohucha.in";
             default:
                 return null;
         }

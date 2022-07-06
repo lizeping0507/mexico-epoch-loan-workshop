@@ -262,6 +262,7 @@ public class OcrController extends BaseController {
             // 获取相似度
             return userService.faceComparison(params);
         } catch (Exception e) {
+            e.printStackTrace();
             LogUtil.sysError("[UserController faceComparison]", e);
 
             // 异常返回结果
