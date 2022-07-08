@@ -12,6 +12,7 @@ import com.epoch.loan.workshop.common.params.params.result.OrderListResult;
 import com.epoch.loan.workshop.common.params.params.result.Result;
 import com.epoch.loan.workshop.common.params.params.result.model.LoanRepaymentRecordResult;
 import com.epoch.loan.workshop.common.params.params.result.model.OrderInfoResult;
+import com.epoch.loan.workshop.common.redis.RedisClient;
 import com.epoch.loan.workshop.common.service.OrderService;
 import com.epoch.loan.workshop.common.util.*;
 import com.epoch.loan.workshop.common.lock.UserApplyDetailLock;
@@ -20,6 +21,7 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -34,6 +36,13 @@ import java.util.*;
  */
 @DubboService(timeout = 5000)
 public class OrderServiceImpl extends BaseService implements OrderService {
+
+    /**
+     * Redis工具累
+     */
+    @Autowired
+    public RedisClient redisClient;
+
     /**
      * 订单绑定放款账户
      *
@@ -636,6 +645,21 @@ public class OrderServiceImpl extends BaseService implements OrderService {
 
         // 订单id
         String orderId = params.getOrderId();
+
+        // 多推模式
+        if (ObjectUtils.isNotEmpty(params.getAppType()) && params.getAppType().equals(NumberField.NUM_ONE)) {
+
+            // 查看缓存，判断现金贷模式-订单号是否已生成
+            Object json = redisClient.get("ydplatform:app-api:mergePush:templateOrder:" + params.getUser().getId());
+
+            // 现金贷模式，第二笔借贷，为虚拟单，走此逻辑
+            if (ObjectUtils.isNotEmpty(json)) {
+                // 申请确认页-多推包现金贷模式
+                return mergePushConfirm(params);
+            }
+
+        }
+
         LoanOrderEntity orderEntity = loanOrderDao.findOrder(orderId);
         if (ObjectUtils.isEmpty(orderEntity)) {
             result.setReturnCode(ResultEnum.NO_EXITS.code());
@@ -777,6 +801,168 @@ public class OrderServiceImpl extends BaseService implements OrderService {
         return result;
     }
 
+    /**
+     * 申请确认页-多推包现金贷模式
+     * @param params
+     * @return
+     */
+    Result<OrderDetailResult> mergePushConfirm(OrderDetailParams params){
+        // 结果集
+        Result<OrderDetailResult> result = new Result<>();
+
+        // 用户id
+        String userId = params.getUser().getId();
+
+        // 订单id
+        String orderId = params.getOrderId();
+
+        // 指定状态的订单最后生成一个订单
+        Integer[] status = new Integer[]{OrderStatus.CREATE, OrderStatus.EXAMINE_WAIT, OrderStatus.EXAMINE_PASS, OrderStatus.EXAMINE_FAIL, OrderStatus.WAIT_PAY, OrderStatus.WAY, OrderStatus.DUE, OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE, OrderStatus.ABANDONED};
+        LoanOrderEntity orderEntity = loanOrderDao.findLatelyOrderByUserIdAndStatus(userId, status);
+
+        if (ObjectUtils.isEmpty(orderEntity)) {
+            result.setReturnCode(ResultEnum.NO_EXITS.code());
+            result.setMessage(ResultEnum.NO_EXITS.message());
+            return result;
+        }
+        if (!orderEntity.getUserId().equals(userId)) {
+            result.setReturnCode(ResultEnum.ORDER_ERROR.code());
+            result.setMessage(ResultEnum.ORDER_ERROR.message());
+            return result;
+        }
+
+        // 封装参数
+        OrderDetailResult detailResult = new OrderDetailResult();
+        detailResult.setOrderNo(params.getOrderId());
+        detailResult.setProductId(orderEntity.getProductId());
+        LoanProductEntity product = loanProductDao.findProduct(orderEntity.getProductId());
+        detailResult.setProductName(product.getProductName());
+//        detailResult.setOrderStatus(orderEntity.getStatus());
+//        detailResult.setIncidentalAmount(orderEntity.getIncidentalAmount() + "");
+
+        // 总利息
+//        Double interestAmount = loanOrderBillDao.sumOrderInterestAmount(orderEntity.getId());
+//        detailResult.setInterest(interestAmount + "");
+
+        // 区分是否放款填充 预计还款时间、预计还款金额、申请时间、申请金额
+        LoanOrderBillEntity lastOrderBill = loanOrderBillDao.findLastOrderBill(orderId);
+        Double estimatedRepaymentAmount = orderEntity.getEstimatedRepaymentAmount();
+        if (orderEntity.getStatus() <= OrderStatus.EXAMINE_WAIT) {
+            String amountRange = product.getAmountRange();
+            String repaymentRange = product.getRepaymentRange();
+            String arrivalRange = product.getArrivalRange();
+
+            // 申请额度
+            detailResult.setApprovalAmount(getAmountRange(amountRange, "oldConfig"));
+            detailResult.setEstimatedRepaymentAmount(getAmountRange(repaymentRange, "oldConfig"));
+            detailResult.setActualAmount(getAmountRange(arrivalRange, "oldConfig"));
+
+        } else {
+            detailResult.setApprovalAmount(orderEntity.getApprovalAmount() + "");
+            detailResult.setEstimatedRepaymentAmount(estimatedRepaymentAmount + "");
+            detailResult.setActualAmount(orderEntity.getActualAmount() + "");
+        }
+
+        // 申请时间
+        if (ObjectUtils.isNotEmpty(orderEntity.getApplyTime())) {
+            detailResult.setApplyTime(orderEntity.getApplyTime());
+        } else {
+            detailResult.setApplyTime(new Date());
+        }
+
+        // 预计还款时间
+        if (ObjectUtils.isNotEmpty(lastOrderBill) &&
+                ObjectUtils.isNotEmpty(lastOrderBill.getRepaymentTime())) {
+            detailResult.setExpectedRepaymentTime(lastOrderBill.getRepaymentTime());
+        } else {
+            Date repaymentTimeStr = DateUtil.addDay(new Date(), 6 * orderEntity.getStages());
+            Date repaymentTime = DateUtil.StringToDate(DateUtil.DateToString(repaymentTimeStr, "yyyy-MM-dd") + " 23:59:59", "yyyy-MM-dd HH:mm:ss");
+            detailResult.setExpectedRepaymentTime(repaymentTime);
+        }
+
+        // 添加银行卡信息
+        // 查询用户是否标记放款卡
+        LoanUserBankCardEntity uc = loanUserBankCardDao.findByUserId(params.getUser().getId());
+        if (ObjectUtils.isEmpty(uc) || ObjectUtils.isEmpty(uc.getBankCard()) || ObjectUtils.isEmpty(uc.getOpenBank())) {
+            // 若用户未标记放款卡，则查询用户最近一次绑卡信息，进行赋值
+            String bankCardId = orderEntity.getBankCardId();
+            LoanRemittanceAccountEntity accountEntity = loanRemittanceAccountDao.findRemittanceAccount(bankCardId);
+            detailResult.setBankCardName(accountEntity.getBank());
+            detailResult.setBankCardNo(accountEntity.getAccountNumber());
+            detailResult.setReceiveWay(accountEntity.getType());
+        } else {
+            // 用户已标记放款卡，进行赋值
+            detailResult.setBankCardNo(uc.getBankCard());
+            detailResult.setBankCardName(uc.getOpenBank());
+            // 需确认默认值
+//            detailResult.setReceiveWay(accountEntity.getType());
+        }
+
+        if (orderEntity.getStatus() <= OrderStatus.EXAMINE_FAIL) {
+            // 封装结果
+            result.setReturnCode(ResultEnum.SUCCESS.code());
+            result.setMessage(ResultEnum.SUCCESS.message());
+            result.setData(detailResult);
+            return result;
+        }
+
+        // 废弃订单
+        if (orderEntity.getStatus() == OrderStatus.ABANDONED) {
+            // 封装结果
+            result.setReturnCode(ResultEnum.SUCCESS.code());
+            result.setMessage(ResultEnum.SUCCESS.message());
+            result.setData(detailResult);
+            return result;
+        }
+        detailResult.setLoanTime(orderEntity.getLoanTime());
+
+        // 总罚息
+        Double punishmentAmount = loanOrderBillDao.sumOrderPunishmentAmount(orderEntity.getId());
+        if (ObjectUtils.isNotEmpty(punishmentAmount)) {
+            detailResult.setPenaltyInterest(punishmentAmount);
+        } else {
+            detailResult.setPenaltyInterest(0.0);
+        }
+
+        Double actualRepaymentAmount = orderEntity.getActualRepaymentAmount();
+        detailResult.setActualRepaymentAmount(actualRepaymentAmount);
+
+        // 剩余还款金额
+        Double remainingRepaymentAmount = new BigDecimal(estimatedRepaymentAmount).subtract(new BigDecimal(actualRepaymentAmount)).doubleValue();
+        detailResult.setRemainingRepaymentAmount(remainingRepaymentAmount);
+
+        // 已还款成功记录
+        List<LoanRepaymentRecordResult> recordDTOList = new ArrayList<>();
+        List<LoanRepaymentPaymentRecordEntity> paymentRecordList = loanRepaymentPaymentRecordDao.findListRecordDTOByOrderIdAndStatus(orderId, LoanRepaymentPaymentRecordStatus.SUCCESS);
+        paymentRecordList.forEach(paymentRecord -> {
+            LoanRepaymentRecordResult recordDTO = new LoanRepaymentRecordResult();
+            recordDTO.setRepaymentAmount(paymentRecord.getAmount());
+            recordDTO.setTotalAmount(paymentRecord.getActualAmount());
+
+            // 手续费
+            double charge = new BigDecimal(paymentRecord.getAmount()).subtract(new BigDecimal(paymentRecord.getActualAmount())).doubleValue();
+            recordDTO.setCharge(charge);
+            recordDTO.setSuccessTime(paymentRecord.getUpdateTime());
+            recordDTO.setSuccessDay(paymentRecord.getUpdateTime());
+            recordDTO.setRepayWay(paymentRecord.getType());
+            recordDTOList.add(recordDTO);
+        });
+        if (CollectionUtils.isNotEmpty(recordDTOList)) {
+            detailResult.setRepayRecord(recordDTOList);
+        }
+
+        // 已还款
+        if (orderEntity.getStatus() == OrderStatus.COMPLETE || orderEntity.getStatus() == OrderStatus.DUE_COMPLETE) {
+            detailResult.setActualRepaymentTime(lastOrderBill.getActualRepaymentTime());
+        }
+
+        // 封装结果
+        result.setReturnCode(ResultEnum.SUCCESS.code());
+        result.setMessage(ResultEnum.SUCCESS.message());
+        result.setData(detailResult);
+        return result;
+
+    }
     /**
      * 多推--申请确认
      *

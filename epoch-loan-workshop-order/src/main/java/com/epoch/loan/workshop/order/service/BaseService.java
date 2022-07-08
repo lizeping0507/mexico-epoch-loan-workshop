@@ -68,4 +68,11 @@ public class BaseService {
      */
     @Autowired
     public LoanRepaymentPaymentRecordDao loanRepaymentPaymentRecordDao;
+
+    /**
+     * 用户放款卡
+     */
+    @Autowired
+    public LoanUserBankCardDao loanUserBankCardDao;
+
 }
