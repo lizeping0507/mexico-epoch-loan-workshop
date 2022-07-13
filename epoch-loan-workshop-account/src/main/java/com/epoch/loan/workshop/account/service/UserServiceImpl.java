@@ -815,11 +815,14 @@ public class UserServiceImpl extends BaseService implements UserService {
 
         // 文件列表
         HashMap<String, File> fileMap = Maps.newHashMap();
-        fileMap.put("image", convertToFile(params.getImageData(),params.getImageFileType()));
+        fileMap.put("image", convertToFile(params.getImageData(), params.getImageFileType()));
 
+        long time = System.currentTimeMillis();
         // 发送请求
         String resultStr = HttpUtils.POST_WITH_HEADER_FORM_FILE(cardInfoUrl, paramMap, heardMap, fileMap);
-        LogUtil.sysInfo("advance获取证件信息: {}",resultStr);
+        LogUtil.sysInfo("advance获取证件信息: {}", resultStr);
+        LogUtil.sysInfo("耗时:" + String.valueOf(System.currentTimeMillis() - time));
+
         // 释放文件
         for (Map.Entry<String, File> entry : fileMap.entrySet()) {
             File value = entry.getValue();
