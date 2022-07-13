@@ -821,7 +821,6 @@ public class UserServiceImpl extends BaseService implements UserService {
         // 发送请求
         String resultStr = HttpUtils.POST_WITH_HEADER_FORM_FILE(cardInfoUrl, paramMap, heardMap, fileMap);
         LogUtil.sysInfo("advance获取证件信息: {}", resultStr);
-        LogUtil.sysInfo("耗时:" + String.valueOf(System.currentTimeMillis() - time));
 
         // 释放文件
         for (Map.Entry<String, File> entry : fileMap.entrySet()) {
@@ -924,7 +923,6 @@ public class UserServiceImpl extends BaseService implements UserService {
      * @return
      */
     private File convertToFile(byte[] byteFile,String imageType) {
-        long time = System.currentTimeMillis();
         String objectId = ObjectIdUtil.getObjectId();
         String newFilePath = "/tmp/" + objectId;
 
@@ -935,7 +933,6 @@ public class UserServiceImpl extends BaseService implements UserService {
                 return null;
             }
             ImageUtil.compressUnderSize(byteFile,2*1024*1024,file,imageType);
-            LogUtil.sysInfo("sdfsfd"+ String.valueOf(System.currentTimeMillis()-time));
             return file;
         } catch (IOException e) {
             e.printStackTrace();
