@@ -924,6 +924,7 @@ public class UserServiceImpl extends BaseService implements UserService {
      * @return
      */
     private File convertToFile(byte[] byteFile,String imageType) {
+        long time = System.currentTimeMillis();
         String objectId = ObjectIdUtil.getObjectId();
         String newFilePath = "/tmp/" + objectId;
 
@@ -934,11 +935,14 @@ public class UserServiceImpl extends BaseService implements UserService {
                 return null;
             }
             ImageUtil.compressUnderSize(byteFile,2*1024*1024,file,imageType);
+            LogUtil.sysInfo("sdfsfd"+ String.valueOf(System.currentTimeMillis()-time));
             return file;
         } catch (IOException e) {
             e.printStackTrace();
             return null;
         }
+
+
     }
 
     /**
