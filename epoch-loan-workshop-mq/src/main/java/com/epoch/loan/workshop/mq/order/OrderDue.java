@@ -132,9 +132,6 @@ public class OrderDue extends BaseOrderMQListener implements MessageListenerConc
 
                 // 推送催收
                 sendCollection(orderId, CollectionField.EVENT_DUE);
-
-                // 删除计算标识
-                redisClient.del(RedisKeyField.ORDER_BILL_DUE_LOCK + orderId);
             } catch (Exception e) {
                 try {
                     // 异常,重试
