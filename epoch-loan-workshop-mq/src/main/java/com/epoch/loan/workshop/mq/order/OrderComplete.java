@@ -68,14 +68,6 @@ public class OrderComplete extends BaseOrderMQListener implements MessageListene
                 // 订单账单id
                 String orderBillId = orderParams.getOrderBillId();
 
-                // 判断是否正在计算逾期
-                Object orderBillDueLock = redisClient.get(RedisKeyField.ORDER_BILL_DUE_LOCK + orderId);
-                if (ObjectUtils.isNotEmpty(orderBillDueLock)) {
-                    // 等待重试
-                    retry(orderParams, subExpression());
-                    continue;
-                }
-
                 // 查询订单ID
                 LoanOrderEntity loanOrderEntity = loanOrderDao.findOrder(orderId);
                 if (ObjectUtils.isEmpty(loanOrderEntity)) {
