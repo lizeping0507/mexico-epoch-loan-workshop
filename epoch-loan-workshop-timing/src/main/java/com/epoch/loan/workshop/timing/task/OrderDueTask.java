@@ -74,9 +74,6 @@ public class OrderDueTask extends BaseTask implements Job {
                     params.setOrderBillId(orderBillId);
                     orderMQManager.sendMessage(params, orderMQManager.getOrderDueSubExpression());
 
-                    // 增加逾期计算标识
-                    redisClient.set(RedisKeyField.ORDER_BILL_DUE_LOCK + orderId, orderBillId);
-
                     // 删除数据
                     loanOrderBillEntityList.remove(loanOrderBillEntity);
                 } catch (Exception e) {

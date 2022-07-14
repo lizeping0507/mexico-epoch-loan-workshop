@@ -165,7 +165,9 @@ public class Collection extends BaseCollectionMQ implements MessageListenerConcu
             } catch (Exception e) {
                 try {
                     // 异常,重试
-                    retryCollection(collectionParams, subExpression());
+                    continue;
+
+//                    retryCollection(collectionParams, subExpression());
                 } catch (Exception exception) {
                     LogUtil.sysError("[Collection]", exception);
                 }
