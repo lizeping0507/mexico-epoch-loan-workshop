@@ -1,5 +1,6 @@
 package com.epoch.loan.workshop.api.aspect;
 
+import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.api.annotated.Authentication;
 import com.epoch.loan.workshop.common.authentication.TokenManager;
 import com.epoch.loan.workshop.common.constant.Field;
@@ -87,6 +88,7 @@ public class AuthenticationAspect {
 
             // Token
             String token = request.getHeader(Field.TOKEN);
+            LogUtil.sysInfo("token : {}", token);
             if (StringUtils.isEmpty(token)) {
                 result.setReturnCode(ResultEnum.NO_LOGIN.code());
                 result.setMessage(ResultEnum.NO_LOGIN.message());
