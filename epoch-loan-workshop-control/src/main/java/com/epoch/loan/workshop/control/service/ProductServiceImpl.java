@@ -18,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author : Shangkunfeng
@@ -1044,6 +1045,431 @@ public class ProductServiceImpl extends BaseService implements ProductService {
     }
 
     /**
+     * 贷超多推
+     * @param params 入参
+     * @return Result<MergePushLoanResult>
+     * @throws Exception 请求异常
+     */
+    @Override
+    public Result<MergePushLoanResult> mergePushLoan(BaseParams params) throws Exception{
+        // 返回集
+        Result<MergePushLoanResult> response = new Result<MergePushLoanResult>();
+        MergePushLoanResult result = new MergePushLoanResult();
+
+        // 用户id
+        String userId = params.getUser().getId();
+
+        // 更新地址
+        String gps = params.getGps();
+        String gpsAddress = params.getGpsAddress();
+        if (StringUtils.isNotEmpty(gps) || StringUtils.isNotEmpty(gpsAddress)){
+            loanUserInfoDao.updateUserGpsMsg(userId, gps, gpsAddress, new Date());
+            tokenManager.updateUserCache(userId);
+        }
+
+        // app名称
+        String appName = params.getUser().getAppName();
+
+        // App版本
+        String appVersion = params.getAppVersion();
+
+//        // 查询用户客群
+//        Integer userType = getUserType(user);
+//
+//        // 获取风控返回可借贷笔数及客群额度
+//        RiskmanagementRefuseReasonResponse riskmanagementResponse = riskManagementLoanMethod(user);
+//
+//        if(null == riskmanagementResponse){
+//            response.setCode(ResponseEnum.SYSTEM_ERROR.value());
+//            response.setMsg(ResponseEnum.SYSTEM_ERROR.getReasonPhrase());
+//            return response;
+//        }
+
+        // 查看缓存，判断订单号是否已生成
+        Object  orderNo = redisClient.get("ydplatform:app-api:mergePush:shopTemplateOrder:" + userId);
+
+        if(ObjectUtils.isEmpty(orderNo)){
+            // 生成订单号
+            orderNo = ObjectIdUtil.getObjectId();
+            // 存储
+            redisClient.set("ydplatform:app-api:mergePush:shopTemplateOrder:" + userId,orderNo);
+        }
+
+        // 产品列表
+        List<ProductList> list = new ArrayList<>();
+
+        // 待还款订单产品
+        List<ProductList> waitRepaymentOrderProductList = new ArrayList<>();
+
+        // 可续贷且开量产品
+        List<ProductList> reloanOrderProductList = new ArrayList<>();
+
+        // 审核中或放款中 且开量产品
+        List<ProductList> examineWaitOrWaitPayOrderProductList = new ArrayList<>();
+
+        // 审核通过 开量产品
+        List<ProductList> newCreateProductList = new ArrayList<>();
+
+        // 审核通过 开量产品
+        List<ProductList> examinePassOrderProductList = new ArrayList<>();
+
+        // 被拒产品
+        List<ProductList> examineFailOrderProductList = new ArrayList<>();
+
+        // 新贷且开量产品
+        List<ProductList> newLoanAndOpenProductList = new ArrayList<>();
+
+        // 关量产品
+        List<ProductList> closeProductList = new ArrayList<>();
+
+        // 是否有过放款成功
+        int[] statues = {OrderStatus.WAY,OrderStatus.DUE,OrderStatus.COMPLETE,OrderStatus.DUE_COMPLETE};
+        Integer integer = loanOrderDao.countUserOrderByStatusIn(userId, statues);
+        boolean hasPaymentOrder = integer > 0;
+
+        // 查询所有产品
+        List<LoanProductEntity> products = loanProductDao.findAll();
+        Map<String, LoanProductEntity> productMap = new HashMap<>();
+        products.forEach(product -> {
+            if (product.getStatus() == 1){
+                productMap.put(product.getId(), product);
+            }
+        });
+
+        // 查询其他包承接盘
+        List<LoanMaskEntity> otherLoanMaskList = loanMaskDao.findLoanMaskByAppNameIsNot(params.getAppName());
+
+        // 过滤它包承接盘产品
+        otherLoanMaskList.parallelStream().forEach(loanMask -> productMap.remove(loanMask.getProductId()));
+
+        Integer[] processStatus = {
+                OrderStatus.CREATE, OrderStatus.EXAMINE_WAIT, OrderStatus.EXAMINE_PASS,
+                OrderStatus.WAIT_PAY, OrderStatus.WAY, OrderStatus.DUE, OrderStatus.DUE
+        };
+        List<LoanOrderEntity> allProcessOrderList = loanOrderDao.findOrderListByUserIdAndStatusAndOrderByField(userId, processStatus, OrderByField.CREATE_TIME, OrderByField.ASC);
+        for (LoanOrderEntity loanOrderEntity : allProcessOrderList) {
+            Integer orderStatus = loanOrderEntity.getStatus();
+            String productId = loanOrderEntity.getProductId();
+            LoanProductEntity loanProductEntity = productMap.get(productId);
+
+            // 跳过不存在产品 以及未开量产品
+            if (ObjectUtils.isEmpty(loanProductEntity) || loanProductEntity.getIsOpen() == 0) {
+                continue;
+            }
+
+            // 封装
+            ProductList productList = new ProductList();
+            BeansUtil.copyProperties(loanProductEntity,productList);
+            productList.setAmountRange(parseProductConfig(loanProductEntity.getAmountRange(),1));
+            productList.setInterest(loanProductEntity.getInterest() + "%/Dia");
+            productList.setPassRate("");
+            productList.setButton(OrderUtils.button(loanOrderEntity.getStatus()));
+            productList.setOrderStatus(loanOrderEntity.getStatus());
+            productList.setOrderNo(loanOrderEntity.getId());
+
+            // 通过订单状态加入对应列表
+            switch (orderStatus){
+                case OrderStatus.WAY:
+                case OrderStatus.DUE:
+                    // 待还款
+                    waitRepaymentOrderProductList.add(productList);
+                    break;
+                case OrderStatus.EXAMINE_PASS:
+                    // 审核通过的产品
+                    examinePassOrderProductList.add(productList);
+                    break;
+                case OrderStatus.EXAMINE_WAIT:
+                case OrderStatus.WAIT_PAY:
+                    // 审核中或放款中且开量产品
+                    examineWaitOrWaitPayOrderProductList.add(productList);
+                    break;
+                case OrderStatus.CREATE:
+                    // 新建且开量产品
+                    // 如果用户在本包没有放款成功记录 不展示通过率
+                    if(hasPaymentOrder){
+                        productList.setPassRate(loanProductEntity.getPassRate().toString());
+                    }
+                    newCreateProductList.add(productList);
+                    break;
+                default:
+                    break;
+            }
+
+            // 移除
+            productMap.remove(productId);
+        }
+
+        LogUtil.sysInfo("productMap : {}", JSONObject.toJSONString(productMap));
+
+        // 查询无订单产品
+        List<LoanProductEntity> withoutUserOrderProductList = loanProductDao.findProductWithoutUserOrder(userId);
+        LogUtil.sysInfo("withoutUserOrderProductList : {}", JSONObject.toJSONString(withoutUserOrderProductList));
+        for (LoanProductEntity loanProduct : withoutUserOrderProductList) {
+            String productId = loanProduct.getId();
+            LoanProductEntity loanProductEntity = productMap.get(productId);
+            if (ObjectUtils.isEmpty(loanProductEntity)){
+                continue;
+            }
+
+            // 封装
+            ProductList productList = new ProductList();
+            BeansUtil.copyProperties(loanProductEntity,productList);
+            productList.setAmountRange(parseProductConfig(loanProductEntity.getAmountRange(),1));
+            productList.setInterest(loanProduct.getInterest() + "%/Dia");
+
+
+            // 新贷开量产品
+            if (loanProductEntity.getIsOpen() == 1){
+                // 如果用户在本包没有放款成功记录 不展示通过率
+                if(!hasPaymentOrder){
+                    productList.setPassRate("");
+                }
+                productList.setButton(OrderUtils.button(0));
+                newLoanAndOpenProductList.add(productList);
+                // 移除
+                productMap.remove(productId);
+                continue;
+            }
+
+            // 关量产品
+            if (loanProductEntity.getIsOpen() == 0){
+                productList.setPassRate("");
+                productList.setInterest(loanProductEntity.getInterest() + "%/Dia");
+                productList.setButton("Full");
+                productList.setOrderStatus(OrderStatus.CREATE);
+                closeProductList.add(productList);
+                // 移除
+                productMap.remove(productId);
+                continue;
+            }
+
+        }
+        LogUtil.sysInfo("productMap : {}", JSONObject.toJSONString(productMap));
+
+        // 查询剩余产品 最后一笔订单
+        for (Map.Entry<String, LoanProductEntity> entry : productMap.entrySet()) {
+            LoanProductEntity productEntity = entry.getValue();
+            String productId = productEntity.getId();
+            LogUtil.sysInfo("productEntity : {}", JSONObject.toJSONString(productEntity));
+
+            // 查询用户在该产品最后一笔订单
+            LoanOrderEntity lastOrder = loanOrderDao.findUserLastOrderWithProduct(userId, productId);
+            Integer status = lastOrder.getStatus();
+
+            // 封装
+            ProductList productList = new ProductList();
+            BeansUtil.copyProperties(productEntity, productList);
+            productList.setAmountRange(parseProductConfig(productEntity.getAmountRange(),1));
+            productList.setInterest(productEntity.getInterest() + "%/Dia");
+
+            // 续贷 必定展示通过率
+            if (status == OrderStatus.COMPLETE || status == OrderStatus.DUE_COMPLETE) {
+                productList.setButton("Aplicar de nuevo");
+                reloanOrderProductList.add(productList);
+                continue;
+            }
+
+            // 被拒
+            if (status == OrderStatus.EXAMINE_FAIL) {
+                Integer cdDays = productEntity.getCdDays();
+                Date updateTime = lastOrder.getUpdateTime();
+
+                // 已过冷却期
+                if (OrderUtils.isCdWithTime(cdDays, updateTime)) {
+                    // 如果用户在本包没有放款成功记录 不展示通过率
+                    if(!hasPaymentOrder){
+                        productList.setPassRate("");
+                    }
+                    productList.setButton(OrderUtils.button(0));
+                    productList.setOrderStatus(OrderStatus.CREATE);
+                    newCreateProductList.add(productList);
+                    continue;
+                }
+
+                // 未过冷却期
+                productList.setPassRate("");
+                productList.setButton(OrderUtils.button(OrderStatus.EXAMINE_FAIL));
+                productList.setOrderStatus(OrderStatus.EXAMINE_FAIL);
+                examineFailOrderProductList.add(productList);
+                continue;
+            }
+
+            // 剩余产品认为是关量产品
+            productList.setPassRate("");
+            productList.setButton("Full");
+            productList.setOrderStatus(OrderStatus.CREATE);
+            closeProductList.add(productList);
+        }
+
+
+        // 产品数量
+        Integer productAllNum = list.size();
+
+        // 可续贷且开亮产品数量
+        Integer reLoanNum = reloanOrderProductList.size();
+
+        // 可借贷产品数量
+//        Integer canBorrowNum = riskmanagementResponse.getCanBorrowNum();
+        Integer canBorrowNum = 3;
+
+        // 风控返回可借额度小于可复贷产品
+        if(canBorrowNum <= reLoanNum){
+            canBorrowNum = reLoanNum;
+        }
+
+        // 可用金额
+        Long availableCredit = 0L;
+
+        // 总申请额度 = 已用额度 + 审批额度
+        Long totalCredit = 0L;
+
+        // 已用额度：未还款订单本金总计
+        Long usedCredit = 0L;
+
+        // 审批金额：未放款已生成订单总计
+        Long pendingCredit = 0L;
+
+        // 额度锁定
+        Integer locked = 0;
+
+        // 按钮状态
+        String buttonStatus = "Apply Immediately";
+
+        // 按钮状态标识
+        Integer buttonStatusIndentify = 0;
+
+        // 查询用户审批中的订单
+        Integer[] pendingStatus = new Integer[]{OrderStatus.EXAMINE_WAIT};
+        List<LoanOrderEntity> orderPendingList = loanOrderDao.findOrderByUserIdAndStatus(userId,pendingStatus);
+
+        // 查询用户放款订单
+        Integer[] waitAndloanStatus = new Integer[]{OrderStatus.WAIT_PAY, OrderStatus.WAY, OrderStatus.DUE};
+        List<LoanOrderEntity> orderLoanList = loanOrderDao.findOrderByUserIdAndStatus(userId,waitAndloanStatus);
+
+        // 查询用户待放款单
+        Integer[] waitLoanStatus = new Integer[]{OrderStatus.WAIT_PAY};
+        List<LoanOrderEntity> pendingOrders = loanOrderDao.findOrderByUserIdAndStatus(userId,waitLoanStatus);
+
+        // 查询已放款订单
+        Integer[] loanStatus = new Integer[]{OrderStatus.WAY, OrderStatus.DUE};
+        List<LoanOrderEntity> loandOrders = loanOrderDao.findOrderByUserIdAndStatus(userId,loanStatus);
+
+
+        // 已用额度：未还款订单本金总计
+        Double usedCreditBD = orderLoanList.stream().collect(Collectors.summingDouble(x -> ((Double) x.get("approvalAmount"))));
+        usedCredit = usedCreditBD.longValue();
+
+        // 审批金额：未放款已生成订单总计
+        Double pendingCreditBD = orderPendingList.stream().collect(Collectors.summingDouble(x -> ((Double) x.get("approvalAmount"))));
+
+        pendingCredit = pendingCreditBD.longValue();
+
+        totalCredit = usedCredit + pendingCredit;
+
+        // 可借贷产品list
+//        List<MergePushProductListDTO> productCanLoanList = new ArrayList<>();
+        List<ProductList> productCanLoanList = new ArrayList<>();
+
+
+        if(canBorrowNum == 0){
+
+            // 无可借产品，加锁，申请额度=总额度*1.2
+            locked = 1;
+            availableCredit = new Double(totalCredit * 1.2).longValue();
+
+            // 无可借产品额度，有订单在审批中，首页展示：审批中Button
+            if(!NumberField.NUM_ZERO.equals(orderPendingList.size())){
+                buttonStatus = "Evaluating";
+                buttonStatusIndentify = 1;
+            }
+
+            // 无可借产品额度，无已放款订单，有放款中订单，首页展示：待放款Button
+            if(!NumberField.NUM_ZERO.equals(pendingOrders.size())){
+                buttonStatus = "Disbursing";
+                buttonStatusIndentify =3;
+            }
+
+            // 无可借产品额度，无审批中订单，有已放款单，首页展示：去还款Button
+            if(!NumberField.NUM_ZERO.equals(loandOrders.size())){
+                buttonStatus = "Repayment";
+                buttonStatusIndentify = 2;
+            }
+
+
+        }else {
+
+            // 有可借产品，结算可借额度
+
+            for (int i = 0; i < canBorrowNum; i++) {
+
+                if(i < productAllNum){
+//                    productCanLoanList.add(productAllList.get(i));
+                    productCanLoanList.add(list.get(i));
+                }
+
+            }
+
+//            availableCredit = productCanLoanList.stream().mapToLong(MergePushProductListDTO::getApprovalAmount).sum();
+
+            totalCredit = availableCredit + usedCredit.intValue();
+
+        }
+
+        // 最终可借贷笔数等于可展示产品数
+        canBorrowNum = productCanLoanList.size();
+
+
+        // 再次对可借贷产品数进行判断，以防用户有可借贷额度，但是无产品可借
+        if(canBorrowNum == 0){
+
+            // 无可借产品，加锁，申请额度=总额度*1.2
+            locked = 1;
+            availableCredit = new Double(totalCredit * 1.2).longValue();
+
+            // 无可借产品额度，有订单在审批中，首页展示：审批中Button
+            if(!NumberField.NUM_ZERO.equals(orderPendingList.size())){
+                buttonStatus = "Evaluating";
+                buttonStatusIndentify = 1;
+            }
+
+            // 无可借产品额度，无已放款订单，有放款中订单，首页展示：待放款Button
+            if(!NumberField.NUM_ZERO.equals(pendingOrders.size())){
+                buttonStatus = "Disbursing";
+                buttonStatusIndentify =3;
+            }
+
+            // 无可借产品额度，无审批中订单，有已放款单，首页展示：去还款Button
+            if(!NumberField.NUM_ZERO.equals(loandOrders.size())){
+                buttonStatus = "Repayment";
+                buttonStatusIndentify = 2;
+            }
+
+        }
+
+        // 查询已放款订单(待还款)
+        List<LoanOrderEntity> repaymentList = loanOrderDao.findOrderByUserIdAndStatus(userId,loanStatus);
+
+//        mergePushHomeResponse.setUserId(vo.getUserId());
+//        mergePushHomeResponse.setAvailableCredit(availableCredit.longValue());
+//        mergePushHomeResponse.setTotalCredit(new Long (totalCredit));
+//        mergePushHomeResponse.setUsedCredit(usedCredit);
+//        mergePushHomeResponse.setButtonStatus(buttonStatus);
+//        mergePushHomeResponse.setButtonStatusIndentify(buttonStatusIndentify);
+//        mergePushHomeResponse.setLocked(locked);
+
+//        mergePushHomeResponse.setOrderNo(orderNo); // 虚拟订单号
+//        mergePushHomeResponse.setCanLoanNum(canBorrowNum + "products");
+//        mergePushHomeResponse.setProductList(productCanLoanList);
+//        mergePushHomeResponse.setRepaymentNum(repaymentList.size());
+//        response.setData(mergePushHomeResponse);
+
+        response.setReturnCode(200);
+        response.setMessage("success");
+        response.setData(result);
+        return response;
+    }
+
+    /**
      * 多投限制
      *
      * @param productId
@@ -1188,7 +1614,8 @@ public class ProductServiceImpl extends BaseService implements ProductService {
      * @return
      * @throws Exception
      */
-    protected LoanOrderEntity initOrder(User user, Integer type, String appVersion, String appName, String orderModelGroup, LoanProductEntity productEntity) throws Exception {
+    @Override
+    public LoanOrderEntity initOrder(User user, Integer type, String appVersion, String appName, String orderModelGroup, LoanProductEntity productEntity) throws Exception {
         // 用户id
         String userId = user.getId();
 

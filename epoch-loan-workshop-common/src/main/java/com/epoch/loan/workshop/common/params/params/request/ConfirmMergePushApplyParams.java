@@ -20,11 +20,6 @@ import java.util.List;
 public class ConfirmMergePushApplyParams extends BaseParams {
 
     /**
-     * 用户标识
-     */
-    private String userId;
-
-    /**
      * 订单标识
      */
     private String orderNo;

@@ -156,4 +156,7 @@ public class LoanOrderEntity {
      */
     private Date createTime;
 
+    public Double get(String approvalAmount) {
+        return this.approvalAmount;
+    }
 }

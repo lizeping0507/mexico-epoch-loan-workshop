@@ -6,14 +6,13 @@ import com.epoch.loan.workshop.common.entity.mysql.*;
 import com.epoch.loan.workshop.common.mq.order.params.OrderParams;
 import com.epoch.loan.workshop.common.params.params.BaseParams;
 import com.epoch.loan.workshop.common.params.params.request.*;
-import com.epoch.loan.workshop.common.params.params.result.ConfirmMergePushApplyResult;
-import com.epoch.loan.workshop.common.params.params.result.OrderDetailResult;
-import com.epoch.loan.workshop.common.params.params.result.OrderListResult;
-import com.epoch.loan.workshop.common.params.params.result.Result;
+import com.epoch.loan.workshop.common.params.params.result.*;
 import com.epoch.loan.workshop.common.params.params.result.model.LoanRepaymentRecordResult;
+import com.epoch.loan.workshop.common.params.params.result.model.MergePushProduct;
 import com.epoch.loan.workshop.common.params.params.result.model.OrderInfoResult;
 import com.epoch.loan.workshop.common.redis.RedisClient;
 import com.epoch.loan.workshop.common.service.OrderService;
+import com.epoch.loan.workshop.common.service.ProductService;
 import com.epoch.loan.workshop.common.util.*;
 import com.epoch.loan.workshop.common.lock.UserApplyDetailLock;
 import org.apache.commons.collections.CollectionUtils;
@@ -42,6 +41,12 @@ public class OrderServiceImpl extends BaseService implements OrderService {
      */
     @Autowired
     public RedisClient redisClient;
+
+    /**
+     * 产品
+     */
+    @Autowired
+    public ProductService productService;
 
     /**
      * 订单绑定放款账户
@@ -881,22 +886,11 @@ public class OrderServiceImpl extends BaseService implements OrderService {
         }
 
         // 添加银行卡信息
-        // 查询用户是否标记放款卡
-        LoanUserBankCardEntity uc = loanUserBankCardDao.findByUserId(params.getUser().getId());
-        if (ObjectUtils.isEmpty(uc) || ObjectUtils.isEmpty(uc.getBankCard()) || ObjectUtils.isEmpty(uc.getOpenBank())) {
-            // 若用户未标记放款卡，则查询用户最近一次绑卡信息，进行赋值
-            String bankCardId = orderEntity.getBankCardId();
-            LoanRemittanceAccountEntity accountEntity = loanRemittanceAccountDao.findRemittanceAccount(bankCardId);
-            detailResult.setBankCardName(accountEntity.getBank());
-            detailResult.setBankCardNo(accountEntity.getAccountNumber());
-            detailResult.setReceiveWay(accountEntity.getType());
-        } else {
-            // 用户已标记放款卡，进行赋值
-            detailResult.setBankCardNo(uc.getBankCard());
-            detailResult.setBankCardName(uc.getOpenBank());
-            // 需确认默认值
-//            detailResult.setReceiveWay(accountEntity.getType());
-        }
+        // 查询用户标记的放款卡
+        LoanRemittanceAccountEntity accountEntity = loanRemittanceAccountDao.findLoanCard(params.getUser().getId());
+        detailResult.setBankCardName(accountEntity.getBank());
+        detailResult.setBankCardNo(accountEntity.getAccountNumber());
+        detailResult.setReceiveWay(accountEntity.getType());
 
         if (orderEntity.getStatus() <= OrderStatus.EXAMINE_FAIL) {
             // 封装结果
@@ -963,55 +957,129 @@ public class OrderServiceImpl extends BaseService implements OrderService {
         return result;
 
     }
+
     /**
-     * 多推--申请确认
+     * 多推-申请确认
      *
      * @param params 请求参数
      * @return Result
      */
     @Override
-    public Result<ConfirmMergePushApplyResult> confirmMergePushApply(ConfirmMergePushApplyParams params) throws Exception {
+    public Result<Object> confirmMergePushApply(ConfirmMergePushApplyParams params) throws Exception {
         // 结果集
-        Result<ConfirmMergePushApplyResult> result = new Result<>();
+        Result<Object> result = new Result<>();
 
-        // 拼接请求路径
-        String url = platformConfig.getPlatformDomain() + PlatformUrl.PLATFORM_CONFIRM_MERGE_PUSH_APPLY;
+        // 用户客群
+        Result<UserTypeResult> userType;
 
-        // 封装请求参数
-        JSONObject requestParam = new JSONObject();
-        requestParam.put("appFlag", params.getAppName());
-        requestParam.put("versionNumber", params.getAppVersion());
-        requestParam.put("mobileType", params.getMobileType());
+        // 推送风控
+        List<String> orderList = new ArrayList<>();
 
-        requestParam.put("userId", params.getUserId());
-        requestParam.put("orderNo", params.getOrderNo());
-        requestParam.put("productList", params.getProductList());
+        // 查询用户标记的放款卡
+        LoanRemittanceAccountEntity uc = loanRemittanceAccountDao.findLoanCard(params.getUser().getId());
 
-        // 封装请求头
-        Map<String, String> headers = new HashMap<>();
-        headers.put("token", params.getToken());
-
-        // 请求
-        String responseStr = HttpUtils.POST_WITH_HEADER(url, requestParam.toJSONString(), headers);
-
-        // 解析响应结果
-        JSONObject responseJson = JSONObject.parseObject(responseStr);
-
-        // 判断接口响应是否正常
-        if (!PlatformUtil.checkResponseCode(result, ConfirmMergePushApplyResult.class, responseJson)) {
+        if(ObjectUtils.isEmpty(uc)){
+            result.setReturnCode(ResultEnum.CLIENT_ERROR.code());
+            result.setMessage(ResultEnum.CLIENT_ERROR.message());
             return result;
         }
 
-        // 获取结果集
-        JSONObject data = responseJson.getJSONObject("data");
+        Integer nums = 0;
+        // 生成订单
+        for(MergePushProduct po : params.getProductList()) {
 
-        // 封装结果就
-        ConfirmMergePushApplyResult res = JSONObject.parseObject(data.toJSONString(), ConfirmMergePushApplyResult.class);
+            // 获取客群
+            UserTypeParams userTypeParams = new UserTypeParams();
+            userTypeParams.setUserId(params.getUser().getId());
+            userTypeParams.setProductId(po.getId().toString());
+            userType = productService.getUserType(userTypeParams);
+
+            // 查询产品详情
+            LoanProductEntity loanProductEntity = loanProductDao.findProduct(po.getId().toString());
+
+            // 初始化订单
+            LoanOrderEntity loanOrderEntity = new LoanOrderEntity();
+            // 订单审核模型
+            String orderModelGroup = loanProductEntity.getOrderModelGroup();
+
+            if (nums.equals(NumberField.NUM_ZERO)) {
+                // 第一笔订单号使用虚拟单号
+                loanOrderEntity = productService.initOrder(params.getUser(), OrderType.LOAN, params.getAppVersion(), params.getAppName(), orderModelGroup, loanProductEntity);
+                loanOrderEntity.setId(params.getOrderNo());
+                // 删除缓存
+                redisClient.del("ydplatform:app-api:mergePush:shopTemplateOrder:" + params.getUser().getId());
+            } else {
+                // 其他关联单号正常生成
+                loanOrderEntity = productService.initOrder(params.getUser(), OrderType.LOAN, params.getAppVersion(), params.getAppName(), orderModelGroup, loanProductEntity);
+            }
+            nums++;
+
+
+            // 进行绑定放款账户
+             loanOrderDao.updateBankCardId(loanOrderEntity.getId(),uc.getId(),new Date());
+
+             // 申请借款
+            try {
+                // 用户id
+                String userId = params.getUser().getId();
+
+                // 订单id
+                String orderId = loanOrderEntity.getId();
+
+                // 查询订单
+                LoanOrderEntity orderEntity = loanOrderDao.findOrder(orderId);
+                LogUtil.sysInfo("loanOrderEntity: {}", orderEntity);
+
+                // 订单审核队列
+                orderModelGroup = orderEntity.getOrderModelGroup();
+
+                // 获取支付账户id
+                String bankCardId = orderEntity.getBankCardId();
+                LogUtil.sysInfo("loanOrderEntity: {}", orderEntity);
+
+                // 修改订单状态
+                int updateOrderStatus = loanOrderDao.updateOrderStatus(orderId, OrderStatus.EXAMINE_WAIT, new Date());
+                LogUtil.sysInfo("updateOrderStatus: {}", updateOrderStatus);
+
+                if (updateOrderStatus != 0) {
+                    // 更新申请时间
+                    loanOrderDao.updateOrderApplyTime(orderId, new Date(), new Date());
+
+                    // 查询审核模型列表
+                    List<String> orderModelList = orderModelDao.findNamesByGroup(orderModelGroup);
+                    LogUtil.sysInfo("orderModelList: {}", updateOrderStatus);
+
+                    // 发送订单审核队列
+                    OrderParams orderParams = new OrderParams();
+                    orderParams.setOrderId(orderId);
+                    orderMQManager.sendMessage(orderParams, orderModelList.get(0));
+                    LogUtil.sysInfo("SUCCESS: {}", "SUCCESS");
+
+                }
+            }catch (Exception e){
+                LogUtil.sysError("[OrderServiceImpl confirmMergePushApply]",e);
+            }
+
+            // 添加订单号
+            orderList.add(loanOrderEntity.getId());
+
+        }
+
+
+        // 多推单推送风控
+        JSONObject sendRiskMergePushResult = sendRiskMergePushBorrowIds(params.getUser().getId(),params.getAppName(),params.getOrderNo(),orderList);
+
+        // 验证状态
+        String status = sendRiskMergePushResult.getString("status");
+        if (!status.equals("VERIFIED")) {
+            result.setReturnCode(ResultEnum.REMITTANCE_ACCOUNT_ERROR.code());
+            result.setMessage(ResultEnum.REMITTANCE_ACCOUNT_ERROR.message());
+            return result;
+        }
 
         // 封装结果
         result.setReturnCode(ResultEnum.SUCCESS.code());
         result.setMessage(ResultEnum.SUCCESS.message());
-        result.setData(res);
         return result;
     }
 
@@ -1130,4 +1198,49 @@ public class OrderServiceImpl extends BaseService implements OrderService {
         JSONObject jsonObject = JSONObject.parseObject(jsonRange, JSONObject.class);
         return jsonObject.getString(key);
     }
+
+    /**
+     * 验证银行卡号
+     *
+     * @param userId
+     * @param
+     * @param
+     * @return
+     */
+    public JSONObject sendRiskMergePushBorrowIds(String userId,String appName,String orderNo,List<String> orderList) throws Exception {
+        // 封装请求参数
+        Map<String, String> params = new HashMap<>();
+        params.put(Field.METHOD, "riskmanagement.dc.multipush");
+        params.put(Field.APP_ID, riskConfig.getAppId());
+        params.put(Field.VERSION, "1.0");
+        params.put(Field.SIGN_TYPE, "RSA");
+        params.put(Field.FORMAT, "json");
+        params.put(Field.TIMESTAMP, String.valueOf(System.currentTimeMillis() / 1000));
+
+        JSONObject bizData = new JSONObject();
+        bizData.put("transactionId", userId);
+        bizData.put("borrowId", orderNo);
+        bizData.put("borrowIdList", orderList);
+        bizData.put("appName", appName);
+
+        params.put(Field.BIZ_DATA, bizData.toJSONString());
+
+        // 生成签名
+        String paramsStr = RSAUtils.getSortParams(params);
+        String sign = RSAUtils.addSign(riskConfig.getPrivateKey(), paramsStr);
+        params.put(Field.SIGN, sign);
+
+        // 请求参数
+        String requestParams = JSONObject.toJSONString(params);
+
+        // 发送请求
+        String result = HttpUtils.POST_FORM(riskConfig.getRiskUrl(), requestParams);
+        LogUtil.sysInfo("风控验卡 请求参数：{}， 响应参数：{}", requestParams, result);
+        if (StringUtils.isEmpty(result)) {
+            return null;
+        }
+
+        return JSONObject.parseObject(result).getJSONObject("data");
+    }
+
 }

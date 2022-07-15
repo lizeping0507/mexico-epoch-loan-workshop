@@ -1,6 +1,7 @@
 package com.epoch.loan.workshop.order.service;
 
 import com.epoch.loan.workshop.common.config.PlatformConfig;
+import com.epoch.loan.workshop.common.config.RiskConfig;
 import com.epoch.loan.workshop.common.dao.mysql.*;
 import com.epoch.loan.workshop.common.mq.order.OrderMQManager;
 import com.epoch.loan.workshop.common.zookeeper.ZookeeperClient;
@@ -70,9 +71,9 @@ public class BaseService {
     public LoanRepaymentPaymentRecordDao loanRepaymentPaymentRecordDao;
 
     /**
-     * 用户放款卡
+     * 风控配置
      */
     @Autowired
-    public LoanUserBankCardDao loanUserBankCardDao;
+    public RiskConfig riskConfig;
 
 }

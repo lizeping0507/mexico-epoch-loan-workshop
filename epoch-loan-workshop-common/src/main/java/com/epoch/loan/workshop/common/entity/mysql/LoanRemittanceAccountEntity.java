@@ -45,6 +45,11 @@ public class LoanRemittanceAccountEntity {
     private Integer type;
 
     /**
+     * 标记放款卡
+     */
+    private Integer markLoanCard;
+
+    /**
      * 创建时间
      */
     private Date createTime;

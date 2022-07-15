@@ -1,5 +1,8 @@
 package com.epoch.loan.workshop.common.service;
 
+import com.epoch.loan.workshop.common.entity.mysql.LoanOrderEntity;
+import com.epoch.loan.workshop.common.entity.mysql.LoanProductEntity;
+import com.epoch.loan.workshop.common.params.User;
 import com.epoch.loan.workshop.common.params.params.BaseParams;
 import com.epoch.loan.workshop.common.params.params.request.*;
 import com.epoch.loan.workshop.common.params.params.result.*;
@@ -48,6 +51,19 @@ public interface ProductService {
      */
     Result<ProductRecommendResult> recommendList(ProductRecommendListParams params) throws Exception;
 
+    /**
+     * 初始化订单
+     *
+     * @param user
+     * @param type
+     * @param appVersion
+     * @param appName
+     * @param orderModelGroup
+     * @param productEntity
+     * @return
+     * @throws Exception
+     */
+    public LoanOrderEntity initOrder(User user, Integer type, String appVersion, String appName, String orderModelGroup, LoanProductEntity productEntity) throws Exception;
 
     /**
      * 变身贷超
@@ -64,4 +80,12 @@ public interface ProductService {
      * @return
      */
     Result<UserTypeResult> getUserType(UserTypeParams params);
+
+    /**
+     * 贷超多推
+     * @param params 入参
+     * @return Result<MergePushLoanResult>
+     * @throws Exception 请求异常
+     */
+    Result<MergePushLoanResult> mergePushLoan(BaseParams params) throws Exception;
 }

@@ -2,6 +2,7 @@ package com.epoch.loan.workshop.control.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.constant.Field;
+import com.epoch.loan.workshop.common.constant.NumberField;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
 import com.epoch.loan.workshop.common.entity.mysql.LoanOrderEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanRemittanceAccountEntity;
@@ -138,6 +139,9 @@ public class RemittanceServiceImpl extends BaseService implements RemittanceServ
             return result;
         }
 
+        // 更新放款卡标识，仅最新增加的银行卡为放款卡
+        loanRemittanceAccountDao.updateMarkLoanCardStatus(userId,new Date());
+
         // 新增银行卡
         String id = ObjectIdUtil.getObjectId();
         LoanRemittanceAccountEntity loanRemittanceAccountEntity = new LoanRemittanceAccountEntity();
@@ -147,6 +151,7 @@ public class RemittanceServiceImpl extends BaseService implements RemittanceServ
         loanRemittanceAccountEntity.setUserId(userId);
         loanRemittanceAccountEntity.setName(name);
         loanRemittanceAccountEntity.setType(type);
+        loanRemittanceAccountEntity.setMarkLoanCard(NumberField.NUM_ONE);
         loanRemittanceAccountEntity.setUpdateTime(new Date());
         loanRemittanceAccountEntity.setCreateTime(new Date());
         loanRemittanceAccountDao.addRemittanceAccount(loanRemittanceAccountEntity);

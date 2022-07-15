@@ -209,6 +209,11 @@ public class URL {
     public static final String TURN_INTO_LOAN = "/turnIntoLoan";
 
     /**
+     * 贷超多推
+     */
+    public static final String MERGE_PUSH_LOAN = "/mergePushLoan";
+
+    /**
      * 订单 - 全部订单列表
      */
     public static final String ORDER_LIST_ALL = "/listAll";

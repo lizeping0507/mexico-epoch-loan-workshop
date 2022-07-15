@@ -69,12 +69,12 @@ public interface OrderService {
    Result<OrderDetailResult> applyConfirmation(OrderDetailParams params);
 
     /**
-     * 多推--申请确认
+     * 多推-申请确认
      *
      * @param params 请求参数
      * @return Result
      */
-    Result<ConfirmMergePushApplyResult> confirmMergePushApply(ConfirmMergePushApplyParams params) throws Exception;
+    Result<Object> confirmMergePushApply(ConfirmMergePushApplyParams params) throws Exception;
 
     /**
      * 催收减免

@@ -39,4 +39,10 @@
             resultType="com.epoch.loan.workshop.common.entity.mysql.LoanRemittanceAccountEntity">
         SELECT * FROM loan_remittance_account WHERE account_number=#{accountNumber} limit 1
     </select>
+    <update id="updateMarkLoanCardStatus">
+        UPDATE loan_remittance_account SET mark_loan_card = 0,update_time = #{updateTime} WHERE user_id = #{userId} AND mark_loan_card != 0
+    </update>
+    <select id="findLoanCard" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanRemittanceAccountEntity">
+        SELECT id,user_id,account_number,bank,name,type,mark_loan_card FROM loan_remittance_account WHERE user_id=#{userId} and mark_loan_card = 1
+    </select>
 </mapper>

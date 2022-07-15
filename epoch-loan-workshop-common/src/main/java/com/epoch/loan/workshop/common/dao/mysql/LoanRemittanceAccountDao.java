@@ -4,6 +4,7 @@ import com.epoch.loan.workshop.common.entity.mysql.LoanRemittanceAccountEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -40,6 +41,13 @@ public interface LoanRemittanceAccountDao {
     LoanRemittanceAccountEntity findRemittanceAccount(String id);
 
     /**
+     * 查询指定放款卡账户
+     * @param userId
+     * @return
+     */
+    LoanRemittanceAccountEntity findLoanCard(String userId);
+
+    /**
      * 新增放款账户
      *
      * @param loanRemittanceAccountEntity
@@ -53,4 +61,11 @@ public interface LoanRemittanceAccountDao {
      * @return
      */
     LoanRemittanceAccountEntity findByAccountNumber(String accountNumber);
+
+    /**
+     * 更新放款卡标识，仅最新增加的银行卡为放款卡
+     * @param userId 入参
+     * @return int
+     */
+    int updateMarkLoanCardStatus(String userId, Date updateTime);
 }

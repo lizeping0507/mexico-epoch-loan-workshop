@@ -1,25 +1,28 @@
 package com.epoch.loan.workshop.common.params.params.result;
 
-import com.epoch.loan.workshop.common.params.params.result.model.MergePushProductInfo;
 import lombok.Data;
 
-import java.io.Serializable;
 import java.util.List;
 
 /**
- * @author : Shangkunfeng
+ * @author : ljy
  * @packageName : com.epoch.loan.workshop.common.params.result;
- * @className : MergePushHomeResult
- * @createTime : 2022/3/24 18:23
- * @description : 多推首页接口返回封装
+ * @className : OrderDetailResult
+ * @createTime : 2022/3/25 12:16
+ * @description : 贷超多推接口结果封装
  */
 @Data
-public class MergePushHomeResult implements Serializable {
+public class MergePushLoanResult {
 
     /**
      * 用户标识
      */
     private Long userId;
+
+    /**
+     * 订单标识
+     */
+    private String orderNo;
 
     /**
      * 可申请额度
@@ -47,11 +50,6 @@ public class MergePushHomeResult implements Serializable {
     private Integer locked;
 
     /**
-     * 订单标识
-     */
-    private String orderNo;
-
-    /**
      * 可申请产品数
      */
     private String canLoanNum;
@@ -64,5 +62,10 @@ public class MergePushHomeResult implements Serializable {
     /**
      * 产品列表
      */
-    private List<MergePushProductInfo> productList;
+    private List<MergePushProductListResult> productList;
+
+    /**
+     * 按钮状态标识
+     */
+    private Integer buttonStatusIndentify;
 }

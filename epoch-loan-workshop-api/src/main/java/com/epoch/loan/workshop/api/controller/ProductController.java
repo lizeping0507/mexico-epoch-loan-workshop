@@ -145,7 +145,6 @@ public class ProductController extends BaseController {
         Result<Object> result = new Result<>();
 
         try {
-            // 获取产品推荐列表
             return productService.turnIntoLoan(params);
         } catch (Exception e) {
             LogUtil.sysError("[ProductController turnIntoLoan]", e);
@@ -158,6 +157,30 @@ public class ProductController extends BaseController {
         }
     }
 
+    /**
+     * 贷超多推
+     *
+     * @param params 基础参数
+     * @return 推荐列表
+     */
+    @Authentication
+    @PostMapping(URL.MERGE_PUSH_LOAN)
+    public Result<MergePushLoanResult> mergePushLoan(BaseParams params) {
+        // 结果集
+        Result<MergePushLoanResult> result = new Result<MergePushLoanResult>();
+
+        try {
+            return productService.mergePushLoan(params);
+        } catch (Exception e) {
+            LogUtil.sysError("[ProductController mergePushLoan]", e);
+
+            // 异常返回结果
+            result.setEx(ThrowableUtils.throwableToString(e));
+            result.setReturnCode(ResultEnum.SYSTEM_ERROR.code());
+            result.setMessage(ResultEnum.SYSTEM_ERROR.message());
+            return result;
+        }
+    }
 
 
 

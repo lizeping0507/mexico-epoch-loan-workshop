@@ -250,18 +250,17 @@ public class OrderController extends BaseController {
     }
 
     /**
-     * 多推--申请确认
+     * 多推-申请确认
      *
      * @param params 请求参数
      * @return Result
      */
     @PostMapping(URL.CONFIRM_MERGE_PUSH_APPLY)
-    public Result<ConfirmMergePushApplyResult> confirmMergePushApply(ConfirmMergePushApplyParams params) {
+    public Result<Object> confirmMergePushApply(ConfirmMergePushApplyParams params) {
         // 结果集
-        Result<ConfirmMergePushApplyResult> result = new Result<>();
+        Result<Object> result = new Result<>();
 
         try {
-            // 订单详情
             return orderService.confirmMergePushApply(params);
         } catch (Exception e) {
             LogUtil.sysError("[OrderController confirmMergePushApply]", e);
