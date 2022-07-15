@@ -1,5 +1,6 @@
 package com.epoch.loan.workshop.api.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.api.annotated.Authentication;
 import com.epoch.loan.workshop.common.config.URL;
 import com.epoch.loan.workshop.common.constant.ResultEnum;
@@ -282,6 +283,8 @@ public class OcrController extends BaseController {
     @Authentication
     @PostMapping(URL.USER_OCR_INFO)
     public Result<UserOcrResult> userOcrInfo(UserOcrFullInfoParams params, HttpServletRequest request) {
+        LogUtil.sysInfo("advance获取证件信息 : {}", JSONObject.toJSONString(params));
+
         // 结果集
         Result<UserOcrResult> result = new Result<>();
 
