@@ -1,5 +1,6 @@
 package com.epoch.loan.workshop.common.params.params.result;
 
+import com.epoch.loan.workshop.common.params.params.result.model.ProductList;
 import lombok.Data;
 
 import java.util.List;
@@ -17,7 +18,7 @@ public class MergePushLoanResult {
     /**
      * 用户标识
      */
-    private Long userId;
+    private String userId;
 
     /**
      * 订单标识
@@ -62,7 +63,7 @@ public class MergePushLoanResult {
     /**
      * 产品列表
      */
-    private List<MergePushProductListResult> productList;
+    private List<ProductList> productList;
 
     /**
      * 按钮状态标识

@@ -39,4 +39,9 @@ public class MineResult implements Serializable {
      * 帮助中心地址
      */
     private String helpUrl;
+
+    /**
+     * 多推模式下的银行卡接口 0-无单不显示 1-有单正常展示
+     */
+    private Integer cardListShowType;
 }

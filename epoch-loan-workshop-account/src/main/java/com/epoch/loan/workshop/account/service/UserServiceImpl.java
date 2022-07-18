@@ -6,6 +6,7 @@ import com.alibaba.fastjson.TypeReference;
 import com.epoch.loan.workshop.common.constant.*;
 import com.epoch.loan.workshop.common.entity.elastic.OcrAdvanceLogElasticEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanAppControlEntity;
+import com.epoch.loan.workshop.common.entity.mysql.LoanOrderEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanUserEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanUserInfoEntity;
 import com.epoch.loan.workshop.common.params.User;
@@ -31,6 +32,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -367,6 +369,21 @@ public class UserServiceImpl extends BaseService implements UserService {
         data.setAllRepaymentOrder(allOrderNum);
 
         // 帮助中心地址 TODO 待确认
+
+
+        // 查询用户总订单数量
+        int[] status = new int[]{OrderStatus.CREATE, OrderStatus.EXAMINE_WAIT, OrderStatus.EXAMINE_PASS, OrderStatus.EXAMINE_FAIL, OrderStatus.WAIT_PAY, OrderStatus.WAY, OrderStatus.DUE, OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE};
+        Integer orderNums = loanOrderDao.countUserOrderByStatusIn(params.getUser().getId(),status);
+
+        // 查询用户审批前订单
+        Integer[] waitAndloanStatus = new Integer[]{OrderStatus.CREATE, OrderStatus.EXAMINE_WAIT};
+        List<LoanOrderEntity> orderList = loanOrderDao.findOrderByUserIdAndStatus(params.getUser().getId(),waitAndloanStatus);
+
+        if(ObjectUtils.isEmpty(orderNums) || orderNums.equals(NumberField.NUM_ZERO) || (orderNums.equals(NumberField.NUM_ONE) && NumberField.NUM_ONE.equals(orderList.size()))){
+            data.setCardListShowType(0);
+        }else {
+            data.setCardListShowType(1);
+        }
 
         // 封装结果
         result.setReturnCode(ResultEnum.SUCCESS.code());

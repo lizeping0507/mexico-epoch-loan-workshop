@@ -353,4 +353,9 @@ public class Field {
      * 联系⼈原始数据
      */
     public final static String ORIGINALCONTACT = "originalContact";
+
+    /**
+     * 可借贷额度
+     */
+    public static final String CAN_BORROW_NUMS = "canBorrowNum";
 }
