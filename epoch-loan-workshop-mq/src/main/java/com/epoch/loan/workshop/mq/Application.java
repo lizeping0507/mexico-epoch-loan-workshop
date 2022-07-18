@@ -5,7 +5,7 @@ import com.epoch.loan.workshop.common.mq.collection.CollectionMQManager;
 import com.epoch.loan.workshop.common.mq.order.OrderMQManager;
 import com.epoch.loan.workshop.common.mq.remittance.RemittanceMQManager;
 import com.epoch.loan.workshop.common.mq.repayment.RepaymentMQManager;
-import com.epoch.loan.workshop.mq.collection.Collection;
+import com.epoch.loan.workshop.mq.collection.CollectionConsumerRegister;
 import com.epoch.loan.workshop.mq.log.AccessLogStorage;
 import com.epoch.loan.workshop.mq.order.*;
 import com.epoch.loan.workshop.mq.order.screen.RiskModelMask;
@@ -23,6 +23,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 
 import javax.annotation.PostConstruct;
+import java.util.Collection;
 
 /**
  * @author : Duke
@@ -131,10 +132,10 @@ public class Application {
     public Collection collection;
 
     /**
-     * 催收、提还队列管理
+     * 订单队列注册器
      */
     @Autowired
-    private CollectionMQManager collectionMQManager;
+    private CollectionConsumerRegister collectionConsumerRegister;
 
     /**
      * 放款补偿
@@ -171,7 +172,7 @@ public class Application {
         repaymentMQManager.init();
         orderMQManager.init();
         remittanceMQManagerProduct.init();
-        collectionMQManager.init();
+        collectionConsumerRegister.init();
         retryOrder.retry();
         retryRemittance.retry();
         riskModelMask.start();
@@ -186,6 +187,6 @@ public class Application {
         distributionRepayment.start();
         pandaPayRePayment.start();
         pandaPayPayment.start();
-        collection.start();
+        collectionConsumerRegister.start();
     }
 }

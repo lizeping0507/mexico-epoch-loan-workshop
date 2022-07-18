@@ -16,14 +16,4 @@ public class CollectionParams {
      * 订单id
      */
     private String orderId;
-
-    /**
-     * 订单账单ID
-     */
-    private String orderBillId;
-
-    /**
-     * 催收事件
-     */
-    private int collectionEvent;
 }
