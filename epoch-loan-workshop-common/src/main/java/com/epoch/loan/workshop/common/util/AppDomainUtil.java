@@ -37,7 +37,7 @@ public class AppDomainUtil {
             case "CreditPeso":
                 return "creditopesos.com";
             case "PesoAhora":
-                return "pesoahora.com";
+                return "peso-ahora.com";
             case "PesoMax":
                 return "peso-max.com";
             case "CreditoHucha":
