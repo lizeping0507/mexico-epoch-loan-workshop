@@ -2,6 +2,7 @@ package com.epoch.loan.workshop.control.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.authentication.TokenManager;
+import com.epoch.loan.workshop.common.config.AfConfig;
 import com.epoch.loan.workshop.common.config.PlatformConfig;
 import com.epoch.loan.workshop.common.config.RiskConfig;
 import com.epoch.loan.workshop.common.dao.elastic.OcrAdvanceLogElasticDao;
@@ -129,6 +130,16 @@ public class BaseService {
     @Autowired
     public LoanChannelDao platformChannelDao;
 
+    /**
+     * af相关配置
+     */
+    @Autowired
+    AfConfig afConfig;
+    /**
+     * app相关配置
+     */
+    @Autowired
+    LoanAppConfigDao loanAppConfigDao;
     /**
      * 变身包承接盘配置
      */

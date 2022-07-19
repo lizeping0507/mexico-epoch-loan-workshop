@@ -404,7 +404,7 @@ public class DateUtil {
     }
 
     /**
-     * 返回当前的 yyyy-MM-dd HH:mm:ss
+     * 返回当前的 yyyy-MM-dd HH:mm:ss.SSS
      *
      * @return
      */
