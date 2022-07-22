@@ -3,8 +3,10 @@ package com.epoch.loan.workshop.common.af;
 import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.constant.AppConfigField;
 import com.epoch.loan.workshop.common.constant.Field;
+import com.epoch.loan.workshop.common.util.DateUtil;
 import com.epoch.loan.workshop.common.util.HttpUtils;
 import com.epoch.loan.workshop.common.util.LogUtil;
+import com.google.common.collect.Maps;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,11 +58,24 @@ public class LoanAfClient {
             }
 
             // 封装 af打点请求参数
-            AfRequestParam afRequestParam = new AfRequestParam();
-            afRequestParam.setAdvertising_id(gaId);
-            afRequestParam.setAppsflyer_id(afId);
-            afRequestParam.setEventName(eventName);
-            afRequestParam.setEventTime(Calendar.getInstance());
+            Map<String,Object> afRequestParam = Maps.newHashMap();
+            afRequestParam.put("advertising_id",gaId);
+            afRequestParam.put("advertising_id",afId);
+            afRequestParam.put("eventName",eventName);
+
+            Calendar calendar = Calendar.getInstance();
+
+            // 时间偏移量
+            int zoneOffset = calendar.get(Calendar.ZONE_OFFSET);
+
+            // 夏令时差
+            int dstOffset = calendar.get(Calendar.DST_OFFSET);
+
+            // UTC时间
+            calendar.add(Calendar.MILLISECOND,-(zoneOffset + dstOffset));
+
+            // 即事件发生的时间，af是以UTC时间显示的
+            afRequestParam.put("eventTime", DateUtil.DateToString(calendar.getTime(),"yyyy-MM-dd HH:mm:ss.SSS"));
             String url = afConfig.getAfRequesterUrl() + afAppId;
 
             // 封装请求头

@@ -88,6 +88,11 @@ public class URL {
      */
     public static final String COLLECTION = API + "/collection";
 
+    /**
+     * 催收还提
+     */
+    public static final String AF = API + "/af";
+
     /*二级*/
     /**
      * 隐私协议
