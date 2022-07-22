@@ -60,7 +60,7 @@ public class LoanAfClient {
             // 封装 af打点请求参数
             Map<String,Object> afRequestParam = Maps.newHashMap();
             afRequestParam.put("advertising_id",gaId);
-            afRequestParam.put("advertising_id",afId);
+            afRequestParam.put("appsflyer_id",afId);
             afRequestParam.put("eventName",eventName);
 
             Calendar calendar = Calendar.getInstance();
@@ -96,4 +96,7 @@ public class LoanAfClient {
             return false;
         }
     }
+
+
+
 }
