@@ -1,5 +1,6 @@
 package com.epoch.loan.workshop.order.service;
 
+import com.epoch.loan.workshop.common.config.AfConfig;
 import com.epoch.loan.workshop.common.config.PlatformConfig;
 import com.epoch.loan.workshop.common.dao.mysql.*;
 import com.epoch.loan.workshop.common.mq.order.OrderMQManager;
@@ -68,4 +69,16 @@ public class BaseService {
      */
     @Autowired
     public LoanRepaymentPaymentRecordDao loanRepaymentPaymentRecordDao;
+
+    /**
+     * af相关配置
+     */
+    @Autowired
+    AfConfig afConfig;
+
+    /**
+     * app相关配置
+     */
+    @Autowired
+    LoanAppConfigDao loanAppConfigDao;
 }

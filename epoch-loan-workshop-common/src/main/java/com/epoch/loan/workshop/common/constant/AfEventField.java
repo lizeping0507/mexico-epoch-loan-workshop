@@ -50,7 +50,7 @@ public class AfEventField {
     public static String AF_SECOND_ORDER = "secondorder";
 
     /**
-     * 用户完成首次进件（
+     * 用户完成首次进件
      */
     public static String AF_SECOND_PERSON = "secondperson";
 

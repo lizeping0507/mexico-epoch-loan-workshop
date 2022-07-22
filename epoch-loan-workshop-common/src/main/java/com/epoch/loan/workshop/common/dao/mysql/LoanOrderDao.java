@@ -237,6 +237,8 @@ public interface LoanOrderDao {
     List<LoanOrderEntity> findOrderByUserAndProductIdAndStatus(String userId, String productId, @Param("array") Integer[] status);
 
     /**
+     * 根据用户id查询指定状态的订单数量
+     *
      * @param userId
      * @param status
      * @return
