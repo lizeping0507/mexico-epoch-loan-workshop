@@ -164,7 +164,7 @@ public class UserServiceImpl extends BaseService implements UserService {
 
         // 保存并发送af注册打点事件
         if (StringUtils.isNotBlank(params.getAfId()) && ObjectUtils.isEmpty(loanAppConfig)) {
-            SendAfInfoUtils.sendAfEvent(afConfig.getAfRequesterUrl(),AfEventField.AF_REGISTER_CODE,params.getGaId(),params.getAfId(),loanAppConfig.getConfig());
+            loanAfClient.sendAfEvent(AfEventField.AF_REGISTER_CODE, params.getGaId(), params.getAfId(), loanAppConfig.getConfig());
         }
 
         // 封装结果
@@ -461,7 +461,7 @@ public class UserServiceImpl extends BaseService implements UserService {
 
         // 保存并发送af注册打点事件
         if (StringUtils.isNotBlank(user.getAfId()) && ObjectUtils.isEmpty(loanAppConfig)) {
-            SendAfInfoUtils.sendAfEvent(afConfig.getAfRequesterUrl(),AfEventField.AF_BASE_INFO,user.getGaId(),user.getAfId(),loanAppConfig.getConfig());
+            loanAfClient.sendAfEvent(AfEventField.AF_BASE_INFO, user.getGaId(), user.getAfId(), loanAppConfig.getConfig());
         }
 
         result.setReturnCode(ResultEnum.SUCCESS.code());
@@ -720,7 +720,7 @@ public class UserServiceImpl extends BaseService implements UserService {
 
         // 保存并发送af注册打点事件
         if (StringUtils.isNotBlank(user.getAfId()) && ObjectUtils.isEmpty(loanAppConfig)) {
-            SendAfInfoUtils.sendAfEvent(afConfig.getAfRequesterUrl(),AfEventField.AF_NAME_INFO,user.getGaId(),user.getAfId(),loanAppConfig.getConfig());
+            loanAfClient.sendAfEvent(AfEventField.AF_NAME_INFO, user.getGaId(), user.getAfId(), loanAppConfig.getConfig());
         }
 
 
@@ -755,8 +755,8 @@ public class UserServiceImpl extends BaseService implements UserService {
 
         // 文件列表
         HashMap<String, File> fileMap = Maps.newHashMap();
-        fileMap.put("firstImage", convertToFile(params.getIdImageData(),params.getIdImgType()));
-        fileMap.put("secondImage", convertToFile(params.getFaceImageData() , params.getFaceImgType()));
+        fileMap.put("firstImage", convertToFile(params.getIdImageData(), params.getIdImgType()));
+        fileMap.put("secondImage", convertToFile(params.getFaceImageData(), params.getFaceImgType()));
 
         // 发送请求
         String resultStr = HttpUtils.POST_WITH_HEADER_FORM_FILE(faceComparisonUrl, null, heardMap, fileMap);
@@ -867,7 +867,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         livingDetectionLog.setResponse(ocrInfoResult);
         livingDetectionLog.setUserId(userId);
         livingDetectionLog.setCreateTime(new Date());
-        LogUtil.sysInfo("advance获取证件信息日志: {}",livingDetectionLog.toString());
+        LogUtil.sysInfo("advance获取证件信息日志: {}", livingDetectionLog.toString());
         ocrAdvanceLogElasticDao.save(livingDetectionLog);
 
         // 根据code值进行判定
@@ -942,11 +942,12 @@ public class UserServiceImpl extends BaseService implements UserService {
 
     /**
      * 文件转换
-     * @param byteFile 图片二进制数据
+     *
+     * @param byteFile  图片二进制数据
      * @param imageType 图片类型
      * @return
      */
-    private File convertToFile(byte[] byteFile,String imageType) {
+    private File convertToFile(byte[] byteFile, String imageType) {
         String objectId = ObjectIdUtil.getObjectId();
         String newFilePath = "/tmp/" + objectId;
 
@@ -956,7 +957,7 @@ public class UserServiceImpl extends BaseService implements UserService {
             if (!newFile) {
                 return null;
             }
-            ImageUtil.compressUnderSize(byteFile,2*1024*1024,file,imageType);
+            ImageUtil.compressUnderSize(byteFile, 2 * 1024 * 1024, file, imageType);
             return file;
         } catch (IOException e) {
             e.printStackTrace();

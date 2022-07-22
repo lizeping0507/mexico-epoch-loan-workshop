@@ -1,4 +1,4 @@
-package com.epoch.loan.workshop.common.config;
+package com.epoch.loan.workshop.common.af;
 
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;

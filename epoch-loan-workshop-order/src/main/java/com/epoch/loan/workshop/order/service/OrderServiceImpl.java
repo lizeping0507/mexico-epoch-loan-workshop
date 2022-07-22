@@ -84,9 +84,9 @@ public class OrderServiceImpl extends BaseService implements OrderService {
             int[] status = new int[]{OrderStatus.CREATE, OrderStatus.EXAMINE_WAIT, OrderStatus.EXAMINE_PASS, OrderStatus.EXAMINE_FAIL, OrderStatus.WAIT_PAY, OrderStatus.WAY, OrderStatus.DUE, OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE, OrderStatus.ABANDONED};
             Integer statusIn = loanOrderDao.countUserOrderByStatusIn(user.getId(), status);
             if (StringUtils.isBlank(loanOrderEntity.getBankCardId()) && 1 == statusIn) {
-                SendAfInfoUtils.sendAfEvent(afConfig.getAfRequesterUrl(), AfEventField.AF_BANK_PERSON, user.getGaId(), user.getAfId(), loanAppConfig.getConfig());
+                loanAfClient.sendAfEvent(AfEventField.AF_BANK_PERSON, user.getGaId(), user.getAfId(), loanAppConfig.getConfig());
             } else {
-                SendAfInfoUtils.sendAfEvent(afConfig.getAfRequesterUrl(), AfEventField.AF_BANK_ORDER, user.getGaId(), user.getAfId(), loanAppConfig.getConfig());
+                loanAfClient.sendAfEvent(AfEventField.AF_BANK_ORDER, user.getGaId(), user.getAfId(), loanAppConfig.getConfig());
             }
         }
 
@@ -193,9 +193,9 @@ public class OrderServiceImpl extends BaseService implements OrderService {
             int[] statuArray = new int[]{OrderStatus.CREATE, OrderStatus.EXAMINE_WAIT, OrderStatus.EXAMINE_PASS, OrderStatus.EXAMINE_FAIL, OrderStatus.WAIT_PAY, OrderStatus.WAY, OrderStatus.DUE, OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE, OrderStatus.ABANDONED};
             Integer statusIn = loanOrderDao.countUserOrderByStatusIn(userId, statuArray);
             if (1 == statusIn) {
-                SendAfInfoUtils.sendAfEvent(afConfig.getAfRequesterUrl(), AfEventField.AF_SECOND_PERSON, user.getGaId(), user.getAfId(), loanAppConfig.getConfig());
+                loanAfClient.sendAfEvent(AfEventField.AF_SECOND_PERSON, user.getGaId(), user.getAfId(), loanAppConfig.getConfig());
             } else {
-                SendAfInfoUtils.sendAfEvent(afConfig.getAfRequesterUrl(), AfEventField.AF_SECOND_ORDER, user.getGaId(), user.getAfId(), loanAppConfig.getConfig());
+                loanAfClient.sendAfEvent(AfEventField.AF_SECOND_ORDER, user.getGaId(), user.getAfId(), loanAppConfig.getConfig());
             }
         }
 
@@ -820,7 +820,8 @@ public class OrderServiceImpl extends BaseService implements OrderService {
         Result<ConfirmMergePushApplyResult> result = new Result<>();
 
         // 拼接请求路径
-        String url = platformConfig.getPlatformDomain() + PlatformUrl.PLATFORM_CONFIRM_MERGE_PUSH_APPLY;
+        //String url = platformConfig.getPlatformDomain() + PlatformUrl.PLATFORM_CONFIRM_MERGE_PUSH_APPLY;
+        String url = "";
 
         // 封装请求参数
         JSONObject requestParam = new JSONObject();

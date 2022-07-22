@@ -1,10 +1,15 @@
-package com.epoch.loan.workshop.common.util;
+package com.epoch.loan.workshop.common.af;
 
 import com.alibaba.fastjson.JSONObject;
-import com.epoch.loan.workshop.common.af.AfRequestParam;
 import com.epoch.loan.workshop.common.constant.AppConfigField;
 import com.epoch.loan.workshop.common.constant.Field;
+import com.epoch.loan.workshop.common.util.HttpUtils;
+import com.epoch.loan.workshop.common.util.LogUtil;
+import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.stereotype.Component;
 
 import java.util.Calendar;
 import java.util.HashMap;
@@ -13,23 +18,31 @@ import java.util.Map;
 /**
  * @author 魏玉强
  * @packagename : com.epoch.loan.workshop.common.af
- * @className : SendAfInfo
- * @createTime : 2022/07/18 14:11
- * @Description: 发送AF打点事件工具类
+ * @className : LoanAfClient
+ * @createTime : 2022/07/22 17:25
+ * @Description:
  */
-public class SendAfInfoUtils {
+@RefreshScope
+@Component
+@Data
+public class LoanAfClient {
+
+    /**
+     * af相关配置
+     */
+    @Autowired
+    AfConfig afConfig;
 
     /**
      * 发送AF打点事件
      *
-     * @param url       af请求地址
      * @param eventName 事件名称
      * @param gaId      谷歌推广id
      * @param afId      AF id
      * @param config    包的相关配置
      * @return
      */
-    public static Boolean sendAfEvent(String url, String eventName, String gaId, String afId, String config) {
+    public Boolean sendAfEvent(String eventName, String gaId, String afId, String config) {
         try {
             // 校验包的相关配置
             if (StringUtils.isBlank(config)) {
@@ -48,7 +61,7 @@ public class SendAfInfoUtils {
             afRequestParam.setAppsflyer_id(afId);
             afRequestParam.setEventName(eventName);
             afRequestParam.setEventTime(Calendar.getInstance());
-            url = url + afAppId;
+            String url = afConfig.getAfRequesterUrl() + afAppId;
 
             // 封装请求头
             Map<String, String> headers = new HashMap<>(2);
@@ -68,5 +81,4 @@ public class SendAfInfoUtils {
             return false;
         }
     }
-
 }

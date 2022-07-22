@@ -1,7 +1,6 @@
 package com.epoch.loan.workshop.order.service;
 
-import com.epoch.loan.workshop.common.config.AfConfig;
-import com.epoch.loan.workshop.common.config.PlatformConfig;
+import com.epoch.loan.workshop.common.af.LoanAfClient;
 import com.epoch.loan.workshop.common.dao.mysql.*;
 import com.epoch.loan.workshop.common.mq.order.OrderMQManager;
 import com.epoch.loan.workshop.common.zookeeper.ZookeeperClient;
@@ -41,12 +40,6 @@ public class BaseService {
     public LoanRemittanceAccountDao loanRemittanceAccountDao;
 
     /**
-     * 贷超相关配置
-     */
-    @Autowired
-    public PlatformConfig platformConfig;
-
-    /**
      * Zookeeper链接工具累
      */
     @Autowired
@@ -71,14 +64,14 @@ public class BaseService {
     public LoanRepaymentPaymentRecordDao loanRepaymentPaymentRecordDao;
 
     /**
-     * af相关配置
-     */
-    @Autowired
-    AfConfig afConfig;
-
-    /**
      * app相关配置
      */
     @Autowired
     LoanAppConfigDao loanAppConfigDao;
+
+    /**
+     * af请求
+     */
+    @Autowired
+    LoanAfClient loanAfClient;
 }

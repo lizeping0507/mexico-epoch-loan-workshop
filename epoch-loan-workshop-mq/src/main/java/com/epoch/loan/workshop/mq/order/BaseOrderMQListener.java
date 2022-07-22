@@ -1,6 +1,7 @@
 package com.epoch.loan.workshop.mq.order;
 
 import com.alibaba.fastjson.JSONObject;
+import com.epoch.loan.workshop.common.af.LoanAfClient;
 import com.epoch.loan.workshop.common.config.RiskConfig;
 import com.epoch.loan.workshop.common.constant.LoanOrderModelStatus;
 import com.epoch.loan.workshop.common.dao.mysql.*;
@@ -111,6 +112,12 @@ public abstract class BaseOrderMQListener {
     public LoanRepaymentPaymentRecordDao loanRepaymentPaymentRecordDao;
 
     /**
+     * 用户信息
+     */
+    @Autowired
+    public LoanUserDao loanUserDao;
+
+    /**
      * 用户详细信息
      */
     @Autowired
@@ -133,6 +140,18 @@ public abstract class BaseOrderMQListener {
      */
     @Autowired
     public ZookeeperClient zookeeperClient;
+
+    /**
+     * app相关配置
+     */
+    @Autowired
+    LoanAppConfigDao loanAppConfigDao;
+
+    /**
+     * af请求
+     */
+    @Autowired
+    LoanAfClient loanAfClient;
 
     /**
      * 催收还提

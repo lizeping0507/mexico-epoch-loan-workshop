@@ -1,9 +1,8 @@
 package com.epoch.loan.workshop.control.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.epoch.loan.workshop.common.af.LoanAfClient;
 import com.epoch.loan.workshop.common.authentication.TokenManager;
-import com.epoch.loan.workshop.common.config.AfConfig;
-import com.epoch.loan.workshop.common.config.PlatformConfig;
 import com.epoch.loan.workshop.common.config.RiskConfig;
 import com.epoch.loan.workshop.common.dao.elastic.OcrAdvanceLogElasticDao;
 import com.epoch.loan.workshop.common.dao.elastic.SdkCatchDataSyncLogElasticDao;
@@ -39,12 +38,6 @@ public class BaseService {
      */
     @Autowired
     public LoanDynamicRequestDao dynamicRequestDao;
-
-    /**
-     * 贷超相关配置
-     */
-    @Autowired
-    public PlatformConfig platformConfig;
 
     /**
      * 三方OCR相关配置
@@ -149,16 +142,16 @@ public class BaseService {
     public TokenManager tokenManager;
 
     /**
-     * af相关配置
-     */
-    @Autowired
-    AfConfig afConfig;
-
-    /**
      * app相关配置
      */
     @Autowired
     LoanAppConfigDao loanAppConfigDao;
+
+    /**
+     * af请求
+     */
+    @Autowired
+    LoanAfClient loanAfClient;
 
     /**
      * 解析产品配置
