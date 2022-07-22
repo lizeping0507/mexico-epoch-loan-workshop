@@ -29,7 +29,12 @@ public class LoanUserEntity {
     private Integer channelId;
 
     /**
-     * 推广ID
+     * AF id
+     */
+    private String afId;
+
+    /**
+     * 谷歌广告ID
      */
     private String gaId;
 

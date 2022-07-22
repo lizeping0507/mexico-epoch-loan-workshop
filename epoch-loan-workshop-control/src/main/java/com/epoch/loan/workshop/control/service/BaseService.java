@@ -128,18 +128,8 @@ public class BaseService {
      * 渠道
      */
     @Autowired
-    public LoanChannelDao platformChannelDao;
+    public LoanChannelDao loanChannelDao;
 
-    /**
-     * af相关配置
-     */
-    @Autowired
-    AfConfig afConfig;
-    /**
-     * app相关配置
-     */
-    @Autowired
-    LoanAppConfigDao loanAppConfigDao;
     /**
      * 变身包承接盘配置
      */
@@ -157,6 +147,18 @@ public class BaseService {
      */
     @Autowired
     public TokenManager tokenManager;
+
+    /**
+     * af相关配置
+     */
+    @Autowired
+    AfConfig afConfig;
+
+    /**
+     * app相关配置
+     */
+    @Autowired
+    LoanAppConfigDao loanAppConfigDao;
 
     /**
      * 解析产品配置

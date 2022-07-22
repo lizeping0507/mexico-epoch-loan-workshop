@@ -54,19 +54,4 @@ public class RedisKeyField {
      * MQ延时队列
      */
     public final static String MQ_DELAY_INDEX = "mqDelayIndex" + SPLIT;
-
-    /**
-     * app 相关配置
-     */
-    public final static String APP_CONFIG = "appConfig" + SPLIT;
-
-    /**
-     * app AF_APP_ID配置
-     */
-    public final static String AF_APP_ID = SPLIT + "afAppId";
-
-    /**
-     * app AF_APP_ID配置
-     */
-    public final static String AF_APP_KEY = SPLIT + "afAppKey";
 }

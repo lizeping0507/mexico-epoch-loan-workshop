@@ -18,52 +18,44 @@ public class AfEventField {
      * 实名认证完成
      */
     public static String AF_NAME_INFO = "nameinfo";
+
     /**
      * 基本信息完成
      */
     public static String AF_BASE_INFO = "baseinfo";
+
     /**
-     * 个人信息完成
-     */
-    public static String AF_PERSONAL_INFO = "personalinfo";
-    /**
-     * 活体完成
-     */
-    public static String AF_OCR_INFO = "ocrinfo";
-    /**
-     * a卡正面
-     */
-    public static String AF_AD_POSITIVE = "adpositive";
-    /**
-     * a卡反面
-     */
-    public static String AF_AD_BACK = "adback";
-    /**
-     * pan卡正面
-     */
-    public static String AF_PAN_POSITIVE = "panpositive";
-    /**
-     * 一推订单
+     * 生成订单
      */
     public static String AF_FIRST_ORDER = "firstorder";
+
     /**
-     * 一推用户
+     * 用户首次生成订单
      */
     public static String AF_FIRST_PERSON = "firstperson";
+
     /**
-     * 绑卡订单
+     * 用户完成绑卡
      */
     public static String AF_BANK_ORDER = "bankorder";
+
     /**
-     * 绑卡用户
+     * 用户首次完成绑卡
      */
     public static String AF_BANK_PERSON = "bankperson";
+
     /**
-     * 二推
+     * 用户完成进件
      */
     public static String AF_SECOND_ORDER = "secondorder";
+
     /**
-     * 二推用户
+     * 用户完成首次进件（
      */
     public static String AF_SECOND_PERSON = "secondperson";
+
+    /**
+     * 审批通过
+     */
+    public static String PASSORDER = "passperson";
 }

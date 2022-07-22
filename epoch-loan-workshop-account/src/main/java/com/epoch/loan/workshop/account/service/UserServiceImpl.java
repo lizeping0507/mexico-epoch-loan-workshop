@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.epoch.loan.workshop.common.constant.*;
 import com.epoch.loan.workshop.common.entity.elastic.OcrAdvanceLogElasticEntity;
+import com.epoch.loan.workshop.common.entity.mysql.LoanAppConfigEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanAppControlEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanUserEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanUserInfoEntity;
@@ -29,9 +30,7 @@ import org.springframework.beans.factory.annotation.Value;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author : Shangkunfeng
@@ -128,7 +127,8 @@ public class UserServiceImpl extends BaseService implements UserService {
         LoanUserEntity user = new LoanUserEntity();
         user.setId(ObjectIdUtil.getObjectId());
         user.setAndroidId(params.getAndroidId());
-        user.setChannelId(81);
+        user.setChannelId(1);
+        user.setAfId(params.getAfId());
         user.setGaId(params.getGaId());
         user.setImei(params.getImei());
         user.setPlatform(params.getPlatform());
@@ -158,6 +158,14 @@ public class UserServiceImpl extends BaseService implements UserService {
 
         // 更新缓存
         tokenManager.updateUserCache(user.getId());
+
+        // 加载 app 配置
+        LoanAppConfigEntity loanAppConfig = loanAppConfigDao.findByAppName(params.getAppName());
+
+        // 保存并发送af注册打点事件
+        if (StringUtils.isNotBlank(params.getAfId()) && ObjectUtils.isEmpty(loanAppConfig)) {
+            SendAfInfoUtils.sendAfEvent(afConfig.getAfRequesterUrl(),AfEventField.AF_REGISTER_CODE,params.getGaId(),params.getAfId(),loanAppConfig.getConfig());
+        }
 
         // 封装结果
         RegisterResult registerResult = new RegisterResult();
@@ -448,6 +456,14 @@ public class UserServiceImpl extends BaseService implements UserService {
         // 更新用户缓存
         tokenManager.updateUserCache(user.getId());
 
+        // 加载 app 配置
+        LoanAppConfigEntity loanAppConfig = loanAppConfigDao.findByAppName(user.getAppName());
+
+        // 保存并发送af注册打点事件
+        if (StringUtils.isNotBlank(user.getAfId()) && ObjectUtils.isEmpty(loanAppConfig)) {
+            SendAfInfoUtils.sendAfEvent(afConfig.getAfRequesterUrl(),AfEventField.AF_BASE_INFO,user.getGaId(),user.getAfId(),loanAppConfig.getConfig());
+        }
+
         result.setReturnCode(ResultEnum.SUCCESS.code());
         result.setMessage(ResultEnum.SUCCESS.message());
         return result;
@@ -698,6 +714,15 @@ public class UserServiceImpl extends BaseService implements UserService {
 
         // 更新用户缓存
         tokenManager.updateUserCache(user.getId());
+
+        // 加载 app 配置
+        LoanAppConfigEntity loanAppConfig = loanAppConfigDao.findByAppName(user.getAppName());
+
+        // 保存并发送af注册打点事件
+        if (StringUtils.isNotBlank(user.getAfId()) && ObjectUtils.isEmpty(loanAppConfig)) {
+            SendAfInfoUtils.sendAfEvent(afConfig.getAfRequesterUrl(),AfEventField.AF_NAME_INFO,user.getGaId(),user.getAfId(),loanAppConfig.getConfig());
+        }
+
 
         // 封装结果
         result.setReturnCode(ResultEnum.SUCCESS.code());

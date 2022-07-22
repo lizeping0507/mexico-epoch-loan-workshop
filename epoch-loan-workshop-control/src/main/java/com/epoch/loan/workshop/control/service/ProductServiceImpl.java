@@ -83,6 +83,8 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
         // 用户id
         String userId = params.getUser().getId();
+        String afId = params.getUser().getAfId();
+        String gaId = params.getUser().getGaId();
 
         // 查询指定状态的订单
         Integer[] status = new Integer[]{OrderStatus.CREATE, OrderStatus.EXAMINE_WAIT, OrderStatus.EXAMINE_PASS, OrderStatus.EXAMINE_FAIL, OrderStatus.WAIT_PAY, OrderStatus.WAY, OrderStatus.DUE, OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE};
@@ -146,6 +148,14 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             return result;
         }
 
+        // 加载 app 配置
+        LoanAppConfigEntity loanAppConfig = loanAppConfigDao.findByAppName(appName);
+
+        // 保存并发送af注册打点事件
+        if (StringUtils.isNotBlank(afId) && ObjectUtils.isEmpty(loanAppConfig)) {
+            SendAfInfoUtils.sendAfEvent(afConfig.getAfRequesterUrl(),AfEventField.AF_FIRST_ORDER,gaId,afId,loanAppConfig.getConfig());
+        }
+
         // 封装结果集
         resData.setOrderId(loanOrderEntity.getId());
         result.setData(resData);
@@ -171,6 +181,8 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
         // 用户id
         String userId = params.getUser().getId();
+        String afId = params.getUser().getAfId();
+        String gaId = params.getUser().getGaId();
 
         // 更新地址
         String gps = params.getGps();
@@ -235,6 +247,9 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             return result;
         }
 
+        // 加载 app 配置
+        LoanAppConfigEntity loanAppConfig = loanAppConfigDao.findByAppName(appName);
+
         // 指定状态的订单最后生成一个订单
         Integer[] status = new Integer[]{OrderStatus.CREATE, OrderStatus.EXAMINE_WAIT, OrderStatus.EXAMINE_PASS, OrderStatus.EXAMINE_FAIL, OrderStatus.WAIT_PAY, OrderStatus.WAY, OrderStatus.DUE, OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE};
         LoanOrderEntity loanOrderEntity = loanOrderDao.findLatelyOrderByUserIdAndStatus(userId, status);
@@ -261,6 +276,12 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
             // 订单状态
             Integer orderStatus = loanOrderEntity.getStatus();
+
+            // 保存并发送af注册打点事件
+            if (StringUtils.isNotBlank(afId) && ObjectUtils.isEmpty(loanAppConfig)) {
+                SendAfInfoUtils.sendAfEvent(afConfig.getAfRequesterUrl(),AfEventField.AF_FIRST_ORDER,gaId,afId,loanAppConfig.getConfig());
+                SendAfInfoUtils.sendAfEvent(afConfig.getAfRequesterUrl(),AfEventField.AF_FIRST_PERSON,gaId,afId,loanAppConfig.getConfig());
+            }
 
             // 返回结果集
             appMaskModelResult.setMaskModel(0);
@@ -338,6 +359,11 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
             // 订单状态
             orderStatus = loanOrderEntity.getStatus();
+
+            // 保存并发送af注册打点事件
+            if (StringUtils.isNotBlank(afId) && ObjectUtils.isEmpty(loanAppConfig)) {
+                SendAfInfoUtils.sendAfEvent(afConfig.getAfRequesterUrl(),AfEventField.AF_FIRST_ORDER,gaId,afId,loanAppConfig.getConfig());
+            }
 
             // 返回结果集
             appMaskModelResult.setMaskModel(0);
@@ -764,10 +790,10 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         Integer userChannelId = user.getChannelId();
 
         // 查询渠道信息
-        LoanChannelEntity platformChannelEntity = platformChannelDao.findChannel(userChannelId);
+        LoanChannelEntity loanChannelEntity = loanChannelDao.findChannel(userChannelId);
 
         // 渠道名称
-        String channelName = platformChannelEntity.getChannelName();
+        String channelName = loanChannelEntity.getChannelName();
 
         List<String> userIdList = new ArrayList<>();
         userIdList.add(userId);
@@ -813,7 +839,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         bizData.put(Field.PROGRESS, 0);
         bizData.put(Field.REGISTER_ADDR, registerAddress);
         bizData.put(Field.CHANNEL_NAME, channelName);
-        bizData.put("channelCode", platformChannelEntity.getChannelCode());
+        bizData.put("channelCode", loanChannelEntity.getChannelCode());
         bizData.put("currentOrder", singleQuantity);
         bizData.put("allOrder", allQuantity);
         bizData.put("address", user.getRegisterAddress());

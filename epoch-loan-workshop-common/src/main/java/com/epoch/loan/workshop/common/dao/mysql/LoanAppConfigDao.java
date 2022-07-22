@@ -3,8 +3,6 @@ package com.epoch.loan.workshop.common.dao.mysql;
 import com.epoch.loan.workshop.common.entity.mysql.LoanAppConfigEntity;
 import org.apache.ibatis.annotations.Mapper;
 
-import java.util.List;
-
 /**
  * @author 魏玉强
  * @packagename : com.epoch.loan.workshop.common.dao.mysql
@@ -21,5 +19,5 @@ public interface LoanAppConfigDao {
      * @param appName app包名
      * @return app相关配置集合
      */
-    List<LoanAppConfigEntity> findByAppName(String appName);
+    LoanAppConfigEntity findByAppName(String appName);
 }

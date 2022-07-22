@@ -3,39 +3,40 @@ package com.epoch.loan.workshop.common.entity.mysql;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @author 魏玉强
  * @packagename : com.epoch.loan.workshop.common.entity.mysql
  * @className : PlatformAppConfig
  * @createTime : 2022/07/18 17:06
- * @Description:
+ * @Description: app相关配置表
  */
 @Data
 public class LoanAppConfigEntity implements Serializable {
 
     /**
-     * 主键
+     * app名称
      */
-    private Long id;
+    private String appName;
 
     /**
-     * appId
+     * 状态  0 停用 1 启用
      */
-    private Long appId;
+    private Integer status;
 
     /**
-     * key
+     * app相关配置
      */
-    private String configKey;
+    private String config;
 
     /**
-     * value
+     * 更新时间
      */
-    private String configValue;
+    private Date updateTime;
 
     /**
-     * 配置说明
+     * 创建时间
      */
-    private String description;
+    private Date createTime;
 }

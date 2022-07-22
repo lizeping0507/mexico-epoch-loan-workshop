@@ -2,9 +2,11 @@ package com.epoch.loan.workshop.common.util;
 
 import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.af.AfRequestParam;
+import com.epoch.loan.workshop.common.constant.AppConfigField;
 import com.epoch.loan.workshop.common.constant.Field;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,19 +22,37 @@ public class SendAfInfoUtils {
     /**
      * 发送AF打点事件
      *
-     * @param url        af请求地址
-     * @param afRequestParam 打点事件信息封装
-     * @param appId      包名 例如：com.app.rupayekey
-     * @param afAppKey   af打点用的app_key
+     * @param url       af请求地址
+     * @param eventName 事件名称
+     * @param gaId      谷歌推广id
+     * @param afId      AF id
+     * @param config    包的相关配置
      * @return
      */
-    public static Boolean sendAfEvent(String url, AfRequestParam afRequestParam, String appId, String afAppKey) {
+    public static Boolean sendAfEvent(String url, String eventName, String gaId, String afId, String config) {
         try {
-            url = url + appId;
+            // 校验包的相关配置
+            if (StringUtils.isBlank(config)) {
+                return false;
+            }
+            JSONObject jsonObject = JSONObject.parseObject(config);
+            String afAppId = jsonObject.getString(AppConfigField.AF_APP_ID);
+            String afAppKey = jsonObject.getString(AppConfigField.AF_APP_KEY);
+            if (StringUtils.isBlank(afAppId) || StringUtils.isBlank(afAppKey)) {
+                return false;
+            }
+
+            // 封装 af打点请求参数
+            AfRequestParam afRequestParam = new AfRequestParam();
+            afRequestParam.setAdvertising_id(gaId);
+            afRequestParam.setAppsflyer_id(afId);
+            afRequestParam.setEventName(eventName);
+            afRequestParam.setEventTime(Calendar.getInstance());
+            url = url + afAppId;
 
             // 封装请求头
             Map<String, String> headers = new HashMap<>(2);
-            headers.put(Field.CONTENT_TYPE,HttpUtils.CONTENT_TYPE_JSON);
+            headers.put(Field.CONTENT_TYPE, HttpUtils.CONTENT_TYPE_JSON);
             headers.put(Field.AUTHENTICATION, afAppKey);
 
             // 发送请求，获取响应结果

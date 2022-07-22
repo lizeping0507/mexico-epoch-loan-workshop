@@ -3,6 +3,6 @@
 <mapper namespace="com.epoch.loan.workshop.common.dao.mysql.LoanAppConfigDao">
 
     <select id="findByAppName" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanAppConfigEntity">
-        SELECT t1.* FROM platform_app_config t1 LEFT JOIN platform_app t2 on t1.app_id = t2.id WHERE t2.`name` = #{appFlag}
+        SELECT * FROM loan_app_config app_name = #{appName}
     </select>
 </mapper>
