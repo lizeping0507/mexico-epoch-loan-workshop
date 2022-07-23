@@ -165,7 +165,7 @@ public class AfCallBackLogElasticEntity {
      * 事件发生时间
      */
     @Field(type = FieldType.Date)
-    private String eventTime;
+    private Date eventTime;
     /**
      * 从SDK发出的详细事件内容。
      */

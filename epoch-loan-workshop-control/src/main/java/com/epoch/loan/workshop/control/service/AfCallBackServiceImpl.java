@@ -6,6 +6,7 @@ import com.epoch.loan.workshop.common.entity.mysql.LoanUserEntity;
 import com.epoch.loan.workshop.common.params.params.request.AfCallBackParams;
 import com.epoch.loan.workshop.common.params.params.result.Result;
 import com.epoch.loan.workshop.common.service.AfCallBackService;
+import com.epoch.loan.workshop.common.util.DateUtil;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -78,6 +79,11 @@ public class AfCallBackServiceImpl extends BaseService implements AfCallBackServ
         BeanUtils.copyProperties(params, afCallbackLogElasticEntity);
         afCallbackLogElasticEntity.setUserId(loanUserEntity.getId());
         afCallbackLogElasticEntity.setCreateTime(new Date());
+        if (StringUtils.isNotBlank(params.getEventTime())) {
+            Date eventTime = DateUtil.StringToDate(params.getEventTime(), "yyyy-MM-dd HH:ss:mm.SSS");
+            afCallbackLogElasticEntity.setEventTime(eventTime);
+        }
+
         afCallBackLogElasticDao.save(afCallbackLogElasticEntity);
         return response;
     }
