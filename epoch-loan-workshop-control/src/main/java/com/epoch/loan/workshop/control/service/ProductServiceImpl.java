@@ -151,7 +151,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         LoanAppConfigEntity loanAppConfig = loanAppConfigDao.findByAppName(appName);
 
         // 保存并发送af注册打点事件
-        if (StringUtils.isNotBlank(user.getAfId()) && ObjectUtils.isEmpty(loanAppConfig)) {
+        if (StringUtils.isNotBlank(user.getAfId()) && ObjectUtils.isNotEmpty(loanAppConfig)) {
             loanAfClient.sendAfEvent(AfEventField.AF_FIRST_ORDER, user.getGaId(), user.getAfId(), loanAppConfig.getConfig());
         }
 
@@ -276,7 +276,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             Integer orderStatus = loanOrderEntity.getStatus();
 
             // 保存并发送af注册打点事件
-            if (StringUtils.isNotBlank(user.getAfId()) && ObjectUtils.isEmpty(loanAppConfig)) {
+            if (StringUtils.isNotBlank(user.getAfId()) && ObjectUtils.isNotEmpty(loanAppConfig)) {
                 loanAfClient.sendAfEvent(AfEventField.AF_FIRST_ORDER, user.getGaId(), user.getAfId(), loanAppConfig.getConfig());
                 loanAfClient.sendAfEvent(AfEventField.AF_FIRST_PERSON, user.getGaId(), user.getAfId(), loanAppConfig.getConfig());
             }
@@ -359,7 +359,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             orderStatus = loanOrderEntity.getStatus();
 
             // 保存并发送af注册打点事件
-            if (StringUtils.isNotBlank(user.getAfId()) && ObjectUtils.isEmpty(loanAppConfig)) {
+            if (StringUtils.isNotBlank(user.getAfId()) && ObjectUtils.isNotEmpty(loanAppConfig)) {
                 loanAfClient.sendAfEvent(AfEventField.AF_FIRST_ORDER, user.getGaId(), user.getAfId(), loanAppConfig.getConfig());
             }
 

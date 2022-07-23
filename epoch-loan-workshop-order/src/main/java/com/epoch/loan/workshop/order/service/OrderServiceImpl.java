@@ -80,7 +80,7 @@ public class OrderServiceImpl extends BaseService implements OrderService {
 
         // 保存并发送af注册打点事件
         User user = bindRemittanceAccountParams.getUser();
-        if (StringUtils.isNotBlank(user.getAfId()) && ObjectUtils.isEmpty(loanAppConfig)) {
+        if (StringUtils.isNotBlank(user.getAfId()) && ObjectUtils.isNotEmpty(loanAppConfig)) {
             int[] status = new int[]{OrderStatus.CREATE, OrderStatus.EXAMINE_WAIT, OrderStatus.EXAMINE_PASS, OrderStatus.EXAMINE_FAIL, OrderStatus.WAIT_PAY, OrderStatus.WAY, OrderStatus.DUE, OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE, OrderStatus.ABANDONED};
             Integer statusIn = loanOrderDao.countUserOrderByStatusIn(user.getId(), status);
             if (StringUtils.isBlank(loanOrderEntity.getBankCardId()) && 1 == statusIn) {
@@ -189,7 +189,7 @@ public class OrderServiceImpl extends BaseService implements OrderService {
         LoanAppConfigEntity loanAppConfig = loanAppConfigDao.findByAppName(user.getAppName());
 
         // 保存并发送af注册打点事件
-        if (StringUtils.isNotBlank(user.getAfId()) && ObjectUtils.isEmpty(loanAppConfig)) {
+        if (StringUtils.isNotBlank(user.getAfId()) && ObjectUtils.isNotEmpty(loanAppConfig)) {
             int[] statuArray = new int[]{OrderStatus.CREATE, OrderStatus.EXAMINE_WAIT, OrderStatus.EXAMINE_PASS, OrderStatus.EXAMINE_FAIL, OrderStatus.WAIT_PAY, OrderStatus.WAY, OrderStatus.DUE, OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE, OrderStatus.ABANDONED};
             Integer statusIn = loanOrderDao.countUserOrderByStatusIn(userId, statuArray);
             if (1 == statusIn) {

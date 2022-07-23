@@ -192,7 +192,7 @@ public class OrderExaminePass extends BaseOrderMQListener implements MessageList
                 LoanAppConfigEntity loanAppConfig = loanAppConfigDao.findByAppName(loanOrderEntity.getAppName());
                 LoanUserEntity loanUserEntity = loanUserDao.findById(loanOrderEntity.getUserId());
                 // 保存并发送af注册打点事件
-                if (StringUtils.isNotBlank(loanUserEntity.getAfId()) && ObjectUtils.isEmpty(loanAppConfig)) {
+                if (StringUtils.isNotBlank(loanUserEntity.getAfId()) && ObjectUtils.isNotEmpty(loanAppConfig)) {
                     int[] statusArray = new int[]{OrderStatus.CREATE, OrderStatus.EXAMINE_WAIT, OrderStatus.EXAMINE_PASS, OrderStatus.EXAMINE_FAIL, OrderStatus.WAIT_PAY, OrderStatus.WAY, OrderStatus.DUE, OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE, OrderStatus.ABANDONED};
                     Integer statusIn = loanOrderDao.countUserOrderByStatusIn(loanOrderEntity.getUserId(), statusArray);
                     if (1 == statusIn) {

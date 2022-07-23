@@ -163,7 +163,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         LoanAppConfigEntity loanAppConfig = loanAppConfigDao.findByAppName(params.getAppName());
 
         // 保存并发送af注册打点事件
-        if (StringUtils.isNotBlank(params.getAfId()) && ObjectUtils.isEmpty(loanAppConfig)) {
+        if (StringUtils.isNotBlank(params.getAfId()) && ObjectUtils.isNotEmpty(loanAppConfig)) {
             loanAfClient.sendAfEvent(AfEventField.AF_REGISTER_CODE, params.getGaId(), params.getAfId(), loanAppConfig.getConfig());
         }
 
@@ -460,7 +460,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         LoanAppConfigEntity loanAppConfig = loanAppConfigDao.findByAppName(user.getAppName());
 
         // 保存并发送af注册打点事件
-        if (StringUtils.isNotBlank(user.getAfId()) && ObjectUtils.isEmpty(loanAppConfig)) {
+        if (StringUtils.isNotBlank(user.getAfId()) && ObjectUtils.isNotEmpty(loanAppConfig)) {
             loanAfClient.sendAfEvent(AfEventField.AF_BASE_INFO, user.getGaId(), user.getAfId(), loanAppConfig.getConfig());
         }
 
@@ -719,7 +719,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         LoanAppConfigEntity loanAppConfig = loanAppConfigDao.findByAppName(user.getAppName());
 
         // 保存并发送af注册打点事件
-        if (StringUtils.isNotBlank(user.getAfId()) && ObjectUtils.isEmpty(loanAppConfig)) {
+        if (StringUtils.isNotBlank(user.getAfId()) && ObjectUtils.isNotEmpty(loanAppConfig)) {
             loanAfClient.sendAfEvent(AfEventField.AF_NAME_INFO, user.getGaId(), user.getAfId(), loanAppConfig.getConfig());
         }
 
