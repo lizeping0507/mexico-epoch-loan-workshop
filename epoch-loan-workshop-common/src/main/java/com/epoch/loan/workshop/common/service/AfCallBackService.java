@@ -1,6 +1,7 @@
 package com.epoch.loan.workshop.common.service;
 
 import com.epoch.loan.workshop.common.params.params.request.AfCallBackParams;
+import com.epoch.loan.workshop.common.params.params.result.Result;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -19,5 +20,5 @@ public interface AfCallBackService {
      * @param params af回调参数
      * @return 响应结果
      */
-    ResponseEntity afCallBack(@RequestBody AfCallBackParams params);
+    Result afCallBack(@RequestBody AfCallBackParams params);
 }

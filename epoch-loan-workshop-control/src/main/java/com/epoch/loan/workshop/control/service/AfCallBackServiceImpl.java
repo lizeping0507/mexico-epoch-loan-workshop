@@ -4,13 +4,12 @@ import com.epoch.loan.workshop.common.entity.elastic.AfCallBackLogElasticEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanChannelEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanUserEntity;
 import com.epoch.loan.workshop.common.params.params.request.AfCallBackParams;
+import com.epoch.loan.workshop.common.params.params.result.Result;
 import com.epoch.loan.workshop.common.service.AfCallBackService;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.Date;
@@ -32,9 +31,9 @@ public class AfCallBackServiceImpl extends BaseService implements AfCallBackServ
      * @return 响应结果
      */
     @Override
-    public ResponseEntity afCallBack(@RequestBody AfCallBackParams params) {
+    public Result afCallBack(@RequestBody AfCallBackParams params) {
         // 响应结果
-        ResponseEntity<Object> response = new ResponseEntity<>(HttpStatus.OK);
+        Result response = new Result();
 
         if (ObjectUtils.isEmpty(params)) {
             return response;

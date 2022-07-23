@@ -328,5 +328,5 @@ public class URL {
     /**
      * af 回调
      */
-    public static final String CALL_BACK = API + "/callBack";
+    public static final String CALL_BACK = "/callBack";
 }

@@ -34,7 +34,7 @@ public class AfCallBackController extends BaseController {
         LogUtil.sysInfo("af 回传信息：{}", JSON.toJSONString(params));
 
         // 结果集
-        Result<?> result = new Result<>();
+        Result result = new Result();
 
         try {
 
