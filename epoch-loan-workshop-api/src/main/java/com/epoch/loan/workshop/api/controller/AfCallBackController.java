@@ -7,6 +7,7 @@ import com.epoch.loan.workshop.common.params.params.request.AfCallBackParams;
 import com.epoch.loan.workshop.common.params.params.result.Result;
 import com.epoch.loan.workshop.common.util.LogUtil;
 import com.epoch.loan.workshop.common.util.ThrowableUtils;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,6 +29,7 @@ public class AfCallBackController extends BaseController {
      * @param params af回调参数
      * @return
      */
+    @PostMapping(URL.CALL_BACK)
     public Object afCallBack(@RequestBody AfCallBackParams params) {
         LogUtil.sysInfo("af 回传信息：{}", JSON.toJSONString(params));
 

@@ -89,7 +89,7 @@ public class URL {
     public static final String COLLECTION = API + "/collection";
 
     /**
-     * 催收还提
+     * af
      */
     public static final String AF = API + "/af";
 
@@ -324,4 +324,9 @@ public class URL {
      * 减免
      */
     public static final String REDUCTION = "/reduction";
+
+    /**
+     * af 回调
+     */
+    public static final String CALL_BACK = API + "/callBack";
 }
