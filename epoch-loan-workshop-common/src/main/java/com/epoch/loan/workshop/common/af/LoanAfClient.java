@@ -58,10 +58,10 @@ public class LoanAfClient {
             }
 
             // 封装 af打点请求参数
-            Map<String,Object> afRequestParam = Maps.newHashMap();
-            afRequestParam.put("advertising_id",gaId);
-            afRequestParam.put("appsflyer_id",afId);
-            afRequestParam.put("eventName",eventName);
+            Map<String, Object> afRequestParam = Maps.newHashMap();
+            afRequestParam.put("advertising_id", gaId);
+            afRequestParam.put("appsflyer_id", afId);
+            afRequestParam.put("eventName", eventName);
 
             Calendar calendar = Calendar.getInstance();
 
@@ -72,10 +72,10 @@ public class LoanAfClient {
             int dstOffset = calendar.get(Calendar.DST_OFFSET);
 
             // UTC时间
-            calendar.add(Calendar.MILLISECOND,-(zoneOffset + dstOffset));
+            calendar.add(Calendar.MILLISECOND, -(zoneOffset + dstOffset));
 
             // 即事件发生的时间，af是以UTC时间显示的
-            afRequestParam.put("eventTime", DateUtil.DateToString(calendar.getTime(),"yyyy-MM-dd HH:mm:ss.SSS"));
+            afRequestParam.put("eventTime", DateUtil.DateToString(calendar.getTime(), "yyyy-MM-dd HH:mm:ss.SSS"));
             String url = afConfig.getAfRequesterUrl() + afAppId;
 
             // 封装请求头
@@ -84,7 +84,9 @@ public class LoanAfClient {
             headers.put(Field.AUTHENTICATION, afAppKey);
 
             // 发送请求，获取响应结果
+            LogUtil.sysInfo("af打点事件： 发送URL:{} ,事件信息:{}", url, afRequestParam);
             String response = HttpUtils.POST_WITH_HEADER(url, JSONObject.toJSONString(afRequestParam), headers);
+            LogUtil.sysInfo("af打点事件： 发送URL:{} ,事件信息:{} , 响应: {}", url, afRequestParam, response);
 
             if (StringUtils.isNotBlank(response)) {
                 return true;
@@ -96,7 +98,6 @@ public class LoanAfClient {
             return false;
         }
     }
-
 
 
 }
