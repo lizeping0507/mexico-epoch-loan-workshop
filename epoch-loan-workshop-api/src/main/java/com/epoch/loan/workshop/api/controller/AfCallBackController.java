@@ -30,7 +30,7 @@ public class AfCallBackController extends BaseController {
      * @return
      */
     @PostMapping(URL.CALL_BACK)
-    public Object afCallBack(@RequestBody AfCallBackParams params) {
+    public Object afCallBack(AfCallBackParams params) {
         LogUtil.sysInfo("af 回传信息：{}", JSON.toJSONString(params));
 
         // 结果集
