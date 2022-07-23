@@ -69,15 +69,6 @@ public interface LoanUserDao {
     /**
      * 根据afId和appName查询 用户信息
      *
-     * @param appName 包名
-     * @param gaId    用户可重置的设备ID，又称GAID
-     * @return 用户信息
-     */
-    LoanUserEntity findByAppNameAndGaId(String appName, String gaId);
-
-    /**
-     * 根据afId和appName查询 用户信息
-     *
      * @param gaId 用户可重置的设备ID，又称GAID
      * @return 用户信息
      */

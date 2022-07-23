@@ -57,12 +57,7 @@ public class AfCallBackServiceImpl extends BaseService implements AfCallBackServ
 
         // 根据GaId 查询用户
         LoanUserEntity loanUserEntity = null;
-        if (StringUtils.isNotBlank(params.getAdvertisingId()) && StringUtils.isNotBlank(params.getAppName())) {
-            loanUserEntity = loanUserDao.findByAppNameAndGaId(params.getAppName(), params.getAdvertisingId());
-        }
-
-        // 先修改本包的用户聚道，本包修改完后修改其他包的用户聚道
-        if (ObjectUtils.isEmpty(loanUserEntity) || loanUserEntity.getChannelId() != 1) {
+        if (StringUtils.isNotBlank(params.getAdvertisingId())) {
             loanUserEntity = loanUserDao.findByGaId(params.getAdvertisingId());
         }
 
