@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.af.LoanAfClient;
 import com.epoch.loan.workshop.common.authentication.TokenManager;
 import com.epoch.loan.workshop.common.config.RiskConfig;
+import com.epoch.loan.workshop.common.dao.elastic.AfCallBackLogElasticDao;
 import com.epoch.loan.workshop.common.dao.elastic.OcrAdvanceLogElasticDao;
 import com.epoch.loan.workshop.common.dao.elastic.SdkCatchDataSyncLogElasticDao;
 import com.epoch.loan.workshop.common.dao.mysql.*;
@@ -152,6 +153,12 @@ public class BaseService {
      */
     @Autowired
     LoanAfClient loanAfClient;
+
+    /**
+     * af请求
+     */
+    @Autowired
+    AfCallBackLogElasticDao afCallBackLogElasticDao;
 
     /**
      * 解析产品配置

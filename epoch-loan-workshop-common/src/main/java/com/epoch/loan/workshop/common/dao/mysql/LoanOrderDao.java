@@ -266,7 +266,7 @@ public interface LoanOrderDao {
     /**
      * 查询用户进行中订单数量
      *
-     * @param userIdList  用户Id
+     * @param userIdList 用户Id
      * @return
      */
     int countProcessOrderNo(@Param("userIdList") List<String> userIdList);
@@ -293,9 +293,9 @@ public interface LoanOrderDao {
     /**
      * 根据用户id查询指定状态的订单计划，并按照指定字段 指定顺序进行排列
      *
-     * @param userId 用户id
-     * @param status 订单状态集合
-     * @param field 排序字段
+     * @param userId   用户id
+     * @param status   订单状态集合
+     * @param field    排序字段
      * @param sequence 正序-ASC 还是 倒序-DESC
      * @return
      */
@@ -331,8 +331,18 @@ public interface LoanOrderDao {
 
     /**
      * 查询指定状态订单
+     *
      * @param status
      * @return
      */
     List<LoanOrderEntity> findOrderByStatusIn(@Param("array") int[] status);
+
+    /**
+     * 更新用户所有订单聚道信息
+     *
+     * @param userId        用户id
+     * @param userChannelId 用户聚道id
+     * @param updateTime    更新时间
+     */
+    void updateOrderUserChannelId(String userId, Long userChannelId, Date updateTime);
 }

@@ -49,4 +49,16 @@
     <update id="updatePassword">
         UPDATE `loan_user` set password = #{newPassword} WHERE id = #{id}
     </update>
+    <select id="findByAppNameAndGaId" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanUserEntity">
+        SELECT * FROM `loan_user` WHERE ga_id = #{gaId} AND app_name = #{appName}
+    </select>
+    <select id="findByGaId" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanUserEntity">
+        SELECT * FROM `loan_user` WHERE ga_id = #{gaId} and (channel_id = 1 or channel_id is null) order by create_time DESC LIMIT 1
+    </select>
+    <update id="updateAfId">
+        UPDATE `loan_user` set af_id = #{afId},update_time=#{updateTime} WHERE id = #{id}
+    </update>
+    <update id="updateChannelId">
+        UPDATE `loan_user` set channel_id = #{channelId},update_time=#{updateTime} WHERE id = #{id}
+    </update>
 </mapper>
