@@ -42,6 +42,8 @@ public class AppDomainUtil {
                 return "peso-max.com";
             case "CreditoHucha":
                 return "creditohucha.in";
+            case "VaroMoneda":
+                return "varomoneda.com";
             default:
                 return null;
         }
