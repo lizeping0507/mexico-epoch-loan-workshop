@@ -98,6 +98,7 @@ public class TokenManager {
         user.setId(userEntity.getId());
         user.setAndroidId(userEntity.getAndroidId());
         user.setChannelId(userEntity.getChannelId());
+        user.setAfId(userEntity.getAfId());
         user.setGaId(userEntity.getGaId());
         user.setImei(userEntity.getImei());
         user.setPlatform(userEntity.getPlatform());

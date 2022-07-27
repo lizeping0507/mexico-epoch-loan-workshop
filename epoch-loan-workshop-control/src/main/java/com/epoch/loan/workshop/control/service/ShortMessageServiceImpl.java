@@ -48,5 +48,4 @@ public class ShortMessageServiceImpl extends BaseService implements ShortMessage
         result.setMessage(ResultEnum.SUCCESS.message());
         return result;
     }
-
 }

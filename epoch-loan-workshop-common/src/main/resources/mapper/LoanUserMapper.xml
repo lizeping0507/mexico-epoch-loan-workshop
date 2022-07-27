@@ -7,6 +7,7 @@
         `android_id`,
         `channel_id`,
         `ga_id`,
+        `af_id`,
         `imei`,
         `platform`,
         `login_name`,
@@ -20,6 +21,7 @@
         #{loanUserEntity.androidId},
         #{loanUserEntity.channelId},
         #{loanUserEntity.gaId},
+        #{loanUserEntity.afId},
         #{loanUserEntity.imei},
         #{loanUserEntity.platform},
         #{loanUserEntity.loginName},
@@ -48,5 +50,14 @@
     </update>
     <update id="updatePassword">
         UPDATE `loan_user` set password = #{newPassword} WHERE id = #{id}
+    </update>
+    <select id="findByGaId" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanUserEntity">
+        SELECT * FROM `loan_user` WHERE ga_id = #{gaId} and channel_id = 1 order by create_time DESC LIMIT 1
+    </select>
+    <update id="updateAfId">
+        UPDATE `loan_user` set af_id = #{afId},update_time=#{updateTime} WHERE id = #{id}
+    </update>
+    <update id="updateChannelId">
+        UPDATE `loan_user` set channel_id = #{channelId},update_time=#{updateTime} WHERE id = #{id}
     </update>
 </mapper>

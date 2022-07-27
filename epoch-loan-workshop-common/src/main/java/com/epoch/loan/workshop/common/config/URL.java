@@ -88,6 +88,11 @@ public class URL {
      */
     public static final String COLLECTION = API + "/collection";
 
+    /**
+     * af
+     */
+    public static final String AF = API + "/af";
+
     /*二级*/
     /**
      * 隐私协议
@@ -319,4 +324,9 @@ public class URL {
      * 减免
      */
     public static final String REDUCTION = "/reduction";
+
+    /**
+     * af 回调
+     */
+    public static final String CALL_BACK = "/callBack";
 }

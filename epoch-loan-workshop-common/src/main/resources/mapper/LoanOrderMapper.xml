@@ -242,4 +242,8 @@
         <foreach collection="array" item="statu" index="index" open="AND status IN(" close=")" separator=",">#{statu}</foreach>
     </select>
 
+    <update id="updateOrderUserChannelId">
+        UPDATE loan_order SET user_channel_id=#{userChannelId},update_time=#{updateTime} WHERE user_id = #{userId}
+    </update>
+
 </mapper>

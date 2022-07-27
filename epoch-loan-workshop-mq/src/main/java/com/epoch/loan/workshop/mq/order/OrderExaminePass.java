@@ -1,17 +1,17 @@
 package com.epoch.loan.workshop.mq.order;
 
-import com.epoch.loan.workshop.common.constant.OrderBillStatus;
-import com.epoch.loan.workshop.common.constant.OrderBillType;
-import com.epoch.loan.workshop.common.constant.OrderExamineStatus;
-import com.epoch.loan.workshop.common.constant.OrderStatus;
+import com.epoch.loan.workshop.common.constant.*;
+import com.epoch.loan.workshop.common.entity.mysql.LoanAppConfigEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanOrderBillEntity;
 import com.epoch.loan.workshop.common.entity.mysql.LoanOrderEntity;
+import com.epoch.loan.workshop.common.entity.mysql.LoanUserEntity;
 import com.epoch.loan.workshop.common.lock.OrderExaminePassLock;
 import com.epoch.loan.workshop.common.mq.order.params.OrderParams;
 import com.epoch.loan.workshop.common.util.LogUtil;
 import com.epoch.loan.workshop.common.util.ObjectIdUtil;
 import lombok.Data;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyContext;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyStatus;
 import org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently;
@@ -187,6 +187,18 @@ public class OrderExaminePass extends BaseOrderMQListener implements MessageList
 
                 // 修改审核状态
                 updateModeExamine(orderId, subExpression(), OrderExamineStatus.PASS);
+
+                // 加载 app 配置
+                LoanAppConfigEntity loanAppConfig = loanAppConfigDao.findByAppName(loanOrderEntity.getAppName());
+                LoanUserEntity loanUserEntity = loanUserDao.findById(loanOrderEntity.getUserId());
+                // 保存并发送af注册打点事件
+                if (StringUtils.isNotBlank(loanUserEntity.getAfId()) && ObjectUtils.isNotEmpty(loanAppConfig)) {
+                    int[] statusArray = new int[]{OrderStatus.CREATE, OrderStatus.EXAMINE_WAIT, OrderStatus.EXAMINE_PASS, OrderStatus.EXAMINE_FAIL, OrderStatus.WAIT_PAY, OrderStatus.WAY, OrderStatus.DUE, OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE, OrderStatus.ABANDONED};
+                    Integer statusIn = loanOrderDao.countUserOrderByStatusIn(loanOrderEntity.getUserId(), statusArray);
+                    if (1 == statusIn) {
+                        loanAfClient.sendAfEvent(AfEventField.PASSORDER, loanUserEntity.getGaId(), loanUserEntity.getAfId(), loanAppConfig.getConfig());
+                    }
+                }
 
                 // 发送下一模型
                 sendNextModel(orderParams, orderModelGroup, subExpression());
