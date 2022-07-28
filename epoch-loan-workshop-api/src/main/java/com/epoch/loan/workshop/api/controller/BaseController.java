@@ -21,7 +21,7 @@ public class BaseController {
     /**
      * App相关业务
      */
-    @Autowired
+    @DubboReference
     public AppService appService;
     /**
      * 支付回调
