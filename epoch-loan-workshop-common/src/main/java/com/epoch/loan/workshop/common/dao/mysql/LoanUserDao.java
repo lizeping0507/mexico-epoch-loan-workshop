@@ -4,6 +4,8 @@ import com.epoch.loan.workshop.common.entity.mysql.LoanUserEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
+
 @Mapper
 public interface LoanUserDao {
     /**
@@ -56,10 +58,37 @@ public interface LoanUserDao {
     LoanUserEntity findById(String id);
 
     /**
-     *根据设备号和appName查询
-     * @param appName
-     * @param androidId
-     * @return
+     * 根据设备号和appName查询 是否存在用户
+     *
+     * @param appName   包名
+     * @param androidId 安卓id
+     * @return 查询数量
      */
     Integer exitByAppNameAndAndroidId(String appName, String androidId);
+
+    /**
+     * 根据afId和appName查询 用户信息
+     *
+     * @param gaId 用户可重置的设备ID，又称GAID
+     * @return 用户信息
+     */
+    LoanUserEntity findByGaId(String gaId);
+
+    /**
+     * 更新afId
+     *
+     * @param id         用户id
+     * @param afId       用户在其设备上安装应用时由SKD生成的非重ID
+     * @param updateTime 更新时间
+     */
+    void updateAfId(String id, String afId, Date updateTime);
+
+    /**
+     * 更新用户聚道
+     *
+     * @param id         用户id
+     * @param channelId  聚道id
+     * @param updateTime 更新时间
+     */
+    void updateChannelId(String id, Long channelId, Date updateTime);
 }

@@ -73,4 +73,10 @@ public class BaseController {
      */
     @DubboReference(check = false)
     StaticResourcesService staticResourcesService;
+
+    /**
+     * af 回调
+     */
+    @DubboReference(check = false)
+    AfCallBackService afCallBackService;
 }

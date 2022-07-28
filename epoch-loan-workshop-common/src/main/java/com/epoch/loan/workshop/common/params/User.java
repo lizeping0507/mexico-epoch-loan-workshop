@@ -31,6 +31,11 @@ public class User implements Serializable {
     private Integer channelId;
 
     /**
+     * AF id
+     */
+    private String afId;
+
+    /**
      * 推广ID
      */
     private String gaId;

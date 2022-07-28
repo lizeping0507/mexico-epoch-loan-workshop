@@ -2,7 +2,17 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.epoch.loan.workshop.common.dao.mysql.LoanChannelDao">
 
+    <insert id="insert">
+        INSERT INTO `loan_channel` (`channel_name`, `create_time`, `channel_code`, `is_open`)
+        VALUES (#{loanChannelEntity.id},#{loanChannelEntity.channelName},#{loanChannelEntity.createTime},
+        #{loanChannelEntity.channelCode},#{loanChannelEntity.isOpen})
+    </insert>
+
     <select id="findChannel" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanChannelEntity">
         SELECT * FROM loan_channel WHERE id=#{id} LIMIT 1
+    </select>
+
+    <select id="findByChannelCode" resultType="com.epoch.loan.workshop.common.entity.mysql.LoanChannelEntity">
+        SELECT * FROM loan_channel WHERE channel_code=#{channelCode} LIMIT 1
     </select>
 </mapper>

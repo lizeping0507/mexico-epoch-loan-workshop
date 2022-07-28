@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.constant.*;
 import com.epoch.loan.workshop.common.entity.mysql.*;
 import com.epoch.loan.workshop.common.mq.order.params.OrderParams;
+import com.epoch.loan.workshop.common.params.User;
 import com.epoch.loan.workshop.common.params.params.BaseParams;
 import com.epoch.loan.workshop.common.params.params.request.*;
 import com.epoch.loan.workshop.common.params.params.result.ConfirmMergePushApplyResult;
@@ -74,6 +75,21 @@ public class OrderServiceImpl extends BaseService implements OrderService {
             return result;
         }
 
+        // 加载 app 配置
+        LoanAppConfigEntity loanAppConfig = loanAppConfigDao.findByAppName(bindRemittanceAccountParams.getUser().getAppName());
+
+        // 保存并发送af注册打点事件
+        User user = bindRemittanceAccountParams.getUser();
+        if (StringUtils.isNotBlank(user.getAfId()) && ObjectUtils.isNotEmpty(loanAppConfig)) {
+            int[] status = new int[]{OrderStatus.CREATE, OrderStatus.EXAMINE_WAIT, OrderStatus.EXAMINE_PASS, OrderStatus.EXAMINE_FAIL, OrderStatus.WAIT_PAY, OrderStatus.WAY, OrderStatus.DUE, OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE, OrderStatus.ABANDONED};
+            Integer statusIn = loanOrderDao.countUserOrderByStatusIn(user.getId(), status);
+            if (StringUtils.isBlank(loanOrderEntity.getBankCardId()) && 1 == statusIn) {
+                loanAfClient.sendAfEvent(AfEventField.AF_BANK_PERSON, user.getGaId(), user.getAfId(), loanAppConfig.getConfig());
+            } else {
+                loanAfClient.sendAfEvent(AfEventField.AF_BANK_ORDER, user.getGaId(), user.getAfId(), loanAppConfig.getConfig());
+            }
+        }
+
         // 进行绑定放款账户
         loanOrderDao.updateBankCardId(orderId, remittanceAccountId, new Date());
 
@@ -95,7 +111,8 @@ public class OrderServiceImpl extends BaseService implements OrderService {
         Result result = new Result();
 
         // 用户id
-        String userId = applyParams.getUser().getId();
+        User user = applyParams.getUser();
+        String userId = user.getId();
 
         // 订单id
         String orderId = applyParams.getOrderId();
@@ -166,6 +183,20 @@ public class OrderServiceImpl extends BaseService implements OrderService {
             result.setReturnCode(ResultEnum.ORDER_ERROR.code());
             result.setMessage(ResultEnum.ORDER_ERROR.message());
             return result;
+        }
+
+        // 加载 app 配置
+        LoanAppConfigEntity loanAppConfig = loanAppConfigDao.findByAppName(user.getAppName());
+
+        // 保存并发送af注册打点事件
+        if (StringUtils.isNotBlank(user.getAfId()) && ObjectUtils.isNotEmpty(loanAppConfig)) {
+            int[] statuArray = new int[]{OrderStatus.CREATE, OrderStatus.EXAMINE_WAIT, OrderStatus.EXAMINE_PASS, OrderStatus.EXAMINE_FAIL, OrderStatus.WAIT_PAY, OrderStatus.WAY, OrderStatus.DUE, OrderStatus.COMPLETE, OrderStatus.DUE_COMPLETE, OrderStatus.ABANDONED};
+            Integer statusIn = loanOrderDao.countUserOrderByStatusIn(userId, statuArray);
+            if (1 == statusIn) {
+                loanAfClient.sendAfEvent(AfEventField.AF_SECOND_PERSON, user.getGaId(), user.getAfId(), loanAppConfig.getConfig());
+            } else {
+                loanAfClient.sendAfEvent(AfEventField.AF_SECOND_ORDER, user.getGaId(), user.getAfId(), loanAppConfig.getConfig());
+            }
         }
 
         // 返回结果集
@@ -517,7 +548,7 @@ public class OrderServiceImpl extends BaseService implements OrderService {
         } else {
             // 手续费
             String incidentalAmountStr = new BigDecimal(detailResult.getApprovalAmount())
-                    .multiply(new BigDecimal(orderEntity.getProcessingFeeProportion()/100)).setScale(2,RoundingMode.HALF_UP).doubleValue() + "";
+                    .multiply(new BigDecimal(orderEntity.getProcessingFeeProportion() / 100)).setScale(2, RoundingMode.HALF_UP).doubleValue() + "";
             detailResult.setIncidentalAmount(incidentalAmountStr);
         }
 
@@ -581,7 +612,7 @@ public class OrderServiceImpl extends BaseService implements OrderService {
         detailResult.setActualRepaymentAmount(actualRepaymentAmount);
 
         // 剩余还款金额
-        Double remainingRepaymentAmount = new BigDecimal(estimatedRepaymentAmount).subtract(new BigDecimal(actualRepaymentAmount)).setScale(2,RoundingMode.HALF_UP).doubleValue();
+        Double remainingRepaymentAmount = new BigDecimal(estimatedRepaymentAmount).subtract(new BigDecimal(actualRepaymentAmount)).setScale(2, RoundingMode.HALF_UP).doubleValue();
         detailResult.setRemainingRepaymentAmount(remainingRepaymentAmount);
 
         // 已还款成功记录
@@ -789,7 +820,8 @@ public class OrderServiceImpl extends BaseService implements OrderService {
         Result<ConfirmMergePushApplyResult> result = new Result<>();
 
         // 拼接请求路径
-        String url = platformConfig.getPlatformDomain() + PlatformUrl.PLATFORM_CONFIRM_MERGE_PUSH_APPLY;
+        //String url = platformConfig.getPlatformDomain() + PlatformUrl.PLATFORM_CONFIRM_MERGE_PUSH_APPLY;
+        String url = "";
 
         // 封装请求参数
         JSONObject requestParam = new JSONObject();
@@ -831,11 +863,12 @@ public class OrderServiceImpl extends BaseService implements OrderService {
 
     /**
      * 催收减免
+     *
      * @param reductionParams 减免金额相关
      * @return
      */
     @Override
-    public Result<Object> reduction(CollectionReductionParams reductionParams){
+    public Result<Object> reduction(CollectionReductionParams reductionParams) {
         // 结果集
         Result result = new Result();
 
@@ -865,7 +898,7 @@ public class OrderServiceImpl extends BaseService implements OrderService {
         // 判断减免金额大小, 催收减免金额不能大于 贷超后台减免金额
         Double reductionAmount = loanOrderBillDao.sumReductionAmount(reductionParams.getOrderNo());
         BigDecimal subOverdueAmount = reductionParams.getSubOverdueAmount();
-        if (new BigDecimal(reductionAmount).compareTo(subOverdueAmount) == 1 ) {
+        if (new BigDecimal(reductionAmount).compareTo(subOverdueAmount) == 1) {
             result.setReturnCode(ResultEnum.REDUCTION_AMOUNT_MORE_ERROR.code());
             result.setMessage(ResultEnum.REDUCTION_AMOUNT_MORE_ERROR.message());
             return result;
@@ -896,7 +929,7 @@ public class OrderServiceImpl extends BaseService implements OrderService {
     /**
      * 计算用户客群
      *
-     * @param userId 用户id
+     * @param userId    用户id
      * @param productId 产品id
      * @return 用户客群
      */
@@ -922,7 +955,7 @@ public class OrderServiceImpl extends BaseService implements OrderService {
      * 获取给定JSON字符串的指定key的最小值
      *
      * @param jsonRange JSON字符串
-     * @param key 指定key
+     * @param key       指定key
      * @return 最小的值
      */
     private String getMinAmountRange(String jsonRange, String key) {
@@ -937,7 +970,7 @@ public class OrderServiceImpl extends BaseService implements OrderService {
      * 获取给定JSON字符串的指定key的值
      *
      * @param jsonRange JSON字符串
-     * @param key 指定key
+     * @param key       指定key
      * @return 最小的值
      */
     private String getAmountRange(String jsonRange, String key) {

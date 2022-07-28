@@ -1,6 +1,7 @@
 package com.epoch.loan.workshop.account.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.epoch.loan.workshop.common.af.LoanAfClient;
 import com.epoch.loan.workshop.common.authentication.TokenManager;
 import com.epoch.loan.workshop.common.config.PlatformConfig;
 import com.epoch.loan.workshop.common.config.RiskConfig;
@@ -136,6 +137,17 @@ public class BaseService {
     @Autowired
     public LoanAppControlDao loanAppControlDao;
 
+    /**
+     * app相关配置
+     */
+    @Autowired
+    LoanAppConfigDao loanAppConfigDao;
+
+    /**
+     * af请求
+     */
+    @Autowired
+    LoanAfClient loanAfClient;
 
     /**
      * 发送队列
