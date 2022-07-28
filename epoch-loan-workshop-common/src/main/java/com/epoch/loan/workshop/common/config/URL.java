@@ -34,6 +34,16 @@ public class URL {
     public static final String REPAYMENT = API + "/repayment";
 
     /**
+     * APP信息
+     */
+    public static final String APP = API + "/app";
+
+    /**
+     * APP信息
+     */
+    public static final String APP_KEYS = "/keys";
+
+    /**
      * 订单
      */
     public static final String ORDER = API + "/order";

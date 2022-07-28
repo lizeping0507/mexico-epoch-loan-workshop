@@ -2,6 +2,7 @@ package com.epoch.loan.workshop.api.controller;
 
 import com.epoch.loan.workshop.common.service.*;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author : Duke
@@ -16,6 +17,12 @@ public class BaseController {
      */
     @DubboReference(check = false)
     public DynamicRequestService dynamicRequestService;
+
+    /**
+     * App相关业务
+     */
+    @Autowired
+    public AppService appService;
     /**
      * 支付回调
      */

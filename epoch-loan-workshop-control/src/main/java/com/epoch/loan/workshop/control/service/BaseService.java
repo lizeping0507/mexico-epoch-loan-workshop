@@ -26,6 +26,11 @@ public class BaseService {
      */
     @Autowired
     public ZookeeperClient zookeeperClient;
+    /**
+     * 动态接口配置
+     */
+    @Autowired
+    public LoanAppKeysDao loanAppKeysDao;
 
     /**
      * 短信
