@@ -32,6 +32,10 @@ public class LoanAppKeysEntity {
      */
     private String riskPrivateKey;
     /**
+     * 风控签名私钥
+     */
+    private String riskAppId;
+    /**
      * 风控SDK签名密钥
      */
     private String riskSecretKey;
