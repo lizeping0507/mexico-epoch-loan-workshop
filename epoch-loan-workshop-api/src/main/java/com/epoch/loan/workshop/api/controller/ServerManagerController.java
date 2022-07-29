@@ -34,7 +34,6 @@ public class ServerManagerController extends BaseController {
         List<LoanDynamicRequestEntity> dynamicRequests = dynamicRequestService.findAll();
         for (LoanDynamicRequestEntity dynamicRequest : dynamicRequests) {
             DynamicRequest.URL_MAPPING_CACHE.put(dynamicRequest.getMappingUrl(), dynamicRequest.getUrl());
-            LogUtil.sysInfo("/fresh/mappingCache: {}", dynamicRequest.getMappingUrl());
             try {
                 DynamicRequest.REQUEST_MAPPING_MAPPING_CACHE.put(
                         dynamicRequest.getMappingUrl(),
