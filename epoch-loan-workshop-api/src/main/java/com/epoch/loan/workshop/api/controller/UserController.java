@@ -226,6 +226,7 @@ public class UserController extends BaseController {
      */
     @PostMapping(URL.FORGOT_PWD)
     public Result<ChangePasswordResult> forgotPwd(ForgotPwdParams forgotPwdParams) {
+        LogUtil.sysInfo("忘记密码 : {}", JSONObject.toJSONString(forgotPwdParams));
         // 结果集
         Result<ChangePasswordResult> result = new Result<>();
 
