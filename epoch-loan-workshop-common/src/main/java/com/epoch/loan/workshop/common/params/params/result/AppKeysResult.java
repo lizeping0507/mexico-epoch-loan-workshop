@@ -28,6 +28,10 @@ public class AppKeysResult implements Serializable {
     /**
      * 风控签名私钥
      */
+    private String riskAppId;
+    /**
+     * 风控签名私钥
+     */
     private String riskPrivateKey;
     /**
      * 风控SDK签名密钥
