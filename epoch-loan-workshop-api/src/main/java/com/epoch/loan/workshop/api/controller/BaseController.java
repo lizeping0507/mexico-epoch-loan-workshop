@@ -15,68 +15,68 @@ public class BaseController {
     /**
      * 支付回调
      */
-    @DubboReference(check = false)
+    @DubboReference(check = false,cluster = "failfast", retries = 0)
     public DynamicRequestService dynamicRequestService;
 
     /**
      * App相关业务
      */
-    @DubboReference
+    @DubboReference(check = false,cluster = "failfast", retries = 0)
     public AppService appService;
     /**
      * 支付回调
      */
-    @DubboReference(check = false)
+    @DubboReference(check = false,cluster = "failfast", retries = 0)
     public PaymentCallbackService paymentCallbackService;
     /**
      * 放款
      */
-    @DubboReference(check = false)
+    @DubboReference(check = false,cluster = "failfast", retries = 0)
     public RepaymentService repaymentService;
     /**
      * 用户
      */
-    @DubboReference(check = false)
+    @DubboReference(check = false,cluster = "failfast", retries = 0)
     public UserService userService;
     /**
      * 产品
      */
-    @DubboReference(check = false)
+    @DubboReference(check = false,cluster = "failfast", retries = 0)
     public ProductService productService;
     /**
      * 手机短信
      */
-    @DubboReference(check = false)
+    @DubboReference(check = false,cluster = "failfast", retries = 0)
     public ShortMessageService shortMessageService;
     /**
      * 合同
      */
-    @DubboReference(check = false)
+    @DubboReference(check = false,cluster = "failfast", retries = 0)
     public OrderService orderService;
     /**
      * OCR
      */
-    @DubboReference(check = false)
+    @DubboReference(check = false,cluster = "failfast", retries = 0)
     public OcrService ocrService;
     /**
      * 放款账户
      */
-    @DubboReference(check = false)
+    @DubboReference(check = false,cluster = "failfast", retries = 0)
     public RemittanceService remittanceService;
     /**
      * SDK
      */
-    @DubboReference(check = false)
+    @DubboReference(check = false,cluster = "failfast", retries = 0)
     public SdkService sdkService;
     /**
      * 静态资源
      */
-    @DubboReference(check = false)
+    @DubboReference(check = false,cluster = "failfast", retries = 0)
     StaticResourcesService staticResourcesService;
 
     /**
      * af 回调
      */
-    @DubboReference(check = false)
+    @DubboReference(check = false,cluster = "failfast", retries = 0)
     AfCallBackService afCallBackService;
 }
