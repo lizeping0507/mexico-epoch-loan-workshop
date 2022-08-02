@@ -81,6 +81,7 @@ public class RbplSMSChannel implements SMSChannel {
 
         // 发送请求
         String result = HttpUtils.POST(url, JSONObject.toJSONString(params));
+        LogUtil.sysInfo("RBPL聚道发送短信结果 : {}", result);
 
         // 封装结果就
         situation.setRequest(JSONObject.toJSONString(params));
