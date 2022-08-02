@@ -87,6 +87,10 @@ public class AuthenticationAspect {
             HttpServletRequest request = Objects.requireNonNull(attributes).getRequest();
 
             // Token
+            String requestURI = request.getRequestURI();
+            LogUtil.sysInfo("getRequestURI : {}", requestURI);
+            StringBuffer requestURL = request.getRequestURL();
+            LogUtil.sysInfo("requestURL : {}", requestURL.toString());
             String token = request.getHeader(Field.TOKEN);
             LogUtil.sysInfo("token : {}", token);
             if (StringUtils.isEmpty(token)) {
