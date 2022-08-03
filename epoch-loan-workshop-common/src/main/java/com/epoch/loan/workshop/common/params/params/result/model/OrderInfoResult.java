@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * @author : Shangkunfeng
@@ -50,24 +49,24 @@ public class OrderInfoResult implements Serializable {
      * 订单创建时间
      */
     @JsonFormat(pattern = "d-M-yyyy",timezone = "America/Mexico_City")
-    private Date applyTime;
+    private String applyTime;
 
     /**
      * 审核通过时间
      */
-    private Date examinePassTime;
+    private String examinePassTime;
 
     /**
      * 放款时间
      */
     @JsonFormat(pattern = "d-M-yyyy",timezone = "America/Mexico_City")
-    private Date loanTime;
+    private String loanTime;
 
     /**
      * 到期时间
      */
     @JsonFormat(pattern = "d-M-yyyy",timezone = "America/Mexico_City")
-    private Date repaymentTime;
+    private String repaymentTime;
 
     /**
      * 按钮文案 pagado-还款 rechazado-被拒 vencido-逾期 completar

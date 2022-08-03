@@ -35,13 +35,13 @@ public class LoanRepaymentRecordResult implements Serializable {
      * 还款时间
      */
     @JsonFormat(pattern = "d-M-yyyy",timezone = "America/Mexico_City")
-    private Date successDay;
+    private String successDay;
 
     /**
      * 还款时间
      */
     @JsonFormat(pattern = "HH:mm:ss",timezone = "America/Mexico_City")
-    private Date successTime;
+    private String successTime;
 
     /**
      * 还款方式  0:银行卡 1.clabe

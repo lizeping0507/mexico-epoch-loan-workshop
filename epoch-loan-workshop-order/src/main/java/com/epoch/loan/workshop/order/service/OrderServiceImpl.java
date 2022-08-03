@@ -244,12 +244,12 @@ public class OrderServiceImpl extends BaseService implements OrderService {
             orderInfoResult.setOrderStatusStr(OrderUtils.button(loanOrderEntity.getStatus()));
 
             // 申请时间--- 取订单创建时间
-            orderInfoResult.setApplyTime(loanOrderEntity.getCreateTime());
+            orderInfoResult.setApplyTime(DateUtil.DateToString(loanOrderEntity.getCreateTime(),"d-M-yyyy"));
 
             // 未还款订单添加 预计还款时间、剩余应还金额
             if (loanOrderEntity.getStatus() >= OrderStatus.WAY && loanOrderEntity.getStatus() != OrderStatus.ABANDONED) {
                 LoanOrderBillEntity lastOrderBill = loanOrderBillDao.findLastOrderBill(loanOrderEntity.getId());
-                orderInfoResult.setRepaymentTime(lastOrderBill.getRepaymentTime());
+                orderInfoResult.setRepaymentTime(DateUtil.DateToString(lastOrderBill.getRepaymentTime(),"d-M-yyyy"));
 
                 // 添加账单id
                 orderInfoResult.setOrderBillId(lastOrderBill.getId());
@@ -353,7 +353,7 @@ public class OrderServiceImpl extends BaseService implements OrderService {
             orderInfoResult.setOrderStatusStr(OrderUtils.button(loanOrderEntity.getStatus()));
 
             // 申请时间--- 取订单创建时间
-            orderInfoResult.setApplyTime(loanOrderEntity.getCreateTime());
+            orderInfoResult.setApplyTime(DateUtil.DateToString(loanOrderEntity.getCreateTime(),"d-M-yyyy"));
 
             // 添加产品名称 和 产品图片
             LoanProductEntity product = loanProductDao.findProduct(loanOrderEntity.getProductId());
@@ -415,11 +415,11 @@ public class OrderServiceImpl extends BaseService implements OrderService {
             orderInfoResult.setOrderStatusStr(OrderUtils.button(loanOrderEntity.getStatus()));
 
             // 申请时间--- 取订单创建时间
-            orderInfoResult.setApplyTime(loanOrderEntity.getCreateTime());
+            orderInfoResult.setApplyTime(DateUtil.DateToString(loanOrderEntity.getCreateTime(),"d-M-yyyy"));
 
             // 应还款时间
             LoanOrderBillEntity lastOrderBill = loanOrderBillDao.findLastOrderBill(loanOrderEntity.getId());
-            orderInfoResult.setRepaymentTime(lastOrderBill.getRepaymentTime());
+            orderInfoResult.setRepaymentTime(DateUtil.DateToString(lastOrderBill.getRepaymentTime(),"d-M-yyyy"));
 
             // 添加账单id
             orderInfoResult.setOrderBillId(lastOrderBill.getId());
@@ -561,19 +561,19 @@ public class OrderServiceImpl extends BaseService implements OrderService {
 
         // 申请时间
         if (ObjectUtils.isNotEmpty(orderEntity.getApplyTime())) {
-            detailResult.setApplyTime(orderEntity.getApplyTime());
+            detailResult.setApplyTime(DateUtil.DateToString(orderEntity.getApplyTime(),"d-M-yyyy"));
         } else {
-            detailResult.setApplyTime(new Date());
+            detailResult.setApplyTime(DateUtil.DateToString(new Date(),"d-M-yyyy"));
         }
 
         // 预计还款时间
         if (ObjectUtils.isNotEmpty(lastOrderBill) &&
                 ObjectUtils.isNotEmpty(lastOrderBill.getRepaymentTime())) {
-            detailResult.setExpectedRepaymentTime(lastOrderBill.getRepaymentTime());
+            detailResult.setExpectedRepaymentTime(DateUtil.DateToString(lastOrderBill.getRepaymentTime(),"d-M-yyyy"));
         } else {
             Date repaymentTimeStr = DateUtil.addDay(new Date(), 6 * orderEntity.getStages());
             Date repaymentTime = DateUtil.StringToDate(DateUtil.DateToString(repaymentTimeStr, "yyyy-MM-dd") + " 23:59:59", "yyyy-MM-dd HH:mm:ss");
-            detailResult.setExpectedRepaymentTime(repaymentTime);
+            detailResult.setExpectedRepaymentTime(DateUtil.DateToString(repaymentTime,"d-M-yyyy"));
         }
 
         // 添加银行卡信息
@@ -603,7 +603,7 @@ public class OrderServiceImpl extends BaseService implements OrderService {
             result.setData(detailResult);
             return result;
         }
-        detailResult.setLoanTime(orderEntity.getLoanTime());
+        detailResult.setLoanTime(DateUtil.DateToString(orderEntity.getLoanTime(),"d-M-yyyy"));
 
         // 总罚息
         Double punishmentAmount = loanOrderBillDao.sumOrderPunishmentAmount(orderEntity.getId());
@@ -636,8 +636,8 @@ public class OrderServiceImpl extends BaseService implements OrderService {
             BigDecimal totalAmount = new BigDecimal(paymentRecord.getActualAmount()).add(new BigDecimal(charge)).setScale(2, RoundingMode.HALF_DOWN);
             recordDTO.setTotalAmount(totalAmount.doubleValue());
             recordDTO.setRepaymentAmount(paymentRecord.getActualAmount());
-            recordDTO.setSuccessTime(paymentRecord.getUpdateTime());
-            recordDTO.setSuccessDay(paymentRecord.getUpdateTime());
+            recordDTO.setSuccessTime(DateUtil.DateToString(paymentRecord.getUpdateTime(),"HH:mm:ss"));
+            recordDTO.setSuccessDay(DateUtil.DateToString(paymentRecord.getUpdateTime(),"d-M-yyyy"));
             recordDTO.setRepayWay(paymentRecord.getType());
             recordDTOList.add(recordDTO);
         });
@@ -647,7 +647,7 @@ public class OrderServiceImpl extends BaseService implements OrderService {
 
         // 已还款
         if (orderEntity.getStatus() == OrderStatus.COMPLETE || orderEntity.getStatus() == OrderStatus.DUE_COMPLETE) {
-            detailResult.setActualRepaymentTime(lastOrderBill.getActualRepaymentTime());
+            detailResult.setActualRepaymentTime(DateUtil.DateToString(lastOrderBill.getActualRepaymentTime(),"d-M-yyyy"));
         }
 
         // 封装结果
@@ -728,19 +728,19 @@ public class OrderServiceImpl extends BaseService implements OrderService {
 
         // 申请时间
         if (ObjectUtils.isNotEmpty(orderEntity.getApplyTime())) {
-            detailResult.setApplyTime(orderEntity.getApplyTime());
+            detailResult.setApplyTime(DateUtil.DateToString(orderEntity.getApplyTime(),"d-M-yyyy"));
         } else {
-            detailResult.setApplyTime(new Date());
+            detailResult.setApplyTime(DateUtil.DateToString(new Date(),"d-M-yyyy"));
         }
 
         // 预计还款时间
         if (ObjectUtils.isNotEmpty(lastOrderBill) &&
                 ObjectUtils.isNotEmpty(lastOrderBill.getRepaymentTime())) {
-            detailResult.setExpectedRepaymentTime(lastOrderBill.getRepaymentTime());
+            detailResult.setExpectedRepaymentTime(DateUtil.DateToString(lastOrderBill.getRepaymentTime(),"d-M-yyyy"));
         } else {
             Date repaymentTimeStr = DateUtil.addDay(new Date(), 6 * orderEntity.getStages());
             Date repaymentTime = DateUtil.StringToDate(DateUtil.DateToString(repaymentTimeStr, "yyyy-MM-dd") + " 23:59:59", "yyyy-MM-dd HH:mm:ss");
-            detailResult.setExpectedRepaymentTime(repaymentTime);
+            detailResult.setExpectedRepaymentTime(DateUtil.DateToString(repaymentTime,"d-M-yyyy"));
         }
 
         // 添加银行卡信息
@@ -766,7 +766,7 @@ public class OrderServiceImpl extends BaseService implements OrderService {
             result.setData(detailResult);
             return result;
         }
-        detailResult.setLoanTime(orderEntity.getLoanTime());
+        detailResult.setLoanTime(DateUtil.DateToString(orderEntity.getLoanTime(),"d-M-yyyy"));
 
         // 总罚息
         Double punishmentAmount = loanOrderBillDao.sumOrderPunishmentAmount(orderEntity.getId());
@@ -794,8 +794,8 @@ public class OrderServiceImpl extends BaseService implements OrderService {
             // 手续费
             double charge = new BigDecimal(paymentRecord.getAmount()).subtract(new BigDecimal(paymentRecord.getActualAmount())).doubleValue();
             recordDTO.setCharge(charge);
-            recordDTO.setSuccessTime(paymentRecord.getUpdateTime());
-            recordDTO.setSuccessDay(paymentRecord.getUpdateTime());
+            recordDTO.setSuccessTime(DateUtil.DateToString(paymentRecord.getUpdateTime(),"HH:mm:ss"));
+            recordDTO.setSuccessDay(DateUtil.DateToString(paymentRecord.getUpdateTime(),"d-M-yyyy"));
             recordDTO.setRepayWay(paymentRecord.getType());
             recordDTOList.add(recordDTO);
         });
@@ -805,7 +805,7 @@ public class OrderServiceImpl extends BaseService implements OrderService {
 
         // 已还款
         if (orderEntity.getStatus() == OrderStatus.COMPLETE || orderEntity.getStatus() == OrderStatus.DUE_COMPLETE) {
-            detailResult.setActualRepaymentTime(lastOrderBill.getActualRepaymentTime());
+            detailResult.setActualRepaymentTime(DateUtil.DateToString(lastOrderBill.getActualRepaymentTime(),"d-M-yyyy"));
         }
 
         // 封装结果

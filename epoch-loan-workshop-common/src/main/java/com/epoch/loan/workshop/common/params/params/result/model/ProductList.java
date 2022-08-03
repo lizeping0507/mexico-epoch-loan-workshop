@@ -3,8 +3,6 @@ package com.epoch.loan.workshop.common.params.params.result.model;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.Date;
-import java.util.List;
 
 /**
  * @author : Shangkunfeng

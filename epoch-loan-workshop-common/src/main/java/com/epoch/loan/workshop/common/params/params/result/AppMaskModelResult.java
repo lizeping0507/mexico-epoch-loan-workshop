@@ -50,13 +50,13 @@ public class AppMaskModelResult implements Serializable {
      * 还款时间
      */
     @JsonFormat(pattern = "d-M-yyyy",timezone = "America/Mexico_City")
-    private Date repaymentTime;
+    private String repaymentTime;
 
     /**
      * 申请时间
      */
     @JsonFormat(pattern = "d-M-yyyy",timezone = "America/Mexico_City")
-    private Date applyTime;
+    private String applyTime;
 
     /**
      * 按钮文案
