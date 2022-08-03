@@ -195,7 +195,7 @@
         SELECT * FROM loan_order WHERE user_id = #{userId}
         <foreach collection="array" item="statu" index="index" open="AND status IN(" close=")" separator=",">#{statu}
         </foreach>
-        ORDER BY ${field} #{sequence}
+        ORDER BY ${field} ${sequence}
     </select>
     <select id="findUserLastOrderWithProduct"
             resultType="com.epoch.loan.workshop.common.entity.mysql.LoanOrderEntity">
