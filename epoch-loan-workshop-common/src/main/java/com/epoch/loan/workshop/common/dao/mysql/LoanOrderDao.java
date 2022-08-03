@@ -299,7 +299,7 @@ public interface LoanOrderDao {
      * @param sequence 正序-ASC 还是 倒序-DESC
      * @return
      */
-    List<LoanOrderEntity> findOrderListByUserIdAndStatusAndOrderByField(String userId, @Param("array") Integer[] status, String field, String sequence);
+    List<LoanOrderEntity> findOrderListByUserIdAndStatusAndOrderByField(@Param("userId") String userId, @Param("array") Integer[] status, @Param("field") String field, @Param("sequence") String sequence);
 
     /**
      * 查询用户在该产品最后一笔订单
