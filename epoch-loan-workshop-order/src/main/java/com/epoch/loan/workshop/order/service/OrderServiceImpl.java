@@ -231,6 +231,10 @@ public class OrderServiceImpl extends BaseService implements OrderService {
             return result;
         }
 
+        for (int i = 0; i < orderAllList.size(); i++) {
+            LogUtil.sysInfo("全部订单 查询：{}" , orderAllList.get(i).getProductId());
+        }
+
         // 转换响应参数
         orderAllList.forEach(loanOrderEntity -> {
             OrderInfoResult orderInfoResult = new OrderInfoResult();
@@ -293,9 +297,9 @@ public class OrderServiceImpl extends BaseService implements OrderService {
                 orderInfoResult.setApprovalAmount(loanOrderEntity.getApprovalAmount() + "");
             }
             orderInfoList.add(orderInfoResult);
+            LogUtil.sysInfo("全部订单 添加：{}" , orderInfoResult.getProductId());
         });
         LogUtil.sysInfo("全部订单：{}" , JSONArray.toJSONString(orderInfoList));
-        LogUtil.sysInfo("全部订单 new Date：{}" , JSONArray.toJSONString(new Date()));
         result.setData(new OrderListResult(orderInfoList));
         return result;
     }
