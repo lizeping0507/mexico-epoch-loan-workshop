@@ -295,6 +295,7 @@ public class OrderServiceImpl extends BaseService implements OrderService {
             orderInfoList.add(orderInfoResult);
         });
         LogUtil.sysInfo("全部订单：{}" , JSONArray.toJSONString(orderInfoList));
+        LogUtil.sysInfo("全部订单 new Date：{}" , JSONArray.toJSONString(new Date()));
         result.setData(new OrderListResult(orderInfoList));
         return result;
     }
