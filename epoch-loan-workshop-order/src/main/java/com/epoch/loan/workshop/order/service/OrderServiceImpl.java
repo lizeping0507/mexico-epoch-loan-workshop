@@ -243,6 +243,11 @@ public class OrderServiceImpl extends BaseService implements OrderService {
             orderInfoResult.setOrderStatus(loanOrderEntity.getStatus());
             orderInfoResult.setOrderStatusStr(OrderUtils.button(loanOrderEntity.getStatus()));
 
+            // 放款时间
+            if (ObjectUtils.isNotEmpty(loanOrderEntity.getLoanTime())) {
+                orderInfoResult.setLoanTime(DateUtil.DateToString(loanOrderEntity.getLoanTime(),"d-M-yyyy"));
+            }
+
             // 申请时间--- 取订单创建时间
             orderInfoResult.setApplyTime(DateUtil.DateToString(loanOrderEntity.getCreateTime(),"d-M-yyyy"));
 
@@ -413,6 +418,11 @@ public class OrderServiceImpl extends BaseService implements OrderService {
             orderInfoResult.setOrderNo(loanOrderEntity.getId());
             orderInfoResult.setOrderStatus(loanOrderEntity.getStatus());
             orderInfoResult.setOrderStatusStr(OrderUtils.button(loanOrderEntity.getStatus()));
+
+            // 放款时间
+            if (ObjectUtils.isNotEmpty(loanOrderEntity.getLoanTime())) {
+                orderInfoResult.setLoanTime(DateUtil.DateToString(loanOrderEntity.getLoanTime(),"d-M-yyyy"));
+            }
 
             // 申请时间--- 取订单创建时间
             orderInfoResult.setApplyTime(DateUtil.DateToString(loanOrderEntity.getCreateTime(),"d-M-yyyy"));
