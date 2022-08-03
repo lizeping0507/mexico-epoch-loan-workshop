@@ -1,5 +1,6 @@
 package com.epoch.loan.workshop.order.service;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.epoch.loan.workshop.common.constant.*;
 import com.epoch.loan.workshop.common.entity.mysql.*;
@@ -293,6 +294,7 @@ public class OrderServiceImpl extends BaseService implements OrderService {
             }
             orderInfoList.add(orderInfoResult);
         });
+        LogUtil.sysInfo("全部订单：{}" , JSONArray.toJSONString(orderInfoList));
         result.setData(new OrderListResult(orderInfoList));
         return result;
     }
